@@ -365,9 +365,12 @@ GROUP BY e.vendor ORDER BY coalesce(sum(e.annual_value), 0) DESC, e.vendor
 def _vendor_rows(vendor: str | None = None) -> list[dict]:
     rows = q(VENDOR_SQL.format(where="AND e.vendor = :v" if vendor else ""), **({"v": vendor} if vendor else {}))
     today = dt.date.today()
+    scores = {r["vendor"]: r for r in q("SELECT vendor, score, tier FROM vendor_scores")}
     for v in rows:
         v["flags"] = _vendor_flags(v)
-        v["risk"] = v["flags"][0]["severity"] if v["flags"] else "low"
+        sc = scores.get(v["vendor"])       # the scorecard tier (all five components) is the vendor's risk level
+        v["risk"] = sc["tier"] if sc else (v["flags"][0]["severity"] if v["flags"] else "low")
+        v["risk_score"] = float(sc["score"]) if sc else None
         v["next_expiry_days"] = (v["next_expiry"] - today).days if v["next_expiry"] else None
     return rows
 

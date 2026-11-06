@@ -44,11 +44,13 @@ def kind_of(col: str, values: list) -> str:
     c = col.lower()
     if c.endswith("_date") or c.endswith("deadline") or c.endswith("expiry") or c.startswith("earliest_") and "notice" in c:
         return "date"
-    if re.search(r"value|spend|fee|usd|cover", c) and "days" not in c and vals and all(isinstance(v, (int, float)) for v in vals):
+    if (re.search(r"value|spend|fee|usd|cover|billed|amount|planned|expected|invoiced|credit|paid", c)
+            and not re.search(r"days|hours|pct|score|compliance|concentration|exposure|performance|count|invoices$|tier", c)
+            and vals and all(isinstance(v, (int, float)) for v in vals)):
         return "money"
     if c == "severity":
         return "severity"
-    if c == "score":
+    if c == "score" and vals and all(isinstance(v, (int, float)) and 0 <= v <= 1 for v in vals):
         return "score"
     if vals and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in vals):
         return "number"
@@ -65,6 +67,8 @@ def table_from_sql(out: dict, title: str | None = None, max_rows: int = 200) -> 
         m = mm.get(cols[i])
         kind = "money" if m and m.get("unit") == "USD" else kind_of(cols[i], [r[i] for r in out["rows"]])
         label = (m["name"] + (f" ({m['unit']})" if m.get("unit") and m["unit"] != "USD" else "")) if m else label_of(cols[i])
+        if cols[i] == "score" and kind != "score":
+            label = "Risk score" if any(c in cols for c in ("tier", "contract_risk")) else "Score"
         columns.append({"key": cols[i], "label": label, "kind": kind})
     rows = []
     for r in out["rows"][:max_rows]:

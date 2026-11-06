@@ -113,7 +113,7 @@ def test_vendors_list_profile_and_risk(client):
     assert len(v) == 9
     acc, dl = v[ACC], v["Delmont Consulting LLP"]
     assert (acc["documents"], acc["contracts"]) == (8, 7) and acc["annual_value"] == 18_700_000 and acc["work_order_value"] == 1_950_000
-    assert dl["risk"] == "critical" and any(f["key"] == "uncapped" for f in dl["flags"])
+    assert dl["risk"] in ("high", "critical") and dl["risk_score"] > 30 and any(f["key"] == "uncapped" for f in dl["flags"])
     assert any(f["key"] == "pd_no_dpa" for f in v["PulseHR Inc"]["flags"])
     assert any(f["key"] == "notice_passed" for f in v["AdSpark Analytics LLP"]["flags"])
     p = client.get(f"/api/vendors/{ACC}").json()
