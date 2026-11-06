@@ -67,9 +67,9 @@ export function Layout() {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-2">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2">
           <span className="text-lg font-bold tracking-tight">Contract<span className="text-indigo-600">IQ</span></span>
-          <nav className="flex gap-1">
+          <nav className="flex flex-wrap gap-1">
             {NAV.map(([to, label]) => (
               <NavLink key={to} to={to} end={to === "/"}
                 className={({ isActive }) => `rounded px-3 py-1.5 text-sm font-medium ${isActive ? "bg-indigo-600 text-white" : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"}`}>
@@ -77,7 +77,7 @@ export function Layout() {
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-4 text-sm">
+          <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             <label className="flex cursor-pointer items-center gap-2" title="Use cached AI results where available, so the demo is fast and works offline">
               <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Demo mode
             </label>
