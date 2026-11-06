@@ -18,7 +18,7 @@ Dates in the documents are relative to the seed run, so **re-run `make seed` on 
 |---|---|---|
 | Extraction | Claude, forced tool call + JSON schema, confidence + source clause | regex extractor over the same text |
 | Redline / deviations | Claude judges each changed clause vs playbook | word diff + pattern library |
-| Ask | Claude tool-use loop (`run_sql`, `search_clauses`, `get_contract`) | scripted plans for the 15 demo questions only |
+| Ask | Claude tool-use loop (`run_sql`, `search_clauses`, `get_contract`); aggregate questions answered headline → breakdown → list | scripted plans for the demo questions, plus an offline planner for counts / totals / group-by over time windows and filters (`ask_nl.py`) |
 | Embeddings | `sentence-transformers` if installed (`pip install -e ".[local-embeddings]"`) else hashed bag-of-words | hashed bag-of-words |
 
 LLM results are cached on disk (`data/.cache/llm`) so re-seeding is free. **Demo mode** (header toggle) answers
@@ -32,7 +32,8 @@ run `make seed` + `make eval` with a key to measure the real thing.
    ₹ value at stake per bucket; 3 uncapped-liability contracts; PulseHR processes personal data with no DPA.
 3. **Contract detail (1m)** — open *MSA – Bluepeak*: click "Payment terms" → source clause highlights on page 2, confidence badge.
    *Effective terms* shows payment 45→**30**, liability 1×→**2×**, expiry extended — each "Overridden by Amendment No. 1". Hierarchy shows MSA → 3 SOWs → amendment → NDA.
-4. **Ask (2m)** — (a) "Which vendors have uncapped liability?" → expand *How I got this* to show the SQL and rows.
+4. **Ask (2m)** — start with an aggregate question: "How many contracts are expiring in the next quarter?" (headline tiles → by category → list).
+   Then (a) "Which vendors have uncapped liability?" → expand *How I got this* to show the SQL and rows.
    (b) "Which contracts give the vendor ownership of the deliverables we pay for?" → cited clause + page.
    (c) "Which auto-renewing contracts have uncapped liability, and what does their liability clause say?" → SQL + clause search.
 5. **Redline (1.5m)** — *Draft MSA – Zenith*: 5 deviations (unlimited liability critical, one-way indemnity, no termination for

@@ -245,14 +245,20 @@ def answer(question: str, demo_mode: bool = False) -> dict:
     if llm.available():
         res, source = ask_llm(question), "llm"
     else:
-        from app import ask_scripted
+        from app import ask_nl, ask_scripted
 
         res = ask_scripted.answer(question)
-        source = "scripted" if res else "none"
+        source = "scripted"
         if not res:
+            res, source = ask_nl.answer(question), "offline-planner"
+        if not res:
+            source = "none"
             res = {
-                "answer": "Live questions need ANTHROPIC_API_KEY. In offline mode only the 15 "
-                "preloaded demo questions are available.",
+                "answer": "I couldn't map that question without Claude. Offline I can answer the "
+                "preloaded demo questions plus counts, totals and lists of contracts by time "
+                "window (e.g. next quarter, next 60 days), type, category, vendor, owner, "
+                "auto-renewal, uncapped liability or DPA status. Set ANTHROPIC_API_KEY for "
+                "free-form questions.",
                 "tool_calls": [],
             }
     res["citations"] = citations(res["tool_calls"])

@@ -11,19 +11,24 @@ from app import ask
 PASS_MARK = 15
 
 
+def sql_outputs(calls):
+    return [c["output"] for c in calls if c["name"] == "run_sql" and "rows" in c["output"]]
+
+
 def values(calls, column):
-    sql = [c for c in calls if c["name"] == "run_sql" and "rows" in c["output"]]
-    if not sql:
-        return None
-    out = sql[-1]["output"]
-    if column not in out["columns"]:
-        return None
-    i = out["columns"].index(column)
-    return [r[i] for r in out["rows"]], out
+    """Values of `column` from the first run_sql result that has it."""
+    for out in sql_outputs(calls):
+        if column in out["columns"]:
+            i = out["columns"].index(column)
+            return [r[i] for r in out["rows"]], out
+    return None
 
 
 def check(q, res):
     spec, calls = q["check"], res["tool_calls"]
+    if spec["kind"] == "all":
+        results = [check({**q, "check": sub}, res) for sub in spec["checks"]]
+        return all(r[0] for r in results), " | ".join(r[1] for r in results if not r[0])
     want = getattr(gt, spec["expected"])()
     cited = {c["title"] for c in res["citations"]}
     kind = spec["kind"]
@@ -39,7 +44,11 @@ def check(q, res):
             f"got {got} want {want}",
         )
     if kind == "dict":
-        sql = [c for c in calls if c["name"] == "run_sql" and "rows" in c["output"]][-1]["output"]
+        sql = next(
+            o
+            for o in sql_outputs(calls)
+            if spec["key"] in o["columns"] and spec["value"] in o["columns"]
+        )
         ki, vi = sql["columns"].index(spec["key"]), sql["columns"].index(spec["value"])
         got = {r[ki]: float(r[vi] or 0) for r in sql["rows"]}
         want = {k: v for k, v in want.items() if v}

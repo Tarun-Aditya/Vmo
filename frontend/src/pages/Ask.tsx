@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { api, useSetting } from "../lib";
+import { api, inr, useSetting } from "../lib";
 import { Card } from "../ui";
 
 type Call = { name: string; input: Record<string, unknown>; output: { columns?: string[]; rows?: unknown[][]; row_count?: number; error?: string; hits?: { title: string; heading: string; page: number; score: number }[] } };
@@ -19,6 +19,27 @@ function SqlBlock({ call }: { call: Call }) {
           <tbody>{o.rows!.map((r, i) => <tr key={i} className="border-t border-slate-100 dark:border-slate-700">{r.map((v, j) => <td key={j} className="px-2 py-1 tabular-nums">{v === null ? "—" : String(v)}</td>)}</tr>)}</tbody>
         </table><p className="mt-1 text-[11px] text-slate-500">{o.row_count} row(s)</p></div>
       )}
+    </div>
+  );
+}
+
+/** Headline numbers: the first single-row, numeric SQL result (e.g. COUNT / SUM) becomes tiles. */
+function Tiles({ calls }: { calls: Call[] }) {
+  const c = calls.find((x) => x.name === "run_sql" && x.output.rows?.length === 1 && x.output.columns!.length <= 4
+    && x.output.rows[0].every((v) => typeof v === "number" || v === null));
+  if (!c) return null;
+  const cols = c.output.columns!, row = c.output.rows![0];
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {cols.map((col, i) => {
+        const money = /value|spend/.test(col);
+        return (
+          <div key={col} className="rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/50">
+            <div className="text-xs font-semibold uppercase tracking-wide text-indigo-700 dark:text-indigo-300">{col.replace(/_/g, " ")}</div>
+            <div className="mt-1 text-3xl font-semibold tabular-nums">{money ? inr(row[i] as number) : String(row[i] ?? "—")}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -45,7 +66,7 @@ export default function Ask() {
       {r && (
         <>
           <Card title="Answer" right={<span className="text-xs text-slate-500">{r.source === "cache" ? `cached (${r.cached_from})` : r.source} · {r.elapsed_ms} ms</span>}>
-            <p className="text-lg leading-relaxed">{r.answer}</p>
+            <div className="space-y-4"><Tiles calls={r.tool_calls} /><p className="whitespace-pre-line text-base leading-relaxed">{r.answer}</p></div>
           </Card>
           <Card title="How I got this" right={<button className="text-xs text-indigo-600" onClick={() => setOpen(!open)}>{open ? "Hide" : "Show"}</button>}>
             {open && (

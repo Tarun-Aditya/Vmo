@@ -253,7 +253,7 @@ def match(question: str) -> str | None:
         j = len(q & tt) / len(q | tt)
         if j > score:
             best, score = k, j
-    return best if score >= 0.6 else None
+    return best if score >= 0.85 else None  # near-exact only; paraphrases go to the planner
 
 
 def answer(question: str) -> dict | None:

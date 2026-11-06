@@ -148,3 +148,57 @@ def uncapped_autorenew():
         for c in load()[1].values()
         if c["liability_cap_text"] == "Unlimited" and c["auto_renew"]
     }
+
+
+def _quarter(off):
+    seed = load()[0]
+    m = 3 * ((seed.month - 1) // 3) + 1 + 3 * off
+    y, m = seed.year + (m - 1) // 12, (m - 1) % 12 + 1
+    a = date(y, m, 1)
+    b = date(y + (m + 2) // 12, (m + 2) % 12 + 1, 1)
+    return a, b  # [a, b)
+
+
+def next_quarter_titles():
+    _, eff, _ = load()
+    a, b = _quarter(1)
+    return {c["title"] for c in eff.values() if a <= _d(c["expiry_date"]) < b}
+
+
+def next_quarter_count():
+    return len(next_quarter_titles())
+
+
+def expire_90_by_category():
+    seed, eff, _ = load()
+    out = defaultdict(int)
+    for c in eff.values():
+        if 0 <= (_d(c["expiry_date"]) - seed).days <= 90:
+            out[c["category"]] += 1
+    return dict(out)
+
+
+def autorenew_count():
+    return len(auto_renewals())
+
+
+def autorenew_value():
+    return sum(c["annual_value"] or 0 for c in load()[1].values() if c["auto_renew"])
+
+
+def contracts_per_vendor():
+    out = defaultdict(int)
+    for c in load()[1].values():
+        out[c["vendor"]] += 1
+    return dict(out)
+
+
+def saas_total():
+    return sum(c["annual_value"] or 0 for c in load()[1].values() if c["type"] == "SaaS")
+
+
+def nda_this_year_count():
+    seed, eff, _ = load()
+    return sum(
+        1 for c in eff.values() if c["type"] == "NDA" and _d(c["expiry_date"]).year == seed.year
+    )

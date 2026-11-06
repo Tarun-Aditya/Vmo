@@ -30,3 +30,13 @@
    check: {kind: set_and_cited, column: title, expected: non_indian_law}}
 - {id: uncapped_autorenew, question: "Which auto-renewing contracts have uncapped liability, and what does their liability clause say?", type: mixed,
    check: {kind: set_and_cited, column: title, expected: uncapped_autorenew}}
+- {id: next_quarter, question: "How many contracts are expiring in the next quarter?", type: sql,
+   check: {kind: all, checks: [{kind: number, column: contracts, expected: next_quarter_count}, {kind: set, column: title, expected: next_quarter_titles}]}}
+- {id: expire_90_by_category, question: "How many contracts expire in the next 90 days, by category?", type: sql,
+   check: {kind: dict, key: category, value: contracts, expected: expire_90_by_category}}
+- {id: autorenew_summary, question: "How many auto-renewing contracts do we have and what is their total annual value?", type: sql,
+   check: {kind: all, checks: [{kind: number, column: contracts, expected: autorenew_count}, {kind: number, column: total_annual_value, expected: autorenew_value}]}}
+- {id: per_vendor, question: "How many contracts does each vendor have?", type: sql,
+   check: {kind: dict, key: vendor, value: contracts, expected: contracts_per_vendor}}
+- {id: saas_total, question: "What is the total annual value of SaaS contracts?", type: sql,
+   check: {kind: number, column: total_annual_value, expected: saas_total}}
