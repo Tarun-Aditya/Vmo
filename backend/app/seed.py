@@ -38,7 +38,7 @@ OVERRIDABLE = {
     "termination_for_convenience",
     "governing_law",
 }
-DATE_FIELDS = {"effective_date", "expiry_date"}
+DATE_FIELDS = {"effective_date", "expiry_date", "customer_signed_date", "supplier_signed_date"}
 
 
 def _coerce(field: str, v):
@@ -114,6 +114,11 @@ def run(
                 governing_law=val.get("governing_law"),
                 processes_personal_data=bool(val.get("processes_personal_data")),
                 has_dpa=bool(val.get("has_dpa")),
+                customer_signatory=val.get("customer_signatory"),
+                customer_signed_date=val.get("customer_signed_date"),
+                supplier_signatory=val.get("supplier_signatory"),
+                supplier_signed_date=val.get("supplier_signed_date"),
+                fully_executed=bool(val.get("fully_executed")),
             )
             s.add(row)
             s.flush()

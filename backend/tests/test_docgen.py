@@ -22,11 +22,12 @@ def gen(tmp_path):
 
 def test_document_set_shape(tmp_path):
     labels, man = gen(tmp_path)
-    assert (len(man["templates"]), len(man["contracts"]), len(man["drafts"])) == (5, 18, 5)
+    assert (len(man["templates"]), len(man["contracts"]), len(man["drafts"])) == (6, 21, 5)
     types = [c["type"] for c in man["contracts"]]
     assert {t: types.count(t) for t in set(types)} == {
         "MSA": 2,
         "SOW": 5,
+        "Work Order": 3,
         "Amendment": 2,
         "SaaS": 4,
         "NDA": 3,
@@ -47,10 +48,12 @@ def test_planted_facts(tmp_path):
     ).days
     assert sum(d <= 30 for d in days.values()) == 4
     assert sum(30 < d <= 90 for d in days.values()) == 4
-    assert sum(d > 365 for d in days.values()) == 8
+    assert sum(d > 365 for d in days.values()) == 11  # 8 + 3 work orders
     assert sum(v["auto_renew"] for v in c.values()) == 5
     assert sum(v["liability_cap_text"] == "Unlimited" for v in c.values()) == 3
     assert sum(v["termination_for_convenience"] is False for v in c.values()) == 2
+    unsigned = [k for k, v in c.items() if v["fully_executed"] is False]
+    assert unsigned == ["bluepeak_wo2"]  # planted: supplier has not countersigned
     saas_pd_no_dpa = [k for k, v in c.items() if v["processes_personal_data"] and not v["has_dpa"]]
     assert saas_pd_no_dpa == ["pulsehr"]
     drafts = labels["drafts"]
@@ -71,5 +74,6 @@ def test_extraction_matches_labels(tmp_path):
 def test_page_markers_and_clause_split(tmp_path):
     gen(tmp_path)
     _, clauses = parse_document((tmp_path / "docs/contracts/pulsehr.md").read_text())
-    assert len(clauses) == 14 and clauses[0]["page"] == 1 and clauses[-1]["page"] == 5
+    assert len(clauses) == 15 and clauses[0]["page"] == 1 and clauses[-1]["page"] == 6
+    assert clauses[-1]["clause_type"] == "execution" and "Lakshmi Rao" in clauses[-1]["text"]
     assert all(c["clause_type"] != "other" for c in clauses)

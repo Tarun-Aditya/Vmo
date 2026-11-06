@@ -202,3 +202,30 @@ def nda_this_year_count():
     return sum(
         1 for c in eff.values() if c["type"] == "NDA" and _d(c["expiry_date"]).year == seed.year
     )
+
+
+def all_documents():
+    return {c["title"] for c in load()[1].values()}
+
+
+def unsigned_titles():
+    return {c["title"] for c in load()[1].values() if c["fully_executed"] is False}
+
+
+def _clauses_of(c):
+    from app.docgen.library import TEMPLATES
+
+    return set(TEMPLATES[c["template"]]["clauses"])
+
+
+def no_audit_rights():
+    return {c["title"] for c in load()[1].values() if "audit_rights" not in _clauses_of(c)}
+
+
+def bluepeak_msa_clause_count():
+    c = next(c for c in load()[1].values() if c["type"] == "MSA" and "Bluepeak" in c["vendor"])
+    return len(_clauses_of(c))
+
+
+def work_orders():
+    return {c["title"] for c in load()[1].values() if c["type"] == "Work Order"}

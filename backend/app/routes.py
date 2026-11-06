@@ -13,7 +13,7 @@ from app import ask as ask_mod
 from app import deviations, llm
 from app.config import settings
 from app.db import SessionLocal
-from app.docgen.library import CLAUSES
+from app.docgen.library import CLAUSES, KEY_CLAUSES, TEMPLATES
 from app.parsing import parse_document
 
 router = APIRouter(prefix="/api")
@@ -78,14 +78,17 @@ def list_contracts(
     return q(
         f"""
       SELECT c.id, c.title, c.vendor, c.category, c.type, c.owner, c.status, c.parent_id,
+             c.effective_date,
              COALESCE(e.expiry_date, c.expiry_date) AS expiry_date,
              COALESCE(e.annual_value, c.annual_value) AS annual_value,
+             COALESCE(e.total_value, c.total_value) AS total_value,
+             c.fully_executed, c.customer_signatory, c.supplier_signatory,
              COALESCE(e.auto_renew, c.auto_renew) AS auto_renew,
              COALESCE(e.liability_uncapped, false) AS liability_uncapped,
              (SELECT count(*) FROM clause_deviations d WHERE d.contract_id = c.id) AS deviation_count
       FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
       {"WHERE " + " AND ".join(where) if where else ""}
-      ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Amendment' THEN 2 ELSE 3 END, c.title""",
+      ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 WHEN 'Amendment' THEN 3 ELSE 4 END, c.title""",
         **p,
     )
 
@@ -104,6 +107,9 @@ EFFECTIVE_FIELDS = [
 ]
 
 
+TREE_ORDER = {"SOW": 0, "Work Order": 1, "Amendment": 2, "NDA": 3, "DPA": 4}
+
+
 def _tree(root_id: int) -> dict:
     rows = q("SELECT id, title, type, parent_id, effective_date FROM contracts")
     kids: dict[int, list] = {}
@@ -115,7 +121,7 @@ def _tree(root_id: int) -> dict:
             **r,
             "children": [
                 build(c)
-                for c in sorted(kids.get(r["id"], []), key=lambda x: (x["type"] != "SOW", x["id"]))
+                for c in sorted(kids.get(r["id"], []), key=lambda x: (TREE_ORDER.get(x["type"], 9), x["id"]))
             ],
         }
 
@@ -168,7 +174,15 @@ def get_contract(cid: int):
     for d in devs:
         d["heading"] = CLAUSES[d["clause_type"]].heading
     devs.sort(key=lambda d: -SEV_RANK[d["severity"]])
+    sig = {
+        k: c[k]
+        for k in (
+            "customer_signatory", "customer_signed_date", "supplier_signatory",
+            "supplier_signed_date", "fully_executed",
+        )
+    }
     return {
+        "signatures": sig,
         "contract": {k: v for k, v in c.items()},
         "clauses": clauses,
         "fields": fields,
@@ -180,6 +194,100 @@ def get_contract(cid: int):
         "parent": (
             {"id": c["parent_id"], "title": titles.get(c["parent_id"])} if c["parent_id"] else None
         ),
+    }
+
+
+# ------------------------------------------------------------------ key clauses matrix
+SHORT = {
+    "termination_for_convenience": "Termination for convenience",
+    "termination_for_cause": "Termination for cause",
+    "execution": "Signed by both parties",
+}
+
+
+def _cell(ct, clause, expected, doc_name, tpl_name, signed=None, draft=False) -> dict:
+    heading = CLAUSES[ct].heading
+    if ct == "execution":
+        present = bool(signed) and not draft
+        if draft:
+            note = "Draft: not signed or executed."
+        elif present:
+            note = None
+        elif clause:
+            note = "Not fully signed. " + clause["text"]
+        else:
+            note = f"No signature block found in this {doc_name}."
+    else:
+        present = clause is not None
+        note = None
+        if not present:
+            note = f"No {heading} clause found in this document. " + (
+                f"The standard {tpl_name} template includes one, so this is a gap."
+                if expected
+                else f"It is not part of the standard {tpl_name} template."
+            )
+    return {
+        "present": present,
+        "expected": expected,
+        "heading": heading,
+        "page": clause["page"] if clause else None,
+        "text": clause["text"][:420] if clause else None,
+        "note": note,
+    }
+
+
+@router.get("/clause-matrix")
+def clause_matrix():
+    """Every document (rows) x key clause (columns): present or absent, with a citation."""
+    cols = [{"key": c, "label": SHORT.get(c, CLAUSES[c].heading)} for c in KEY_CLAUSES]
+    clause_idx = {
+        (c["contract_id"], c["clause_type"]): c
+        for c in q("SELECT contract_id, clause_type, heading, text, page FROM clauses")
+    }
+    rows = []
+    for c in q(
+        """SELECT c.id, c.title, c.vendor, c.type, c.fully_executed, t.type AS tpl, t.name AS tpl_name
+           FROM contracts c JOIN templates t ON t.id = c.template_id
+           WHERE c.type <> 'Amendment'
+           ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, c.title"""
+    ):
+        exp = set(TEMPLATES[c["tpl"]]["clauses"])
+        cells = {
+            ct: _cell(ct, clause_idx.get((c["id"], ct)), ct in exp, c["type"], c["tpl_name"], c["fully_executed"])
+            for ct in KEY_CLAUSES
+        }
+        rows.append({"id": c["id"], "title": c["title"], "vendor": c["vendor"], "type": c["type"],
+                     "kind": "contract", "cells": cells})
+    draft_rows = []
+    for d in q(
+        """SELECT d.id, d.title, d.vendor, d.body_md, t.type AS tpl, t.name AS tpl_name
+           FROM drafts d JOIN templates t ON t.id = d.template_id ORDER BY d.id"""
+    ):
+        _, cl = parse_document(d["body_md"])
+        idx = {c["clause_type"]: c for c in cl}
+        exp = set(TEMPLATES[d["tpl"]]["clauses"])
+        cells = {
+            ct: _cell(ct, idx.get(ct), ct in exp, "draft", d["tpl_name"], False, draft=True)
+            for ct in KEY_CLAUSES
+        }
+        draft_rows.append({"id": d["id"], "title": d["title"], "vendor": d["vendor"],
+                           "type": d["tpl"], "kind": "draft", "cells": cells})
+    for r in rows + draft_rows:
+        r["present_count"] = sum(1 for c in r["cells"].values() if c["present"])
+        r["gap_count"] = sum(
+            1
+            for ct, c in r["cells"].items()
+            if not c["present"] and c["expected"] and not (r["kind"] == "draft" and ct == "execution")
+        )
+    totals = {ct: sum(1 for r in rows if r["cells"][ct]["present"]) for ct in KEY_CLAUSES}
+    return {
+        "columns": cols,
+        "groups": [
+            {"name": "Executed contracts", "rows": rows},
+            {"name": "Vendor drafts (not yet executed)", "rows": draft_rows},
+        ],
+        "totals": totals,
+        "executed_count": len(rows),
     }
 
 
@@ -195,27 +303,47 @@ def dashboard():
         count(*) FILTER (WHERE auto_renew AND notice_days_left < 0) AS autorenew_notice_passed,
         count(*) FILTER (WHERE liability_uncapped) AS uncapped
         FROM v_renewals""")
-    items = q(
+    rows = q(
         """SELECT contract_id AS id, title, vendor, category, type, owner, annual_value, auto_renew,
-                   expiry_date, notice_period_days, notice_deadline, days_left, notice_days_left, bucket,
-                   liability_uncapped,
-                   CASE WHEN auto_renew THEN 'notice' ELSE 'expiry' END AS action
-                 FROM v_renewals WHERE bucket <> 'later'
-                 ORDER BY CASE WHEN auto_renew THEN notice_deadline ELSE expiry_date END"""
+                  expiry_date, notice_period_days, notice_deadline, days_left, notice_days_left,
+                  liability_uncapped, fully_executed
+           FROM v_renewals WHERE days_left BETWEEN 0 AND 90 ORDER BY expiry_date, title"""
     )
-    sev = {"overdue": "critical", "30": "high", "60": "medium", "90": "low"}
-    for i in items:
-        i["severity"] = sev[i["bucket"]]
-        i["action_date"] = i["notice_deadline"] if i["auto_renew"] else i["expiry_date"]
-    buckets = []
-    for b in ("overdue", "30", "60", "90"):
-        its = [i for i in items if i["bucket"] == b]
-        buckets.append(
+    lanes = {
+        key: {"label": label, "severity": sev, "items": [], "value": 0.0}
+        for key, label, sev in (
+            ("30", "Expiring in 0–30 days", "high"),
+            ("60", "Expiring in 31–60 days", "medium"),
+            ("90", "Expiring in 61–90 days", "low"),
+        )
+    }
+    for r in rows:
+        key = "30" if r["days_left"] <= 30 else "60" if r["days_left"] <= 60 else "90"
+        r["notice_passed"] = bool(r["auto_renew"] and r["notice_days_left"] < 0)
+        lanes[key]["items"].append(r)
+        lanes[key]["value"] += float(r["annual_value"] or 0)
+    for lane in lanes.values():
+        lane["count"] = len(lane["items"])
+    monthly = {
+        r["m"]: r
+        for r in q(
+            """SELECT to_char(date_trunc('month', expiry_date), 'YYYY-MM') AS m, count(*) AS count,
+                      coalesce(sum(annual_value), 0) AS value
+               FROM v_renewals WHERE expiry_date >= date_trunc('month', current_date)
+                 AND expiry_date < date_trunc('month', current_date) + interval '12 months' GROUP BY 1"""
+        )
+    }
+    today = dt.date.today()
+    months = []
+    for n in range(12):
+        y, m0 = today.year + (today.month - 1 + n) // 12, (today.month - 1 + n) % 12 + 1
+        key = f"{y}-{m0:02d}"
+        months.append(
             {
-                "bucket": b,
-                "severity": sev[b],
-                "count": len(its),
-                "value": sum(float(i["annual_value"] or 0) for i in its),
+                "month": key,
+                "label": dt.date(y, m0, 1).strftime("%b %y"),
+                "count": monthly.get(key, {}).get("count", 0),
+                "value": float(monthly.get(key, {}).get("value", 0)),
             }
         )
     risks = {
@@ -228,7 +356,7 @@ def dashboard():
         "pd_without_dpa": q("""SELECT contract_id AS id, title, vendor FROM v_effective_terms
                               WHERE processes_personal_data AND NOT has_dpa AND type <> 'DPA'"""),
     }
-    return {"kpis": k, "buckets": buckets, "timeline": items, "risks": risks}
+    return {"kpis": k, "lanes": lanes, "monthly": months, "risks": risks}
 
 
 # ------------------------------------------------------------------ ask

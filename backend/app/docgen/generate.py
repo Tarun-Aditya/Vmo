@@ -16,7 +16,7 @@ from app.docgen.library import (
     clause_text,
     standard_text,
 )
-from app.docgen.specs import CONTRACTS, DRAFTS
+from app.docgen.specs import CONTRACTS, CUSTOMER_SIGNERS, DRAFTS, VENDOR_SIGNERS
 
 KEY_FIELDS = [
     "effective_date",
@@ -31,6 +31,11 @@ KEY_FIELDS = [
     "governing_law",
     "processes_personal_data",
     "has_dpa",
+    "customer_signatory",
+    "customer_signed_date",
+    "supplier_signatory",
+    "supplier_signed_date",
+    "fully_executed",
 ]
 
 
@@ -62,13 +67,39 @@ def _layout(title: str, header: list[str], clauses: list[tuple[str, str]]) -> st
             page += 1
             out += [f"<!-- page: {page} -->", ""]
         out += [f"## {i + 1}. {heading}", text, ""]
-    out += [
-        f"<!-- page: {page + 1} -->",
-        "",
-        "Signed for and on behalf of the parties by their " "authorised signatories.",
-        "",
-    ]
     return "\n".join(out)
+
+
+def execution_block(spec: dict, eff: date) -> tuple[str, dict]:
+    """Signature clause text + the signature labels. The Supplier may be unsigned (planted)."""
+    cust = CUSTOMER_SIGNERS["legal" if spec["type"] in ("NDA", "DPA") else "default"]
+    sup = VENDOR_SIGNERS[spec["vendor"]]
+    cd, sd = eff - timedelta(days=3), eff - timedelta(days=2)
+    text = (
+        f"Signed for and on behalf of {CUSTOMER} (the Customer) by {cust[0]}, {cust[1]}, "
+        f"on {long_date(cd)}. "
+    )
+    labels = dict(
+        customer_signatory=cust[0],
+        customer_signed_date=cd.isoformat(),
+        supplier_signatory=None,
+        supplier_signed_date=None,
+        fully_executed=False,
+    )
+    if spec.get("unsigned_supplier"):
+        text += (
+            f"Supplier signature pending: {spec['vendor']} (the Supplier) has not yet "
+            "countersigned this document."
+        )
+    else:
+        text += (
+            f"Signed for and on behalf of {spec['vendor']} (the Supplier) by {sup[0]}, {sup[1]}, "
+            f"on {long_date(sd)}."
+        )
+        labels.update(
+            supplier_signatory=sup[0], supplier_signed_date=sd.isoformat(), fully_executed=True
+        )
+    return text, labels
 
 
 def _header(vendor: str | None, eff: str, dtype: str, ref: str, draft: bool = False) -> list[str]:
@@ -155,6 +186,7 @@ def build_contract(spec: dict, seed: date, by_key: dict[str, dict]) -> tuple[str
         cap_text = "2 times annual fees"
     if "liability_cap" not in clauses_in:
         cap_text = None
+    exec_text, exec_labels = execution_block(spec, eff)
     ctx = dict(
         effective_date=long_date(eff),
         expiry_date=long_date(exp),
@@ -163,6 +195,7 @@ def build_contract(spec: dict, seed: date, by_key: dict[str, dict]) -> tuple[str
         scope_text=spec.get("scope", ""),
         notice_period_days=spec.get("notice"),
         dpa_date=long_date(eff + timedelta(days=14)),
+        execution_text=exec_text,
         data_scope_text=(
             f"The services involve the processing of personal data of the "
             f"Customer's {spec.get('subjects')}."
@@ -183,7 +216,8 @@ def build_contract(spec: dict, seed: date, by_key: dict[str, dict]) -> tuple[str
         seq.append((CLAUSES[c].heading, clause_text(c, doc, ctx, chosen.get(c))))
     ref = f"ARC-{ttype}-{spec['key'].upper()}"
     md = _layout(spec["title"], _header(spec["vendor"], long_date(eff), spec["type"], ref), seq)
-    labels = {k: fields.get(k) for k in KEY_FIELDS}
+    labels = {k: fields.get(k) for k in KEY_FIELDS if k not in exec_labels}
+    labels.update(exec_labels)
     labels["liability_cap_text"] = cap_text
     labels["deviations"] = [
         dict(
@@ -216,6 +250,9 @@ def _build_amendment(spec, seed, eff, exp, parent):
             labels["liability_cap_multiple"] = float(o["cap"])
             labels["liability_cap_text"] = f"{o['cap']} times annual fees"
         seq.append((CLAUSES[ctype].heading, text))
+    exec_text, exec_labels = execution_block(spec, eff)
+    seq.append((CLAUSES["execution"].heading, exec_text))
+    labels.update(exec_labels)
     ref = f"ARC-AMD-{spec['key'].upper()}"
     header = _header(spec["vendor"], long_date(eff), "Amendment", ref) + [
         f"**Amends:** {parent['title']}",
@@ -241,6 +278,8 @@ def build_draft(spec: dict) -> tuple[str, dict]:
         data_scope_text="The services involve the processing of personal data.",
         dpa_date="[date]",
         notice_period_days=60,
+        execution_text="Signature blocks: [Customer signatory: to be signed] [Supplier "
+        "signatory: to be signed]. This draft has not been executed.",
     )
     seq = []
     for c in tdef["clauses"]:

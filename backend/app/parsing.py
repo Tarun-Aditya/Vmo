@@ -34,9 +34,4 @@ def parse_document(md: str) -> tuple[dict[str, str], list[dict]]:
                 header[m.group(1)] = m.group(2)
         elif line.strip():
             cur["text"] = (cur["text"] + " " + line.strip()).strip()
-    # the signature block sits after the last clause; drop it from that clause
-    if clauses and clauses[-1]["text"].startswith("Signed for"):
-        clauses.pop()
-    elif clauses:
-        clauses[-1]["text"] = clauses[-1]["text"].split(" Signed for and on behalf")[0]
     return header, clauses

@@ -294,7 +294,70 @@ CONTRACTS: list[dict] = [
         exp=800,
         dev=["breach_notification:h72"],
     ),
+    # Work Orders: call-offs under a SOW. Fixed fee only (no annual value, so spend is not
+    # double-counted). Expiry >12 months so the 30/60/90 buckets are unchanged.
+    dict(
+        key="bluepeak_wo1",
+        title="Work Order 1 – SD-WAN Rollout Phase 2 – Bluepeak Technologies",
+        vendor="Bluepeak Technologies Pvt Ltd",
+        category="Telecom",
+        type="Work Order",
+        template="WO",
+        owner="Rahul Menon (Infrastructure)",
+        parent="bluepeak_sow2",
+        eff=-60,
+        exp=380,
+        total=48 * L,
+        scope="SD-WAN rollout to 40 additional stores in Mumbai and Pune.",
+        dev=[],
+    ),
+    dict(
+        key="bluepeak_wo2",
+        title="Work Order 2 – Store Wi-Fi Refresh – Bluepeak Technologies",
+        vendor="Bluepeak Technologies Pvt Ltd",
+        category="Telecom",
+        type="Work Order",
+        template="WO",
+        owner="Rahul Menon (Infrastructure)",
+        parent="bluepeak_sow2",
+        eff=-20,
+        exp=390,
+        total=30 * L,
+        scope="Replacement of in-store Wi-Fi access points at 55 stores.",
+        unsigned_supplier=True,  # planted: Supplier has not countersigned yet
+        dev=[],
+    ),
+    dict(
+        key="meridian_wo1",
+        title="Work Order 1 – Warehouse Racking Upgrade – Meridian Logistics",
+        vendor="Meridian Logistics Services Ltd",
+        category="Facilities",
+        type="Work Order",
+        template="WO",
+        owner="Sunita Rao (Facilities)",
+        parent="meridian_sow2",
+        eff=-25,
+        exp=370,
+        total=24 * L,
+        scope="Racking upgrade and re-slotting at the Bhiwandi warehouse.",
+        dev=[],
+    ),
 ]
+
+# Fictional signatories. Customer signs for Arcadia; Legal signs NDAs and DPAs.
+CUSTOMER_SIGNERS = {
+    "default": ("Rohit Sharma", "Chief Procurement Officer"),
+    "legal": ("Anjali Desai", "Head of Legal"),
+}
+VENDOR_SIGNERS = {
+    "Bluepeak Technologies Pvt Ltd": ("Sanjay Kulkarni", "Chief Executive Officer"),
+    "Meridian Logistics Services Ltd": ("Deepak Bhatt", "Managing Director"),
+    "CloudDesk Software Inc": ("Emily Carter", "VP Sales"),
+    "Ledgerly Systems Pvt Ltd": ("Farhan Qureshi", "Director"),
+    "PulseHR Technologies Pvt Ltd": ("Lakshmi Rao", "Founder and CEO"),
+    "AdSpark Analytics LLP": ("Tanvi Joshi", "Partner"),
+    "Skyguard Security Solutions Pvt Ltd": ("Imran Sheikh", "Director"),
+}
 
 # Vendor drafts. "missing" = template clause omitted from the draft.
 DRAFTS: list[dict] = [

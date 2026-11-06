@@ -167,7 +167,7 @@ def build_system() -> str:
 
 
 def ask_llm(question: str, max_turns: int = 8) -> dict:
-    system, calls, sql_errors = build_system(), [], 0
+    system, calls, sql_errors, notes = build_system(), [], 0, []
     messages = [{"role": "user", "content": question}]
     answer = ""
     for _ in range(max_turns):
@@ -183,6 +183,7 @@ def ask_llm(question: str, max_turns: int = 8) -> dict:
             answer = "".join(b.text for b in resp.content if b.type == "text")
             break
         messages.append({"role": "assistant", "content": resp.content})
+        notes += [b.text for b in resp.content if b.type == "text" and b.text.strip()]
         results = []
         for b in (b for b in resp.content if b.type == "tool_use"):
             out = execute_tool(b.name, b.input)
@@ -196,7 +197,11 @@ def ask_llm(question: str, max_turns: int = 8) -> dict:
                 {"type": "tool_result", "tool_use_id": b.id, "content": content, "is_error": is_err}
             )
         messages.append({"role": "user", "content": results})
-    return {"answer": answer or "I could not complete that question.", "tool_calls": calls}
+    return {
+        "answer": answer or "I could not complete that question.",
+        "tool_calls": calls,
+        "notes": notes,
+    }
 
 
 # --------------------------------------------------------------------------- public API
@@ -262,6 +267,9 @@ def answer(question: str, demo_mode: bool = False) -> dict:
                 "tool_calls": [],
             }
     res["citations"] = citations(res["tool_calls"])
+    from app import ask_present
+
+    ask_present.finalize(res)
     res.update(question=question, source=source, elapsed_ms=int((time.time() - t0) * 1000))
     return res
 

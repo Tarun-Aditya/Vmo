@@ -40,3 +40,13 @@
    check: {kind: dict, key: vendor, value: contracts, expected: contracts_per_vendor}}
 - {id: saas_total, question: "What is the total annual value of SaaS contracts?", type: sql,
    check: {kind: number, column: total_annual_value, expected: saas_total}}
+- {id: signatures_all, question: "Show start date, end date and signatures for all contracts", type: sql,
+   check: {kind: set, column: title, expected: all_documents}}
+- {id: unsigned, question: "Which contracts are not fully signed?", type: sql,
+   check: {kind: set, column: title, expected: unsigned_titles}}
+- {id: no_audit, question: "Which contracts do not have an audit rights clause?", type: sql,
+   check: {kind: set, column: title, expected: no_audit_rights}}
+- {id: bluepeak_clauses, question: "Show the key clauses in the Bluepeak MSA", type: sql,
+   check: {kind: rowcount, column: clause, expected: bluepeak_msa_clause_count}}
+- {id: list_work_orders, question: "List all work orders", type: sql,
+   check: {kind: set, column: title, expected: work_orders}}

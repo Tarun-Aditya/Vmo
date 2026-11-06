@@ -99,7 +99,49 @@ def test_aggregate_answer_has_headline_breakdown_and_list(monkeypatch, seeded):
     r = ask.answer(
         "How many auto-renewing contracts do we have and what is their total annual value?", False
     )
-    a = r["answer"]
-    assert a.startswith("5 auto-renewing contracts") and "By category:" in a and a.count("•") == 5
+    assert r["answer"].startswith("5 auto-renewing contracts")
     assert [c["name"] for c in r["tool_calls"]] == ["run_sql"] * 3  # aggregate, breakdown, list
     assert r["tool_calls"][0]["output"]["rows"][0][0] == 5
+    # presented as headline tiles + a breakdown table + the contract table, SQL hidden in thinking
+    assert [t["label"] for t in r["tiles"]] == ["Contracts", "Annual value"]
+    assert [t["title"] for t in r["tables"]] == ["Breakdown by category", "Contracts"]
+    assert len(r["tables"][1]["rows"]) == 5 and "sql" in r["thinking"][1]
+    assert r["thinking"][0]["title"] == "Understood the question"
+
+
+def test_table_questions_pick_the_requested_columns(monkeypatch, seeded):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    r = ask.answer("Show start date, end date and signatures for all contracts", False)
+    t = r["tables"][0]
+    labels = [c["label"] for c in t["columns"]]
+    assert labels == ["Contract", "Type", "Start date", "End date", "Signed by (Arcadia)", "Arcadia signed on",
+                      "Signed by (Supplier)", "Supplier signed on", "Fully signed"]
+    assert len(t["rows"]) == 19 and t["columns"][-1]["kind"] == "bool" and t["columns"][2]["kind"] == "date"
+    assert not r["tiles"]                                  # plain list: no headline tiles
+
+
+def test_signature_and_clause_presence_filters(monkeypatch, seeded):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    r = ask.answer("Which contracts are not fully signed?", False)
+    assert [x["title"] for x in r["tables"][0]["rows"]] == ["Work Order 2 – Store Wi-Fi Refresh – Bluepeak Technologies"]
+    r = ask.answer("Which contracts do not have an audit rights clause?", False)
+    rows = r["tables"][0]["rows"]
+    assert 0 < len(rows) < 19 and all(x["has_audit_rights"] is False for x in rows)
+    assert "without an audit rights clause" in r["answer"]
+
+
+def test_single_document_question_returns_its_clauses(monkeypatch, seeded):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    r = ask.answer("Show the key clauses in the Bluepeak MSA", False)
+    t = r["tables"][0]
+    assert [c["label"] for c in t["columns"]] == ["Contract", "Clause", "Page", "Clause text"]
+    assert len(t["rows"]) == 15 and {x["title"] for x in t["rows"]} == {"Master Services Agreement – Bluepeak Technologies"}
+    assert t["rows"][-1]["clause"] == "Execution"
+
+
+def test_thinking_hides_sql_from_the_answer_but_keeps_it_inspectable(monkeypatch, seeded):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    r = ask.answer("Which vendors have uncapped liability?", False)
+    assert "SELECT" not in r["answer"] and r["tables"][0]["columns"][0]["label"] == "Vendor"
+    assert any(s.get("sql", "").startswith("SELECT") for s in r["thinking"])
+    assert r["thinking"][-1]["title"] == "Composed the answer"

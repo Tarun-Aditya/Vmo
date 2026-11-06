@@ -46,3 +46,7 @@ export function useSetting(key: string, initial: boolean): [boolean, (v: boolean
     setVal(v);
   }];
 }
+
+export type Col = { key: string; label: string; kind: "text" | "date" | "money" | "bool" | "number" | "score" | "quote" };
+export type Table = { title: string | null; columns: Col[]; rows: Record<string, unknown>[]; row_count: number };
+export type Step = { title: string; detail?: string; sql?: string; columns?: string[]; rows?: unknown[][]; row_count?: number; error?: string };

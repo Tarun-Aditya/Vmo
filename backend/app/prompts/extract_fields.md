@@ -10,3 +10,4 @@ Rules:
 - For an Amendment, extract only the terms it changes and leave everything else null.
 - `source_clause` is the number of the clause (the "## N." heading) that supports the value, or null if it comes from the header.
 - `confidence` is 0-1: explicit and unambiguous = 0.9+, inferred from absence = 0.5-0.7.
+- Signatures live in the Execution clause. `customer_signatory` / `supplier_signatory` are the names of the people who signed for each party (null if that party has not signed or the clause says signature is pending); the `*_signed_date` fields are ISO dates. `fully_executed` is true only if both parties have signed.

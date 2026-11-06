@@ -56,124 +56,108 @@ def _list(items: list[str]) -> str:
 
 
 def _plan(key: str, r: Run) -> str:
+    """Run the fixed tool calls for a demo question and return a short headline. The detail is
+    shown as tables by the UI (see ask_present), so the text only summarises."""
     if key == "notice_60":
         d = rows(
             r.sql(
-                """SELECT title, vendor, notice_deadline, notice_days_left, auto_renew, annual_value
+                """SELECT contract_id, title, vendor, notice_deadline, notice_days_left, auto_renew, annual_value
             FROM v_renewals WHERE notice_days_left BETWEEN 0 AND 60 ORDER BY notice_deadline"""
             )
         )
         return (
-            f"{len(d)} contracts have a notice deadline in the next 60 days: "
-            + _list(
-                [f"{x['title']} ({x['notice_deadline']}, {x['notice_days_left']} days)" for x in d]
-            )
-            + ". For contracts without auto-renewal the deadline is the expiry date itself."
+            f"{len(d)} contracts have a notice deadline in the next 60 days. For contracts without "
+            "auto-renewal the deadline is the expiry date itself."
         )
     if key == "quarter_by_category":
         d = rows(
-            r.sql("""SELECT category, COUNT(*) AS contracts, SUM(annual_value) AS total_annual_value
+            r.sql(
+                """SELECT category, COUNT(*) AS contracts, SUM(annual_value) AS total_annual_value
             FROM v_effective_terms WHERE status='active'
               AND expiry_date >= date_trunc('quarter', current_date)
               AND expiry_date < date_trunc('quarter', current_date) + interval '3 months'
-            GROUP BY category ORDER BY 3 DESC NULLS LAST""")
+            GROUP BY category ORDER BY 3 DESC NULLS LAST"""
+            )
         )
         tot = sum(float(x["total_annual_value"] or 0) for x in d)
-        return (
-            f"Contracts expiring this quarter carry {money(tot)} of annual value: "
-            + _list(
-                [
-                    f"{x['category']} {money(x['total_annual_value'])} ({x['contracts']} contract"
-                    f"{'s' if x['contracts'] != 1 else ''})"
-                    for x in d
-                ]
-            )
-            + "."
-        )
+        return f"Contracts expiring this quarter carry {money(tot)} of annual value across {len(d)} categories."
     if key == "uncapped":
-        d = rows(r.sql("""SELECT DISTINCT vendor, title FROM v_effective_terms
-            WHERE liability_uncapped ORDER BY vendor"""))
-        return (
-            f"{len(d)} vendors have uncapped liability: "
-            + _list([f"{x['vendor']} ({x['title']})" for x in d])
-            + "."
+        d = rows(
+            r.sql(
+                """SELECT DISTINCT contract_id, vendor, title, liability_cap_text FROM v_effective_terms
+            WHERE liability_uncapped ORDER BY vendor"""
+            )
         )
+        return f"{len(d)} vendors have uncapped liability."
     if key == "saas_no_dpa":
-        d = rows(r.sql("""SELECT vendor, title FROM v_effective_terms
-            WHERE type='SaaS' AND processes_personal_data AND NOT has_dpa"""))
-        return (
-            f"{len(d)} SaaS vendor processes personal data without a DPA: "
-            + _list([f"{x['vendor']} ({x['title']})" for x in d])
-            + "."
+        d = rows(
+            r.sql(
+                """SELECT contract_id, vendor, title FROM v_effective_terms
+            WHERE type='SaaS' AND processes_personal_data AND NOT has_dpa"""
+            )
         )
+        return f"{len(d)} SaaS vendor processes personal data without a DPA."
     if key == "no_tfc":
-        d = rows(r.sql("""SELECT title, vendor FROM v_effective_terms
-            WHERE termination_for_convenience = false"""))
-        return (
-            f"{len(d)} contracts cannot be terminated for convenience: "
-            + _list([x["title"] for x in d])
-            + "."
+        d = rows(
+            r.sql(
+                """SELECT contract_id, title, vendor, termination_for_convenience FROM v_effective_terms
+            WHERE termination_for_convenience = false"""
+            )
         )
+        return f"{len(d)} contracts cannot be terminated for convenience."
     if key == "bluepeak_payment":
-        d = rows(r.sql("""SELECT e.title, e.payment_terms_days AS effective_payment_terms_days,
+        d = rows(
+            r.sql(
+                """SELECT e.contract_id, e.title, e.payment_terms_days AS effective_payment_terms_days,
               s.title AS set_by, s.type AS set_by_type
             FROM v_effective_terms e JOIN contracts s ON s.id = e.payment_terms_days_source
-            WHERE e.type='MSA' AND e.vendor ILIKE '%Bluepeak%'"""))
+            WHERE e.type='MSA' AND e.vendor ILIKE '%Bluepeak%'"""
+            )
+        )
         x = d[0]
         return (
             f"The effective payment term on {x['title']} is {x['effective_payment_terms_days']} days, "
             f"set by {x['set_by']} (the original MSA said 45)."
         )
     if key == "top5_vendors":
-        d = rows(r.sql("""SELECT vendor, SUM(annual_value) AS total_annual_value,
+        d = rows(
+            r.sql(
+                """SELECT vendor, SUM(annual_value) AS total_annual_value,
               MIN(expiry_date) AS earliest_expiry, MIN(notice_deadline) AS earliest_notice_deadline
             FROM v_renewals WHERE annual_value IS NOT NULL GROUP BY vendor
-            ORDER BY 2 DESC LIMIT 5"""))
-        return (
-            "Top 5 vendors by annual value: "
-            + _list(
-                [
-                    f"{x['vendor']} {money(x['total_annual_value'])} (first expiry {x['earliest_expiry']})"
-                    for x in d
-                ]
+            ORDER BY 2 DESC LIMIT 5"""
             )
-            + "."
         )
+        return f"Top 5 vendors by annual value; the largest is {d[0]['vendor']} at {money(d[0]['total_annual_value'])}."
     if key == "nda_before_msa":
-        d = rows(r.sql("""SELECT n.title AS nda, n.expiry_date AS nda_expiry, m.title AS msa,
+        d = rows(
+            r.sql(
+                """SELECT n.contract_id, n.title AS nda, n.expiry_date AS nda_expiry, m.title AS msa,
               m.expiry_date AS msa_effective_expiry
             FROM v_effective_terms n JOIN v_effective_terms m ON m.contract_id = n.parent_id
-            WHERE n.type='NDA' AND m.type='MSA' AND n.expiry_date < m.expiry_date"""))
-        return (
-            f"{len(d)} NDAs expire before their MSA: "
-            + _list(
-                [f"{x['nda']} ends {x['nda_expiry']} vs MSA {x['msa_effective_expiry']}" for x in d]
+            WHERE n.type='NDA' AND m.type='MSA' AND n.expiry_date < m.expiry_date"""
             )
-            + "."
         )
+        return f"{len(d)} NDAs expire before their related MSA."
     if key == "auto_renewals":
-        d = rows(r.sql("""SELECT title, vendor, expiry_date, notice_period_days, notice_deadline,
-              notice_days_left FROM v_renewals WHERE auto_renew ORDER BY notice_deadline"""))
-        late = [x for x in d if x["notice_days_left"] < 0]
-        return (
-            f"{len(d)} contracts auto-renew. "
-            + (
-                f"The notice deadline has already passed for {_list([x['title'] for x in late])}. "
-                if late
-                else ""
+        d = rows(
+            r.sql(
+                """SELECT contract_id, title, vendor, expiry_date, notice_period_days, notice_deadline,
+              notice_days_left FROM v_renewals WHERE auto_renew ORDER BY notice_deadline"""
             )
-            + "Deadlines: "
-            + _list([f"{x['title']} {x['notice_deadline']}" for x in d])
-            + "."
+        )
+        late = [x for x in d if x["notice_days_left"] < 0]
+        return f"{len(d)} contracts auto-renew" + (
+            f"; the notice deadline has already passed for {_list([x['title'] for x in late])}." if late else "."
         )
     if key == "expire_30":
-        d = rows(r.sql("""SELECT title, vendor, expiry_date, days_left, annual_value FROM v_renewals
-            WHERE days_left BETWEEN 0 AND 30 ORDER BY expiry_date"""))
-        return (
-            f"{len(d)} contracts expire in the next 30 days: "
-            + _list([f"{x['title']} ({x['days_left']} days)" for x in d])
-            + "."
+        d = rows(
+            r.sql(
+                """SELECT contract_id, title, vendor, expiry_date, days_left, annual_value FROM v_renewals
+            WHERE days_left BETWEEN 0 AND 30 ORDER BY expiry_date"""
+            )
         )
+        return f"{len(d)} contracts expire in the next 30 days."
     if key == "total_value":
         d = rows(
             r.sql(
@@ -183,7 +167,7 @@ def _plan(key: str, r: Run) -> str:
         )[0]
         return (
             f"Total annual value of active contracts is {money(d['total_annual_value'])} across "
-            f"{d['contracts_with_value']} contracts that carry fees (MSAs carry no fees themselves)."
+            f"{d['contracts_with_value']} contracts that carry fees (MSAs and Work Orders carry no annual fee)."
         )
     if key == "short_confidentiality":
         h = r.search(
@@ -193,10 +177,8 @@ def _plan(key: str, r: Run) -> str:
         )["hits"]
         short = [x for x in h if re.search(r"\b1 year\b|one year", x["text"])]
         return (
-            "Found "
-            + f"{len(short)} contract with a confidentiality tail shorter than the 3-year standard: "
-            + _list([f"{x['title']} [{x['heading']}, p.{x['page']}]" for x in short])
-            + ". All other confidentiality clauses searched keep the 3-year standard."
+            f"{len(short)} contract has a confidentiality tail shorter than the 3-year standard "
+            "(top semantic matches shown; the first is the short one)."
         )
     if key == "vendor_owns_ip":
         h = r.search(
@@ -206,42 +188,37 @@ def _plan(key: str, r: Run) -> str:
         )["hits"]
         own = [x for x in h if x["text"].startswith("The Supplier owns")]
         return (
-            f"{len(own)} contract gives the vendor ownership of deliverables: "
-            + _list([f"{x['title']} [{x['heading']}, p.{x['page']}]" for x in own])
-            + ". The standard position is that Arcadia owns bespoke deliverables."
+            f"{len(own)} contract gives the vendor ownership of deliverables; the standard position is "
+            "that Arcadia owns bespoke deliverables."
         )
     if key == "non_indian_law":
-        d = rows(r.sql("""SELECT title, vendor, governing_law FROM v_effective_terms
-            WHERE governing_law IS NOT NULL AND governing_law <> 'India' ORDER BY title"""))
-        h = r.search(
+        d = rows(
+            r.sql(
+                """SELECT contract_id, title, vendor, governing_law FROM v_effective_terms
+            WHERE governing_law IS NOT NULL AND governing_law <> 'India' ORDER BY title"""
+            )
+        )
+        r.search(
             query="governed by the laws of England and Wales or Singapore, courts of London or Singapore",
             clause_type="governing_law",
             top_k=len(d) + 1,
-        )["hits"]
-        non_in = [x for x in h if "laws of India" not in x["text"]]
-        return (
-            f"{len(d)} contracts use a non-Indian governing law: "
-            + _list([f"{x['title']} ({x['governing_law']})" for x in d])
-            + ". Clause wording: "
-            + _list([f"{x['title']} [{x['heading']}, p.{x['page']}]" for x in non_in])
-            + "."
         )
+        return f"{len(d)} contracts use a non-Indian governing law; the clause wording is cited below."
     if key == "uncapped_autorenew":
-        d = rows(r.sql("""SELECT contract_id, title, vendor, expiry_date, notice_deadline
-            FROM v_renewals WHERE auto_renew AND liability_uncapped ORDER BY notice_deadline"""))
-        parts = []
+        d = rows(
+            r.sql(
+                """SELECT contract_id, title, vendor, expiry_date, notice_deadline
+            FROM v_renewals WHERE auto_renew AND liability_uncapped ORDER BY notice_deadline"""
+            )
+        )
         for x in d:
-            h = r.search(
+            r.search(
                 query="limitation of liability",
                 clause_type="liability_cap",
                 vendor=x["vendor"].split()[0],
                 top_k=1,
-            )["hits"]
-            if h:
-                parts.append(
-                    f"{x['title']}: \"{h[0]['text']}\" [{h[0]['heading']}, p.{h[0]['page']}]"
-                )
-        return f"{len(d)} auto-renewing contracts have uncapped liability. " + " ".join(parts)
+            )
+        return f"{len(d)} auto-renewing contracts have uncapped liability; their liability clauses are cited below."
     raise KeyError(key)
 
 
@@ -261,4 +238,13 @@ def answer(question: str) -> dict | None:
     if not key:
         return None
     r = Run()
-    return {"answer": _plan(key, r), "tool_calls": r.calls}
+    headline = _plan(key, r)
+    kinds = sorted({"SQL over the extracted contract data" if c["name"] == "run_sql" else "semantic clause search"
+                    for c in r.calls})
+    steps = [
+        {
+            "title": "Understood the question",
+            "detail": "Matched it to a preloaded analysis (offline mode) and planned: " + " + ".join(kinds) + ".",
+        }
+    ]
+    return {"answer": headline, "tool_calls": r.calls, "plan_steps": steps}

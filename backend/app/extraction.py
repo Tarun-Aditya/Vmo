@@ -25,6 +25,11 @@ FIELDS = [
     "governing_law",
     "processes_personal_data",
     "has_dpa",
+    "customer_signatory",
+    "customer_signed_date",
+    "supplier_signatory",
+    "supplier_signed_date",
+    "fully_executed",
 ]
 
 
@@ -68,7 +73,7 @@ def heuristic_extract(header: dict[str, str], clauses: list[dict], doc_type: str
         put("notice_period_days", None, 0.6)
     if c := by.get("fees"):
         a = re.search(r"annual fees .*? are INR ([\d,]+)", c["text"])
-        t = re.search(r"total contract value is INR ([\d,]+)", c["text"])
+        t = re.search(r"(?:total contract value is|fixed fee for this Work Order is) INR ([\d,]+)", c["text"])
         put("annual_value", _money(a.group(1)) if a else None, 0.95 if a else 0.4, "fees")
         put("total_value", _money(t.group(1)) if t else None, 0.95 if t else 0.4, "fees")
     elif not amendment:
@@ -120,6 +125,19 @@ def heuristic_extract(header: dict[str, str], clauses: list[dict], doc_type: str
             put("has_dpa", "Data Processing Agreement dated" in c["text"], 0.95, "dpa_reference")
         else:
             put("has_dpa", False, 0.75)
+    # signatures: "Signed ... (the Customer) by <Name>, <Title>, on <date>"
+    sig = by.get("execution")
+    cm = sm = None
+    if sig:
+        cm = re.search(r"\(the Customer\) by ([^,]+), [^,]+, on " + DATE_RE, sig["text"])
+        sm = re.search(r"\(the Supplier\) by ([^,]+), [^,]+, on " + DATE_RE, sig["text"])
+    ctype = "execution" if sig else None
+    conf = 0.96 if sig else 0.5
+    put("customer_signatory", cm.group(1) if cm else None, conf, ctype)
+    put("customer_signed_date", _iso(cm.group(2)) if cm else None, conf, ctype)
+    put("supplier_signatory", sm.group(1) if sm else None, conf, ctype)
+    put("supplier_signed_date", _iso(sm.group(2)) if sm else None, conf, ctype)
+    put("fully_executed", bool(cm and sm), conf, ctype)
     return out
 
 
@@ -149,6 +167,11 @@ def llm_tool() -> dict:
         governing_law="string",
         processes_personal_data="boolean",
         has_dpa="boolean",
+        customer_signatory="string",
+        customer_signed_date="string",
+        supplier_signatory="string",
+        supplier_signed_date="string",
+        fully_executed="boolean",
     )
     return {
         "name": "record_fields",

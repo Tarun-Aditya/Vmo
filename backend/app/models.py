@@ -63,6 +63,11 @@ class Contract(Base):
     owner: Mapped[str | None] = mapped_column(Text)
     # Amendments only: names of the contract columns this amendment overrides. Needed because
     # liability_cap_multiple NULL means "uncapped", so NULL can't also mean "not overridden".
+    customer_signatory: Mapped[str | None] = mapped_column(Text)
+    customer_signed_date: Mapped[date | None] = mapped_column(Date)
+    supplier_signatory: Mapped[str | None] = mapped_column(Text)
+    supplier_signed_date: Mapped[date | None] = mapped_column(Date)
+    fully_executed: Mapped[bool] = mapped_column(Boolean, default=False)
     overrides: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
     body_md: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

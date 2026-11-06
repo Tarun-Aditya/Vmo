@@ -43,6 +43,10 @@ def check(q, res):
             got is not None and abs(float(got) - float(want)) <= 0.01 * float(want),
             f"got {got} want {want}",
         )
+    if kind == "rowcount":
+        v = values(calls, spec["column"])
+        got = len(v[0]) if v else None
+        return got == want, f"got {got} rows want {want}"
     if kind == "dict":
         sql = next(
             o

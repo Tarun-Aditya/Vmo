@@ -78,7 +78,12 @@ CLAUSES: dict[str, ClauseDef] = {
             "The annual fees under this {doc} are INR {annual_value} and the total "
             "contract value is INR {total_value}, exclusive of applicable taxes.",
             variable=True,
+            by_doc={
+                "Work Order": "The fixed fee for this Work Order is INR {total_value}, exclusive "
+                "of applicable taxes."
+            },
         ),
+        C("execution", "Execution", "{execution_text}", variable=True),
         C("scope", "Scope", "{scope_text}", variable=True),
         C("data_scope", "Data Scope", "{data_scope_text}", variable=True),
         C(
@@ -549,6 +554,7 @@ TEMPLATES: dict[str, dict] = {
             "assignment",
             "non_solicit",
             "governing_law",
+            "execution",
         ],
     ),
     "SOW": dict(
@@ -564,12 +570,25 @@ TEMPLATES: dict[str, dict] = {
             "change_control",
             "termination_for_convenience",
             "liability_cap",
+            "execution",
         ],
+    ),
+    "WO": dict(
+        name="Work Order",
+        doc="Work Order",
+        clauses=["scope", "term", "fees", "payment", "acceptance", "change_control", "execution"],
     ),
     "NDA": dict(
         name="Non-Disclosure Agreement",
         doc="NDA",
-        clauses=["term", "confidentiality", "return_info", "non_solicit", "governing_law"],
+        clauses=[
+            "term",
+            "confidentiality",
+            "return_info",
+            "non_solicit",
+            "governing_law",
+            "execution",
+        ],
     ),
     "SaaS": dict(
         name="SaaS Subscription Agreement",
@@ -590,6 +609,7 @@ TEMPLATES: dict[str, dict] = {
             "ip_ownership",
             "confidentiality",
             "governing_law",
+            "execution",
         ],
     ),
     "DPA": dict(
@@ -605,9 +625,16 @@ TEMPLATES: dict[str, dict] = {
             "audit_rights",
             "data_return",
             "governing_law",
+            "execution",
         ],
     ),
 }
+# Columns of the key-clauses matrix (variable/deal-specific clauses excluded). `execution` means
+# "signed by both parties".
+KEY_CLAUSES = ["term", "renewal", "payment", "termination_for_convenience", "termination_for_cause",
+               "liability_cap", "indemnity", "ip_ownership", "confidentiality", "data_protection",
+               "audit_rights", "assignment", "non_solicit", "governing_law", "sla", "security",
+               "data_return", "execution"]
 OPTIONAL = {"dpa_reference"}  # present only when a DPA exists; not "missing" when absent
 
 
@@ -630,6 +657,7 @@ def standard_text(ctype: str, doc: str) -> str:
         scope_text="[Scope of services]",
         data_scope_text="[Description of personal data processed, if any]",
         dpa_date="[date]",
+        execution_text="[Signature blocks: Customer and Supplier signatories and dates]",
         notice_period_days="[notice]",
     )
     return clause_text(ctype, doc, ph)

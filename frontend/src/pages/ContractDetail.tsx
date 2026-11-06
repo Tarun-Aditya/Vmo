@@ -12,6 +12,7 @@ type Detail = {
   effective_terms: { field: string; value: unknown; source_id: number; source_title: string; overridden: boolean }[];
   hierarchy: Node; deviations: { severity: Sev; deviation_summary: string; heading: string }[];
   is_amendment: boolean; overrides: string[]; parent: { id: number; title: string } | null;
+  signatures: { customer_signatory: string | null; customer_signed_date: string | null; supplier_signatory: string | null; supplier_signed_date: string | null; fully_executed: boolean };
 };
 
 const LABEL: Record<string, string> = {
@@ -19,6 +20,7 @@ const LABEL: Record<string, string> = {
   annual_value: "Annual value", total_value: "Total value", payment_terms_days: "Payment terms (days)", liability_cap_multiple: "Liability cap (× annual fees)",
   liability_cap_text: "Liability cap", termination_for_convenience: "Termination for convenience", governing_law: "Governing law",
   processes_personal_data: "Processes personal data", has_dpa: "Has DPA",
+  customer_signatory: "Customer signatory", supplier_signatory: "Supplier signatory", customer_signed_date: "Customer signed", supplier_signed_date: "Supplier signed", fully_executed: "Fully signed",
 };
 function show(field: string, v: unknown): string {
   if (v === null || v === undefined || v === "null") return field === "liability_cap_multiple" ? "Uncapped / n.a." : "—";
@@ -61,9 +63,17 @@ export default function ContractDetail() {
       </div>
       <div className="grid gap-4 lg:grid-cols-5">
         <div className="space-y-4 lg:col-span-2">
+          <Card title="Signatures" right={d.signatures.fully_executed ? <span className="font-bold text-emerald-600">✓ fully signed</span> : <span className="font-bold text-red-600">✗ not fully signed</span>}>
+            <table className="w-full text-sm"><tbody>
+              {([["Arcadia Retail Ltd", d.signatures.customer_signatory, d.signatures.customer_signed_date], [c.vendor, d.signatures.supplier_signatory, d.signatures.supplier_signed_date]] as [string, string | null, string | null][]).map(([party, who, when]) => (
+                <tr key={party} className="border-t border-slate-100 dark:border-slate-700"><Td className="text-slate-500">{party}</Td>
+                  <Td className="font-medium">{who ?? <span className="text-red-600">signature pending</span>}</Td><Td className="text-right tabular-nums">{when ? fmtDate(when) : "—"}</Td></tr>))}
+            </tbody></table>
+          </Card>
+
           <Card title="Extracted fields (click to see the source)">
             <table className="w-full text-sm"><tbody>
-              {d.fields.filter((f) => f.field !== "liability_cap_text").map((f) => (
+              {d.fields.filter((f) => f.field !== "liability_cap_text" && !/signat|signed|fully_executed/.test(f.field)).map((f) => (
                 <tr key={f.field} onClick={() => f.source_clause_id && setHl(f.source_clause_id)}
                   className={`border-t border-slate-100 dark:border-slate-700 ${f.source_clause_id ? "cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700" : ""} ${hl && hl === f.source_clause_id ? "bg-yellow-50 dark:bg-yellow-900/30" : ""}`}>
                   <Td className="text-slate-500">{LABEL[f.field] ?? f.field}</Td>

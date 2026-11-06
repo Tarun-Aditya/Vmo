@@ -20,7 +20,7 @@ def same(field, got, want):
         return abs(float(got) - float(want)) <= 0.01 * abs(float(want))
     if field in ("liability_cap_multiple",):
         return abs(float(got) - float(want)) < 1e-6
-    if field in ("effective_date", "expiry_date"):
+    if field.endswith("_date"):
         return str(got) == str(want)
     return got == want
 
