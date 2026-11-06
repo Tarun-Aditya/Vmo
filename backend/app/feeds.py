@@ -85,8 +85,6 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
                 if d <= today:
                     inv(c, d, float(tot) * pct, f"Milestone invoice ({int(pct * 100)}% of fixed fee)")
     # ---- planted problems (each one is a demo story)
-    by_title = {c["title"]: c for c in cons}
-
     def find(sub):
         return next((c for c in cons if sub in c["title"]), None)
 

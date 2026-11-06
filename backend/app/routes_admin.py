@@ -93,10 +93,7 @@ class PipelineTrigger(BaseModel):
 
 
 def _pipelines() -> list[dict]:
-    root = None
     out = rows("SELECT key, name, description, folders, trigger_mode, enabled, interval_minutes, last_run_at, next_run_at FROM pipeline_config ORDER BY id")
-    with SessionLocal() as s:
-        root = pipeline.inbox_path(s)
     for p in out:
         with SessionLocal() as s:
             p["files"] = len(pipeline.watched_files(s, p["key"], [x for x in p["folders"].split(",") if x]))

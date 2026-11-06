@@ -32,13 +32,17 @@ def compute_all(s, today: date | None = None) -> int:
         for r in s.execute(text("""SELECT t.contract_id, t.title, t.type, t.liability_uncapped, t.termination_for_convenience, t.processes_personal_data, t.has_dpa, t.fully_executed
                                    FROM v_effective_terms t WHERE t.vendor=:v AND t.status <> 'draft'"""), {"v": v}).mappings():
             if r["liability_uncapped"]:
-                pts += 30; drivers.append(f"Uncapped liability: {r['title']}")
+                pts += 30
+                drivers.append(f"Uncapped liability: {r['title']}")
             if r["termination_for_convenience"] is False and r["type"] in ("MSA", "SaaS"):
-                pts += 8; drivers.append(f"No termination for convenience: {r['title']}")
+                pts += 8
+                drivers.append(f"No termination for convenience: {r['title']}")
             if r["processes_personal_data"] and not r["has_dpa"]:
-                pts += 25; drivers.append(f"Personal data without a DPA: {r['title']}")
+                pts += 25
+                drivers.append(f"Personal data without a DPA: {r['title']}")
             if r["fully_executed"] is False:
-                pts += 25; drivers.append(f"Not fully signed: {r['title']}")
+                pts += 25
+                drivers.append(f"Not fully signed: {r['title']}")
         wsev = {"critical": 12, "high": 6, "medium": 2, "low": 0.5}
         fails = s.execute(text("""SELECT cr.severity, count(*) FROM check_results cr JOIN contracts c ON c.id = cr.contract_id
                                   WHERE c.vendor=:v AND c.status <> 'draft' AND cr.status='fail' AND cr.rule_key NOT IN ('executed','no_unlimited_liability')
@@ -53,11 +57,14 @@ def compute_all(s, today: date | None = None) -> int:
         pts, drivers = 0.0, []
         for r in s.execute(text("SELECT title, auto_renew, expiry_date, notice_deadline, notice_days_left, days_left, annual_value FROM v_renewals WHERE vendor=:v"), {"v": v}).mappings():
             if r["auto_renew"] and r["notice_days_left"] is not None and r["notice_days_left"] < 0 and r["days_left"] >= 0:
-                pts += 50; drivers.append(f"Auto-renewal notice deadline passed: {r['title']}")
+                pts += 50
+                drivers.append(f"Auto-renewal notice deadline passed: {r['title']}")
             elif r["auto_renew"] and r["notice_days_left"] is not None and r["notice_days_left"] <= 30:
-                pts += 30; drivers.append(f"Auto-renewal notice due within {max(r['notice_days_left'], 0)} days: {r['title']}")
+                pts += 30
+                drivers.append(f"Auto-renewal notice due within {max(r['notice_days_left'], 0)} days: {r['title']}")
             elif r["days_left"] is not None and 0 <= r["days_left"] <= 90:
-                pts += 12; drivers.append(f"Expires in {r['days_left']} days: {r['title']}")
+                pts += 12
+                drivers.append(f"Expires in {r['days_left']} days: {r['title']}")
         comp["renewal_exposure"] = {"score": sat(pts, 60), "drivers": drivers[:6]}
         # ---- performance
         pts, drivers = 0.0, []
