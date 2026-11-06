@@ -3,6 +3,7 @@
 Revision ID: 0001
 Revises:
 """
+
 from alembic import op
 
 revision = "0001"
@@ -10,9 +11,16 @@ down_revision = None
 
 # Amendment-overridable contract columns (liability_cap_multiple included: NULL = uncapped).
 OVERRIDABLE = [
-    "expiry_date", "notice_period_days", "auto_renew", "annual_value", "total_value",
-    "payment_terms_days", "liability_cap_multiple", "liability_cap_text",
-    "termination_for_convenience", "governing_law",
+    "expiry_date",
+    "notice_period_days",
+    "auto_renew",
+    "annual_value",
+    "total_value",
+    "payment_terms_days",
+    "liability_cap_multiple",
+    "liability_cap_text",
+    "termination_for_convenience",
+    "governing_law",
 ]
 
 
@@ -138,7 +146,9 @@ ALTER ROLE vmo_readonly SET default_transaction_read_only = on;
 
 def downgrade() -> None:
     op.execute("DROP VIEW IF EXISTS v_renewals, v_effective_terms")
-    op.execute("DROP TABLE IF EXISTS llm_calls, redline_results, drafts, clause_deviations, "
-               "field_extractions, clauses, contracts, template_clauses, templates CASCADE")
+    op.execute(
+        "DROP TABLE IF EXISTS llm_calls, redline_results, drafts, clause_deviations, "
+        "field_extractions, clauses, contracts, template_clauses, templates CASCADE"
+    )
     op.execute("REVOKE ALL ON SCHEMA public FROM vmo_readonly")
     op.execute("DROP ROLE IF EXISTS vmo_readonly")

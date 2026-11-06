@@ -14,8 +14,10 @@ def test_inr_grouping():
 
 def gen(tmp_path):
     generate(tmp_path, SEED)
-    return (json.loads((tmp_path / "labels.json").read_text()),
-            json.loads((tmp_path / "manifest.json").read_text()))
+    return (
+        json.loads((tmp_path / "labels.json").read_text()),
+        json.loads((tmp_path / "manifest.json").read_text()),
+    )
 
 
 def test_document_set_shape(tmp_path):
@@ -23,7 +25,13 @@ def test_document_set_shape(tmp_path):
     assert (len(man["templates"]), len(man["contracts"]), len(man["drafts"])) == (5, 18, 5)
     types = [c["type"] for c in man["contracts"]]
     assert {t: types.count(t) for t in set(types)} == {
-        "MSA": 2, "SOW": 5, "Amendment": 2, "SaaS": 4, "NDA": 3, "DPA": 2}
+        "MSA": 2,
+        "SOW": 5,
+        "Amendment": 2,
+        "SaaS": 4,
+        "NDA": 3,
+        "DPA": 2,
+    }
 
 
 def test_planted_facts(tmp_path):
@@ -31,8 +39,12 @@ def test_planted_facts(tmp_path):
     c = {k: v for k, v in labels["contracts"].items() if "_amd" not in k}
     days = {k: (date.fromisoformat(v["expiry_date"]) - SEED).days for k, v in c.items()}
     # effective expiry: amendments extend the two MSAs
-    days["bluepeak_msa"] = (date.fromisoformat(labels["contracts"]["bluepeak_amd1"]["expiry_date"]) - SEED).days
-    days["meridian_msa"] = (date.fromisoformat(labels["contracts"]["meridian_amd1"]["expiry_date"]) - SEED).days
+    days["bluepeak_msa"] = (
+        date.fromisoformat(labels["contracts"]["bluepeak_amd1"]["expiry_date"]) - SEED
+    ).days
+    days["meridian_msa"] = (
+        date.fromisoformat(labels["contracts"]["meridian_amd1"]["expiry_date"]) - SEED
+    ).days
     assert sum(d <= 30 for d in days.values()) == 4
     assert sum(30 < d <= 90 for d in days.values()) == 4
     assert sum(d > 365 for d in days.values()) == 8

@@ -1,4 +1,5 @@
 """ORM models. The schema itself is owned by Alembic migrations (see alembic/versions)."""
+
 from __future__ import annotations
 
 from datetime import date, datetime
@@ -85,7 +86,9 @@ class FieldExtraction(Base):
     field: Mapped[str] = mapped_column(Text)
     value: Mapped[str | None] = mapped_column(Text)
     confidence: Mapped[float | None] = mapped_column(Numeric(4, 3))
-    source_clause_id: Mapped[int | None] = mapped_column(ForeignKey("clauses.id", ondelete="SET NULL"))
+    source_clause_id: Mapped[int | None] = mapped_column(
+        ForeignKey("clauses.id", ondelete="SET NULL")
+    )
     source_page: Mapped[int | None] = mapped_column(Integer)
 
 
@@ -93,7 +96,9 @@ class ClauseDeviation(Base):
     __tablename__ = "clause_deviations"
     id: Mapped[int] = mapped_column(primary_key=True)
     contract_id: Mapped[int] = mapped_column(ForeignKey("contracts.id", ondelete="CASCADE"))
-    template_clause_id: Mapped[int] = mapped_column(ForeignKey("template_clauses.id", ondelete="CASCADE"))
+    template_clause_id: Mapped[int] = mapped_column(
+        ForeignKey("template_clauses.id", ondelete="CASCADE")
+    )
     deviation_summary: Mapped[str] = mapped_column(Text)
     severity: Mapped[str] = mapped_column(Text)
 
@@ -109,7 +114,9 @@ class Draft(Base):
 
 class RedlineResult(Base):
     __tablename__ = "redline_results"
-    draft_id: Mapped[int] = mapped_column(ForeignKey("drafts.id", ondelete="CASCADE"), primary_key=True)
+    draft_id: Mapped[int] = mapped_column(
+        ForeignKey("drafts.id", ondelete="CASCADE"), primary_key=True
+    )
     items: Mapped[list] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

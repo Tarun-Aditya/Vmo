@@ -1,4 +1,5 @@
 """Split a Markdown contract into header metadata and clauses with page numbers."""
+
 from __future__ import annotations
 
 import re
@@ -20,8 +21,13 @@ def parse_document(md: str) -> tuple[dict[str, str], list[dict]]:
             page = int(m.group(1))
             continue
         if m := CLAUSE_RE.match(line):
-            cur = dict(idx=int(m.group(1)), heading=m.group(2),
-                       clause_type=HEADING_TO_TYPE.get(m.group(2), "other"), text="", page=page)
+            cur = dict(
+                idx=int(m.group(1)),
+                heading=m.group(2),
+                clause_type=HEADING_TO_TYPE.get(m.group(2), "other"),
+                text="",
+                page=page,
+            )
             clauses.append(cur)
         elif cur is None:
             if m := HEADER_RE.match(line):

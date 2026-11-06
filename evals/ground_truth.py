@@ -1,13 +1,23 @@
 """Expected answers computed from labels.json + manifest.json only (never from the DB)."""
+
 import json
 from collections import defaultdict
 from datetime import date, timedelta
 
 from app.config import data_path
 
-OVERRIDABLE = ["expiry_date", "notice_period_days", "auto_renew", "annual_value", "total_value",
-               "payment_terms_days", "liability_cap_multiple", "liability_cap_text",
-               "termination_for_convenience", "governing_law"]
+OVERRIDABLE = [
+    "expiry_date",
+    "notice_period_days",
+    "auto_renew",
+    "annual_value",
+    "total_value",
+    "payment_terms_days",
+    "liability_cap_multiple",
+    "liability_cap_text",
+    "termination_for_convenience",
+    "governing_law",
+]
 
 
 def load():
@@ -19,8 +29,10 @@ def load():
     for m in man:
         if m["type"] != "Amendment":
             eff[m["key"]] = {**labels["contracts"][m["key"]], **m, "_src": {}}
-    for m in sorted((m for m in man if m["type"] == "Amendment"),
-                    key=lambda m: labels["contracts"][m["key"]]["effective_date"]):
+    for m in sorted(
+        (m for m in man if m["type"] == "Amendment"),
+        key=lambda m: labels["contracts"][m["key"]]["effective_date"],
+    ):
         for f in OVERRIDABLE:
             if f in labels["contracts"][m["key"]]:
                 eff[m["parent"]][f] = labels["contracts"][m["key"]][f]
@@ -62,8 +74,11 @@ def uncapped():
 
 
 def saas_no_dpa():
-    return {c["vendor"] for c in load()[1].values()
-            if c["type"] == "SaaS" and c["processes_personal_data"] and not c["has_dpa"]}
+    return {
+        c["vendor"]
+        for c in load()[1].values()
+        if c["type"] == "SaaS" and c["processes_personal_data"] and not c["has_dpa"]
+    }
 
 
 def no_tfc():
@@ -71,8 +86,11 @@ def no_tfc():
 
 
 def bluepeak_payment():
-    return next(c["payment_terms_days"] for c in load()[1].values()
-                if c["type"] == "MSA" and "Bluepeak" in c["vendor"])
+    return next(
+        c["payment_terms_days"]
+        for c in load()[1].values()
+        if c["type"] == "MSA" and "Bluepeak" in c["vendor"]
+    )
 
 
 def top5_vendors():
@@ -86,7 +104,11 @@ def nda_before_msa():
     _, eff, meta = load()
     out = set()
     for k, c in eff.items():
-        if c["type"] == "NDA" and c.get("parent") and c["expiry_date"] < eff[c["parent"]]["expiry_date"]:
+        if (
+            c["type"] == "NDA"
+            and c.get("parent")
+            and c["expiry_date"] < eff[c["parent"]]["expiry_date"]
+        ):
             out.add(c["title"])
     return out
 
@@ -101,13 +123,19 @@ def total_value():
 
 def short_confidentiality():
     _, eff, _ = load()
-    return {c["title"] for k, c in eff.items()
-            if any(d["clause_type"] == "confidentiality" for d in c["deviations"])}
+    return {
+        c["title"]
+        for k, c in eff.items()
+        if any(d["clause_type"] == "confidentiality" for d in c["deviations"])
+    }
 
 
 def vendor_owns_ip():
-    return {c["title"] for c in load()[1].values()
-            if any(d["clause_type"] == "ip_ownership" for d in c["deviations"])}
+    return {
+        c["title"]
+        for c in load()[1].values()
+        if any(d["clause_type"] == "ip_ownership" for d in c["deviations"])
+    }
 
 
 def non_indian_law():
@@ -115,5 +143,8 @@ def non_indian_law():
 
 
 def uncapped_autorenew():
-    return {c["title"] for c in load()[1].values()
-            if c["liability_cap_text"] == "Unlimited" and c["auto_renew"]}
+    return {
+        c["title"]
+        for c in load()[1].values()
+        if c["liability_cap_text"] == "Unlimited" and c["auto_renew"]
+    }

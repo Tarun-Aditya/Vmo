@@ -1,4 +1,5 @@
 """REST API for the POC frontend."""
+
 from __future__ import annotations
 
 import datetime as dt
@@ -12,7 +13,7 @@ from app import ask as ask_mod
 from app import deviations, llm
 from app.config import settings
 from app.db import SessionLocal
-from app.docgen.library import CLAUSES, TEMPLATES
+from app.docgen.library import CLAUSES
 from app.parsing import parse_document
 
 router = APIRouter(prefix="/api")
@@ -35,29 +36,47 @@ def meta():
     from app import embeddings
 
     row = q1("SELECT min(created_at) AS seeded_at FROM contracts")
-    return {"llm_available": llm.available(), "embedding_provider": embeddings.provider(),
-            "today": dt.date.today().isoformat(), "seeded_at": row and row["seeded_at"]}
+    return {
+        "llm_available": llm.available(),
+        "embedding_provider": embeddings.provider(),
+        "today": dt.date.today().isoformat(),
+        "seeded_at": row and row["seeded_at"],
+    }
 
 
 # ------------------------------------------------------------------ contracts
 @router.get("/contracts/filters")
 def contract_filters():
-    return {k: [r["v"] for r in q(f"SELECT DISTINCT {k} AS v FROM contracts WHERE {k} IS NOT NULL ORDER BY 1")]
-            for k in ("vendor", "category", "type", "owner", "status")}
+    return {
+        k: [
+            r["v"]
+            for r in q(f"SELECT DISTINCT {k} AS v FROM contracts WHERE {k} IS NOT NULL ORDER BY 1")
+        ]
+        for k in ("vendor", "category", "type", "owner", "status")
+    }
 
 
 @router.get("/contracts")
-def list_contracts(vendor: str | None = None, category: str | None = None, type: str | None = None,
-                   owner: str | None = None, status: str | None = None, search: str | None = None):
+def list_contracts(
+    vendor: str | None = None,
+    category: str | None = None,
+    type: str | None = None,
+    owner: str | None = None,
+    status: str | None = None,
+    search: str | None = None,
+):
     where, p = [], {}
-    for k, v in dict(vendor=vendor, category=category, type=type, owner=owner, status=status).items():
+    for k, v in dict(
+        vendor=vendor, category=category, type=type, owner=owner, status=status
+    ).items():
         if v:
             where.append(f"c.{k} = :{k}")
             p[k] = v
     if search:
         where.append("(c.title ILIKE :s OR c.vendor ILIKE :s)")
         p["s"] = f"%{search}%"
-    return q(f"""
+    return q(
+        f"""
       SELECT c.id, c.title, c.vendor, c.category, c.type, c.owner, c.status, c.parent_id,
              COALESCE(e.expiry_date, c.expiry_date) AS expiry_date,
              COALESCE(e.annual_value, c.annual_value) AS annual_value,
@@ -66,12 +85,23 @@ def list_contracts(vendor: str | None = None, category: str | None = None, type:
              (SELECT count(*) FROM clause_deviations d WHERE d.contract_id = c.id) AS deviation_count
       FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
       {"WHERE " + " AND ".join(where) if where else ""}
-      ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Amendment' THEN 2 ELSE 3 END, c.title""", **p)
+      ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Amendment' THEN 2 ELSE 3 END, c.title""",
+        **p,
+    )
 
 
-EFFECTIVE_FIELDS = ["expiry_date", "notice_period_days", "auto_renew", "annual_value", "total_value",
-                    "payment_terms_days", "liability_cap_multiple", "liability_cap_text",
-                    "termination_for_convenience", "governing_law"]
+EFFECTIVE_FIELDS = [
+    "expiry_date",
+    "notice_period_days",
+    "auto_renew",
+    "annual_value",
+    "total_value",
+    "payment_terms_days",
+    "liability_cap_multiple",
+    "liability_cap_text",
+    "termination_for_convenience",
+    "governing_law",
+]
 
 
 def _tree(root_id: int) -> dict:
@@ -81,8 +111,14 @@ def _tree(root_id: int) -> dict:
         kids.setdefault(r["parent_id"], []).append(r)
 
     def build(r):
-        return {**r, "children": [build(c) for c in sorted(kids.get(r["id"], []),
-                                                           key=lambda x: (x["type"] != "SOW", x["id"]))]}
+        return {
+            **r,
+            "children": [
+                build(c)
+                for c in sorted(kids.get(r["id"], []), key=lambda x: (x["type"] != "SOW", x["id"]))
+            ],
+        }
+
     return build(next(r for r in rows if r["id"] == root_id))
 
 
@@ -91,35 +127,60 @@ def get_contract(cid: int):
     c = q1("SELECT * FROM contracts WHERE id = :i", i=cid)
     if not c:
         raise HTTPException(404, "contract not found")
-    clauses = q("SELECT id, clause_type, heading, text, page FROM clauses WHERE contract_id=:i ORDER BY id", i=cid)
-    fields = q("""SELECT f.field, f.value, f.confidence, f.source_clause_id, f.source_page,
+    clauses = q(
+        "SELECT id, clause_type, heading, text, page FROM clauses WHERE contract_id=:i ORDER BY id",
+        i=cid,
+    )
+    fields = q(
+        """SELECT f.field, f.value, f.confidence, f.source_clause_id, f.source_page,
                          cl.heading AS source_heading
                   FROM field_extractions f LEFT JOIN clauses cl ON cl.id = f.source_clause_id
-                  WHERE f.contract_id = :i ORDER BY f.id""", i=cid)
+                  WHERE f.contract_id = :i ORDER BY f.id""",
+        i=cid,
+    )
     titles = {r["id"]: r["title"] for r in q("SELECT id, title FROM contracts")}
     eff = q1("SELECT * FROM v_effective_terms WHERE contract_id = :i", i=cid)
     effective = []
     if eff:
         for f in EFFECTIVE_FIELDS:
             src = eff[f"{f}_source"]
-            effective.append({"field": f, "value": eff[f], "source_id": src,
-                              "source_title": titles[src], "overridden": src != cid})
+            effective.append(
+                {
+                    "field": f,
+                    "value": eff[f],
+                    "source_id": src,
+                    "source_title": titles[src],
+                    "overridden": src != cid,
+                }
+            )
     root = cid
     while True:
         p = q1("SELECT parent_id FROM contracts WHERE id = :i", i=root)
         if not p or not p["parent_id"]:
             break
         root = p["parent_id"]
-    devs = q("""SELECT d.severity, d.deviation_summary, tc.clause_type, tc.id AS template_clause_id
+    devs = q(
+        """SELECT d.severity, d.deviation_summary, tc.clause_type, tc.id AS template_clause_id
                 FROM clause_deviations d JOIN template_clauses tc ON tc.id = d.template_clause_id
-                WHERE d.contract_id = :i""", i=cid)
+                WHERE d.contract_id = :i""",
+        i=cid,
+    )
     for d in devs:
         d["heading"] = CLAUSES[d["clause_type"]].heading
     devs.sort(key=lambda d: -SEV_RANK[d["severity"]])
-    return {"contract": {k: v for k, v in c.items()}, "clauses": clauses, "fields": fields,
-            "effective_terms": effective, "hierarchy": _tree(root), "deviations": devs,
-            "is_amendment": c["type"] == "Amendment", "overrides": c["overrides"],
-            "parent": {"id": c["parent_id"], "title": titles.get(c["parent_id"])} if c["parent_id"] else None}
+    return {
+        "contract": {k: v for k, v in c.items()},
+        "clauses": clauses,
+        "fields": fields,
+        "effective_terms": effective,
+        "hierarchy": _tree(root),
+        "deviations": devs,
+        "is_amendment": c["type"] == "Amendment",
+        "overrides": c["overrides"],
+        "parent": (
+            {"id": c["parent_id"], "title": titles.get(c["parent_id"])} if c["parent_id"] else None
+        ),
+    }
 
 
 # ------------------------------------------------------------------ dashboard
@@ -134,12 +195,14 @@ def dashboard():
         count(*) FILTER (WHERE auto_renew AND notice_days_left < 0) AS autorenew_notice_passed,
         count(*) FILTER (WHERE liability_uncapped) AS uncapped
         FROM v_renewals""")
-    items = q("""SELECT contract_id AS id, title, vendor, category, type, owner, annual_value, auto_renew,
+    items = q(
+        """SELECT contract_id AS id, title, vendor, category, type, owner, annual_value, auto_renew,
                    expiry_date, notice_period_days, notice_deadline, days_left, notice_days_left, bucket,
                    liability_uncapped,
                    CASE WHEN auto_renew THEN 'notice' ELSE 'expiry' END AS action
                  FROM v_renewals WHERE bucket <> 'later'
-                 ORDER BY CASE WHEN auto_renew THEN notice_deadline ELSE expiry_date END""")
+                 ORDER BY CASE WHEN auto_renew THEN notice_deadline ELSE expiry_date END"""
+    )
     sev = {"overdue": "critical", "30": "high", "60": "medium", "90": "low"}
     for i in items:
         i["severity"] = sev[i["bucket"]]
@@ -147,11 +210,21 @@ def dashboard():
     buckets = []
     for b in ("overdue", "30", "60", "90"):
         its = [i for i in items if i["bucket"] == b]
-        buckets.append({"bucket": b, "severity": sev[b], "count": len(its),
-                        "value": sum(float(i["annual_value"] or 0) for i in its)})
+        buckets.append(
+            {
+                "bucket": b,
+                "severity": sev[b],
+                "count": len(its),
+                "value": sum(float(i["annual_value"] or 0) for i in its),
+            }
+        )
     risks = {
-        "uncapped": q("SELECT contract_id AS id, title, vendor FROM v_effective_terms WHERE liability_uncapped"),
-        "no_tfc": q("SELECT contract_id AS id, title, vendor FROM v_effective_terms WHERE termination_for_convenience = false"),
+        "uncapped": q(
+            "SELECT contract_id AS id, title, vendor FROM v_effective_terms WHERE liability_uncapped"
+        ),
+        "no_tfc": q(
+            "SELECT contract_id AS id, title, vendor FROM v_effective_terms WHERE termination_for_convenience = false"
+        ),
         "pd_without_dpa": q("""SELECT contract_id AS id, title, vendor FROM v_effective_terms
                               WHERE processes_personal_data AND NOT has_dpa AND type <> 'DPA'"""),
     }
@@ -171,7 +244,9 @@ def ask(body: AskIn):
 
 @router.get("/ask/suggestions")
 def suggestions():
-    return [r["question"] for r in q("SELECT question FROM ask_cache ORDER BY created_at, question")]
+    return [
+        r["question"] for r in q("SELECT question FROM ask_cache ORDER BY created_at, question")
+    ]
 
 
 # ------------------------------------------------------------------ redline
@@ -205,8 +280,11 @@ def redline(did: int):
 
 @router.post("/drafts/{did}/redline/rerun")
 def redline_rerun(did: int):
-    d = q1("""SELECT d.body_md, t.type FROM drafts d JOIN templates t ON t.id = d.template_id
-              WHERE d.id=:i""", i=did)
+    d = q1(
+        """SELECT d.body_md, t.type FROM drafts d JOIN templates t ON t.id = d.template_id
+              WHERE d.id=:i""",
+        i=did,
+    )
     if not d:
         raise HTTPException(404, "draft not found")
     _, clauses = parse_document(d["body_md"])
@@ -217,8 +295,11 @@ def redline_rerun(did: int):
     t0 = time.time()
     items = deviations.compare_document(clauses, d["type"], mode)
     with SessionLocal() as s:
-        s.execute(text("""UPDATE redline_results SET items = CAST(:it AS jsonb), created_at = now()
-                          WHERE draft_id=:i"""), {"it": json.dumps(items), "i": did})
+        s.execute(
+            text("""UPDATE redline_results SET items = CAST(:it AS jsonb), created_at = now()
+                          WHERE draft_id=:i"""),
+            {"it": json.dumps(items), "i": did},
+        )
         s.commit()
     return {**_draft_payload(did, items, mode), "elapsed_ms": int((time.time() - t0) * 1000)}
 
@@ -241,18 +322,26 @@ def template(tid: int):
     if not t:
         raise HTTPException(404, "template not found")
     clauses = q("SELECT * FROM template_clauses WHERE template_id=:i ORDER BY id", i=tid)
-    contracts = q("""SELECT id, title, vendor FROM contracts WHERE template_id=:i AND type <> 'Amendment'
-                     ORDER BY vendor, title""", i=tid)
-    devs = q("""SELECT d.contract_id, d.template_clause_id, d.severity, d.deviation_summary
+    contracts = q(
+        """SELECT id, title, vendor FROM contracts WHERE template_id=:i AND type <> 'Amendment'
+                     ORDER BY vendor, title""",
+        i=tid,
+    )
+    devs = q(
+        """SELECT d.contract_id, d.template_clause_id, d.severity, d.deviation_summary
                 FROM clause_deviations d JOIN template_clauses tc ON tc.id = d.template_clause_id
-                WHERE tc.template_id = :i""", i=tid)
+                WHERE tc.template_id = :i""",
+        i=tid,
+    )
     cell = {(d["contract_id"], d["template_clause_id"]): d for d in devs}
     for c in clauses:
         c["heading"] = CLAUSES[c["clause_type"]].heading
         c["variable"] = CLAUSES[c["clause_type"]].variable
         c["deviation_count"] = sum(1 for d in devs if d["template_clause_id"] == c["id"])
-    matrix = [{"contract": c, "cells": {str(cl["id"]): cell.get((c["id"], cl["id"])) for cl in clauses}}
-              for c in contracts]
+    matrix = [
+        {"contract": c, "cells": {str(cl["id"]): cell.get((c["id"], cl["id"])) for cl in clauses}}
+        for c in contracts
+    ]
     return {"template": t, "clauses": clauses, "matrix": matrix}
 
 
@@ -266,11 +355,20 @@ def usage():
                        sum(output_tokens) AS output_tokens, round(avg(latency_ms)) AS avg_latency_ms
                 FROM llm_calls GROUP BY purpose, model ORDER BY purpose""")
     for r in rows:
-        r["est_cost_usd"] = round((r["input_tokens"] * PRICE_PER_MTOK["input"] +
-                                   r["output_tokens"] * PRICE_PER_MTOK["output"]) / 1e6, 4)
-    return {"rows": rows, "total_calls": sum(r["calls"] for r in rows),
-            "total_input_tokens": sum(r["input_tokens"] for r in rows),
-            "total_output_tokens": sum(r["output_tokens"] for r in rows),
-            "est_cost_usd": round(sum(r["est_cost_usd"] for r in rows), 4),
-            "price_note": f"Estimated at ${PRICE_PER_MTOK['input']}/MTok in, ${PRICE_PER_MTOK['output']}/MTok out",
-            "llm_available": bool(settings.anthropic_api_key)}
+        r["est_cost_usd"] = round(
+            (
+                r["input_tokens"] * PRICE_PER_MTOK["input"]
+                + r["output_tokens"] * PRICE_PER_MTOK["output"]
+            )
+            / 1e6,
+            4,
+        )
+    return {
+        "rows": rows,
+        "total_calls": sum(r["calls"] for r in rows),
+        "total_input_tokens": sum(r["input_tokens"] for r in rows),
+        "total_output_tokens": sum(r["output_tokens"] for r in rows),
+        "est_cost_usd": round(sum(r["est_cost_usd"] for r in rows), 4),
+        "price_note": f"Estimated at ${PRICE_PER_MTOK['input']}/MTok in, ${PRICE_PER_MTOK['output']}/MTok out",
+        "llm_available": bool(settings.anthropic_api_key),
+    }

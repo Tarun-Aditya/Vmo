@@ -1,4 +1,5 @@
 """API smoke tests against the seeded DB (skipped when no DB / not seeded)."""
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
@@ -45,7 +46,7 @@ def test_sql_guard(client):
 
     assert "error" in run_sql("DELETE FROM contracts")
     assert "error" in run_sql("SELECT 1; SELECT 2")
-    assert "error" in run_sql("SELECT embedding FROM clauses")          # column revoked from RO role
+    assert "error" in run_sql("SELECT embedding FROM clauses")  # column revoked from RO role
     assert run_sql("SELECT count(*) AS n FROM contracts WHERE title LIKE '%MSA%'")["rows"]
 
 
