@@ -76,8 +76,7 @@ Measured with Claude on the subscription (`make seed && make eval`): extraction 
 Offline: 442/442, 18/18, 27/27. `make test` seeds offline first (the tests assert the deterministic offline data). Free-form (non-cached)
 questions need **Demo mode off** to go live; with it on, preloaded questions are served from the cache that the seed generated with Claude.
 
-The header badge shows the engine. Offline eval scores prove the plumbing and data, not Claude's quality — run
-`make seed && make eval` with a key to measure the real thing. **Demo mode** answers the preloaded questions from cache.
+The header badge shows the engine in use. Offline eval scores prove the plumbing and data, not Claude's quality; the Claude scores above do.
 
 ## Demo script (~10 min)
 1. **Dashboard (1m)** — USD; contracts expiring in the next 30 / 60 / 90 days with $ at stake; AdSpark's notice deadline has passed.
