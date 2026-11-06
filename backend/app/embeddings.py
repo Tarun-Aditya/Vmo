@@ -22,6 +22,8 @@ _GROUPS = [("terminate", "termination", "cancel", "cancellation", "exit"),
            ("renew", "renews", "renewal", "automatically", "extension"),
            ("personal", "pii", "privacy"), ("pay", "payment", "invoice", "invoices")]
 _CANON = {w: g[0] for g in _GROUPS for w in g}
+_NUMS = {"one": "1", "two": "2", "three": "3", "four": "4", "five": "5", "six": "6", "ten": "10"}
+_CANON.update(_NUMS)
 _model = None
 
 
@@ -39,7 +41,8 @@ def _hash_embed(text: str) -> list[float]:
     vec = [0.0] * DIM
     for f in feats:
         h = int(hashlib.md5(f.encode()).hexdigest(), 16)
-        vec[h % DIM] += 1.0 if (h >> 100) & 1 else -1.0
+        w = 3.0 if re.search(r"\d", f) else 1.0  # numbers (periods, caps, days) decide contract meaning
+        vec[h % DIM] += w if (h >> 100) & 1 else -w
     norm = math.sqrt(sum(v * v for v in vec)) or 1.0
     return [v / norm for v in vec]
 

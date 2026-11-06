@@ -14,6 +14,9 @@ def upgrade() -> None:
 CREATE TABLE ask_cache (
   question_key text PRIMARY KEY, question text NOT NULL, response jsonb NOT NULL,
   source text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+-- The Ask assistant's role may read clause text but not raw embedding vectors.
+REVOKE SELECT ON clauses FROM vmo_readonly;
+GRANT SELECT (id, contract_id, clause_type, heading, text, page) ON clauses TO vmo_readonly;
 """)
 
 

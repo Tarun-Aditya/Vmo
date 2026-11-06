@@ -1,0 +1,32 @@
+# 15 demo questions. `expected` names a function in evals/ground_truth.py computed from labels.json
+# (independent of the DB and the SQL), so a correct answer is checked against the planted facts.
+- {id: notice_60, question: "Which contracts have a notice deadline in the next 60 days?", type: sql,
+   check: {kind: set, column: title, expected: notice_60}}
+- {id: quarter_by_category, question: "What is the total annual value of contracts expiring this quarter, by category?", type: sql,
+   check: {kind: dict, key: category, value: total_annual_value, expected: quarter_by_category}}
+- {id: uncapped, question: "Which vendors have uncapped liability?", type: sql,
+   check: {kind: set, column: vendor, expected: uncapped}}
+- {id: saas_no_dpa, question: "Which SaaS vendors process personal data without a DPA?", type: sql,
+   check: {kind: set, column: vendor, expected: saas_no_dpa}}
+- {id: no_tfc, question: "Which contracts can't be terminated for convenience?", type: sql,
+   check: {kind: set, column: title, expected: no_tfc}}
+- {id: bluepeak_payment, question: "What are the current effective payment terms on the Bluepeak MSA after amendments?", type: sql,
+   check: {kind: number, column: effective_payment_terms_days, expected: bluepeak_payment}}
+- {id: top5_vendors, question: "Who are the top 5 vendors by annual value and what are their renewal dates?", type: sql,
+   check: {kind: set, column: vendor, expected: top5_vendors}}
+- {id: nda_before_msa, question: "Which NDAs expire before their related MSA?", type: sql,
+   check: {kind: set, column: nda, expected: nda_before_msa}}
+- {id: auto_renewals, question: "Which contracts auto-renew, and by when must we give notice?", type: sql,
+   check: {kind: set, column: title, expected: auto_renewals}}
+- {id: expire_30, question: "Which contracts expire in the next 30 days?", type: sql,
+   check: {kind: set, column: title, expected: expire_30}}
+- {id: total_value, question: "What is the total annual value of all active contracts?", type: sql,
+   check: {kind: number, column: total_annual_value, expected: total_value}}
+- {id: short_confidentiality, question: "Which contracts have a confidentiality period shorter than three years?", type: clause,
+   check: {kind: cited, expected: short_confidentiality}}
+- {id: vendor_owns_ip, question: "Which contracts give the vendor ownership of the deliverables we pay for?", type: clause,
+   check: {kind: cited, expected: vendor_owns_ip}}
+- {id: non_indian_law, question: "Which contracts are governed by a law other than Indian law, and what does the clause say?", type: mixed,
+   check: {kind: set_and_cited, column: title, expected: non_indian_law}}
+- {id: uncapped_autorenew, question: "Which auto-renewing contracts have uncapped liability, and what does their liability clause say?", type: mixed,
+   check: {kind: set_and_cited, column: title, expected: uncapped_autorenew}}
