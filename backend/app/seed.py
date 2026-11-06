@@ -25,7 +25,7 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
         f"{len(manifest['drafts'])} drafts into {root / 'inbox'} (seed date {seed_date})")
     with SessionLocal() as s:
         s.execute(text("TRUNCATE templates, template_clauses, contracts, clauses, field_extractions, clause_deviations, "
-                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs RESTART IDENTITY CASCADE"))
+                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages RESTART IDENTITY CASCADE"))
         kcc.ensure_defaults(s)
         s.execute(text("UPDATE pipeline_config SET inbox_path = NULL, last_run_at = NULL, next_run_at = NULL, last_fingerprint = NULL"))
         s.execute(text("UPDATE pipeline_config SET enabled = true, trigger_mode = 'periodic', interval_minutes = 120, folders = 'contracts,uploads' WHERE key = 'contracts'"))

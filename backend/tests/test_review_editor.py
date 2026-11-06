@@ -156,3 +156,29 @@ def test_generator_brief_clause_picker_and_library(client):
     md = client.post("/api/generator/preview", json={"template": "NDA", "params": {"vendor": "Qux Inc", "clauses": keys}}).json()["md"]
     assert "Audit Rights" in md and "Governing Law" not in md
     assert client.post("/api/generator/brief", json={"text": "  "}).status_code == 422
+
+
+def test_chat_streams_steps_then_answer_and_keeps_history(client):
+    import json
+
+    def run(q, cid=None, scope=None):
+        r = client.post("/api/chat/stream", json={"question": q, "conversation_id": cid, "demo_mode": False, "contract_ids": scope})
+        assert r.status_code == 200 and r.headers["content-type"].startswith("text/event-stream")
+        return [json.loads(x[5:]) for x in r.text.split("\n\n") if x.startswith("data:")]
+
+    ev = run("How many contracts are expiring in the next quarter?")
+    kinds = [e["type"] for e in ev]
+    assert kinds[0] == "meta" and kinds[-1] == "done" and "step" in kinds and "token" in kinds and kinds.index("step") < kinds.index("token") < kinds.index("result")
+    res = next(e for e in ev if e["type"] == "result")["result"]
+    assert "".join(e["text"] for e in ev if e["type"] == "token").strip() == res["answer"].strip() and res["tables"] and res["thinking"]
+    cid = ev[0]["conversation_id"]
+    ev2 = run("Which vendors have uncapped liability?", cid)                      # a follow-up lands in the same conversation
+    assert ev2[0]["conversation_id"] == cid
+    conv = client.get(f"/api/conversations/{cid}").json()
+    assert [m["role"] for m in conv["messages"]] == ["user", "assistant", "user", "assistant"] and conv["messages"][1]["payload"]["tables"]
+    lst = {c["id"]: c for c in client.get("/api/conversations").json()}
+    assert lst[cid]["questions"] == 2 and cid in {c["id"] for c in client.get("/api/conversations?q=uncapped").json()}
+    assert cid not in {c["id"] for c in client.get("/api/conversations?q=zzznotthere").json()}
+    assert client.patch(f"/api/conversations/{cid}", json={"title": "Renamed"}).json()["title"] == "Renamed"
+    assert client.delete(f"/api/conversations/{cid}").status_code == 200 and client.get(f"/api/conversations/{cid}").status_code == 404
+    assert client.post("/api/chat/stream", json={"question": " "}).status_code == 422

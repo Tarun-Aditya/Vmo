@@ -48,6 +48,11 @@ data/inbox/**.md  ──►  pipeline  ──►  contracts · clauses · fields
   editor with the live checklist, create: it is dropped into the folder, extracted, and appears everywhere.
 * **Templates** — every template clause by clause with its deviation heatmap, and a coverage matrix of which clauses each
   template contains; "Create a contract from this template" jumps into New contract.
+* **Chat** — Ask is a chat window: the **thinking trail streams live** (understood the question → SQL → composed the answer; with
+  Claude also its reasoning text), then the answer is written out and the tables appear; **Stop** cancels. Follow-ups stay in
+  the same conversation (Claude gets the earlier turns as context; the offline planner answers each question on its own).
+  **Conversation history** on the left: reopen any past chat with its answers, tables and thinking, search, rename, delete.
+  Re-seeding resets history (document ids change).
 * **Ask** — *analytical* questions over the whole portfolio, or questions about **specific documents** chosen (search +
   select) in the panel on the right. Answers are tables; the SQL and steps are under a collapsed **Thinking** section.
 

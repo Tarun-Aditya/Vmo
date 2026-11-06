@@ -19,7 +19,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const caption = async (t) => p.evaluate((t) => {
     let el = document.getElementById('__cap');
     if (!el) { el = document.createElement('div'); el.id = '__cap';
-      el.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:99999;background:rgba(15,23,42,.93);color:#fff;padding:10px 20px;border-radius:10px;font:600 16px system-ui;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.4)';
+      el.style.cssText = 'position:fixed;left:50%;bottom:84px;pointer-events:none;transform:translateX(-50%);z-index:99999;background:rgba(15,23,42,.93);color:#fff;padding:10px 20px;border-radius:10px;font:600 16px system-ui;max-width:90%;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.4)';
       document.body.appendChild(el); }
     el.textContent = t; }, t);
   const check = async (name, fn) => {
@@ -32,9 +32,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const text = (sel) => p.locator(sel).first().innerText();
   const api = (path, init) => p.evaluate(([u, i]) => fetch(u, i).then((r) => r.json()), [A + path, init]);
   const nav = async (label) => { await p.click(`nav >> text=${label}`); await sleep(700); };
-  const ans = () => text('section:has-text("Answer")');
-  const ask = async (q, waitFor) => {
-    await p.fill('form input', q); await p.click('button:has-text("Ask")');
+  const ans = () => p.locator('[data-msg="assistant"] section').last().innerText();
+  const settled = () => p.waitForFunction(() => !document.querySelector('[data-streaming]') && document.querySelectorAll('[data-msg="assistant"]').length > 0);
+  const ask = async (q, waitFor, follow = false) => {
+    if (!follow) await p.click('button:has-text("+ New chat")');
+    const n = await p.locator('[data-msg="assistant"]').count();
+    await p.fill('form input', q); await p.click('form button:has-text("Ask")');
+    await p.waitForFunction((k) => document.querySelectorAll('[data-msg="assistant"]').length > k && !document.querySelector('[data-streaming]'), n, { timeout: 30000 });
     await p.waitForSelector(waitFor || 'text=Thinking'); await sleep(900);
   };
 
@@ -93,7 +97,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await top(); await nav('Ask'); await p.waitForSelector('text=Scope of the question'); await sleep(600);
   await step('5 · Ask — analytical questions across the portfolio (scope: all documents)', 2400);
   await check('Ask: scope panel lists all 32 documents with search', async () => (await p.locator('ul[aria-label="Documents"] li').count()) === 32);
-  await p.click('button:has-text("Which vendors have uncapped liability?")'); await p.waitForSelector('text=Thinking'); await sleep(900);
+  await p.click('button:has-text("Which vendors have uncapped liability?")'); await p.waitForSelector('text=Thinking'); await settled(); await sleep(900);
   await check('Ask: table answer (3 vendors), no SQL visible; thinking collapsed', async () => (await p.locator('section:has-text("Answer") tbody tr').count()) === 3 && (await p.locator('pre').count()) === 0 && (await ans()).includes('PulseHR'));
   await p.click('button:has-text("Thinking")'); await sleep(800);
   await check('Thinking: numbered steps incl. generated SQL', async () => (await p.locator('ol li').count()) >= 3 && (await p.locator('pre:has-text("v_effective_terms")').count()) >= 1);
@@ -110,12 +114,33 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await ask('Which vendors have contracts expiring in the next 90 days?', 'text=Vendors');
   await check('Vendor-level: 6 vendors, tiles Contracts 8 / Vendors 6 / $15.69M', async () => { const t = await p.locator('div.bg-indigo-50').allInnerTexts(); return t.length === 3 && t[0].includes('8') && t[1].includes('6') && t[2].includes('$15.69M'); });
 
+  await p.click('button:has-text("+ New chat")');
+  await p.fill('form input', 'Which vendors have uncapped liability?'); await p.click('form button:has-text("Ask")');
+  await check('Chat streams: a live "Thinking…" panel and a Stop button while the answer is produced', async () => { await p.waitForSelector('[data-thinking="live"]', { timeout: 4000 }); return (await p.locator('button:has-text("Stop")').count()) === 1; });
+  await step('Chat window: the thinking trail streams step by step, then the answer is written out', 1600);
+  await settled(); await sleep(600);
+  await check('When done the thinking collapses; the answer and table stay', async () => (await p.locator('[data-thinking="done"]').count()) === 1 && (await p.locator('section:has-text("Answer") tbody tr').count()) === 3);
+  await ask('How many contracts are expiring in the next 90 days?', 'text=Breakdown by category', true);
+  await step('Follow-up questions stay in the same conversation', 2400);
+  await check('Follow-up: two question/answer pairs in one transcript', async () => (await p.locator('[data-msg="assistant"]').count()) === 2 && (await p.locator('[data-msg="user"]').count()) === 2);
+  await check('History: the conversation is saved with both questions', async () => { const c = (await api('/api/conversations'))[0]; return c.questions === 2 && c.title.includes('uncapped liability'); });
+  await p.click('button:has-text("+ New chat")'); await sleep(500);
+  await check('New chat clears the transcript', async () => (await p.locator('[data-msg]').count()) === 0);
+  await p.locator('aside[aria-label="Conversation history"] li button').first().click(); await p.waitForSelector('[data-msg="assistant"]'); await sleep(900);
+  await step('Previous conversations: reopen any past chat with its answers, tables and thinking', 2600);
+  await check('Reopened conversation restores both answers and tables', async () => (await p.locator('[data-msg="assistant"]').count()) === 2 && (await p.locator('section:has-text("Answer") table').count()) >= 2);
+  await p.fill('input[aria-label="Search conversations"]', 'zzz-nothing'); await sleep(700);
+  await check('History search filters conversations', async () => (await p.locator('aside[aria-label="Conversation history"] li').count()) === 1 && (await text('aside[aria-label="Conversation history"]')).includes('No conversations match'));
+  await p.fill('input[aria-label="Search conversations"]', 'uncapped'); await sleep(700);
+  await check('History search finds conversations by their questions', async () => (await p.locator('aside[aria-label="Conversation history"] li button').count()) >= 1);
+  await p.fill('input[aria-label="Search conversations"]', ''); await sleep(500);
+
   // ---------------------------------------------------------------- 6 ASK (scoped to documents)
   await p.click('[role=radio]:has-text("Selected documents")'); await sleep(500);
   await p.fill('input[aria-label="Search documents"]', 'delmont'); await sleep(600);
   await p.locator('ul[aria-label="Documents"] label:has-text("Master Services Agreement – Delmont") input').check(); await sleep(500);
   await step('6 · Ask about specific documents: pick them on the right (search + select)', 2800);
-  await check('Scope: 1 selected; list filtered by search', async () => (await text('aside')).includes('1 selected') && (await p.locator('ul[aria-label="Documents"] li').count()) === 6);
+  await check('Scope: 1 selected; list filtered by search', async () => (await text('aside[aria-label="Question scope"]')).includes('1 selected') && (await p.locator('ul[aria-label="Documents"] li').count()) === 6);
   await ask('Tell me about this contract', 'section:has-text("Answer") table');
   await step('Specific document → a fact sheet: dates, signatories, extracted terms and limits', 3200);
   await check('Fact sheet (Delmont MSA): England and Wales, Unlimited liability, $500K insurance', async () => { const t = await ans(); return t.includes('England and Wales') && t.includes('Unlimited') && t.includes('$500K') && t.includes('Scope: 1 selected document'); });
