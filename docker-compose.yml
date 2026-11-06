@@ -1,0 +1,36 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vmo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vmo}
+      POSTGRES_DB: ${POSTGRES_DB:-vmo}
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vmo} -d ${POSTGRES_DB:-vmo}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ./backend
+    env_file: [.env]
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://vmo:vmo@db:5432/vmo}
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["8000:8000"]
+    volumes: ["./backend:/app", "./data:/data", "./scripts:/scripts", "./evals:/evals"]
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  web:
+    build: ./frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports: ["5173:5173"]
+    volumes: ["./frontend:/app", "/app/node_modules"]
+    depends_on: [api]
+
+volumes:
+  pgdata:
