@@ -31,7 +31,7 @@ def test_loop_feeds_sql_error_back_and_retries(monkeypatch, seeded):
         ),
         NS(
             stop_reason="end_turn",
-            content=[NS(type="text", text="There are 19 renewable contracts.")],
+            content=[NS(type="text", text="There are 25 renewable contracts.")],
         ),
     ]
     seen = []
@@ -42,12 +42,12 @@ def test_loop_feeds_sql_error_back_and_retries(monkeypatch, seeded):
 
     monkeypatch.setattr("app.llm.create", fake_create)
     res = ask.ask_llm("How many?")
-    assert res["answer"].startswith("There are 19")
+    assert res["answer"].startswith("There are 25")
     assert [("error" in c["output"]) for c in res["tool_calls"]] == [True, False]
     # the error text was fed back to the model as an is_error tool_result
     fed_back = seen[1][-1]["content"][0]
     assert fed_back["is_error"] and "nope" in fed_back["content"]
-    assert res["tool_calls"][1]["output"]["rows"] == [[19]]
+    assert res["tool_calls"][1]["output"]["rows"] == [[25]]
 
 
 def test_demo_mode_uses_cache_and_offline_answers_are_cited(monkeypatch, seeded):

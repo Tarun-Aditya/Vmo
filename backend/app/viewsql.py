@@ -11,7 +11,7 @@ OVERRIDABLE = [
 ]
 
 
-def effective_terms_sql() -> str:
+def effective_terms_sql(name: str = "v_effective_terms", drafts: bool = False) -> str:
     """One row per non-amendment contract with amendments applied, plus provenance
     (<field>_source = id of the contract whose text set the value) and signature status."""
     selects, joins = [], []
@@ -23,7 +23,7 @@ def effective_terms_sql() -> str:
             f"LEFT JOIN contracts a_{f} ON a_{f}.id = o_{f}.src"
         )
     return f"""
-CREATE VIEW v_effective_terms AS
+CREATE VIEW {name} AS
 SELECT t.*,
        -- Uncapped = a cap clause says "Unlimited". Docs with no cap clause are NOT uncapped.
        (t.liability_cap_multiple IS NULL AND t.liability_cap_text ILIKE 'unlimited%') AS liability_uncapped
@@ -41,7 +41,7 @@ SELECT c.id AS contract_id, c.title, c.vendor, c.effective_date, c.category, c.t
        {", ".join(selects)}
 FROM contracts c
 {" ".join(joins)}
-WHERE c.type <> 'Amendment'
+WHERE c.type <> 'Amendment' {'' if drafts else "AND c.status <> 'draft'"}
 ) t
 """
 
@@ -72,16 +72,17 @@ FROM (
 """
 
 
-def key_clauses_sql() -> str:
+def key_clauses_sql(keys: list[str] | None = None) -> str:
     """One boolean per key clause: does the document contain it? (has_execution = fully signed.)"""
+    keys = keys or KEY_CLAUSES
     cols = [
         f"COALESCE(bool_or(cl.clause_type = '{c}'), false) AS has_{c}"
-        for c in KEY_CLAUSES
+        for c in keys
         if c != "execution"
     ]
     return f"""
 CREATE VIEW v_key_clauses AS
-SELECT c.id AS contract_id, {", ".join(cols)}, c.fully_executed AS has_execution
+SELECT c.id AS contract_id, {", ".join(cols)}{', c.fully_executed AS has_execution' if 'execution' in keys else ''}
 FROM contracts c LEFT JOIN clauses cl ON cl.contract_id = c.id
 WHERE c.type <> 'Amendment'
 GROUP BY c.id, c.fully_executed

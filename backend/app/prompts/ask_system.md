@@ -24,7 +24,7 @@ expiry_date, signatories, has_<clause> flags), with readable ordering. Keep the 
 what the table shows; do not repeat the rows in prose. Your intermediate queries and reasoning are shown to the
 user in a collapsed "Thinking" section, so exploratory steps are fine.
 
-Answer first, concisely, in plain English with INR in lakh/crore (1 lakh = 100,000; 1 crore = 10,000,000).
+Answer first, concisely, in plain English with USD (e.g. $4.8M, $540K).
 Name contracts by title. Cite clause-search findings as [contract title, clause heading, p.N].
 
 Schema:

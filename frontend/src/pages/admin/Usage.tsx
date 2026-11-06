@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../lib";
-import { Card, Loading, Td, Th } from "../ui";
+import { api } from "../../lib";
+import { Card, Loading, Td, Th } from "../../ui";
 
 type U = { rows: { purpose: string; model: string; calls: number; input_tokens: number; output_tokens: number; avg_latency_ms: number; est_cost_usd: number }[];
   total_calls: number; total_input_tokens: number; total_output_tokens: number; est_cost_usd: number; price_note: string; llm_available: boolean };
@@ -11,7 +11,7 @@ export default function Admin() {
   const u = q.data;
   return (
     <div className="mx-auto max-w-4xl space-y-4">
-      <h1 className="text-xl font-semibold">AI usage</h1>
+      <h2 className="text-lg font-semibold">AI usage</h2>
       <div className="grid grid-cols-4 gap-4">
         {[["LLM calls", u.total_calls], ["Input tokens", u.total_input_tokens.toLocaleString()], ["Output tokens", u.total_output_tokens.toLocaleString()], ["Est. cost", `$${u.est_cost_usd}`]].map(([l, v]) => (
           <Card key={String(l)}><div className="text-xs uppercase text-slate-500">{l}</div><div className="text-2xl font-semibold tabular-nums">{v}</div></Card>))}

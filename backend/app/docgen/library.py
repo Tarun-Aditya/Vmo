@@ -8,15 +8,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-CUSTOMER = "Arcadia Retail Ltd"
+CUSTOMER = "Arcadia Retail Inc."
 
 # Standard (template) values for every placeholder used in clause text.
 STD: dict[str, str | int] = dict(
     payment_terms_days=45,
     tfc_notice_days=30,
     cap="1",
-    governing_law="India",
-    venue="Mumbai",
+    governing_law="New York",
+    venue="New York County",
     conf_period="3 years",
     sla="99.9",
     sec_hours=48,
@@ -26,7 +26,7 @@ STD: dict[str, str | int] = dict(
     cure_days=30,
     accept_days=10,
     warranty_days=90,
-    insurance_cover="INR 5 crore",
+    insurance_cover="USD 5,000,000",
     fm_days=60,
     kp_days=15,
 )
@@ -79,11 +79,11 @@ CLAUSES: dict[str, ClauseDef] = {
         C(
             "fees",
             "Fees",
-            "The annual fees under this {doc} are INR {annual_value} and the total "
-            "contract value is INR {total_value}, exclusive of applicable taxes.",
+            "The annual fees under this {doc} are USD {annual_value} and the total "
+            "contract value is USD {total_value}, exclusive of applicable taxes.",
             variable=True,
             by_doc={
-                "Work Order": "The fixed fee for this Work Order is INR {total_value}, exclusive "
+                "Work Order": "The fixed fee for this Work Order is USD {total_value}, exclusive "
                 "of applicable taxes."
             },
         ),
@@ -222,7 +222,7 @@ CLAUSES: dict[str, ClauseDef] = {
             "Governing Law",
             "This {doc} is governed by the laws of {governing_law}. "
             "The courts at {venue} have exclusive jurisdiction.",
-            "Indian law and courts at Mumbai.",
+            "New York law and courts in New York County.",
             "Neutral law only with Legal approval.",
             "medium",
         ),
@@ -299,8 +299,8 @@ CLAUSES: dict[str, ClauseDef] = {
             "cross_border",
             "Cross-Border Transfers",
             "The Supplier shall not transfer personal data "
-            "outside India without the Customer's prior written consent.",
-            "No transfers outside India without consent.",
+            "outside the United States without the Customer's prior written consent.",
+            "No transfers outside the United States without consent.",
             "",
             "critical",
         ),
@@ -358,8 +358,8 @@ CLAUSES: dict[str, ClauseDef] = {
             "The Supplier shall maintain professional indemnity and commercial general liability "
             "insurance of at least {insurance_cover} per claim throughout the term and provide "
             "certificates on request.",
-            "Minimum INR 5 crore per claim.",
-            "INR 2 crore per claim for engagements under INR 1 crore a year.",
+            "Minimum USD 5 million per claim.",
+            "USD 2 million per claim for engagements under USD 1 million a year.",
             "medium",
         ),
         C(
@@ -380,7 +380,7 @@ CLAUSES: dict[str, ClauseDef] = {
             "Disputes shall first be escalated to the parties' senior management for resolution "
             "within 15 days, and then referred to mediation before either party commences court "
             "proceedings.",
-            "Escalate, then mediate, then Mumbai courts. Foreign arbitration needs Legal approval.",
+            "Escalate, then mediate, then New York courts. Foreign arbitration needs Legal approval.",
             "",
             "low",
         ),
@@ -555,16 +555,23 @@ VARIANTS: dict[str, dict[str, Variant]] = {
         "england": V(
             "england",
             "medium",
-            "Governed by English law (standard: Indian law)",
+            "Governed by English law (standard: New York law)",
             ctx={"governing_law": "England and Wales", "venue": "London"},
             fields={"governing_law": "England and Wales"},
         ),
         "singapore": V(
             "singapore",
             "medium",
-            "Governed by Singapore law (standard: Indian law)",
+            "Governed by Singapore law (standard: New York law)",
             ctx={"governing_law": "Singapore", "venue": "Singapore"},
             fields={"governing_law": "Singapore"},
+        ),
+        "india": V(
+            "india",
+            "medium",
+            "Governed by Indian law (standard: New York law)",
+            ctx={"governing_law": "India", "venue": "Mumbai"},
+            fields={"governing_law": "India"},
         ),
     },
     "sla": {
@@ -647,8 +654,8 @@ VARIANTS.update(
         },
         "insurance": {
             "low": V(
-                "low", "medium", "Insurance cover only INR 50 lakh (standard: INR 5 crore)",
-                ctx={"insurance_cover": "INR 50 lakh"},
+                "low", "medium", "Insurance cover only USD 500,000 (standard: USD 5,000,000)",
+                ctx={"insurance_cover": "USD 500,000"},
             )
         },
         "force_majeure": {
@@ -661,7 +668,7 @@ VARIANTS.update(
         },
         "dispute_resolution": {
             "arbitration": V(
-                "arbitration", "medium", "Disputes go to arbitration in London (standard: Mumbai courts)",
+                "arbitration", "medium", "Disputes go to arbitration in London (standard: New York courts)",
                 text="Disputes shall be finally settled by arbitration in London under the ICC "
                 "rules, and the courts of England have no jurisdiction.",
             )

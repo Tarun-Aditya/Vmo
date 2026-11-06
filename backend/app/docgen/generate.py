@@ -40,18 +40,8 @@ KEY_FIELDS = [
 
 
 def inr(n: int) -> str:
-    """Indian digit grouping: 4800000 -> 48,00,000."""
-    s = str(int(n))
-    if len(s) <= 3:
-        return s
-    head, tail = s[:-3], s[-3:]
-    parts = []
-    while len(head) > 2:
-        parts.insert(0, head[-2:])
-        head = head[:-2]
-    if head:
-        parts.insert(0, head)
-    return ",".join(parts + [tail])
+    """US digit grouping: 4800000 -> 4,800,000 (name kept for the callers)."""
+    return f"{int(n):,}"
 
 
 def long_date(d: date) -> str:
@@ -352,54 +342,57 @@ def build_draft(spec: dict) -> tuple[str, dict]:
     return md, {"deviations": devs}
 
 
+def _clean(d: Path) -> None:
+    d.mkdir(parents=True, exist_ok=True)
+    for f in list(d.glob("*.md")) + list(d.glob("*.meta.json")):
+        f.unlink()
+
+
 def generate(root: Path, seed: date) -> dict:
-    """Write all docs under root/docs, plus root/manifest.json and root/labels.json."""
-    docs = root / "docs"
-    for sub in ("templates", "contracts", "drafts"):
-        (docs / sub).mkdir(parents=True, exist_ok=True)
-        for f in (docs / sub).glob("*.md"):
-            f.unlink()
+    """Write the corpus under root:
+    templates/*.md                      standard templates (loaded as templates)
+    inbox/contracts/*.md + .meta.json   executed contracts, as if dropped into the watched folder
+    inbox/drafts/*.md    + .meta.json   vendor drafts (status=draft)
+    manifest.json / labels.json         catalogue + ground truth, used only by the evals."""
+    tdir, cdir, ddir = root / "templates", root / "inbox" / "contracts", root / "inbox" / "drafts"
+    for d in (tdir, cdir, ddir, root / "inbox" / "generated", root / "inbox" / "uploads"):
+        _clean(d)
     manifest = dict(
-        seed_date=seed.isoformat(), customer=CUSTOMER, templates=[], contracts=[], drafts=[]
+        seed_date=seed.isoformat(), customer=CUSTOMER, currency="USD", templates=[], contracts=[], drafts=[]
     )
     labels = dict(seed_date=seed.isoformat(), contracts={}, drafts={})
     for tt, t in TEMPLATES.items():
         md, _ = render_template(tt)
         rel = f"templates/template_{tt.lower()}.md"
-        (docs / rel).write_text(md)
+        (root / rel).write_text(md)
         manifest["templates"].append(
             dict(key=tt.lower(), name=f"{t['name']} (Standard)", type=tt, file=rel)
         )
     by_key = {s["key"]: s for s in CONTRACTS}
     for s in CONTRACTS:
         md, lab, _ = build_contract(s, seed, by_key)
-        rel = f"contracts/{s['key']}.md"
-        (docs / rel).write_text(md)
+        rel = f"inbox/contracts/{s['key']}.md"
+        (root / rel).write_text(md)
+        parent = by_key.get(s.get("parent", ""), {})
+        (root / f"inbox/contracts/{s['key']}.meta.json").write_text(json.dumps({
+            "key": s["key"], "category": s["category"], "owner": s["owner"],
+            "parent_title": parent.get("title"), "status": "active", "template": s["template"],
+        }))
         manifest["contracts"].append(
-            {
-                k: s.get(k)
-                for k in (
-                    "key",
-                    "title",
-                    "vendor",
-                    "category",
-                    "type",
-                    "template",
-                    "owner",
-                    "parent",
-                )
-            }
+            {k: s.get(k) for k in ("key", "title", "vendor", "category", "type", "template", "owner", "parent")}
             | {"file": rel}
         )
         labels["contracts"][s["key"]] = lab
     for s in DRAFTS:
         md, lab = build_draft(s)
-        rel = f"drafts/{s['key']}.md"
-        (docs / rel).write_text(md)
+        rel = f"inbox/drafts/{s['key']}.md"
+        (root / rel).write_text(md)
+        (root / f"inbox/drafts/{s['key']}.meta.json").write_text(json.dumps({
+            "key": s["key"], "category": "Vendor draft", "owner": "Legal Operations",
+            "status": "draft", "template": s["template"],
+        }))
         manifest["drafts"].append(
-            dict(
-                key=s["key"], title=s["title"], vendor=s["vendor"], template=s["template"], file=rel
-            )
+            dict(key=s["key"], title=s["title"], vendor=s["vendor"], template=s["template"], file=rel)
         )
         labels["drafts"][s["key"]] = lab
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2))

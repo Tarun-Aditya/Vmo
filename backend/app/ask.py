@@ -101,7 +101,8 @@ def run_sql(query: str) -> dict:
 
 
 def search_clauses(
-    query: str, clause_type: str | None = None, vendor: str | None = None, top_k: int = 5
+    query: str, clause_type: str | None = None, vendor: str | None = None, top_k: int = 5,
+    contract_ids: list[int] | None = None,
 ) -> dict:
     vec = embeddings.embed([query])[0]
     where, params = [], {"v": str(vec), "k": max(1, min(int(top_k or 5), 15))}
@@ -111,6 +112,11 @@ def search_clauses(
     if vendor:
         where.append("c.vendor ILIKE :vendor")
         params["vendor"] = f"%{vendor}%"
+    if contract_ids:
+        where.append("c.id = ANY(:ids)")
+        params["ids"] = [int(i) for i in contract_ids]
+    else:
+        where.append("c.status <> 'draft'")  # portfolio questions are about executed documents
     sql = f"""SELECT cl.id AS clause_id, c.id AS contract_id, c.title, c.vendor, c.type,
                      cl.clause_type, cl.heading, cl.page, cl.text,
                      1 - (cl.embedding <=> CAST(:v AS vector)) AS score
@@ -142,17 +148,25 @@ def get_contract(id: int) -> dict:
     }
 
 
-def execute_tool(name: str, args: dict) -> dict:
+def execute_tool(name: str, args: dict, scope: list[int] | None = None) -> dict:
     fn = {"run_sql": run_sql, "search_clauses": search_clauses, "get_contract": get_contract}[name]
     try:
+        if scope and name == "search_clauses":
+            args = {**args, "contract_ids": scope}  # the user's document selection always applies
+        if scope and name == "get_contract" and args.get("id") not in scope:
+            return {"error": "That document is outside the selected scope."}
         return fn(**args)
     except Exception as e:
         return {"error": f"{type(e).__name__}: {e}"}
 
 
 # --------------------------------------------------------------------------- LLM loop
-def build_system() -> str:
+def build_system(scope: list[int] | None = None) -> str:
     schema = (Path(__file__).parent / "prompts" / "schema.md").read_text()
+    if scope:
+        schema += (f"\n\nSCOPE: the user selected {len(scope)} document(s) with contract ids {sorted(scope)}. Answer ONLY about these. "
+                   "Use v_document_terms (includes drafts) and always add `contract_id IN (...)` to SQL; clause search is already restricted. "
+                   "For a single document, prefer a one-row query of its fields and extracted values (v_values) so the UI can show a fact sheet.")
     with SessionLocal() as s:
         samples = {
             "vendors": [
@@ -166,8 +180,8 @@ def build_system() -> str:
     return llm.prompt("ask_system").format(today=dt.date.today().isoformat(), schema=schema)
 
 
-def ask_llm(question: str, max_turns: int = 8) -> dict:
-    system, calls, sql_errors, notes = build_system(), [], 0, []
+def ask_llm(question: str, max_turns: int = 8, scope: list[int] | None = None) -> dict:
+    system, calls, sql_errors, notes = build_system(scope), [], 0, []
     messages = [{"role": "user", "content": question}]
     answer = ""
     for _ in range(max_turns):
@@ -186,7 +200,7 @@ def ask_llm(question: str, max_turns: int = 8) -> dict:
         notes += [b.text for b in resp.content if b.type == "text" and b.text.strip()]
         results = []
         for b in (b for b in resp.content if b.type == "tool_use"):
-            out = execute_tool(b.name, b.input)
+            out = execute_tool(b.name, b.input, scope)
             calls.append({"name": b.name, "input": b.input, "output": out})
             is_err = "error" in out
             sql_errors += is_err and b.name == "run_sql"
@@ -232,9 +246,9 @@ def citations(calls: list[dict]) -> list[dict]:
     return out
 
 
-def answer(question: str, demo_mode: bool = False) -> dict:
+def answer(question: str, demo_mode: bool = False, scope: list[int] | None = None) -> dict:
     t0 = time.time()
-    if demo_mode:
+    if demo_mode and not scope:
         with SessionLocal() as s:
             row = s.execute(
                 text("SELECT response, source FROM ask_cache WHERE question_key=:k"),
@@ -248,14 +262,14 @@ def answer(question: str, demo_mode: bool = False) -> dict:
                 "elapsed_ms": int((time.time() - t0) * 1000),
             }
     if llm.available():
-        res, source = ask_llm(question), "llm"
+        res, source = ask_llm(question, scope=scope), "llm"
     else:
         from app import ask_nl, ask_scripted
 
-        res = ask_scripted.answer(question)
+        res = None if scope else ask_scripted.answer(question)
         source = "scripted"
         if not res:
-            res, source = ask_nl.answer(question), "offline-planner"
+            res, source = ask_nl.answer(question, scope=scope), "offline-planner"
         if not res:
             source = "none"
             res = {
@@ -270,7 +284,7 @@ def answer(question: str, demo_mode: bool = False) -> dict:
     from app import ask_present
 
     ask_present.finalize(res)
-    res.update(question=question, source=source, elapsed_ms=int((time.time() - t0) * 1000))
+    res.update(question=question, source=source, elapsed_ms=int((time.time() - t0) * 1000), scoped=len(scope) if scope else 0)
     return res
 
 

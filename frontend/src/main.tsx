@@ -10,12 +10,18 @@ import ContractDetail from "./pages/ContractDetail";
 import Ask from "./pages/Ask";
 import Redline from "./pages/Redline";
 import Templates from "./pages/Templates";
-import Admin from "./pages/Admin";
 import Clauses from "./pages/Clauses";
 import Vendors from "./pages/Vendors";
 import VendorProfile from "./pages/VendorProfile";
+import NewContract from "./pages/NewContract";
+import AdminLayout from "./pages/admin/AdminLayout";
+import Pipeline from "./pages/admin/Pipeline";
+import Kcc from "./pages/admin/Kcc";
+import Values from "./pages/admin/Values";
+import Checklist from "./pages/admin/Checklist";
+import Usage from "./pages/admin/Usage";
 
-const qc = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } } });
+const qc = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1, staleTime: 5000 } } });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -31,8 +37,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="clauses" element={<Clauses />} />
             <Route path="ask" element={<Ask />} />
             <Route path="redline" element={<Redline />} />
+            <Route path="redline/:id" element={<Redline />} />
             <Route path="templates" element={<Templates />} />
-            <Route path="admin" element={<Admin />} />
+            <Route path="new" element={<NewContract />} />
+            <Route path="admin" element={<AdminLayout />}>
+              <Route index element={<Pipeline />} />
+              <Route path="clauses" element={<Kcc />} />
+              <Route path="values" element={<Values />} />
+              <Route path="checklist" element={<Checklist />} />
+              <Route path="usage" element={<Usage />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

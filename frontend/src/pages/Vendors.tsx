@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { api, daysLabel, fmtDate, inr } from "../lib";
+import { api, daysLabel, fmtDate, usd } from "../lib";
 import { Card, Loading, Sev, SeverityChip, Td, Th } from "../ui";
 
 export type Vendor = {
@@ -21,7 +21,7 @@ export default function Vendors() {
         <p className="text-sm text-slate-500">Each vendor’s whole relationship in one place: contracts, spend, upcoming dates and risk. Open a vendor for its MSA → SOW → Work Order tree and key-clause coverage.</p>
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {[["Vendors", String(v.length)], ["Annual value", inr(total)], ["Vendors with critical flags", String(critical)], ["Contracts & work orders", String(v.reduce((a, x) => a + x.contracts, 0))]].map(([l, x]) => (
+        {[["Vendors", String(v.length)], ["Annual value", usd(total)], ["Vendors with critical flags", String(critical)], ["Contracts & work orders", String(v.reduce((a, x) => a + x.contracts, 0))]].map(([l, x]) => (
           <Card key={l}><div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{l}</div><div className="mt-1 text-3xl font-semibold tabular-nums">{x}</div></Card>
         ))}
       </div>
@@ -39,7 +39,7 @@ export default function Vendors() {
                   <Td><SeverityChip sev={x.risk} label={x.risk === "low" ? "ok" : x.risk} /></Td>
                   <Td className="text-right tabular-nums">{x.contracts}<div className="text-[11px] text-slate-500">{x.documents} {x.documents === 1 ? "doc" : "docs"}</div></Td>
                   <Td>
-                    <div className="font-medium tabular-nums">{x.annual_value ? inr(x.annual_value) : "—"}{x.work_order_value > 0 && <span className="ml-1 text-[11px] font-normal text-slate-500">+ {inr(x.work_order_value)} WOs</span>}</div>
+                    <div className="font-medium tabular-nums">{x.annual_value ? usd(x.annual_value) : "—"}{x.work_order_value > 0 && <span className="ml-1 text-[11px] font-normal text-slate-500">+ {usd(x.work_order_value)} WOs</span>}</div>
                     <div className="mt-1 h-1.5 rounded bg-slate-200 dark:bg-slate-700" role="img" aria-label={`${Math.round((x.annual_value / total) * 100)}% of annual value`}><div className="h-1.5 rounded bg-indigo-500" style={{ width: `${(x.annual_value / max) * 100}%` }} /></div>
                   </Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(x.next_expiry)}<div className="text-xs text-slate-500">{x.next_expiry_days !== null ? daysLabel(x.next_expiry_days) : ""}</div></Td>

@@ -14,7 +14,7 @@ QUESTIONS = {
     "uncapped": "Which vendors have uncapped liability?",
     "saas_no_dpa": "Which SaaS vendors process personal data without a DPA?",
     "no_tfc": "Which contracts can't be terminated for convenience?",
-    "bluepeak_payment": "What are the current effective payment terms on the Bluepeak MSA after amendments?",
+    "bluepeak_payment": "What are the current effective payment terms on the Accentia MSA after amendments?",
     "top5_vendors": "Who are the top 5 vendors by annual value and what are their renewal dates?",
     "nda_before_msa": "Which NDAs expire before their related MSA?",
     "auto_renewals": "Which contracts auto-renew, and by when must we give notice?",
@@ -22,14 +22,18 @@ QUESTIONS = {
     "total_value": "What is the total annual value of all active contracts?",
     "short_confidentiality": "Which contracts have a confidentiality period shorter than three years?",
     "vendor_owns_ip": "Which contracts give the vendor ownership of the deliverables we pay for?",
-    "non_indian_law": "Which contracts are governed by a law other than Indian law, and what does the clause say?",
+    "non_indian_law": "Which contracts are governed by a law other than New York law, and what does the clause say?",
     "uncapped_autorenew": "Which auto-renewing contracts have uncapped liability, and what does their liability clause say?",
 }
 
 
 def money(n) -> str:
     n = float(n or 0)
-    return f"₹{n / 1e7:.2f} crore" if n >= 1e7 else f"₹{n / 1e5:.1f} lakh"
+    if n >= 1e6:
+        return f"${n / 1e6:.2f}M"
+    if n >= 1e3:
+        return f"${n / 1e3:.0f}K" if n % 1e3 == 0 else f"${n / 1e3:.1f}K"
+    return f"${n:,.0f}"
 
 
 class Run:
@@ -111,7 +115,7 @@ def _plan(key: str, r: Run) -> str:
                 """SELECT e.contract_id, e.title, e.payment_terms_days AS effective_payment_terms_days,
               s.title AS set_by, s.type AS set_by_type
             FROM v_effective_terms e JOIN contracts s ON s.id = e.payment_terms_days_source
-            WHERE e.type='MSA' AND e.vendor ILIKE '%Bluepeak%'"""
+            WHERE e.type='MSA' AND e.vendor ILIKE '%Accentia%'"""
             )
         )
         x = d[0]
@@ -195,7 +199,7 @@ def _plan(key: str, r: Run) -> str:
         d = rows(
             r.sql(
                 """SELECT contract_id, title, vendor, governing_law FROM v_effective_terms
-            WHERE governing_law IS NOT NULL AND governing_law <> 'India' ORDER BY title"""
+            WHERE governing_law IS NOT NULL AND governing_law <> 'New York' ORDER BY title"""
             )
         )
         r.search(
@@ -203,7 +207,7 @@ def _plan(key: str, r: Run) -> str:
             clause_type="governing_law",
             top_k=len(d) + 1,
         )
-        return f"{len(d)} contracts use a non-Indian governing law; the clause wording is cited below."
+        return f"{len(d)} contracts use a non-New-York governing law; the clause wording is cited below."
     if key == "uncapped_autorenew":
         d = rows(
             r.sql(

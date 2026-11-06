@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { api, fmtDate, inr } from "../lib";
+import { api, fmtDate, usd } from "../lib";
 import { Card, Loading, SeverityChip, Td, Th } from "../ui";
 
 type Row = { id: number; title: string; vendor: string; category: string; type: string; owner: string; status: string; parent_id: number | null;
@@ -37,7 +37,7 @@ function TreeNode({ n, depth }: { n: Node; depth: number }) {
         <TypeBadge t={n.type} />
         <Link to={`/contracts/${n.id}`} className="min-w-0 flex-1 truncate font-medium text-indigo-600 hover:underline dark:text-indigo-400">{n.title}</Link>
         <span className="hidden w-52 shrink-0 text-xs tabular-nums text-slate-500 md:block">{fmtDate(n.effective_date)} → {fmtDate(n.expiry_date)}</span>
-        <span className="hidden w-24 shrink-0 text-right tabular-nums lg:block">{n.annual_value ? inr(n.annual_value) : n.total_value ? `${inr(n.total_value)} fixed` : "—"}</span>
+        <span className="hidden w-24 shrink-0 text-right tabular-nums lg:block">{n.annual_value ? usd(n.annual_value) : n.total_value ? `${usd(n.total_value)} fixed` : "—"}</span>
         <span className="hidden w-24 shrink-0 text-xs sm:block"><Signed c={n} /></span>
         <span className="hidden w-48 shrink-0 xl:block"><Flags c={n} /></span>
       </div>
@@ -111,7 +111,7 @@ export default function Contracts() {
                   <Td><TypeBadge t={c.type} /></Td><Td>{c.category}</Td><Td>{c.owner}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.effective_date)}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.expiry_date)}</Td>
-                  <Td className="text-right tabular-nums">{c.annual_value ? inr(c.annual_value) : c.total_value ? <span title="fixed fee">{inr(c.total_value)}*</span> : "—"}</Td>
+                  <Td className="text-right tabular-nums">{c.annual_value ? usd(c.annual_value) : c.total_value ? <span title="fixed fee">{usd(c.total_value)}*</span> : "—"}</Td>
                   <Td><Signed c={c} /></Td>
                   <Td><Flags c={c} /></Td>
                 </tr>

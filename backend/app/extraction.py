@@ -72,8 +72,8 @@ def heuristic_extract(header: dict[str, str], clauses: list[dict], doc_type: str
         put("auto_renew", False, 0.6)
         put("notice_period_days", None, 0.6)
     if c := by.get("fees"):
-        a = re.search(r"annual fees .*? are INR ([\d,]+)", c["text"])
-        t = re.search(r"(?:total contract value is|fixed fee for this Work Order is) INR ([\d,]+)", c["text"])
+        a = re.search(r"annual fees .*? are USD ([\d,]+)", c["text"])
+        t = re.search(r"(?:total contract value is|fixed fee for this Work Order is) USD ([\d,]+)", c["text"])
         put("annual_value", _money(a.group(1)) if a else None, 0.95 if a else 0.4, "fees")
         put("total_value", _money(t.group(1)) if t else None, 0.95 if t else 0.4, "fees")
     elif not amendment:

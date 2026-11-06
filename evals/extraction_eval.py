@@ -33,6 +33,8 @@ def main() -> int:
     with SessionLocal() as s:
         rows = s.execute(text("SELECT * FROM contracts")).mappings().all()
     for r in rows:
+        if r["title"] not in key_by_title:  # drafts carry no field labels
+            continue
         want = labels[key_by_title[r["title"]]]
         for f in KEY_FIELDS:
             if f not in want:  # amendments only label the terms they change

@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { api, useSetting } from "./lib";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Status, ago, api, inFuture, useSetting } from "./lib";
 
 export type Sev = "low" | "medium" | "high" | "critical";
 
@@ -57,13 +57,22 @@ export function Loading({ q }: { q: { isLoading: boolean; error: unknown } }) {
   return null;
 }
 
-const NAV = [["/", "Dashboard"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"]];
+const NAV = [["/", "Dashboard"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"], ["/new", "New contract"]];
 
 export function Layout() {
   const [dark, setDark] = useSetting("dark", window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);
   const [demo, setDemo] = useSetting("demo", true);
   document.documentElement.classList.toggle("dark", dark);
   const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ llm_available: boolean; today: string }>("/api/meta") });
+  const qc = useQueryClient();
+  const st = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/api/status"), refetchInterval: 10000 });
+  const lastRun = useRef<number | null>(null);
+  useEffect(() => {
+    // A pipeline run finished: refresh every screen, so all modules show the same new data.
+    const id = st.data?.last_run?.id ?? null;
+    if (lastRun.current !== null && id !== lastRun.current) qc.invalidateQueries({ predicate: (q) => q.queryKey[0] !== "status" });
+    lastRun.current = id;
+  }, [st.data?.last_run?.id, qc]);
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
@@ -78,13 +87,21 @@ export function Layout() {
             ))}
           </nav>
           <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            {st.data && (
+              <NavLink to="/admin" className="flex items-center gap-1.5 rounded border border-slate-200 px-2 py-0.5 text-xs dark:border-slate-600"
+                title={`Pipeline ${st.data.config.enabled ? "on" : "off"} · every ${st.data.config.interval_minutes} min`}>
+                <span className={`inline-block h-2 w-2 rounded-full ${st.data.running ? "animate-pulse bg-amber-500" : st.data.config.enabled ? "bg-emerald-500" : "bg-slate-400"}`} aria-hidden />
+                {st.data.running ? "Pipeline running…" : `Synced ${ago(st.data.config.last_run_at)}`}
+                {!st.data.running && st.data.config.enabled && <span className="text-slate-500">· next {inFuture(st.data.config.next_run_at)}</span>}
+              </NavLink>
+            )}
             <label className="flex cursor-pointer items-center gap-2" title="Use cached AI results where available, so the demo is fast and works offline">
               <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Demo mode
             </label>
             <span className={`rounded px-2 py-0.5 text-xs ${meta.data?.llm_available ? "bg-emerald-100 text-emerald-900" : "bg-slate-200 text-slate-700"}`}>
               {meta.data ? (meta.data.llm_available ? "Claude live" : "Offline engine") : "…"}
             </span>
-            <NavLink to="/admin" className="text-slate-500 hover:underline">Admin</NavLink>
+            <NavLink to="/admin" title="Pipeline, key clauses, values & limits, checklist" className={({ isActive }) => `rounded px-2 py-1 ${isActive ? "bg-slate-200 font-medium dark:bg-slate-700" : "text-slate-500 hover:underline"}`}>⚙ Admin</NavLink>
             <button onClick={() => setDark(!dark)} className="rounded border px-2 py-1" aria-label="Toggle theme">{dark ? "☀ Light" : "☾ Dark"}</button>
           </div>
         </div>

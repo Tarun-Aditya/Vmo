@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { api, fmtDate, inr } from "../lib";
+import { api, fmtDate, usd } from "../lib";
 import { Card, ConfidenceBadge, Loading, Sev, SeverityChip, Td, Th } from "../ui";
 
 type Node = { id: number; title: string; type: string; children: Node[] };
@@ -14,6 +14,8 @@ type Detail = {
   is_amendment: boolean; overrides: string[]; parent: { id: number; title: string } | null;
   lineage: { id: number; title: string; type: string }[];
   inherited_terms: { label: string; value: unknown; source_id: number; source_title: string }[];
+  values: { metric_key: string; name: string; unit: string | null; kind: string; value_num: number | null; value_text: string | null; page: number | null }[];
+  checks: { rule_key: string; name: string; status: "pass" | "fail" | "na"; severity: Sev; actual: string | null; expected: string | null; page: number | null; excerpt: string | null; suggested_text: string | null }[];
   signatures: { customer_signatory: string | null; customer_signed_date: string | null; supplier_signatory: string | null; supplier_signed_date: string | null; fully_executed: boolean };
 };
 
@@ -28,7 +30,7 @@ function show(field: string, v: unknown, inherits = false): string {
   if (inherits && (v === null || v === undefined || v === "null") && ["liability_cap_multiple", "governing_law"].includes(field)) return "Inherited from MSA";
   if (v === null || v === undefined || v === "null") return field === "liability_cap_multiple" ? "Uncapped / n.a." : "—";
   if (field.endsWith("_date")) return fmtDate(String(v));
-  if (field.endsWith("_value")) return inr(v as number);
+  if (field.endsWith("_value")) return usd(v as number);
   if (typeof v === "boolean" || v === "True" || v === "False") return String(v) === "true" || v === "True" ? "Yes" : "No";
   return String(v);
 }
@@ -60,7 +62,8 @@ export default function ContractDetail() {
     <div className="space-y-4">
       <div>
         <Link to="/contracts" className="text-sm text-slate-500 hover:underline">← Contracts</Link>
-        <h1 className="text-xl font-semibold">{c.title}</h1>
+        <h1 className="text-xl font-semibold">{c.title} {c.status === "draft" && <span className="ml-2 rounded border border-amber-500 px-2 py-0.5 align-middle text-xs font-medium text-amber-700 dark:text-amber-300">DRAFT</span>}</h1>
+        <div className="mt-1 flex gap-4 text-sm"><Link className="text-indigo-600 hover:underline" to={`/ask?doc=${c.id}`}>💬 Ask about this document</Link><Link className="text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Review & checklist</Link></div>
         <p className="text-sm text-slate-500">{c.vendor} · {c.type} · {c.category} · owner {c.owner} · <span className="capitalize">{c.status}</span>
           {d.parent && <> · amends/under <Link className="text-indigo-600 hover:underline" to={`/contracts/${d.parent.id}`}>{d.parent.title}</Link></>}</p>
       </div>
@@ -90,6 +93,32 @@ export default function ContractDetail() {
             </Card>
           )}
 
+          {d.values.length > 0 && (
+            <Card title="Terms & limits (extracted values)">
+              <table className="w-full text-sm"><tbody>
+                {d.values.map((v) => (
+                  <tr key={v.metric_key} className="border-t border-slate-100 dark:border-slate-700">
+                    <Td className="text-slate-500">{v.name}</Td>
+                    <Td className="font-medium tabular-nums">{v.value_text ?? (v.unit === "USD" ? usd(v.value_num) : Number(v.value_num).toLocaleString("en-US", { maximumFractionDigits: 2 }))}{v.unit && v.unit !== "USD" && v.value_text === null ? <span className="ml-1 text-xs font-normal text-slate-500">{v.unit}</span> : null}</Td>
+                    <Td className="text-right text-[11px] text-slate-500">{v.page ? `p.${v.page}` : ""}</Td>
+                  </tr>))}
+              </tbody></table>
+            </Card>
+          )}
+
+          {d.checks.length > 0 && (
+            <Card title={`Checklist — ${d.checks.filter((x) => x.status === "pass").length} pass · ${d.checks.filter((x) => x.status === "fail").length} fail`} right={<Link className="text-xs text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Open in Redline</Link>}>
+              <ul className="space-y-1 text-sm">
+                {d.checks.filter((x) => x.status !== "na").map((x) => (
+                  <li key={x.rule_key} className="flex items-start gap-2">
+                    <b className={x.status === "pass" ? "text-emerald-600" : "text-red-600"}>{x.status === "pass" ? "✓" : "✗"}</b>
+                    <span className="flex-1"><span className={x.status === "fail" ? "font-medium" : "text-slate-600 dark:text-slate-300"}>{x.name}</span>{x.actual && <span className="ml-1 text-xs text-slate-500">({x.actual})</span>}</span>
+                    {x.status === "fail" && <SeverityChip sev={x.severity} />}
+                  </li>))}
+              </ul>
+            </Card>
+          )}
+
           <Card title="Signatures" right={d.signatures.fully_executed ? <span className="font-bold text-emerald-600">✓ fully signed</span> : <span className="font-bold text-red-600">✗ not fully signed</span>}>
             <table className="w-full text-sm"><tbody>
               {([["Arcadia Retail Ltd", d.signatures.customer_signatory, d.signatures.customer_signed_date], [c.vendor, d.signatures.supplier_signatory, d.signatures.supplier_signed_date]] as [string, string | null, string | null][]).map(([party, who, when]) => (
@@ -112,7 +141,7 @@ export default function ContractDetail() {
             </tbody></table>
           </Card>
 
-          {!d.is_amendment && (
+          {!d.is_amendment && d.effective_terms.length > 0 && (
             <Card title="Effective terms (after amendments)">
               <table className="w-full text-sm">
                 <thead><tr><Th>Term</Th><Th>Current value</Th><Th>Set by</Th></tr></thead>

@@ -85,11 +85,11 @@ def no_tfc():
     return {c["title"] for c in load()[1].values() if c["termination_for_convenience"] is False}
 
 
-def bluepeak_payment():
+def accentia_payment():
     return next(
         c["payment_terms_days"]
         for c in load()[1].values()
-        if c["type"] == "MSA" and "Bluepeak" in c["vendor"]
+        if c["type"] == "MSA" and "Accentia" in c["vendor"]
     )
 
 
@@ -138,8 +138,8 @@ def vendor_owns_ip():
     }
 
 
-def non_indian_law():
-    return {c["title"] for c in load()[1].values() if c["governing_law"] not in (None, "India")}
+def non_ny_law():
+    return {c["title"] for c in load()[1].values() if c["governing_law"] not in (None, "New York")}
 
 
 def uncapped_autorenew():
@@ -222,8 +222,8 @@ def no_audit_rights():
     return {c["title"] for c in load()[1].values() if "audit_rights" not in _clauses_of(c)}
 
 
-def bluepeak_msa_clause_count():
-    c = next(c for c in load()[1].values() if c["type"] == "MSA" and "Bluepeak" in c["vendor"])
+def accentia_msa_clause_count():
+    c = next(c for c in load()[1].values() if c["type"] == "MSA" and "Accentia" in c["vendor"])
     return len(_clauses_of(c))
 
 
@@ -236,5 +236,5 @@ def vendors_expiring_90():
     return {c["vendor"] for c in eff.values() if 0 <= (_d(c["expiry_date"]) - seed).days <= 90}
 
 
-def bluepeak_docs():
-    return {c["title"] for c in load()[1].values() if "Bluepeak" in c["vendor"]}
+def accentia_docs():
+    return {c["title"] for c in load()[1].values() if "Accentia" in c["vendor"]}

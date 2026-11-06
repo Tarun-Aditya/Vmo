@@ -10,11 +10,10 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from app import ask as ask_mod
-from app import deviations, llm
+from app import llm
 from app.config import settings
 from app.db import SessionLocal
-from app.docgen.library import CLAUSES, KEY_CLAUSES, TEMPLATES
-from app.parsing import parse_document
+from app.docgen.library import CLAUSES
 
 router = APIRouter(prefix="/api")
 
@@ -128,6 +127,18 @@ def _tree(root_id: int) -> dict:
     return build(next(r for r in rows if r["id"] == root_id))
 
 
+def _checks(cid: int) -> list[dict]:
+    rows = q(
+        """SELECT cr.rule_key, r.name, r.description, r.rule_type, r.suggested_text, cr.status, cr.severity,
+                  cr.actual, cr.expected, cr.page, cr.excerpt
+           FROM check_results cr JOIN checklist_rules r ON r.key = cr.rule_key WHERE cr.contract_id = :i""",
+        i=cid,
+    )
+    order = {"fail": 0, "pass": 1, "na": 2}
+    rows.sort(key=lambda r: (order[r["status"]], -SEV_RANK[r["severity"]], r["name"]))
+    return rows
+
+
 @router.get("/contracts/{cid}")
 def get_contract(cid: int):
     c = q1("SELECT * FROM contracts WHERE id = :i", i=cid)
@@ -189,6 +200,12 @@ def get_contract(cid: int):
         ):
             inherited.append({"label": label, "value": m[text_field] if text_field and m[field] is None else m[field],
                               "source_id": m[f"{field}_source"], "source_title": titles.get(m[f"{field}_source"])})
+    values = q(
+        """SELECT ev.metric_key, m.name, m.unit, m.kind, ev.value_num, ev.value_text, ev.page, ev.confidence
+           FROM extracted_values ev JOIN metrics m ON m.key = ev.metric_key WHERE ev.contract_id = :i ORDER BY m.name""",
+        i=cid,
+    )
+    checks = _checks(cid)
     sig = {
         k: c[k]
         for k in (
@@ -198,6 +215,8 @@ def get_contract(cid: int):
     }
     return {
         "signatures": sig,
+        "values": values,
+        "checks": checks,
         "lineage": lineage,
         "inherited_terms": inherited,
         "contract": {k: v for k, v in c.items()},
@@ -222,31 +241,31 @@ SHORT = {
 }
 
 
-def _cell(ct, clause, expected, doc_name, tpl_name, signed=None, draft=False) -> dict:
-    heading = CLAUSES[ct].heading
-    if ct == "execution":
-        present = bool(signed) and not draft
-        if draft:
+def _cell(k: dict, clause: dict | None, doc_type: str, status: str, signed: bool) -> dict:
+    expected = doc_type in (k["applies_to"] or [])
+    if k["key"] == "execution":
+        present = bool(signed) and status != "draft"
+        if status == "draft":
             note = "Draft: not signed or executed."
         elif present:
             note = None
         elif clause:
             note = "Not fully signed. " + clause["text"]
         else:
-            note = f"No signature block found in this {doc_name}."
+            note = f"No signature block found in this {doc_type}."
     else:
         present = clause is not None
         note = None
         if not present:
-            note = f"No {heading} clause found in this document. " + (
-                f"The standard {tpl_name} template includes one, so this is a gap."
+            note = f"No {k['name']} clause found in this document. " + (
+                f"The standard {doc_type} template includes one, so this is a gap."
                 if expected
-                else f"It is not part of the standard {tpl_name} template."
+                else f"It is not part of the standard {doc_type} template."
             )
     return {
         "present": present,
         "expected": expected,
-        "heading": heading,
+        "heading": k["name"],
         "page": clause["page"] if clause else None,
         "text": clause["text"][:420] if clause else None,
         "note": note,
@@ -255,56 +274,34 @@ def _cell(ct, clause, expected, doc_name, tpl_name, signed=None, draft=False) ->
 
 @router.get("/clause-matrix")
 def clause_matrix(vendor: str | None = None):
-    """Every document (rows) x key clause (columns): present or absent, with a citation."""
-    cols = [{"key": c, "label": SHORT.get(c, CLAUSES[c].heading)} for c in KEY_CLAUSES]
-    clause_idx = {
-        (c["contract_id"], c["clause_type"]): c
-        for c in q("SELECT contract_id, clause_type, heading, text, page FROM clauses")
-    }
-    rows = []
+    """Every document (rows) x key clause (columns, from the KCC library): present or absent, with a citation."""
+    ks = q("SELECT key, name, applies_to FROM kcc_library WHERE enabled AND in_matrix ORDER BY sort_order, key")
+    cols = [{"key": k["key"], "label": SHORT.get(k["key"], k["name"])} for k in ks]
+    clause_idx = {}
+    for c in q("SELECT contract_id, clause_type, heading, text, page FROM clauses ORDER BY id"):
+        clause_idx.setdefault((c["contract_id"], c["clause_type"]), c)
+    rows, draft_rows = [], []
     for c in q(
-        """SELECT c.id, c.title, c.vendor, c.type, c.fully_executed, t.type AS tpl, t.name AS tpl_name
-           FROM contracts c JOIN templates t ON t.id = c.template_id
-           WHERE c.type <> 'Amendment' AND (CAST(:vendor AS text) IS NULL OR c.vendor = :vendor)
-           ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, c.title""",
+        """SELECT id, title, vendor, type, status, fully_executed FROM contracts
+           WHERE type <> 'Amendment' AND (CAST(:vendor AS text) IS NULL OR vendor = :vendor)
+           ORDER BY vendor, CASE type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, title""",
         vendor=vendor,
     ):
-        exp = set(TEMPLATES[c["tpl"]]["clauses"])
-        cells = {
-            ct: _cell(ct, clause_idx.get((c["id"], ct)), ct in exp, c["type"], c["tpl_name"], c["fully_executed"])
-            for ct in KEY_CLAUSES
-        }
-        rows.append({"id": c["id"], "title": c["title"], "vendor": c["vendor"], "type": c["type"],
-                     "kind": "contract", "cells": cells})
-    draft_rows = []
-    for d in q(
-        """SELECT d.id, d.title, d.vendor, d.body_md, t.type AS tpl, t.name AS tpl_name
-           FROM drafts d JOIN templates t ON t.id = d.template_id
-           WHERE (CAST(:vendor AS text) IS NULL OR d.vendor = :vendor) ORDER BY d.id""",
-        vendor=vendor,
-    ):
-        _, cl = parse_document(d["body_md"])
-        idx = {c["clause_type"]: c for c in cl}
-        exp = set(TEMPLATES[d["tpl"]]["clauses"])
-        cells = {
-            ct: _cell(ct, idx.get(ct), ct in exp, "draft", d["tpl_name"], False, draft=True)
-            for ct in KEY_CLAUSES
-        }
-        draft_rows.append({"id": d["id"], "title": d["title"], "vendor": d["vendor"],
-                           "type": d["tpl"], "kind": "draft", "cells": cells})
-    for r in rows + draft_rows:
-        r["present_count"] = sum(1 for c in r["cells"].values() if c["present"])
+        cells = {k["key"]: _cell(k, clause_idx.get((c["id"], k["key"])), c["type"], c["status"], c["fully_executed"]) for k in ks}
+        r = {"id": c["id"], "title": c["title"], "vendor": c["vendor"], "type": c["type"],
+             "kind": "draft" if c["status"] == "draft" else "contract", "cells": cells}
+        r["present_count"] = sum(1 for x in cells.values() if x["present"])
         r["gap_count"] = sum(
-            1
-            for ct, c in r["cells"].items()
-            if not c["present"] and c["expected"] and not (r["kind"] == "draft" and ct == "execution")
+            1 for key, x in cells.items()
+            if not x["present"] and x["expected"] and not (r["kind"] == "draft" and key == "execution")
         )
-    totals = {ct: sum(1 for r in rows if r["cells"][ct]["present"]) for ct in KEY_CLAUSES}
+        (draft_rows if c["status"] == "draft" else rows).append(r)
+    totals = {k["key"]: sum(1 for r in rows if r["cells"][k["key"]]["present"]) for k in ks}
     return {
         "columns": cols,
         "groups": [
             {"name": "Executed contracts", "rows": rows},
-            {"name": "Vendor drafts (not yet executed)", "rows": draft_rows},
+            {"name": "Drafts and new documents (not yet executed)", "rows": draft_rows},
         ],
         "totals": totals,
         "executed_count": len(rows),
@@ -406,7 +403,7 @@ def vendor_profile(vendor: str):
 @router.get("/dashboard")
 def dashboard():
     k = q1("""SELECT
-        (SELECT count(*) FROM contracts) AS contracts,
+        (SELECT count(*) FROM contracts WHERE status <> 'draft') AS contracts,
         (SELECT coalesce(sum(annual_value),0) FROM v_effective_terms WHERE status='active') AS annual_value,
         count(*) FILTER (WHERE days_left BETWEEN 0 AND 90) AS expiring_90,
         coalesce(sum(annual_value) FILTER (WHERE days_left BETWEEN 0 AND 90),0) AS expiring_90_value,
@@ -474,11 +471,12 @@ def dashboard():
 class AskIn(BaseModel):
     question: str
     demo_mode: bool = False
+    contract_ids: list[int] | None = None  # scope: only these documents (None = whole portfolio)
 
 
 @router.post("/ask")
 def ask(body: AskIn):
-    return ask_mod.answer(body.question, body.demo_mode)
+    return ask_mod.answer(body.question, body.demo_mode, body.contract_ids or None)
 
 
 @router.get("/ask/suggestions")
@@ -488,59 +486,68 @@ def suggestions():
     ]
 
 
-# ------------------------------------------------------------------ redline
-def _draft_payload(did: int, items: list[dict], source: str):
-    d = q1("SELECT id, title, vendor, template_id, body_md FROM drafts WHERE id=:i", i=did)
-    counts = {s: sum(1 for i in items if i["severity"] == s) for s in SEV_RANK}
-    tpl = q1("SELECT id, name, type FROM templates WHERE id=:t", t=d["template_id"])
-    return {**d, "template": tpl, "items": items, "counts": counts, "source": source}
+# ------------------------------------------------------------------ redline & checklist
+def _sev_counts(items: list[dict]) -> dict:
+    return {sv: sum(1 for i in items if i["severity"] == sv) for sv in SEV_RANK}
 
 
-@router.get("/drafts")
-def drafts():
+@router.get("/redline/documents")
+def redline_documents():
     out = []
-    for d in q("""SELECT d.id, d.title, d.vendor, t.type AS template_type, r.items
-                  FROM drafts d JOIN templates t ON t.id = d.template_id
-                  LEFT JOIN redline_results r ON r.draft_id = d.id ORDER BY d.id"""):
+    for d in q(
+        """SELECT c.id, c.title, c.vendor, c.type, c.status, c.origin, r.items
+           FROM contracts c LEFT JOIN redlines r ON r.contract_id = c.id
+           WHERE c.type <> 'Amendment' ORDER BY (c.status = 'draft') DESC, c.id DESC"""
+    ):
         items = d.pop("items") or []
-        d["counts"] = {s: sum(1 for i in items if i["severity"] == s) for s in SEV_RANK}
+        fails = q("SELECT severity FROM check_results WHERE contract_id = :i AND status = 'fail'", i=d["id"])
         d["deviations"] = len(items)
+        d["counts"] = _sev_counts(items)
+        d["checks_failed"] = len(fails)
+        d["check_counts"] = _sev_counts(fails)
         out.append(d)
     return out
 
 
-@router.get("/drafts/{did}/redline")
-def redline(did: int):
-    r = q1("SELECT items FROM redline_results WHERE draft_id=:i", i=did)
-    if not r:
-        raise HTTPException(404, "draft not found")
-    return _draft_payload(did, r["items"], "cached")
-
-
-@router.post("/drafts/{did}/redline/rerun")
-def redline_rerun(did: int):
-    d = q1(
-        """SELECT d.body_md, t.type FROM drafts d JOIN templates t ON t.id = d.template_id
-              WHERE d.id=:i""",
-        i=did,
-    )
+def _redline_payload(cid: int, source: str) -> dict:
+    d = q1("SELECT id, title, vendor, type, status, body_md, origin FROM contracts WHERE id = :i", i=cid)
     if not d:
-        raise HTTPException(404, "draft not found")
-    _, clauses = parse_document(d["body_md"])
-    mode = "llm" if llm.available() else "heuristic"
-    import json
+        raise HTTPException(404, "document not found")
+    r = q1("SELECT items FROM redlines WHERE contract_id = :i", i=cid)
+    items = (r or {}).get("items") or []
+    tpl = q1("SELECT t.id, t.name, t.type FROM templates t JOIN contracts c ON c.template_id = t.id WHERE c.id = :i", i=cid)
+    checks = _checks(cid)
+    summary = {s_: sum(1 for c in checks if c["status"] == s_) for s_ in ("pass", "fail", "na")}
+    return {**d, "template": tpl, "items": items, "counts": _sev_counts(items), "source": source,
+            "checklist": checks, "checklist_summary": summary,
+            "checklist_fail_counts": _sev_counts([c for c in checks if c["status"] == "fail"])}
+
+
+@router.get("/redline/{cid}")
+def redline(cid: int):
+    return _redline_payload(cid, "cached")
+
+
+@router.post("/redline/{cid}/rerun")
+def redline_rerun(cid: int):
+    """Re-run the template comparison (Claude if a key is set) and the checklist on the stored clauses."""
     import time
 
+    from app import pipeline as pl
+    from app.db import SessionLocal as SL
+    from app.models import Contract
+
     t0 = time.time()
-    items = deviations.compare_document(clauses, d["type"], mode)
-    with SessionLocal() as s:
-        s.execute(
-            text("""UPDATE redline_results SET items = CAST(:it AS jsonb), created_at = now()
-                          WHERE draft_id=:i"""),
-            {"it": json.dumps(items), "i": did},
-        )
+    with SL() as s:
+        c = s.get(Contract, cid)
+        if not c:
+            raise HTTPException(404, "document not found")
+        rows = s.execute(text("SELECT id, clause_type, heading, text, page FROM clauses WHERE contract_id=:c ORDER BY id"), {"c": cid}).mappings().all()
+        cfg = pl.load_config(s)
+        mode = "llm" if llm.available() else "heuristic"
+        pl.derive(s, c, [dict(r) for r in rows], cfg, pl.TEMPLATE_KEY.get(c.type, "MSA"), mode)
         s.commit()
-    return {**_draft_payload(did, items, mode), "elapsed_ms": int((time.time() - t0) * 1000)}
+    return {**_redline_payload(cid, mode), "elapsed_ms": int((time.time() - t0) * 1000)}
 
 
 # ------------------------------------------------------------------ templates
@@ -549,9 +556,9 @@ def templates():
     return q("""SELECT t.id, t.name, t.type, t.version,
                   (SELECT count(*) FROM template_clauses WHERE template_id = t.id) AS clause_count,
                   (SELECT count(DISTINCT c.id) FROM contracts c WHERE c.template_id = t.id
-                      AND c.type <> 'Amendment') AS contracts,
+                      AND c.type <> 'Amendment' AND c.status <> 'draft') AS contracts,
                   (SELECT count(DISTINCT d.contract_id) FROM clause_deviations d
-                      JOIN contracts c ON c.id = d.contract_id WHERE c.template_id = t.id) AS deviating_contracts
+                      JOIN contracts c ON c.id = d.contract_id WHERE c.template_id = t.id AND c.status <> 'draft') AS deviating_contracts
                 FROM templates t ORDER BY t.id""")
 
 
@@ -562,7 +569,7 @@ def template(tid: int):
         raise HTTPException(404, "template not found")
     clauses = q("SELECT * FROM template_clauses WHERE template_id=:i ORDER BY id", i=tid)
     contracts = q(
-        """SELECT id, title, vendor FROM contracts WHERE template_id=:i AND type <> 'Amendment'
+        """SELECT id, title, vendor FROM contracts WHERE template_id=:i AND type <> 'Amendment' AND status <> 'draft'
                      ORDER BY vendor, title""",
         i=tid,
     )

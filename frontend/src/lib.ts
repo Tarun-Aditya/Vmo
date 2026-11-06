@@ -7,17 +7,27 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
   });
-  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  if (!r.ok) {
+    const body = await r.text();
+    let msg = body;
+    try {
+      const j = JSON.parse(body);
+      msg = typeof j.detail === "string" ? j.detail : JSON.stringify(j.detail ?? j);
+    } catch {
+      /* plain text */
+    }
+    throw new Error(msg || String(r.status));
+  }
   return r.json();
 }
 
-/** ₹ in lakh / crore. */
-export function inr(n: number | string | null | undefined): string {
+/** US dollars: $4.80M, $540K, $48,000. */
+export function usd(n: number | string | null | undefined): string {
   if (n === null || n === undefined || n === "") return "—";
   const v = Number(n);
-  if (v >= 1e7) return `₹${(v / 1e7).toFixed(2)} Cr`;
-  if (v >= 1e5) return `₹${(v / 1e5).toFixed(1)} L`;
-  return `₹${v.toLocaleString("en-IN")}`;
+  if (v >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M";
+  if (v >= 1e3) return "$" + (v / 1e3).toFixed(v % 1e3 === 0 ? 0 : 1) + "K";
+  return "$" + v.toLocaleString("en-US");
 }
 
 export const fmtDate = (d?: string | null) =>
@@ -47,6 +57,28 @@ export function useSetting(key: string, initial: boolean): [boolean, (v: boolean
   }];
 }
 
-export type Col = { key: string; label: string; kind: "text" | "date" | "money" | "bool" | "number" | "score" | "quote" };
-export type Table = { title: string | null; columns: Col[]; rows: Record<string, unknown>[]; row_count: number };
+export type Col = { key: string; label: string; kind: "text" | "date" | "money" | "bool" | "number" | "score" | "quote" | "severity" };
+export type Table = { title: string | null; kv?: boolean; columns: Col[]; rows: Record<string, unknown>[]; row_count: number };
 export type Step = { title: string; detail?: string; sql?: string; columns?: string[]; rows?: unknown[][]; row_count?: number; error?: string };
+
+export const when = (iso?: string | null) =>
+  iso ? new Date(iso).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "—";
+
+export function ago(iso?: string | null): string {
+  if (!iso) return "never";
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  return m < 1 ? "just now" : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`;
+}
+
+export function inFuture(iso?: string | null): string {
+  if (!iso) return "—";
+  const m = Math.round((new Date(iso).getTime() - Date.now()) / 60000);
+  return m <= 0 ? "due now" : m < 60 ? `in ${m} min` : m < 1440 ? `in ${Math.floor(m / 60)} h ${m % 60} min` : `in ${Math.round(m / 1440)} d`;
+}
+
+export type Status = {
+  running: boolean;
+  config: { enabled: boolean; interval_minutes: number; last_run_at: string | null; next_run_at: string | null };
+  last_run: { id: number; status: string; trigger: string; new_docs: number; updated: number; failed: number } | null;
+  documents: Record<string, number>;
+};

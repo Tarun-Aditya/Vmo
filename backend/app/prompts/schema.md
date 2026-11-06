@@ -32,7 +32,7 @@ clause_deviations(contract_id, template_clause_id, deviation_summary, severity) 
 clauses(id, contract_id, clause_type, heading, text, page)  -- clause text of every contract
 field_extractions(contract_id, field, value, confidence, source_clause_id, source_page)
 
-Notes: all money is INR (1 lakh = 100,000; 1 crore = 10,000,000). MSAs carry no annual_value (their SOWs do),
+Notes: all money is USD. MSAs carry no annual_value (their SOWs do),
 so summing annual_value never double counts; Work Orders carry total_value only (fixed fee). Hierarchy: MSA ->
 SOW -> Work Order via parent_id; amendments, NDAs and DPAs also point at their parent. contract `type` values: MSA,
 SOW, Work Order, NDA, SaaS, DPA, Amendment.

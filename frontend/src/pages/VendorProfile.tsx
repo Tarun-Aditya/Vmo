@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { api, daysLabel, fmtDate, inr } from "../lib";
+import { api, daysLabel, fmtDate, usd } from "../lib";
 import { Card, Loading, Sev, SeverityChip, Td, Th } from "../ui";
 import { Hierarchy } from "./Contracts";
 import { ClauseMatrix } from "./Clauses";
@@ -35,7 +35,7 @@ export default function VendorProfile() {
       </div>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Tile l="Documents" v={s.documents} sub={`${s.contracts} contracts & work orders`} />
-        <Tile l="Annual value" v={s.annual_value ? inr(s.annual_value) : "—"} sub={s.work_order_value ? `+ ${inr(s.work_order_value)} fixed-fee work orders` : undefined} />
+        <Tile l="Annual value" v={s.annual_value ? usd(s.annual_value) : "—"} sub={s.work_order_value ? `+ ${usd(s.work_order_value)} fixed-fee work orders` : undefined} />
         <Tile l="Next end date" v={fmtDate(s.next_expiry)} sub={s.next_expiry_days !== null ? daysLabel(s.next_expiry_days) : undefined} />
         <Tile l="Deviations" v={s.deviations} sub={`${s.dev_critical} critical · ${s.dev_high} high`} sev={s.dev_critical ? "critical" : undefined} />
         <Tile l="Not fully signed" v={s.unsigned} sub={s.unsigned ? "needs countersignature" : "all signed"} sev={s.unsigned ? "high" : undefined} />

@@ -18,8 +18,8 @@ def main() -> int:
     with SessionLocal() as s:
         rows = s.execute(
             text(
-                "SELECT d.title, r.items FROM drafts d JOIN redline_results r "
-                "ON r.draft_id = d.id"
+                "SELECT c.title, r.items FROM contracts c JOIN redlines r ON r.contract_id = c.id "
+                "WHERE c.status = 'draft'"
             )
         ).all()
     tot_hit = tot = sev_ok = 0

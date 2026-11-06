@@ -10,8 +10,8 @@
    check: {kind: set, column: vendor, expected: saas_no_dpa}}
 - {id: no_tfc, question: "Which contracts can't be terminated for convenience?", type: sql,
    check: {kind: set, column: title, expected: no_tfc}}
-- {id: bluepeak_payment, question: "What are the current effective payment terms on the Bluepeak MSA after amendments?", type: sql,
-   check: {kind: number, column: effective_payment_terms_days, expected: bluepeak_payment}}
+- {id: accentia_payment, question: "What are the current effective payment terms on the Accentia MSA after amendments?", type: sql,
+   check: {kind: number, column: effective_payment_terms_days, expected: accentia_payment}}
 - {id: top5_vendors, question: "Who are the top 5 vendors by annual value and what are their renewal dates?", type: sql,
    check: {kind: set, column: vendor, expected: top5_vendors}}
 - {id: nda_before_msa, question: "Which NDAs expire before their related MSA?", type: sql,
@@ -26,8 +26,8 @@
    check: {kind: cited, expected: short_confidentiality}}
 - {id: vendor_owns_ip, question: "Which contracts give the vendor ownership of the deliverables we pay for?", type: clause,
    check: {kind: cited, expected: vendor_owns_ip}}
-- {id: non_indian_law, question: "Which contracts are governed by a law other than Indian law, and what does the clause say?", type: mixed,
-   check: {kind: set_and_cited, column: title, expected: non_indian_law}}
+- {id: non_ny_law, question: "Which contracts are governed by a law other than New York law, and what does the clause say?", type: mixed,
+   check: {kind: set_and_cited, column: title, expected: non_ny_law}}
 - {id: uncapped_autorenew, question: "Which auto-renewing contracts have uncapped liability, and what does their liability clause say?", type: mixed,
    check: {kind: set_and_cited, column: title, expected: uncapped_autorenew}}
 - {id: next_quarter, question: "How many contracts are expiring in the next quarter?", type: sql,
@@ -46,11 +46,11 @@
    check: {kind: set, column: title, expected: unsigned_titles}}
 - {id: no_audit, question: "Which contracts do not have an audit rights clause?", type: sql,
    check: {kind: set, column: title, expected: no_audit_rights}}
-- {id: bluepeak_clauses, question: "Show the key clauses in the Bluepeak MSA", type: sql,
-   check: {kind: rowcount, column: clause, expected: bluepeak_msa_clause_count}}
+- {id: accentia_clauses, question: "Show the key clauses in the Accentia MSA", type: sql,
+   check: {kind: rowcount, column: clause, expected: accentia_msa_clause_count}}
 - {id: list_work_orders, question: "List all work orders", type: sql,
    check: {kind: set, column: title, expected: work_orders}}
 - {id: vendors_expiring_90, question: "Which vendors have contracts expiring in the next 90 days?", type: sql,
    check: {kind: set, column: vendor, expected: vendors_expiring_90}}
-- {id: bluepeak_docs, question: "Show all Bluepeak contracts with start date, end date and annual value", type: sql,
-   check: {kind: set, column: title, expected: bluepeak_docs}}
+- {id: accentia_docs, question: "Show all Accentia contracts with start date, end date and annual value", type: sql,
+   check: {kind: set, column: title, expected: accentia_docs}}

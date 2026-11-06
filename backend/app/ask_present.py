@@ -44,8 +44,10 @@ def kind_of(col: str, values: list) -> str:
     c = col.lower()
     if c.endswith("_date") or c.endswith("deadline") or c.endswith("expiry") or c.startswith("earliest_") and "notice" in c:
         return "date"
-    if re.search(r"value|spend|fee", c) and "days" not in c and vals and all(isinstance(v, (int, float)) for v in vals):
+    if re.search(r"value|spend|fee|usd|cover", c) and "days" not in c and vals and all(isinstance(v, (int, float)) for v in vals):
         return "money"
+    if c == "severity":
+        return "severity"
     if c == "score":
         return "score"
     if vals and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in vals):
@@ -58,9 +60,12 @@ def table_from_sql(out: dict, title: str | None = None, max_rows: int = 200) -> 
     cid = cols.index("contract_id") if "contract_id" in cols else (cols.index("id") if "id" in cols else None)
     show = [i for i, c in enumerate(cols) if c not in HIDE]
     columns = []
+    mm = _metric_meta()
     for i in show:
-        columns.append({"key": cols[i], "label": label_of(cols[i]),
-                        "kind": kind_of(cols[i], [r[i] for r in out["rows"]])})
+        m = mm.get(cols[i])
+        kind = "money" if m and m.get("unit") == "USD" else kind_of(cols[i], [r[i] for r in out["rows"]])
+        label = (m["name"] + (f" ({m['unit']})" if m.get("unit") and m["unit"] != "USD" else "")) if m else label_of(cols[i])
+        columns.append({"key": cols[i], "label": label, "kind": kind})
     rows = []
     for r in out["rows"][:max_rows]:
         d = {cols[i]: r[i] for i in show}
@@ -68,6 +73,20 @@ def table_from_sql(out: dict, title: str | None = None, max_rows: int = 200) -> 
             d["_cid"] = r[cid]
         rows.append(d)
     return {"title": title, "columns": columns, "rows": rows, "row_count": out.get("row_count", len(rows))}
+
+
+def table_vertical(out: dict, title: str | None, metrics: dict[str, dict] | None = None) -> dict:
+    """One-row result shown as Field / Value (a document fact sheet)."""
+    cols, row = out["columns"], out["rows"][0]
+    rows = []
+    for c, v in zip(cols, row):
+        if c in HIDE:
+            continue
+        m = (metrics or {}).get(c)
+        kind = "money" if m and m.get("kind") == "money" else kind_of(c, [v])
+        rows.append({"field": m["name"] if m else label_of(c), "value": v, "kind": kind, "unit": (m or {}).get("unit")})
+    return {"title": title, "kv": True, "columns": [{"key": "field", "label": "Field", "kind": "text"}, {"key": "value", "label": "Value", "kind": "text"}],
+            "rows": rows, "row_count": len(rows), "_cid": row[cols.index("contract_id")] if "contract_id" in cols else None}
 
 
 def table_from_hits(hits: list[dict]) -> dict:
@@ -80,6 +99,18 @@ def table_from_hits(hits: list[dict]) -> dict:
             for h in hits]
     return {"title": "Matching clauses (semantic search)", "columns": columns, "rows": rows,
             "row_count": len(rows)}
+
+
+def _metric_meta() -> dict[str, dict]:
+    try:
+        from sqlalchemy import text
+
+        from app.db import SessionLocal
+
+        with SessionLocal() as s:
+            return {r["key"]: dict(r) for r in s.execute(text("SELECT key, name, kind, unit FROM metrics")).mappings()}
+    except Exception:
+        return {}
 
 
 def _ok_sql(calls):
@@ -104,7 +135,11 @@ def tiles_from_calls(calls: list[dict]) -> tuple[list[dict], dict | None]:
 def build_tables(calls: list[dict], tile_call: dict | None) -> list[dict]:
     sql = [c for c in _ok_sql(calls) if c is not tile_call and not c.get("no_tiles")]
     chosen = [c for c in sql if c.get("display")] or sql[-1:]
-    tables = [table_from_sql(c["output"], c.get("label")) for c in chosen if c["output"]["rows"]]
+    tables = [
+        (table_vertical(c["output"], c.get("label"), _metric_meta()) if c.get("vertical") else table_from_sql(c["output"], c.get("label")))
+        for c in chosen
+        if c["output"]["rows"]
+    ]
     hits, seen = [], set()
     for c in calls:
         if c["name"] == "search_clauses":

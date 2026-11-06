@@ -16,7 +16,7 @@ def test_drafts_find_all_planted_and_clean_control_is_clean(tmp_path):
     labels = json.loads((tmp_path / "labels.json").read_text())["drafts"]
     man = json.loads((tmp_path / "manifest.json").read_text())["drafts"]
     for d in man:
-        _, clauses = parse_document((tmp_path / "docs" / d["file"]).read_text())
+        _, clauses = parse_document((tmp_path / d["file"]).read_text())
         found = {i["clause_type"]: i for i in compare_document(clauses, d["template"], "heuristic")}
         planted = labels[d["key"]]["deviations"]
         assert {p["clause_type"] for p in planted} == set(found), d["key"]

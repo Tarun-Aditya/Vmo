@@ -1,11 +1,38 @@
+import asyncio
+import logging
+import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.db import engine
+from app import kcc, scheduler
+from app.db import SessionLocal, engine
 from app.routes import router
+from app.routes_admin import router as admin_router
 
-app = FastAPI(title="ContractIQ API", version="0.1.0")
+log = logging.getLogger("app")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Seed missing config defaults, then run the pipeline scheduler in the background."""
+    task = None
+    try:
+        with SessionLocal() as s:
+            kcc.ensure_defaults(s)
+            s.commit()
+        if os.environ.get("SCHEDULER_ENABLED", "1") == "1":
+            task = asyncio.create_task(scheduler.scheduler_loop())
+    except Exception:  # DB not migrated yet: the API still starts, /health tells the story
+        log.exception("startup config/scheduler not started")
+    yield
+    if task:
+        task.cancel()
+
+
+app = FastAPI(title="ContractIQ API", version="0.2.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -14,6 +41,7 @@ app.add_middleware(
 )
 
 app.include_router(router)
+app.include_router(admin_router)
 
 
 @app.get("/health")
