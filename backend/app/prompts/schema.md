@@ -23,6 +23,16 @@ v_renewals  -- active contracts with renewal maths. Columns: contract_id, title,
   there is no notice period), days_left (to expiry), notice_days_left (to notice_deadline; negative =
   deadline passed), bucket ('overdue' | '30' | '60' | '90' | 'later') based on notice_deadline for
   auto-renewals and expiry_date otherwise.
+v_document_terms  -- same columns as v_effective_terms but INCLUDING vendor drafts (status='draft'). Use it for questions about
+  drafts or about specific selected documents.
+v_values  -- extracted terms & limits, one row per (document, metric): contract_id, title, vendor, type, status, metric_key,
+  metric, unit, value_num, value_text, page. metric_key values: payment_terms_days, liability_cap_multiple, tfc_notice_days,
+  renewal_notice_days, insurance_cover_usd, warranty_days, confidentiality_years, sla_availability_pct, incident_notice_hours,
+  breach_notice_hours, cure_period_days, key_personnel_replacement_days, acceptance_days, audit_notice_days,
+  force_majeure_termination_days, governing_law_text. USE THIS for any threshold question ("shorter than", "below", "at least",
+  "more than") on those numbers, e.g. `WHERE metric_key='confidentiality_years' AND value_num < 3`.
+v_checks  -- pre-signature checklist results, one row per (document, rule): contract_id, title, vendor, type, status, rule_key, rule,
+  result ('pass'|'fail'|'na'), severity (low|medium|high|critical), actual, expected, page. Use it for "which contracts fail ...".
 contracts  -- raw rows incl. Amendment rows (type='Amendment', parent_id -> amended contract; the columns
   an amendment changes are listed in `overrides`). Raw values are NOT amendment-adjusted.
 template_clauses(id, template_id, clause_type, standard_text, playbook_position, fallback_text,
@@ -31,6 +41,12 @@ clause_deviations(contract_id, template_clause_id, deviation_summary, severity) 
   contract departs from its standard template (severity: low|medium|high|critical)
 clauses(id, contract_id, clause_type, heading, text, page)  -- clause text of every contract
 field_extractions(contract_id, field, value, confidence, source_clause_id, source_page)
+
+Meaning of flags: termination_for_convenience is true (customer may terminate without cause), false (the contract bars it) or NULL
+(not addressed, e.g. NDAs). "Cannot be terminated for convenience" means = false only. has_dpa is true when a signed DPA covers the
+vendor (a DPA document for the same vendor, or one referenced by the contract). A SaaS vendor "without a DPA" has
+processes_personal_data AND NOT has_dpa. When asked what a clause SAYS, also call search_clauses (use the vendor / clause_type
+filters) so the wording is cited, in addition to any SQL.
 
 Notes: all money is USD. MSAs carry no annual_value (their SOWs do),
 so summing annual_value never double counts; Work Orders carry total_value only (fixed fee). Hierarchy: MSA ->

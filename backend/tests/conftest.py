@@ -1,8 +1,11 @@
+import os
 import shutil
 from pathlib import Path
 
 import pytest
 from sqlalchemy import text
+
+os.environ["LLM_PROVIDER"] = "offline"      # tests are deterministic: no LLM, whatever is installed
 
 
 @pytest.fixture(scope="session")

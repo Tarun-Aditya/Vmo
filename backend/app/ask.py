@@ -181,6 +181,10 @@ def build_system(scope: list[int] | None = None) -> str:
 
 
 def ask_llm(question: str, max_turns: int = 8, scope: list[int] | None = None) -> dict:
+    if llm.provider() == "claude_code":
+        from app import agent
+
+        return agent.ask_agent(question, scope)
     system, calls, sql_errors, notes = build_system(scope), [], 0, []
     messages = [{"role": "user", "content": question}]
     answer = ""
@@ -246,7 +250,7 @@ def citations(calls: list[dict]) -> list[dict]:
     return out
 
 
-def answer(question: str, demo_mode: bool = False, scope: list[int] | None = None) -> dict:
+def answer(question: str, demo_mode: bool = False, scope: list[int] | None = None, force_offline: bool = False) -> dict:
     t0 = time.time()
     if demo_mode and not scope:
         with SessionLocal() as s:
@@ -261,8 +265,8 @@ def answer(question: str, demo_mode: bool = False, scope: list[int] | None = Non
                 "cached_from": row[1],
                 "elapsed_ms": int((time.time() - t0) * 1000),
             }
-    if llm.available():
-        res, source = ask_llm(question, scope=scope), "llm"
+    if llm.available() and not force_offline:
+        res, source = ask_llm(question, scope=scope), "llm" if llm.provider() == "api" else "claude-subscription"
     else:
         from app import ask_nl, ask_scripted
 
@@ -304,8 +308,18 @@ def precompute_demo_answers(log=print) -> int:
     with SessionLocal() as s:
         s.execute(text("DELETE FROM ask_cache"))
         s.commit()
-    for q in qs:
-        res = answer(q["question"], demo_mode=False)
+    def one(q):
+        try:
+            return q, answer(q["question"], demo_mode=False)
+        except Exception as e:      # the LLM failed for this question: keep the demo safe with the offline answer
+            log(f"  LLM failed for {q['question']!r} ({type(e).__name__}); using the offline engine")
+            return q, answer(q["question"], demo_mode=False, force_offline=True)
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(3 if llm.available() else 1) as ex:
+        done = list(ex.map(one, qs))
+    for q, res in done:
         with SessionLocal() as s:
             s.execute(
                 text("INSERT INTO ask_cache VALUES (:k,:q,CAST(:r AS jsonb),:src,now())"),

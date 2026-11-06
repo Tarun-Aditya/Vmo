@@ -63,7 +63,7 @@ export function Layout() {
   const [dark, setDark] = useSetting("dark", window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);
   const [demo, setDemo] = useSetting("demo", true);
   document.documentElement.classList.toggle("dark", dark);
-  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ llm_available: boolean; today: string }>("/api/meta") });
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ llm_available: boolean; llm_label: string; llm_provider: string; today: string }>("/api/meta") });
   const qc = useQueryClient();
   const st = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/api/status"), refetchInterval: 10000 });
   const lastRun = useRef<number | null>(null);
@@ -99,7 +99,7 @@ export function Layout() {
               <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Demo mode
             </label>
             <span className={`rounded px-2 py-0.5 text-xs ${meta.data?.llm_available ? "bg-emerald-100 text-emerald-900" : "bg-slate-200 text-slate-700"}`}>
-              {meta.data ? (meta.data.llm_available ? "Claude live" : "Offline engine") : "…"}
+              {meta.data ? meta.data.llm_label : "…"}
             </span>
             <NavLink to="/admin" title="Pipeline, key clauses, values & limits, checklist" className={({ isActive }) => `rounded px-2 py-1 ${isActive ? "bg-slate-200 font-medium dark:bg-slate-700" : "text-slate-500 hover:underline"}`}>⚙ Admin</NavLink>
             <button onClick={() => setDark(!dark)} className="rounded border px-2 py-1" aria-label="Toggle theme">{dark ? "☀ Light" : "☾ Dark"}</button>

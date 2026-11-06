@@ -165,12 +165,12 @@ def compare_document(clauses: list[dict], template_type: str, mode: str = "auto"
 
     def run(job):
         ct, std, found = job
-        r = (
-            llm_compare(ct, doc, std, found["text"])
-            if use_llm
-            else heuristic_compare(ct, std, found["text"], doc)
-        )
-        return ct, std, found, r
+        if use_llm and llm.available():
+            try:
+                return ct, std, found, llm_compare(ct, doc, std, found["text"])
+            except Exception as e:      # limit reached / network: fall back to the pattern library for this clause
+                llm.note_failure(e)
+        return ct, std, found, heuristic_compare(ct, std, found["text"], doc)
 
     with ThreadPoolExecutor(8) as ex:
         results = list(ex.map(run, jobs)) if use_llm else [run(j) for j in jobs]

@@ -26,7 +26,7 @@ def effective_terms_sql(name: str = "v_effective_terms", drafts: bool = False) -
 CREATE VIEW {name} AS
 SELECT t.*,
        -- Uncapped = a cap clause says "Unlimited". Docs with no cap clause are NOT uncapped.
-       (t.liability_cap_multiple IS NULL AND t.liability_cap_text ILIKE 'unlimited%') AS liability_uncapped
+       (t.liability_cap_multiple IS NULL AND t.liability_cap_text ~* 'unlimited|uncapped') AS liability_uncapped
 FROM (
 WITH latest_override AS (
   SELECT DISTINCT ON (a.parent_id, f.field) a.parent_id, f.field, a.id AS src

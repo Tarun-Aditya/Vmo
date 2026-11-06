@@ -11,7 +11,6 @@ from sqlalchemy import text
 
 from app import ask as ask_mod
 from app import llm
-from app.config import settings
 from app.db import SessionLocal
 from app.docgen.library import CLAUSES
 
@@ -37,6 +36,8 @@ def meta():
     row = q1("SELECT min(created_at) AS seeded_at FROM contracts")
     return {
         "llm_available": llm.available(),
+        "llm_provider": llm.provider(),
+        "llm_label": llm.status()["label"] + (" · paused (limit), offline fallback" if llm.status()["paused"] else ""),
         "embedding_provider": embeddings.provider(),
         "today": dt.date.today().isoformat(),
         "seeded_at": row and row["seeded_at"],
@@ -621,5 +622,6 @@ def usage():
         "total_output_tokens": sum(r["output_tokens"] for r in rows),
         "est_cost_usd": round(sum(r["est_cost_usd"] for r in rows), 4),
         "price_note": f"Estimated at ${PRICE_PER_MTOK['input']}/MTok in, ${PRICE_PER_MTOK['output']}/MTok out",
-        "llm_available": bool(settings.anthropic_api_key),
+        "llm_available": llm.available(),
+        "llm_provider": llm.provider(),
     }

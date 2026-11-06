@@ -28,10 +28,13 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
                        "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages RESTART IDENTITY CASCADE"))
         kcc.ensure_defaults(s)
         s.execute(text("UPDATE pipeline_config SET inbox_path = NULL, last_run_at = NULL, next_run_at = NULL, last_fingerprint = NULL"))
-        s.execute(text("UPDATE pipeline_config SET enabled = true, trigger_mode = 'periodic', interval_minutes = 120, folders = 'contracts,uploads' WHERE key = 'contracts'"))
-        s.execute(text("UPDATE pipeline_config SET enabled = true, trigger_mode = 'on_change', interval_minutes = 15, folders = 'drafts,generated' WHERE key = 'drafts'"))
+        s.execute(text("UPDATE pipeline_config SET enabled = false, trigger_mode = 'periodic', interval_minutes = 120, folders = 'contracts,uploads' WHERE key = 'contracts'"))
+        s.execute(text("UPDATE pipeline_config SET enabled = false, trigger_mode = 'on_change', interval_minutes = 15, folders = 'drafts,generated' WHERE key = 'drafts'"))
         s.commit()
     res = pipeline.run_pipeline("seed", extractor, log=lambda r: log(f"pipeline: {r}"))
+    with SessionLocal() as s:       # pipelines were paused while seeding so a running API scheduler cannot race the seed
+        s.execute(text("UPDATE pipeline_config SET enabled = true"))
+        s.commit()
     stats = dict(pipeline=res)
     try:
         from app import ask

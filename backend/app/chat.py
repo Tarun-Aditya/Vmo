@@ -101,6 +101,18 @@ def _reveal(res: dict) -> Iterator[dict]:
 
 def _llm_stream(question: str, scope: list[int] | None, history: list[dict]) -> Iterator[dict]:
     """Real streaming tool-use loop: reasoning and answer tokens as they arrive, a step per tool call."""
+    if llm.provider() == "claude_code":                      # Claude subscription via the Agent SDK
+        from app import agent
+
+        for ev in agent.events(question, scope, history):
+            if ev["type"] == "final":
+                res = ev["res"]
+                res["citations"] = ask.citations(res["tool_calls"])
+                ask_present.finalize(res)
+                yield {"type": "final", "res": res, "source": "claude-subscription"}
+            else:
+                yield ev
+        return
     system = ask.build_system(scope)
     messages = history + [{"role": "user", "content": question}]
     calls, notes, sql_errors, answer = [], [], 0, ""
@@ -158,11 +170,12 @@ def stream_answer(question: str, conversation_id: int | None, demo_mode: bool, s
                         res, source = ev["res"], ev["source"]
                     else:
                         yield _sse(ev)
-            except Exception as e:      # streaming/thinking not available: fall back to the plain loop
-                yield _sse({"type": "step", "step": {"title": "Streaming unavailable, using the standard loop", "detail": str(e)[:160]}})
+            except Exception as e:      # limit reached / network: answer with the offline engine instead
+                llm.note_failure(e)
+                yield _sse({"type": "step", "step": {"title": "Claude is unavailable right now, using the offline engine", "detail": str(e)[:200]}})
                 res = None
         if res is None:
-            res = ask.answer(question, demo_mode, scope)
+            res = ask.answer(question, demo_mode, scope, force_offline=True)
             source = res.get("source", "offline-planner")
             for ev in _reveal(res):
                 yield _sse(ev)

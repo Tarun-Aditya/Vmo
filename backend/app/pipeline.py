@@ -12,12 +12,13 @@ import json
 import re
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 from sqlalchemy import text
 
-from app import deviations, embeddings, extraction, kcc
+from app import deviations, embeddings, extraction, kcc, llm
 from app.config import data_path
 from app.db import SessionLocal
 from app.docgen.generate import render_template
@@ -254,26 +255,41 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
         files = only if only is not None else scan(root, folders)
         counts = dict(scanned=len(files), new_docs=0, updated=0, unchanged=0, failed=0)
         pending: dict[int, str | None] = {}
-        for f in files:
+        lk = threading.Lock()
+
+        def work(f: Path) -> None:
             try:
                 with SessionLocal() as s:
                     r = ingest_file(s, f, root, cfg, extractor)
                     if r["action"] in ("new", "updated"):
-                        pending[r["contract_id"]] = r.get("parent_title")
+                        with lk:
+                            pending[r["contract_id"]] = r.get("parent_title")
                     s.execute(text("INSERT INTO pipeline_events (run_id, path, contract_id, action, detail) VALUES (:r,:p,:c,:a,:d)"),
                               {"r": run_id, "p": r["path"], "c": r["contract_id"], "a": r["action"],
                                "d": (f"{r.get('title', '')} · {r.get('values', 0)} values, {r.get('checks', 0)} checks, "
                                      f"{r.get('deviations', 0)} deviations") if r["action"] != "unchanged" else "content unchanged"})
                     s.commit()
-                counts[{"new": "new_docs", "updated": "updated", "unchanged": "unchanged"}[r["action"]]] += 1
+                with lk:
+                    counts[{"new": "new_docs", "updated": "updated", "unchanged": "unchanged"}[r["action"]]] += 1
             except Exception as e:  # one bad document must not stop the run
-                counts["failed"] += 1
+                with lk:
+                    counts["failed"] += 1
                 with SessionLocal() as s:
                     s.execute(text("INSERT INTO pipeline_events (run_id, path, action, detail) VALUES (:r,:p,'failed',:d)"),
                               {"r": run_id, "p": str(f.name), "d": f"{type(e).__name__}: {e}"[:300]})
                     s.commit()
+
+        workers = 4 if llm.available() and extractor != "offline" and len(files) > 1 else 1     # LLM calls dominate: overlap them
+        if workers > 1:
+            with ThreadPoolExecutor(workers) as ex:
+                list(ex.map(work, files))
+        else:
+            for f in files:
+                work(f)
         with SessionLocal() as s:
             linked = link_parents(s, pending)
+            s.execute(text("""UPDATE contracts c SET has_dpa = true WHERE c.type <> 'DPA' AND c.status <> 'draft' AND COALESCE(c.has_dpa, false) = false
+                              AND EXISTS (SELECT 1 FROM contracts d WHERE d.type = 'DPA' AND d.status <> 'draft' AND d.vendor = c.vendor)"""))
             now = datetime.now(timezone.utc)
             s.execute(text("UPDATE pipeline_runs SET finished_at=now(), status=:st, scanned=:a, new_docs=:b, updated=:c, unchanged=:d, failed=:e, message=:m WHERE id=:i"),
                       {"st": "failed" if counts["failed"] and not (counts["new_docs"] + counts["updated"]) else "completed",

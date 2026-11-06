@@ -132,9 +132,42 @@ def tiles_from_calls(calls: list[dict]) -> tuple[list[dict], dict | None]:
     return [], None
 
 
+def _label_for(o: dict) -> str | None:
+    cols = o["columns"]
+    if "title" in cols or "contract_id" in cols:
+        return "Contracts"
+    text_cols = [c for c in cols if c not in HIDE and not any(isinstance(r[cols.index(c)], (int, float)) and not isinstance(r[cols.index(c)], bool) for r in o["rows"][:1])]
+    return f"Breakdown by {label_of(text_cols[0]).lower()}" if text_cols and len(o["rows"]) > 1 else None
+
+
+def plain(t: str) -> str:
+    """Written answers are prose: strip markdown the model may add (the tables carry the detail)."""
+    lines = [ln for ln in t.splitlines() if not ln.strip().startswith("|")]
+    out, items = [], []
+    for ln in lines:
+        m = re.match(r"^\s*(?:[-*•]|\d+[.)])\s+(.*)$", ln)
+        if m:
+            items.append(m.group(1).strip().rstrip(".;"))
+        elif ln.strip():
+            out.append(ln.strip())
+    s = " ".join(out)
+    if items:
+        s = (s.rstrip(":") + ": " if s else "") + "; ".join(items) + "."
+    return re.sub(r"\s+", " ", re.sub(r"[*_`]{1,3}", "", s)).strip()
+
+
 def build_tables(calls: list[dict], tile_call: dict | None) -> list[dict]:
     sql = [c for c in _ok_sql(calls) if c is not tile_call and not c.get("no_tiles")]
-    chosen = [c for c in sql if c.get("display")] or sql[-1:]
+    chosen = [c for c in sql if c.get("display")]
+    if not chosen:      # free-form (Claude) answers: show the grouped breakdown(s) and the final list, each as its own table
+        picked: list[dict] = []
+        for c in sql:
+            o = c["output"]
+            if not o["rows"]:
+                continue
+            picked = [p for p in picked if p["output"]["columns"] != o["columns"]]      # a re-run of the same shape replaces the older one
+            picked.append(c)
+        chosen = [{**c, "label": c.get("label") or _label_for(c["output"])} for c in picked[-3:]]
     tables = [
         (table_vertical(c["output"], c.get("label"), _metric_meta()) if c.get("vertical") else table_from_sql(c["output"], c.get("label")))
         for c in chosen
@@ -184,6 +217,8 @@ def build_thinking(calls: list[dict], plan_steps: list[dict] | None, notes: list
 
 def finalize(res: dict) -> dict:
     calls = res["tool_calls"]
+    if res.get("answer") and any(c["name"] in ("run_sql", "search_clauses", "get_contract") for c in calls):
+        res["answer"] = plain(res["answer"])
     tiles, tile_call = tiles_from_calls(calls)
     res["tiles"] = tiles
     res["tables"] = build_tables(calls, tile_call)

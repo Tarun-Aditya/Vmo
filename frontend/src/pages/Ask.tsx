@@ -184,6 +184,7 @@ export default function Ask() {
           if (ev.type === "meta") setConvId(ev.conversation_id);
           else if (ev.type === "step") patchLast((m) => ({ steps: [...m.steps, ev.step] }));
           else if (ev.type === "reasoning") patchLast((m) => ({ reasoning: m.reasoning + ev.text }));
+          else if (ev.type === "demote") patchLast((m) => ({ reasoning: `${m.reasoning}${m.reasoning ? "\n" : ""}${ev.text}\n`, answer: "" }));
           else if (ev.type === "token") patchLast((m) => ({ answer: m.answer + ev.text }));
           else if (ev.type === "result") patchLast(() => ({ result: ev.result, answer: ev.result.answer }));
           else if (ev.type === "error") patchLast(() => ({ error: ev.message }));

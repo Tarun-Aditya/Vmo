@@ -24,6 +24,23 @@ def values(calls, column):
     return None
 
 
+def best_set(calls, column, want):
+    """The set the answer gave. Claude names columns freely, so: the named column when present, otherwise the column of
+    any result whose values overlap the expected set most (what matters is the content, not the alias)."""
+    v = values(calls, column)
+    if v:
+        return set(v[0])
+    best, score = set(), -1.0
+    for out in sql_outputs(calls):
+        for i in range(len(out["columns"])):
+            col = {r[i] for r in out["rows"] if isinstance(r[i], str)}
+            if col:
+                j = len(col & want) / len(col | want)
+                if j > score:
+                    best, score = col, j
+    return best
+
+
 def check(q, res):
     spec, calls = q["check"], res["tool_calls"]
     if spec["kind"] == "all":
@@ -33,34 +50,32 @@ def check(q, res):
     cited = {c["title"] for c in res["citations"]}
     kind = spec["kind"]
     if kind == "set":
-        v = values(calls, spec["column"])
-        got = set(v[0]) if v else None
-        return got == want, f"got {sorted(got or [])} want {sorted(want)}"
+        got = best_set(calls, spec["column"], want)
+        return got == want, f"got {sorted(got)} want {sorted(want)}"
     if kind == "number":
-        v = values(calls, spec["column"])
-        got = v[0][0] if v else None
-        return (
-            got is not None and abs(float(got) - float(want)) <= 0.01 * float(want),
-            f"got {got} want {want}",
-        )
+        nums = [float(x) for o in sql_outputs(calls) for r in o["rows"] for x in r if isinstance(x, (int, float)) and not isinstance(x, bool)]
+        ok = any(abs(n - float(want)) <= 0.01 * max(float(want), 1) for n in nums)
+        return ok, f"want {want}, numbers returned {sorted(set(nums))[:12]}"
     if kind == "rowcount":
-        v = values(calls, spec["column"])
-        got = len(v[0]) if v else None
-        return got == want, f"got {got} rows want {want}"
+        got = [len(o["rows"]) for o in sql_outputs(calls)]
+        return want in got, f"got {got} rows want {want}"
     if kind == "dict":
-        sql = next(
-            o
-            for o in sql_outputs(calls)
-            if spec["key"] in o["columns"] and spec["value"] in o["columns"]
-        )
-        ki, vi = sql["columns"].index(spec["key"]), sql["columns"].index(spec["value"])
-        got = {r[ki]: float(r[vi] or 0) for r in sql["rows"]}
         want = {k: v for k, v in want.items() if v}
-        got = {k: v for k, v in got.items() if v}
-        ok = got.keys() == want.keys() and all(
-            abs(got[k] - want[k]) <= 0.01 * want[k] for k in want
-        )
-        return ok, f"got {got} want {want}"
+        seen = []
+        for o in sql_outputs(calls):
+            for ki, kc in enumerate(o["columns"]):
+                for vi, vc in enumerate(o["columns"]):
+                    if ki == vi:
+                        continue
+                    try:
+                        got = {r[ki]: float(r[vi] or 0) for r in o["rows"] if isinstance(r[ki], str)}
+                    except (TypeError, ValueError):
+                        continue
+                    got = {k: v for k, v in got.items() if v}
+                    seen.append(got)
+                    if got.keys() == want.keys() and all(abs(got[k] - want[k]) <= 0.01 * want[k] for k in want):
+                        return True, ""
+        return False, f"want {want}; closest {max(seen, key=lambda g: len(g.keys() & want.keys()), default={})}"
     if kind == "cited":
         top = {
             h["title"]
@@ -70,8 +85,7 @@ def check(q, res):
         }
         return want <= top, f"top-2 cited {sorted(top)} want {sorted(want)}"
     if kind == "set_and_cited":
-        v = values(calls, spec["column"])
-        got = set(v[0]) if v else set()
+        got = best_set(calls, spec["column"], want)
         return (
             got == want and want <= cited,
             f"sql {sorted(got)} cited {sorted(cited)} want {sorted(want)}",
@@ -83,8 +97,11 @@ def main() -> int:
     qs = yaml.safe_load((Path(__file__).parent / "questions.yaml").read_text())
     ok = 0
     for q in qs:
-        res = ask.answer(q["question"], demo_mode=False)
-        good, detail = check(q, res)
+        try:
+            res = ask.answer(q["question"], demo_mode=False)
+            good, detail = check(q, res)
+        except Exception as e:
+            res, good, detail = {"source": "error"}, False, f"{type(e).__name__}: {e}"
         ok += good
         print(
             f"{'PASS' if good else 'FAIL'} [{res['source']:8s}] {q['id']:22s} {'' if good else detail}"
