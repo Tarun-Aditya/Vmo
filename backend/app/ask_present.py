@@ -180,8 +180,8 @@ def build_tables(calls: list[dict], tile_call: dict | None) -> list[dict]:
                 if h["clause_id"] not in seen:
                     seen.add(h["clause_id"])
                     hits.append(h)
-    if hits:
-        tables.append(table_from_hits(hits))
+    if hits:       # keep clause hits as supporting evidence when SQL tables carry the answer
+        tables.append(table_from_hits(hits[: 3 if tables else 8]))
     return tables
 
 

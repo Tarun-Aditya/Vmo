@@ -56,14 +56,25 @@ data/inbox/**.md  ──►  pipeline  ──►  contracts · clauses · fields
 * **Ask** — *analytical* questions over the whole portfolio, or questions about **specific documents** chosen (search +
   select) in the panel on the right. Answers are tables; the SQL and steps are under a collapsed **Thinking** section.
 
-### Two engines
-| | With `ANTHROPIC_API_KEY` | Without (offline engine) |
+### LLM engine: Claude subscription, API key, or offline
+`LLM_PROVIDER=auto` (default) picks, in order: **`api`** (`ANTHROPIC_API_KEY` set) → **`claude_code`** (the `claude` CLI is installed and
+logged in: everything runs on your **Claude subscription**, no key; run the API on the host, `pip install -e ".[claude-code]"`) →
+**`offline`**. To move from the subscription to a key later, just set `ANTHROPIC_API_KEY` (or `LLM_PROVIDER=api`); nothing else changes.
+If Claude is unavailable (e.g. the subscription's 5-hour limit), calls fall back to the offline engine and the header says so.
+
+| | Claude (`api` / `claude_code`) | Offline engine |
 |---|---|---|
-| Extraction | Claude, forced tool call + JSON schema | regex extractor over the same text |
-| Redline / deviations | Claude judges each changed clause vs playbook | word diff + pattern library |
-| Checklist, values, clause identification | same (rule engine, no LLM needed) | same |
-| Ask | Claude tool-use loop (`run_sql`, `search_clauses`, `get_contract`) over the extracted data | scripted plans for the demo questions + a planner for counts, totals, group-by, windows, filters, columns, thresholds, checklist, vendor-level and scoped questions |
-| Embeddings | `sentence-transformers` if installed (`pip install -e ".[local-embeddings]"`) else hashed bag-of-words | hashed bag-of-words |
+| Extraction | Claude, forced JSON schema (cached on disk, so re-seeding is free) | regex extractor |
+| Redline / deviations | Claude judges each changed clause vs the playbook | word diff + pattern library |
+| Brief → new-contract form | Claude fills the schema | rule-based reader |
+| Checklist, values, clause identification | rule engine (no LLM) | same |
+| Ask | Claude tool-use loop (`run_sql`, `search_clauses`, `get_contract`), streamed live: reasoning, SQL steps, answer | scripted plans + rule-based planner |
+| Embeddings | `sentence-transformers` if installed, else hashed bag-of-words | hashed bag-of-words |
+
+Measured with Claude on the subscription (`make seed && make eval`): extraction **437/442 (98.9%)**, redline recall **18/18** (severity agreement
+14/18: Claude grades severity differently from the planted labels), Ask **26/27** (the miss is clause *retrieval* ranking with the hashed embeddings).
+Offline: 442/442, 18/18, 27/27. `make test` seeds offline first (the tests assert the deterministic offline data). Free-form (non-cached)
+questions need **Demo mode off** to go live; with it on, preloaded questions are served from the cache that the seed generated with Claude.
 
 The header badge shows the engine. Offline eval scores prove the plumbing and data, not Claude's quality — run
 `make seed && make eval` with a key to measure the real thing. **Demo mode** answers the preloaded questions from cache.
