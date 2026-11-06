@@ -25,13 +25,21 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
         f"{len(manifest['drafts'])} drafts into {root / 'inbox'} (seed date {seed_date})")
     with SessionLocal() as s:
         s.execute(text("TRUNCATE templates, template_clauses, contracts, clauses, field_extractions, clause_deviations, "
-                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages RESTART IDENTITY CASCADE"))
+                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages, vendor_scores RESTART IDENTITY CASCADE"))
         kcc.ensure_defaults(s)
         s.execute(text("UPDATE pipeline_config SET inbox_path = NULL, last_run_at = NULL, next_run_at = NULL, last_fingerprint = NULL"))
         s.execute(text("UPDATE pipeline_config SET enabled = false, trigger_mode = 'periodic', interval_minutes = 120, folders = 'contracts,uploads' WHERE key = 'contracts'"))
         s.execute(text("UPDATE pipeline_config SET enabled = false, trigger_mode = 'on_change', interval_minutes = 15, folders = 'drafts,generated' WHERE key = 'drafts'"))
+        s.execute(text("UPDATE pipeline_config SET enabled = false, trigger_mode = 'on_change', interval_minutes = 60, folders = 'feeds' WHERE key = 'feeds'"))
         s.commit()
     res = pipeline.run_pipeline("seed", extractor, log=lambda r: log(f"pipeline: {r}"))
+    try:        # operational feeds: invoices, SLA measurements, obligation status -> spend exceptions, risk scores
+        from app import feeds
+
+        log(f"feeds generated: {feeds.generate(seed_date)}")
+        log(f"feeds loaded: {feeds.run_feeds('seed')}")
+    except Exception as e:
+        log(f"feeds failed: {type(e).__name__}: {e}")
     with SessionLocal() as s:       # pipelines were paused while seeding so a running API scheduler cannot race the seed
         s.execute(text("UPDATE pipeline_config SET enabled = true"))
         s.commit()

@@ -214,6 +214,7 @@ def ensure_defaults(s) -> dict:
     out["rules"] = _insert_missing(s, "checklist_rules", RULE_COLS + ["sort_order"], rules)
     s.execute(text("INSERT INTO pipeline_config (id, key, name, folders) VALUES (1, 'contracts', 'Executed contracts', 'contracts,uploads') ON CONFLICT DO NOTHING"))
     s.execute(text("INSERT INTO pipeline_config (id, key, name, folders, trigger_mode, interval_minutes) VALUES (2, 'drafts', 'Draft review (redline)', 'drafts,generated', 'on_change', 15) ON CONFLICT DO NOTHING"))
+    s.execute(text("INSERT INTO pipeline_config (id, key, name, folders, trigger_mode, interval_minutes) VALUES (3, 'feeds', 'Operational feeds', 'feeds', 'on_change', 60) ON CONFLICT DO NOTHING"))
     rebuild_key_clauses_view(s)
     return out
 

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api, daysLabel, fmtDate, usd } from "../lib";
 import { Card, Loading, Sev, SeverityChip, sevStripe } from "../ui";
+import { Tile, TierChip } from "../components/vmo";
 
 type Item = { id: number; title: string; vendor: string; category: string; type: string; owner: string; annual_value: number | null; auto_renew: boolean;
   expiry_date: string; notice_deadline: string; days_left: number; notice_days_left: number; notice_passed: boolean; liability_uncapped: boolean; fully_executed: boolean };
@@ -20,6 +21,26 @@ function Kpi({ label, value, sub, sev }: { label: string; value: string | number
   );
 }
 
+function OpsStrip() {
+  const ob = useQuery({ queryKey: ["obligations", ""], queryFn: () => api<{ summary: { overdue: number; due_30: number } }>("/api/obligations") });
+  const sp = useQuery({ queryKey: ["spend-summary"], queryFn: () => api<{ exceptions: number; at_risk: number; off_contract: number }>("/api/spend/summary") });
+  const sla = useQuery({ queryKey: ["sla"], queryFn: () => api<{ summary: { breach_months: number; credit_usd: number } }>("/api/sla") });
+  const rk = useQuery({ queryKey: ["risk"], queryFn: () => api<{ vendors: { vendor: string; score: number; tier: string }[] }>("/api/risk/vendors") });
+  if (!ob.data || !sp.data || !sla.data || !rk.data) return null;
+  const top = rk.data.vendors[0];
+  return (
+    <div>
+      <h2 className="mb-2 text-lg font-semibold">Vendor operations</h2>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4" aria-label="Vendor operations">
+        <Link to="/obligations"><Tile l="Overdue obligations" v={ob.data.summary.overdue} tone={ob.data.summary.overdue ? "red" : "green"} sub={`${ob.data.summary.due_30} more due in 30 days`} /></Link>
+        <Link to="/spend"><Tile l="Spend exceptions" v={sp.data.exceptions} tone="amber" sub={`${usd(sp.data.at_risk)} at risk · ${usd(sp.data.off_contract)} off-contract`} /></Link>
+        <Link to="/obligations"><Tile l="SLA breach months" v={sla.data.summary.breach_months} tone={sla.data.summary.breach_months ? "red" : "green"} sub={`~${usd(sla.data.summary.credit_usd)} estimated credits`} /></Link>
+        <Link to="/risk"><Tile l="Highest-risk vendor" v={<span className="text-lg">{top.vendor.replace(/ (Inc|LLP|Ltd)$/, "")}</span>} sub={<span className="inline-flex items-center gap-2">score {top.score.toFixed(0)} <TierChip tier={top.tier} /></span>} /></Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const q = useQuery({ queryKey: ["dash"], queryFn: () => api<Dash>("/api/dashboard"), refetchInterval: 30000 });
   if (!q.data) return <Loading q={q} />;
@@ -33,6 +54,8 @@ export default function Dashboard() {
         <Kpi label="Auto-renew, notice due" value={k.autorenew_notice_soon} sub={`${k.autorenew_notice_passed} already passed`} sev="critical" />
         <Kpi label="Uncapped liability" value={k.uncapped} sub="vendors with unlimited exposure" sev="critical" />
       </div>
+
+      <OpsStrip />
 
       <div>
         <h2 className="mb-2 text-lg font-semibold">Contract expiry — next 30 / 60 / 90 days</h2>

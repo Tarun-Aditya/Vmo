@@ -15,6 +15,10 @@ import Vendors from "./pages/Vendors";
 import VendorProfile from "./pages/VendorProfile";
 import NewContract from "./pages/NewContract";
 import DocumentEditor from "./pages/DocumentEditor";
+import Obligations from "./pages/Obligations";
+import Spend from "./pages/Spend";
+import Risk from "./pages/Risk";
+import RiskWeights from "./pages/admin/RiskWeights";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Pipeline from "./pages/admin/Pipeline";
 import Kcc from "./pages/admin/Kcc";
@@ -41,12 +45,16 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="redline/:id" element={<Redline />} />
             <Route path="templates" element={<Templates />} />
             <Route path="new" element={<NewContract />} />
+            <Route path="obligations" element={<Obligations />} />
+            <Route path="spend" element={<Spend />} />
+            <Route path="risk" element={<Risk />} />
             <Route path="documents/:id/edit" element={<DocumentEditor />} />
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<Pipeline />} />
               <Route path="clauses" element={<Kcc />} />
               <Route path="values" element={<Values />} />
               <Route path="checklist" element={<Checklist />} />
+              <Route path="risk" element={<RiskWeights />} />
               <Route path="usage" element={<Usage />} />
             </Route>
           </Route>

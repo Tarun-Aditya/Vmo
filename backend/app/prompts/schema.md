@@ -33,6 +33,21 @@ v_values  -- extracted terms & limits, one row per (document, metric): contract_
   "more than") on those numbers, e.g. `WHERE metric_key='confidentiality_years' AND value_num < 3`.
 v_checks  -- pre-signature checklist results, one row per (document, rule): contract_id, title, vendor, type, status, rule_key, rule,
   result ('pass'|'fail'|'na'), severity (low|medium|high|critical), actual, expected, page. Use it for "which contracts fail ...".
+v_obligations  -- what each party must do: obligation_id, contract_id, title (contract), vendor, type, contract_status, kind (milestone | sla | notice |
+  payment | acceptance | personnel | cure | audit | renewal | warranty | insurance | reporting | security | certificate | governance | delivery | other), party
+  (Supplier | Customer | Both), obligation (text), due_date, frequency, target_value, target_unit, status ('open' | 'overdue' | 'done' | 'waived'; overdue =
+  open and past due_date), completed_on, days_left. Exclude drafts with contract_status <> 'draft'.
+v_invoices  -- invoices from the AP feed: invoice_id, vendor, contract_id (NULL = no contract matched), contract_title, invoice_no, invoice_date, due_date,
+  paid_date, amount, description, days_paid_late.
+v_contract_spend  -- per contract with a value: contract_id, title, vendor, type, planned_value (value over the term), billed, invoices, expected_to_date,
+  pct_of_planned (billed / planned_value), elapsed_pct (share of the term gone).
+v_spend_exceptions  -- invoices/contracts that break a rule: exception_id, kind (no_contract | unsigned_contract | billed_before_effective | billed_after_expiry |
+  duplicate | above_run_rate | over_contract_value | late_payment), severity, amount_at_risk, detail, vendor, contract_id, contract_title, invoice_no, invoice_date,
+  invoice_amount. "Spend with vendors that have no contract on file" = SUM(invoice_amount) WHERE kind = 'no_contract'.
+v_sla  -- monthly SLA actuals vs the contract target: contract_id, title, vendor, metric_key (sla_availability_pct | incident_notice_hours), period (month start),
+  actual, target, breach (true when the target was missed), shortfall, incidents.
+v_vendor_scores  -- vendor risk (0-100, higher = riskier): vendor, score, tier (low | medium | high | critical), contract_risk, renewal_exposure, performance,
+  spend_compliance, concentration (each 0-100).
 contracts  -- raw rows incl. Amendment rows (type='Amendment', parent_id -> amended contract; the columns
   an amendment changes are listed in `overrides`). Raw values are NOT amendment-adjusted.
 template_clauses(id, template_id, clause_type, standard_text, playbook_position, fallback_text,

@@ -54,3 +54,9 @@
    check: {kind: set, column: vendor, expected: vendors_expiring_90}}
 - {id: accentia_docs, question: "Show all Accentia contracts with start date, end date and annual value", type: sql,
    check: {kind: set, column: title, expected: accentia_docs}}
+- {id: off_contract_spend, question: "How much have we been invoiced by vendors with no contract on file?", type: sql,
+   check: {kind: number, column: off_contract_spend, expected: off_contract_spend}}
+- {id: sla_breaches, question: "Which vendors missed their availability SLA in the last 6 months?", type: sql,
+   check: {kind: set, column: vendor, expected: sla_breach_vendors}}
+- {id: duplicate_invoices, question: "Which vendors sent duplicate invoices?", type: sql,
+   check: {kind: set, column: vendor, expected: duplicate_invoice_vendors}}

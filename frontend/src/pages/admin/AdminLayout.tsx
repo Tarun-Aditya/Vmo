@@ -5,6 +5,7 @@ const TABS: [string, string, string][] = [
   ["/admin/clauses", "Key clause library", "What clauses to identify"],
   ["/admin/values", "Values & limits", "What numbers to extract"],
   ["/admin/checklist", "Redline checklist", "Rules to run before signing"],
+  ["/admin/risk", "Risk scoring", "Weights of the vendor risk score"],
   ["/admin/usage", "AI usage", "Calls, tokens, cost"],
 ];
 

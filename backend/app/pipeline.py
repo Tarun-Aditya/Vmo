@@ -18,7 +18,7 @@ from pathlib import Path
 
 from sqlalchemy import text
 
-from app import deviations, embeddings, extraction, kcc, llm
+from app import deviations, embeddings, extraction, kcc, llm, obligations
 from app.config import data_path
 from app.db import SessionLocal
 from app.docgen.generate import render_template
@@ -128,7 +128,8 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
             if tcid:
                 s.add(ClauseDeviation(contract_id=cid, template_clause_id=tcid, deviation_summary=it["deviation"], severity=it["severity"]))
     s.execute(text("INSERT INTO redlines (contract_id, items) VALUES (:c, CAST(:i AS jsonb))"), {"c": cid, "i": json.dumps(items)})
-    return {"values": len(vals), "checks": len(results), "deviations": len(items)}
+    n_obl = obligations.derive(s, contract, clauses_db, vals)
+    return {"values": len(vals), "checks": len(results), "deviations": len(items), "obligations": n_obl}
 
 
 def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", redline_mode: str = "auto") -> dict:
@@ -218,6 +219,16 @@ def scan(root: Path, folders: list[str] | None = None) -> list[Path]:
                   if p.is_file() and p.suffix.lower() in SUPPORTED and not p.name.endswith(".meta.json"))
 
 
+def watched_files(s, key: str, folders: list[str]) -> list[Path]:
+    """Files a pipeline watches: the inbox sub-folders, or (feeds) the CSV files in data/feeds."""
+    if key == "feeds":
+        from app import feeds
+
+        d = feeds.feeds_dir()
+        return sorted(d.glob("*.csv")) if d.exists() else []
+    return scan(inbox_path(s), folders)
+
+
 def fingerprint(files: list[Path]) -> str:
     """Cheap change detector for a folder: names, sizes and modification times."""
     import hashlib
@@ -238,6 +249,10 @@ def pipeline_folders(s, key: str) -> list[str]:
 def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Path] | None = None, log=lambda *_: None,
                  pipeline_key: str | None = None) -> dict:
     """Process the inbox (or one pipeline's folders, or only the given files). Safe to call from the scheduler, the API and the seed."""
+    if pipeline_key == "feeds":
+        from app import feeds
+
+        return feeds.run_feeds(trigger)
     if not _lock.acquire(blocking=False):
         return {"status": "busy", "message": "a pipeline run is already in progress"}
     t0 = time.time()
@@ -297,7 +312,7 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
                        "m": f"linked {linked} parent relationships", "i": run_id})
             if only is None:   # stamp the pipeline(s) that just ran, and remember what the folder looked like
                 for k, fl in [(r[0], r[1]) for r in s.execute(text("SELECT key, folders FROM pipeline_config"))]:
-                    if pipeline_key and k != pipeline_key:
+                    if (pipeline_key and k != pipeline_key) or k == "feeds":
                         continue
                     fp = fingerprint(scan(root, [x for x in fl.split(",") if x]))
                     s.execute(text("UPDATE pipeline_config SET last_run_at=:n, next_run_at=:n + make_interval(mins => interval_minutes), last_fingerprint=:f WHERE key=:k"),
@@ -305,6 +320,12 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
             if trigger == "watch" and not (counts["new_docs"] or counts["updated"] or counts["failed"]):
                 s.execute(text("DELETE FROM pipeline_runs WHERE id=:i"), {"i": run_id})   # nothing changed: keep the history quiet
             s.commit()
+        try:    # contracts changed: refresh spend exceptions and vendor risk scores
+            from app import feeds
+
+            feeds.recompute()
+        except Exception:
+            pass
         out = {"status": "completed", "run_id": run_id, "seconds": round(time.time() - t0, 2), **counts}
         log(out)
         return out
@@ -329,6 +350,12 @@ def reprocess_all(extractor: str = "auto") -> dict:
             derive(s, c, db, cfg, TEMPLATE_KEY.get(c.type, "MSA"), "auto")
             n += 1
         s.commit()
+    try:
+        from app import feeds
+
+        feeds.recompute()
+    except Exception:
+        pass
     return {"reprocessed": n}
 
 

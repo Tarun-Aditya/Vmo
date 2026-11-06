@@ -24,6 +24,9 @@ QUESTIONS = {
     "vendor_owns_ip": "Which contracts give the vendor ownership of the deliverables we pay for?",
     "non_indian_law": "Which contracts are governed by a law other than New York law, and what does the clause say?",
     "uncapped_autorenew": "Which auto-renewing contracts have uncapped liability, and what does their liability clause say?",
+    "off_contract_spend": "How much have we been invoiced by vendors with no contract on file?",
+    "sla_breaches": "Which vendors missed their availability SLA in the last 6 months?",
+    "duplicate_invoices": "Which vendors sent duplicate invoices?",
 }
 
 
@@ -223,6 +226,19 @@ def _plan(key: str, r: Run) -> str:
                 top_k=1,
             )
         return f"{len(d)} auto-renewing contracts have uncapped liability; their liability clauses are cited below."
+    if key == "off_contract_spend":
+        r.sql("""SELECT COUNT(*) AS invoices, COALESCE(SUM(invoice_amount), 0) AS off_contract_spend FROM v_spend_exceptions WHERE kind = 'no_contract'""")
+        d = rows(r.sql("""SELECT vendor, COUNT(*) AS invoices, SUM(invoice_amount) AS off_contract_spend FROM v_spend_exceptions WHERE kind = 'no_contract' GROUP BY vendor ORDER BY 3 DESC"""))
+        tot = sum(float(x["off_contract_spend"] or 0) for x in d)
+        return f"{money(tot)} was invoiced by {len(d)} vendors that have no contract on file: {_list([x['vendor'] for x in d])}."
+    if key == "sla_breaches":
+        d = rows(r.sql("""SELECT DISTINCT ON (vendor, period) vendor, title, period, actual, target, shortfall FROM v_sla
+            WHERE breach AND metric_key = 'sla_availability_pct' AND period >= current_date - 183 ORDER BY vendor, period DESC"""))
+        r.sql("""SELECT vendor, COUNT(*) AS breach_months, MIN(actual) AS worst_actual FROM v_sla WHERE breach AND metric_key = 'sla_availability_pct' AND period >= current_date - 183 GROUP BY vendor ORDER BY 2 DESC""")
+        return f"{len({x['vendor'] for x in d})} vendors missed their availability target in the last 6 months."
+    if key == "duplicate_invoices":
+        d = rows(r.sql("""SELECT vendor, contract_title, invoice_no, invoice_date, invoice_amount, amount_at_risk FROM v_spend_exceptions WHERE kind = 'duplicate' ORDER BY invoice_date DESC"""))
+        return f"{len(d)} duplicate invoice{'s' if len(d) != 1 else ''} found, {money(sum(float(x['amount_at_risk'] or 0) for x in d))} at risk."
     raise KeyError(key)
 
 

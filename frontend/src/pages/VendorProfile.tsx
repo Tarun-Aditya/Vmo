@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { api, daysLabel, fmtDate, usd } from "../lib";
 import { Card, Loading, Sev, SeverityChip, Td, Th } from "../ui";
 import { Hierarchy } from "./Contracts";
+import { TierChip } from "../components/vmo";
+import { ScoreBlock } from "./Risk";
 import { ClauseMatrix } from "./Clauses";
 import type { Vendor } from "./Vendors";
 
@@ -12,6 +14,25 @@ type Profile = {
   deviations: { contract_id: number; title: string; type: string; heading: string; severity: Sev; deviation_summary: string }[];
   upcoming: { id: number; title: string; type: string; expiry_date: string; notice_deadline: string; auto_renew: boolean; days_left: number; notice_days_left: number }[];
 };
+
+type RiskDetail = { score: number; tier: string; components: Record<string, { score: number; drivers: string[] }>; weights: { key: string; label: string; weight: number; enabled?: boolean }[];
+  exceptions: { kind: string; severity: Sev; amount_at_risk: number; detail: string }[]; overdue: { obligation_id: number; title: string; obligation: string; due_date: string; days_left: number }[]; breaches: { title: string; metric_key: string; period: string; actual: number; target: number }[] };
+
+function RiskCard({ vendor }: { vendor: string }) {
+  const q = useQuery({ queryKey: ["vendor-risk", vendor], queryFn: () => api<RiskDetail>(`/api/risk/vendors/${encodeURIComponent(vendor)}`) });
+  if (!q.data) return null;
+  const r = q.data;
+  return (
+    <Card title={<span>Risk scorecard <span className="ml-2 text-2xl font-semibold tabular-nums">{r.score.toFixed(0)}</span><span className="text-sm text-slate-500"> / 100</span></span>} right={<TierChip tier={r.tier} />}>
+      <ScoreBlock v={r} weights={r.weights.map((w) => ({ ...w, description: "", enabled: true }))} />
+      {(r.exceptions.length > 0 || r.overdue.length > 0) && (
+        <div className="mt-3 grid gap-4 border-t border-slate-100 pt-3 text-sm md:grid-cols-2 dark:border-slate-700">
+          <div><div className="mb-1 text-xs font-semibold uppercase text-slate-500">Largest spend exceptions</div><ul className="space-y-1">{r.exceptions.slice(0, 3).map((e, i) => <li key={i}><SeverityChip sev={e.severity} /> <span className="ml-1">{e.detail}</span> <b className="tabular-nums">{usd(e.amount_at_risk)}</b></li>)}{r.exceptions.length === 0 && <li className="text-slate-400">None.</li>}</ul></div>
+          <div><div className="mb-1 text-xs font-semibold uppercase text-slate-500">Overdue obligations</div><ul className="space-y-1">{r.overdue.map((o) => <li key={o.obligation_id}>▲▲ {o.obligation} <span className="text-slate-500">({-o.days_left} days late)</span></li>)}{r.overdue.length === 0 && <li className="text-slate-400">None.</li>}</ul></div>
+        </div>)}
+    </Card>
+  );
+}
 
 const Tile = ({ l, v, sub, sev }: { l: string; v: string | number; sub?: string; sev?: Sev }) => (
   <Card className={sev ? "border-l-4 border-l-red-500" : ""}><div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{l}</div><div className="mt-1 text-2xl font-semibold tabular-nums">{v}</div>{sub && <div className="text-xs text-slate-500">{sub}</div>}</Card>
@@ -33,6 +54,7 @@ export default function VendorProfile() {
         <p className="text-sm text-slate-500">{s.categories.join(" · ")}</p>
         <div className="mt-2 flex flex-wrap gap-1">{s.flags.map((f) => <SeverityChip key={f.key} sev={f.severity} label={f.label} />)}</div>
       </div>
+      <RiskCard vendor={vendor} />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <Tile l="Documents" v={s.documents} sub={`${s.contracts} contracts & work orders`} />
         <Tile l="Annual value" v={s.annual_value ? usd(s.annual_value) : "—"} sub={s.work_order_value ? `+ ${usd(s.work_order_value)} fixed-fee work orders` : undefined} />

@@ -98,7 +98,8 @@ def _pipelines() -> list[dict]:
     with SessionLocal() as s:
         root = pipeline.inbox_path(s)
     for p in out:
-        p["files"] = len(pipeline.scan(root, [x for x in p["folders"].split(",") if x]))
+        with SessionLocal() as s:
+            p["files"] = len(pipeline.watched_files(s, p["key"], [x for x in p["folders"].split(",") if x]))
     return out
 
 

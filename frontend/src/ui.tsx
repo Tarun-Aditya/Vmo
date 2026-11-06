@@ -57,7 +57,7 @@ export function Loading({ q }: { q: { isLoading: boolean; error: unknown } }) {
   return null;
 }
 
-const NAV = [["/", "Dashboard"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"], ["/new", "New contract"]];
+const NAV = [["/", "Dashboard"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/risk", "Risk"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"], ["/new", "New contract"]];
 
 export function Layout() {
   const [dark, setDark] = useSetting("dark", window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);

@@ -238,3 +238,43 @@ def vendors_expiring_90():
 
 def accentia_docs():
     return {c["title"] for c in load()[1].values() if "Accentia" in c["vendor"]}
+
+
+# ---- operational feeds (invoices, SLA measurements): computed from the CSV feed files, never from the DB
+def _feed(name):
+    import csv
+
+    return list(csv.DictReader((data_path() / "feeds" / name).open()))
+
+
+def off_contract_spend():
+    return sum(float(r["amount"]) for r in _feed("invoices.csv") if not r["contract_title"].strip())
+
+
+# availability targets written into the fictional contracts (planted spec), by vendor keyword
+SLA_TARGETS = {"Nginova": 99.5, "Cirrus": 99.5, "Ledgerline": 99.9, "PulseHR": 99.9, "AdSpark": 99.9, "Service Desk Staff": 99.0}
+
+
+def sla_breach_vendors():
+    seed, _, _ = load()
+    out = set()
+    for r in _feed("sla_measurements.csv"):
+        if r["metric_key"] != "sla_availability_pct" or _d(r["period"]) < seed - timedelta(days=183):
+            continue
+        for k, t in SLA_TARGETS.items():
+            if k in r["contract_title"] and float(r["actual"]) < t:
+                out.add({"Service Desk Staff": "Accentia Technology Services Inc"}.get(k, next(v for v in VENDOR_BY_KEY if k in v)))
+    return out
+
+
+VENDOR_BY_KEY = ["Nginova Systems Inc", "Cirrus CRM Inc", "Ledgerline Systems Inc", "PulseHR Inc", "AdSpark Analytics LLP"]
+
+
+def duplicate_invoice_vendors():
+    seen, out = set(), set()
+    for r in _feed("invoices.csv"):
+        k = (r["contract_title"], r["invoice_no"], r["amount"])
+        if k in seen:
+            out.add(r["vendor"])
+        seen.add(k)
+    return out

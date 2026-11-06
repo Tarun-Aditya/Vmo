@@ -53,6 +53,20 @@ data/inbox/**.md  ──►  pipeline  ──►  contracts · clauses · fields
   the same conversation (Claude gets the earlier turns as context; the offline planner answers each question on its own).
   **Conversation history** on the left: reopen any past chat with its answers, tables and thinking, search, rename, delete.
   Re-seeding resets history (document ids change).
+* **VMO depth** (what a vendor-management office runs on, beyond the contract text):
+  * **Obligations & SLAs** — what each party must do, per contract: dated milestones, SLA targets, notice periods, payment, acceptance,
+    insurance and audit duties, renewal-notice deadlines (rules over the extracted text; with Claude, extra duties such as reporting or
+    certificates are added, tagged "found by Claude"). Status is tracked (open / overdue / done / waived; mark done in the UI). Monthly SLA
+    actuals from monitoring feeds are charted against the contract target, with breaches and *estimated* service credits.
+  * **Spend vs contract** — invoices (AP/ERP export) matched to contracts and checked: no contract on file, billed against an unsigned
+    contract, before/after the term, duplicates, above the usual invoice, over the planned value, late payment (interest exposure).
+    Contract utilisation shows billed vs planned vs share of term elapsed.
+  * **Vendor risk scorecards** — 0–100 per vendor from five explainable components (contract terms, renewal exposure, performance,
+    spend compliance, concentration), weights set in Admin → Risk scoring, every driver listed. **Term benchmarks** show each term across
+    the portfolio against the median and our policy.
+  * **Operational feeds** — a third pipeline loads CSVs from `data/feeds/` (`invoices*.csv`, `sla*.csv`, `obligation_status*.csv`) on its own
+    trigger (default: when a file changes), or via upload in the UI. `make seed` writes believable fictional feeds with planted problems
+    (unsigned work order billed, a hosting vendor with only a draft MSA, a duplicate invoice, SLA misses...). Replace them with real exports.
 * **Ask** — *analytical* questions over the whole portfolio, or questions about **specific documents** chosen (search +
   select) in the panel on the right. Answers are tables; the SQL and steps are under a collapsed **Thinking** section.
 

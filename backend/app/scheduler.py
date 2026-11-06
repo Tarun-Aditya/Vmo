@@ -24,7 +24,7 @@ def due(key: str = "contracts") -> bool:
         if not row or not row[0] or row[1] == "manual":
             return False
         if row[1] == "on_change":
-            files = pipeline.scan(pipeline.inbox_path(s), [x for x in row[3].split(",") if x])
+            files = pipeline.watched_files(s, key, [x for x in row[3].split(",") if x])
             return pipeline.fingerprint(files) != (row[4] or "")
     return row[2] is None or datetime.now(timezone.utc) >= row[2]
 
