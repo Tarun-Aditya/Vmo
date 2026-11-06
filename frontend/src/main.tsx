@@ -14,6 +14,7 @@ import Clauses from "./pages/Clauses";
 import Vendors from "./pages/Vendors";
 import VendorProfile from "./pages/VendorProfile";
 import NewContract from "./pages/NewContract";
+import DocumentEditor from "./pages/DocumentEditor";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Pipeline from "./pages/admin/Pipeline";
 import Kcc from "./pages/admin/Kcc";
@@ -40,6 +41,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="redline/:id" element={<Redline />} />
             <Route path="templates" element={<Templates />} />
             <Route path="new" element={<NewContract />} />
+            <Route path="documents/:id/edit" element={<DocumentEditor />} />
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<Pipeline />} />
               <Route path="clauses" element={<Kcc />} />

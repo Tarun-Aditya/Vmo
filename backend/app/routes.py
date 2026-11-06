@@ -495,9 +495,12 @@ def _sev_counts(items: list[dict]) -> dict:
 def redline_documents():
     out = []
     for d in q(
-        """SELECT c.id, c.title, c.vendor, c.type, c.status, c.origin, r.items
-           FROM contracts c LEFT JOIN redlines r ON r.contract_id = c.id
-           WHERE c.type <> 'Amendment' ORDER BY (c.status = 'draft') DESC, c.id DESC"""
+        """SELECT c.id, c.title, c.vendor, c.type, c.status, c.origin, r.items, COALESCE(v.status, 'pending') AS review_status,
+                  c.source_path, c.created_at
+           FROM contracts c LEFT JOIN redlines r ON r.contract_id = c.id LEFT JOIN contract_reviews v ON v.contract_id = c.id
+           WHERE c.type <> 'Amendment'
+           ORDER BY (c.status = 'draft') DESC,
+                    CASE COALESCE(v.status, 'pending') WHEN 'pending' THEN 0 WHEN 'in_review' THEN 1 WHEN 'changes_requested' THEN 2 ELSE 3 END, c.id DESC"""
     ):
         items = d.pop("items") or []
         fails = q("SELECT severity FROM check_results WHERE contract_id = :i AND status = 'fail'", i=d["id"])
@@ -518,7 +521,9 @@ def _redline_payload(cid: int, source: str) -> dict:
     tpl = q1("SELECT t.id, t.name, t.type FROM templates t JOIN contracts c ON c.template_id = t.id WHERE c.id = :i", i=cid)
     checks = _checks(cid)
     summary = {s_: sum(1 for c in checks if c["status"] == s_) for s_ in ("pass", "fail", "na")}
-    return {**d, "template": tpl, "items": items, "counts": _sev_counts(items), "source": source,
+    from app.routes_docs import review_get
+
+    return {**d, **review_get(cid), "template": tpl, "items": items, "counts": _sev_counts(items), "source": source,
             "checklist": checks, "checklist_summary": summary,
             "checklist_fail_counts": _sev_counts([c for c in checks if c["status"] == "fail"])}
 

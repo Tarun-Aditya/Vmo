@@ -12,7 +12,7 @@ import json
 import re
 import threading
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from sqlalchemy import text
@@ -210,13 +210,33 @@ def load_config(s) -> dict:
     return dict(kcc=kcc.load_kcc(s), metrics=kcc.load_metrics(s), rules=kcc.load_rules(s), templates=tmpl, tclause=tclause)
 
 
-def scan(root: Path) -> list[Path]:
-    return sorted(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in SUPPORTED and not p.name.endswith(".meta.json"))
+def scan(root: Path, folders: list[str] | None = None) -> list[Path]:
+    """Supported files under the inbox; with `folders`, only those sub-folders (a pipeline's watch list)."""
+    bases = [root / f for f in folders] if folders else [root]
+    return sorted(p for b in bases if b.exists() for p in b.rglob("*")
+                  if p.is_file() and p.suffix.lower() in SUPPORTED and not p.name.endswith(".meta.json"))
+
+
+def fingerprint(files: list[Path]) -> str:
+    """Cheap change detector for a folder: names, sizes and modification times."""
+    import hashlib
+
+    h = hashlib.sha1()
+    for f in files:
+        st = f.stat()
+        h.update(f"{f.name}|{st.st_size}|{st.st_mtime_ns}".encode())
+    return h.hexdigest()
+
+
+def pipeline_folders(s, key: str) -> list[str]:
+    raw = s.execute(text("SELECT folders FROM pipeline_config WHERE key=:k"), {"k": key}).scalar() or ""
+    return [x.strip() for x in raw.split(",") if x.strip()]
 
 
 # ------------------------------------------------------------------ a run
-def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Path] | None = None, log=lambda *_: None) -> dict:
-    """Process the inbox (or only the given files). Safe to call from the scheduler, the API and the seed."""
+def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Path] | None = None, log=lambda *_: None,
+                 pipeline_key: str | None = None) -> dict:
+    """Process the inbox (or one pipeline's folders, or only the given files). Safe to call from the scheduler, the API and the seed."""
     if not _lock.acquire(blocking=False):
         return {"status": "busy", "message": "a pipeline run is already in progress"}
     t0 = time.time()
@@ -226,11 +246,12 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
             kcc.ensure_defaults(s)
             root = inbox_path(s)
             root.mkdir(parents=True, exist_ok=True)
-            run_id = s.execute(text("INSERT INTO pipeline_runs (trigger) VALUES (:t) RETURNING id"), {"t": trigger}).scalar()
+            folders = pipeline_folders(s, pipeline_key) if pipeline_key else None
+            run_id = s.execute(text("INSERT INTO pipeline_runs (trigger, pipeline) VALUES (:t, :p) RETURNING id"), {"t": trigger, "p": pipeline_key or "all"}).scalar()
             s.commit()
             cfg = load_config(s)
             s.commit()
-        files = only if only is not None else scan(root)
+        files = only if only is not None else scan(root, folders)
         counts = dict(scanned=len(files), new_docs=0, updated=0, unchanged=0, failed=0)
         pending: dict[int, str | None] = {}
         for f in files:
@@ -254,13 +275,19 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
         with SessionLocal() as s:
             linked = link_parents(s, pending)
             now = datetime.now(timezone.utc)
-            cfgrow = s.execute(text("SELECT interval_minutes FROM pipeline_config WHERE id=1")).first()
-            nxt = now + timedelta(minutes=cfgrow[0] if cfgrow else 120)
             s.execute(text("UPDATE pipeline_runs SET finished_at=now(), status=:st, scanned=:a, new_docs=:b, updated=:c, unchanged=:d, failed=:e, message=:m WHERE id=:i"),
                       {"st": "failed" if counts["failed"] and not (counts["new_docs"] + counts["updated"]) else "completed",
                        "a": counts["scanned"], "b": counts["new_docs"], "c": counts["updated"], "d": counts["unchanged"], "e": counts["failed"],
                        "m": f"linked {linked} parent relationships", "i": run_id})
-            s.execute(text("UPDATE pipeline_config SET last_run_at=:n, next_run_at=:x WHERE id=1"), {"n": now, "x": nxt})
+            if only is None:   # stamp the pipeline(s) that just ran, and remember what the folder looked like
+                for k, fl in [(r[0], r[1]) for r in s.execute(text("SELECT key, folders FROM pipeline_config"))]:
+                    if pipeline_key and k != pipeline_key:
+                        continue
+                    fp = fingerprint(scan(root, [x for x in fl.split(",") if x]))
+                    s.execute(text("UPDATE pipeline_config SET last_run_at=:n, next_run_at=:n + make_interval(mins => interval_minutes), last_fingerprint=:f WHERE key=:k"),
+                              {"n": now, "k": k, "f": fp})
+            if trigger == "watch" and not (counts["new_docs"] or counts["updated"] or counts["failed"]):
+                s.execute(text("DELETE FROM pipeline_runs WHERE id=:i"), {"i": run_id})   # nothing changed: keep the history quiet
             s.commit()
         out = {"status": "completed", "run_id": run_id, "seconds": round(time.time() - t0, 2), **counts}
         log(out)

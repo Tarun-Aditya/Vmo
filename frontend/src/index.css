@@ -3,3 +3,21 @@
 @tailwind utilities;
 body { @apply bg-slate-50 text-slate-900 antialiased; font-variant-numeric: tabular-nums; }
 .dark body { @apply bg-slate-900 text-slate-100; }
+
+/* ---- Word / Docs style page ---- */
+.docpage { background: #fff; color: #1f2328; width: 100%; max-width: 8.5in; min-height: 11in; padding: 0.9in 1in; box-shadow: 0 1px 3px rgba(0,0,0,.25); outline: none;
+  font-family: Cambria, "Times New Roman", Georgia, serif; font-size: 12pt; line-height: 1.55; }
+.docpage h1 { font-size: 20pt; font-weight: 700; margin: 0 0 .6em; font-family: Calibri, "Segoe UI", sans-serif; }
+.docpage h2 { font-size: 13pt; font-weight: 700; margin: 1.1em 0 .25em; font-family: Calibri, "Segoe UI", sans-serif; }
+.docpage p { margin: 0 0 .55em; }
+.docpage ul, .docpage ol { margin: 0 0 .6em 1.4em; } .docpage ul { list-style: disc; } .docpage ol { list-style: decimal; }
+.docpage .pagebreak { margin: 1.2em -1in; padding: 0 1in; border-top: 1px dashed #b6bcc6; text-align: right; font: 10px Calibri, sans-serif; color: #8a93a0; user-select: none; }
+.docpage mark.ph { background: #fff3a3; color: inherit; border-radius: 2px; padding: 0 1px; }
+.docpage ins.tc { background: #d3f5df; color: #0a5d2c; text-decoration: underline; border-radius: 2px; }
+.docpage del.tc { background: #fddede; color: #8e1b1b; text-decoration: line-through; border-radius: 2px; }
+.docpage .rl-block { position: relative; border-left: 3px solid transparent; padding-left: 6px; margin-left: -9px; }
+.docpage .rl-block.rl-open { border-left-color: #f59e0b; background: #fffbea; }
+.docpage .rl-block.rl-accepted { border-left-color: #10b981; background: #f0fdf6; }
+.docpage .rl-block.rl-rejected { border-left-color: #94a3b8; background: #f6f7f9; }
+.docpage .pagebreak.first { display: none; }
+.docpage h1 { line-height: 1.2; }

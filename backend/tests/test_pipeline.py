@@ -116,11 +116,11 @@ def test_only_one_run_at_a_time(seeded):
 
 def test_scheduler_due_logic_follows_frequency_and_pause(seeded):
     with SessionLocal() as s:
-        saved = s.execute(text("SELECT enabled, interval_minutes, last_run_at, next_run_at FROM pipeline_config")).first()
+        saved = s.execute(text("SELECT enabled, interval_minutes, last_run_at, next_run_at FROM pipeline_config WHERE key='contracts'")).first()
     try:
         def put(**kw):
             with SessionLocal() as s:
-                s.execute(text("UPDATE pipeline_config SET enabled=:e, next_run_at=:n WHERE id=1"), kw)
+                s.execute(text("UPDATE pipeline_config SET enabled=:e, next_run_at=:n WHERE key='contracts'"), kw)
                 s.commit()
 
         now = datetime.now(timezone.utc)
@@ -133,10 +133,10 @@ def test_scheduler_due_logic_follows_frequency_and_pause(seeded):
         with SessionLocal() as s:                                   # changing the frequency recomputes the next run
             scheduler.set_interval(s, 15, True)
             s.commit()
-            row = s.execute(text("SELECT interval_minutes, next_run_at, last_run_at FROM pipeline_config")).first()
+            row = s.execute(text("SELECT interval_minutes, next_run_at, last_run_at FROM pipeline_config WHERE key='contracts'")).first()
         assert row[0] == 15 and abs((row[1] - row[2]) - timedelta(minutes=15)) < timedelta(seconds=2)
     finally:
         with SessionLocal() as s:
-            s.execute(text("UPDATE pipeline_config SET enabled=:a, interval_minutes=:b, last_run_at=:c, next_run_at=:d WHERE id=1"),
+            s.execute(text("UPDATE pipeline_config SET enabled=:a, interval_minutes=:b, last_run_at=:c, next_run_at=:d WHERE key='contracts'"),
                       dict(a=saved[0], b=saved[1], c=saved[2], d=saved[3]))
             s.commit()

@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import { api } from "../lib";
 import { Card, Loading, Sev, SeverityChip } from "../ui";
 
+type Lib = { key: string; heading: string; preview: string; in_templates: string[] };
+const KEYS: [string, string][] = [["MSA", "MSA"], ["SOW", "SOW"], ["WO", "Work Order"], ["NDA", "NDA"], ["SaaS", "SaaS"], ["DPA", "DPA"]];
+const GEN_KEY: Record<string, string> = { MSA: "MSA", SOW: "SOW", "Work Order": "WO", NDA: "NDA", SaaS: "SaaS", DPA: "DPA" };
 type T = { id: number; name: string; type: string; clause_count: number; contracts: number; deviating_contracts: number };
 type Clause = { id: number; clause_type: string; heading: string; standard_text: string; playbook_position: string; fallback_text: string | null; variable: boolean; deviation_count: number };
 type Cell = { severity: Sev; deviation_summary: string } | null;
@@ -14,6 +17,7 @@ const GLYPH: Record<Sev, string> = { critical: "▲▲", high: "▲", medium: "�
 
 export default function Templates() {
   const list = useQuery({ queryKey: ["templates"], queryFn: () => api<T[]>("/api/templates") });
+  const lib = useQuery({ queryKey: ["gen-library"], queryFn: () => api<Lib[]>("/api/generator/library") });
   const [sel, setSel] = useState<number | null>(null);
   const id = sel ?? list.data?.[0]?.id;
   const d = useQuery({ queryKey: ["template", id], enabled: !!id, queryFn: () => api<Detail>(`/api/templates/${id}`) });
@@ -27,6 +31,27 @@ export default function Templates() {
             <div className="font-medium">{t.name}</div><div className="text-xs text-slate-500">{t.clause_count} clauses · {t.deviating_contracts}/{t.contracts} contracts deviate</div>
           </button>))}
       </div>
+      {list.data && id && (
+        <div className="flex items-center gap-3 rounded-lg border border-indigo-200 bg-indigo-50 p-3 text-sm dark:border-indigo-900 dark:bg-slate-800">
+          <span className="flex-1">Templates are the starting point for new contracts: pick the clauses to include, fill the placeholders from a brief or the form, and edit in the online editor.</span>
+          <Link className="rounded bg-indigo-600 px-3 py-1.5 font-medium text-white hover:bg-indigo-700" to={`/new?template=${GEN_KEY[list.data.find((t) => t.id === id)?.type ?? "MSA"] ?? "MSA"}`}>Create a contract from this template →</Link>
+        </div>)}
+      {lib.data && (
+        <details className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800" open>
+          <summary className="cursor-pointer text-sm font-semibold">Clause library coverage — which clauses each template contains ({lib.data.length} clauses × {KEYS.length} templates)</summary>
+          <div className="mt-2 max-h-80 overflow-auto">
+            <table className="w-full text-xs" aria-label="Clause coverage by template">
+              <thead className="sticky top-0 bg-white dark:bg-slate-800"><tr><th className="p-1 text-left">Clause</th>{KEYS.map(([, l]) => <th key={l} className="w-16 p-1">{l}</th>)}</tr></thead>
+              <tbody>
+                {lib.data.map((c) => (
+                  <tr key={c.key} className="border-t border-slate-100 dark:border-slate-700" title={c.preview}>
+                    <td className="p-1">{c.heading}</td>
+                    {KEYS.map(([k, l]) => <td key={k} className="p-1 text-center">{c.in_templates.includes(k) ? <b className="text-emerald-600" aria-label={`${l} includes ${c.heading}`}>✓</b> : <span className="text-slate-300" aria-hidden>·</span>}</td>)}
+                  </tr>))}
+              </tbody>
+            </table>
+          </div>
+        </details>)}
       <Loading q={d} />
       {d.data && (
         <>

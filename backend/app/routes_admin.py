@@ -36,8 +36,8 @@ def _reprocess():
 # ------------------------------------------------------------------ status / documents
 @router.get("/status")
 def status():
-    cfg = rows("SELECT enabled, interval_minutes, last_run_at, next_run_at FROM pipeline_config WHERE id=1")[0]
-    last = rows("SELECT id, started_at, finished_at, trigger, status, scanned, new_docs, updated, unchanged, failed FROM pipeline_runs ORDER BY id DESC LIMIT 1")
+    cfg = rows("SELECT enabled, interval_minutes, last_run_at, next_run_at FROM pipeline_config WHERE key='contracts'")[0]
+    last = rows("SELECT id, started_at, finished_at, trigger, pipeline, status, scanned, new_docs, updated, unchanged, failed FROM pipeline_runs ORDER BY id DESC LIMIT 1")
     docs = rows("SELECT status, count(*) AS n FROM contracts GROUP BY status")
     return {"running": pipeline._lock.locked(), "config": cfg, "last_run": last[0] if last else None,
             "documents": {d["status"]: d["n"] for d in docs}, "now": datetime.now(timezone.utc).isoformat()}
@@ -85,6 +85,52 @@ def pipeline_run():
     return {"started": True}
 
 
+class PipelineTrigger(BaseModel):
+    enabled: bool = True
+    trigger_mode: str = "periodic"
+    interval_minutes: int = 120
+    folders: str | None = None
+
+
+def _pipelines() -> list[dict]:
+    root = None
+    out = rows("SELECT key, name, description, folders, trigger_mode, enabled, interval_minutes, last_run_at, next_run_at FROM pipeline_config ORDER BY id")
+    with SessionLocal() as s:
+        root = pipeline.inbox_path(s)
+    for p in out:
+        p["files"] = len(pipeline.scan(root, [x for x in p["folders"].split(",") if x]))
+    return out
+
+
+@router.get("/admin/pipelines")
+def pipelines_get():
+    return {"pipelines": _pipelines(), "running": pipeline._lock.locked()}
+
+
+@router.put("/admin/pipelines/{key}")
+def pipelines_put(key: str, c: PipelineTrigger):
+    if c.trigger_mode not in scheduler.TRIGGERS:
+        raise HTTPException(422, f"trigger must be one of {', '.join(scheduler.TRIGGERS)}")
+    if not 1 <= c.interval_minutes <= 60 * 24 * 7:
+        raise HTTPException(422, "interval must be between 1 minute and 7 days")
+    if not rows("SELECT 1 FROM pipeline_config WHERE key=:k", k=key):
+        raise HTTPException(404, "unknown pipeline")
+    with SessionLocal() as s:
+        scheduler.set_interval(s, c.interval_minutes, c.enabled, key, c.trigger_mode, c.folders)
+        s.commit()
+    return pipelines_get()
+
+
+@router.post("/admin/pipelines/{key}/run")
+def pipelines_run(key: str):
+    if not rows("SELECT 1 FROM pipeline_config WHERE key=:k", k=key):
+        raise HTTPException(404, "unknown pipeline")
+    if pipeline._lock.locked():
+        return {"started": False, "message": "a run is already in progress"}
+    threading.Thread(target=pipeline.run_pipeline, kwargs={"trigger": "manual", "pipeline_key": key}, daemon=True).start()
+    return {"started": True}
+
+
 @router.get("/admin/pipeline/runs")
 def pipeline_runs():
     return rows("SELECT * FROM pipeline_runs ORDER BY id DESC LIMIT 25")
@@ -108,7 +154,8 @@ def pipeline_upload(u: UploadIn):
     """Drop a document into the inbox and process it straight away."""
     if not u.content.strip():
         raise HTTPException(422, "document is empty")
-    p = pipeline.add_document(u.filename, u.content, {"category": u.category, "owner": u.owner, "status": u.status, "origin": "upload"})
+    p = pipeline.add_document(u.filename, u.content, {"category": u.category, "owner": u.owner, "status": u.status, "origin": "upload"},
+                             subdir="drafts" if u.status == "draft" else "uploads")
     res = pipeline.run_pipeline("upload", only=[p])
     return {"saved_as": str(p.name), "run": res}
 
@@ -368,7 +415,7 @@ def rule_delete(key: str):
 
 # ------------------------------------------------------------------ new contract
 class GenIn(BaseModel):
-    template: str
+    template: str = ""
     params: dict = {}
     md: str | None = None
 
@@ -377,6 +424,33 @@ class GenIn(BaseModel):
 def gen_forms():
     return {"forms": generator.forms(), "vendors": [r["vendor"] for r in rows("SELECT DISTINCT vendor FROM contracts WHERE status<>'draft' ORDER BY 1")],
             "parents": rows("SELECT id, title, type, vendor FROM contracts WHERE status<>'draft' AND type IN ('MSA','SOW','SaaS') ORDER BY vendor, title")}
+
+
+class BriefIn(BaseModel):
+    text: str | None = None
+    filename: str | None = None
+    content_b64: str | None = None
+    template: str | None = None
+
+
+@router.post("/generator/brief")
+def gen_brief(b: BriefIn):
+    """Read deal details given as text or an uploaded file and return the form values found."""
+    from app import brief, ingest_text
+    import base64
+
+    try:
+        txt = b.text if b.text else ingest_text.extract_text(b.filename or "brief.txt", base64.b64decode(b.content_b64 or ""))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    if not txt.strip():
+        raise HTTPException(422, "nothing to read: paste some details or choose a file")
+    return brief.read_brief(txt, b.template)
+
+
+@router.get("/generator/library")
+def gen_library():
+    return generator.clause_library()
 
 
 @router.post("/generator/preview")

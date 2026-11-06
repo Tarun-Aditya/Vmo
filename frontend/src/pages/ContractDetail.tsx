@@ -63,7 +63,7 @@ export default function ContractDetail() {
       <div>
         <Link to="/contracts" className="text-sm text-slate-500 hover:underline">← Contracts</Link>
         <h1 className="text-xl font-semibold">{c.title} {c.status === "draft" && <span className="ml-2 rounded border border-amber-500 px-2 py-0.5 align-middle text-xs font-medium text-amber-700 dark:text-amber-300">DRAFT</span>}</h1>
-        <div className="mt-1 flex gap-4 text-sm"><Link className="text-indigo-600 hover:underline" to={`/ask?doc=${c.id}`}>💬 Ask about this document</Link><Link className="text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Review & checklist</Link></div>
+        <div className="mt-1 flex gap-4 text-sm"><Link className="text-indigo-600 hover:underline" to={`/ask?doc=${c.id}`}>💬 Ask about this document</Link><Link className="text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Review & checklist</Link><Link className="text-indigo-600 hover:underline" to={`/documents/${c.id}/edit`}>{c.status === "draft" ? "✎ Open in document editor" : "📄 View as document"}</Link></div>
         <p className="text-sm text-slate-500">{c.vendor} · {c.type} · {c.category} · owner {c.owner} · <span className="capitalize">{c.status}</span>
           {d.parent && <> · amends/under <Link className="text-indigo-600 hover:underline" to={`/contracts/${d.parent.id}`}>{d.parent.title}</Link></>}</p>
       </div>

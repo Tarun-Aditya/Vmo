@@ -34,7 +34,21 @@ def forms() -> list[dict]:
         "DPA": common + ["parent_id"],
     }
     return [{"template": k, "name": TEMPLATES[k]["name"], "type": DOC_TYPE[k], "parent_type": PARENT_TYPE.get(k),
-             "clauses": len(TEMPLATES[k]["clauses"]), "fields": spec[k]} for k in TEMPLATES]
+             "clauses": len(TEMPLATES[k]["clauses"]), "fields": spec[k],
+             "clause_keys": [c for c in TEMPLATES[k]["clauses"] if c != "dpa_reference"]} for k in TEMPLATES]
+
+
+def clause_library() -> list[dict]:
+    """Every clause the platform knows, with a short standard-text preview, for the clause picker."""
+    out = []
+    for key, c in CLAUSES.items():
+        try:
+            prev = clause_text(key, "Agreement", {})
+        except Exception:
+            prev = ""
+        out.append({"key": key, "heading": c.heading, "preview": " ".join(prev.split())[:160],
+                    "in_templates": [t for t, d in TEMPLATES.items() if key in d["clauses"]]})
+    return sorted(out, key=lambda x: x["heading"])
 
 
 def _add_months(d: date, n: int) -> date:
@@ -96,7 +110,10 @@ def build(tk: str, p: dict) -> dict:
         ctx["scope_text"] = (f"This DPA supplements the {parent['title']} and applies to all personal data the Supplier processes on behalf of the Customer."
                              if parent else "This DPA applies to all personal data the Supplier processes on behalf of the Customer.")
     seq = []
-    for c in TEMPLATES[tk]["clauses"]:
+    keys = [c for c in (p.get("clauses") or TEMPLATES[tk]["clauses"]) if c in CLAUSES]
+    if "execution" in keys:                      # signature block always closes the document
+        keys = [c for c in keys if c != "execution"] + ["execution"]
+    for c in keys:
         if c == "dpa_reference":
             continue
         variant = "auto" if c == "renewal" and p["auto_renew"] else None

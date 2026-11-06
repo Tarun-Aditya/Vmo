@@ -22,9 +22,11 @@ data/inbox/**.md  ──►  pipeline  ──►  contracts · clauses · fields
  (folder watch)        parse → classify clauses (KCC library) → extract fields (Claude / offline) → embed
                        → extract values & limits → compare to template → run the redline checklist
 ```
-* **Folder pipeline** — anything dropped into `data/inbox/` (Markdown or text) is picked up and processed; vendor, type and
-  parent are read from the document. A file is re-processed only when its content changes. The **async scheduler** runs the
-  pipeline on a configurable frequency (default every 2 hours; Admin → Pipeline) and on demand. The seed uses the same path.
+* **Folder pipelines** — anything dropped into `data/inbox/` (Markdown or text) is picked up and processed; vendor, type and
+  parent are read from the document. A file is re-processed only when its content changes. There are two pipelines, each with
+  its **own trigger** (Admin → Pipeline): *Executed contracts* (`contracts/`, `uploads/`; default **periodic, every 2 hours**) and
+  *Draft review* (`drafts/`, `generated/`; default **dynamic: runs as soon as a new or changed file appears**). A trigger is
+  periodic (any frequency), dynamic (on new/changed files, checked every 20 s) or manual, plus Run now. The seed uses the same path.
 * **Admin** (⚙) configures what the platform identifies, extracts and checks — every change re-runs over all documents:
   * **Key clause library** — which clauses to identify (heading aliases + keywords), what the standard says, whether each shows
     in the matrix. Add any number; a new clause becomes a column in Key clauses and in Ask. *Preview matches* before saving.
@@ -33,8 +35,19 @@ data/inbox/**.md  ──►  pipeline  ──►  contracts · clauses · fields
   * **Redline checklist** — rules run on a contract before signing: clause required / absent, value vs threshold, forbidden
     wording; severity, where it applies, suggested replacement wording.
   * **Pipeline** — frequency, run now, add a document, run history with per-document events.
-* **New contract** — pick a template (MSA/SOW/Work Order/NDA/SaaS/DPA), set the terms, edit the text with a live checklist,
-  create the draft: it is dropped into the folder, extracted, and appears everywhere.
+* **Review queue (Redline)** — drafts from the drafts folder (or uploaded: `.docx`, `.md`, `.txt`) are redlined automatically and
+  wait in a queue (To review / In review / Changes requested / Approved). Each opens as a **Word-style page with the redline as
+  tracked changes** and margin comments: accept or reject each change, **apply accepted changes as a new version**, approve or
+  request changes with a note. The checklist (rules live in Admin) sits on its own tab.
+* **Online editor** — any draft opens in a Word/Docs-style editor (toolbar, page sheet, highlighted `[placeholders]`, word
+  count) with a live checklist and **version history**; saving writes the file back and re-runs the pipeline. Executed
+  contracts are read-only (change them by amendment).
+* **New contract** — pick a template (MSA/SOW/Work Order/NDA/SaaS/DPA), or **paste/upload the deal details** (an email, term
+  sheet, `key: value` lines, JSON, CSV, `.docx`) and the form is filled from them (Claude when a key is set, otherwise a
+  rule-based reader). Choose which clauses go in (the template's, plus any of the 39 in the clause library), edit in the online
+  editor with the live checklist, create: it is dropped into the folder, extracted, and appears everywhere.
+* **Templates** — every template clause by clause with its deviation heatmap, and a coverage matrix of which clauses each
+  template contains; "Create a contract from this template" jumps into New contract.
 * **Ask** — *analytical* questions over the whole portfolio, or questions about **specific documents** chosen (search +
   select) in the panel on the right. Answers are tables; the SQL and steps are under a collapsed **Thinking** section.
 
@@ -57,11 +70,12 @@ The header badge shows the engine. Offline eval scores prove the plumbing and da
 4. **Key clauses (1m)** — every document × every key clause ✓/✗; hover for the citation; Work Order 2 is unsigned.
 5. **Ask — portfolio (2m)** — "How many contracts are expiring in the next quarter?" · "Which contracts have payment terms below 45 days?" · "Which contracts fail the checklist?"; open **Thinking**.
 6. **Ask — specific documents (1m)** — switch to *Selected documents*, search "delmont", tick the MSA: "Tell me about this contract", "What does the indemnity clause say?"; tick a draft: "Which checklist rules does it fail?".
-7. **Review before signing (1m)** — a vendor draft: checklist failures with the clause cited and suggested wording; the redline.
-8. **New contract (1m)** — SOW from the template under the Accentia MSA with 20-day payment terms → the checklist flags it → edit → re-check → create.
-9. **Admin (1.5m)** — pipeline schedule & add-a-document; add a key clause → new matrix column; tighten a threshold → everything re-checks.
+7. **Review queue (1.5m)** — a vendor draft as a Word-style page with tracked changes; accept/reject, request changes, checklist tab; upload a `.docx`/`.md` and watch it join the queue; apply accepted changes → new version.
+8. **New contract (1.5m)** — paste an email with the deal details → the SOW form fills itself (parent MSA picked) → add a clause from the library → the checklist flags 20-day payment → fix it in the editor → create → open it in the online editor, type, save v2.
+9. **Templates (0.5m)** — clause coverage across the 6 templates; "Create a contract from this template".
+10. **Admin (1.5m)** — each pipeline's trigger (periodic / dynamic / manual); add a key clause → new matrix column; tighten a threshold → everything re-checks.
 
-`NODE_PATH=$(npm root -g) node scripts/demo_walkthrough.js` walks every screen above (≈85 assertions) and records a captioned video.
+`NODE_PATH=$(npm root -g) node scripts/demo_walkthrough.js` walks every screen above and records a captioned video.
 
 ## Notes
 - Severity values are `low | medium | high | critical`. "Uncapped" means a liability clause that states liability is unlimited.
