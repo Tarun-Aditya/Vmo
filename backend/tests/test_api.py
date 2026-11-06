@@ -128,7 +128,7 @@ def test_vendor_profile(client):
 def test_sow_and_work_order_inherit_from_msa(client):
     rows = {r["title"]: r for r in client.get("/api/contracts").json()}
     wo = client.get(f"/api/contracts/{rows['Work Order 1 – SD-WAN Rollout Phase 2 – Bluepeak Technologies']['id']}").json()
-    assert [(l["type"]) for l in wo["lineage"]] == ["MSA", "SOW"]
+    assert [x["type"] for x in wo["lineage"]] == ["MSA", "SOW"]
     cap = next(t for t in wo["inherited_terms"] if t["label"] == "Liability cap")
     assert cap["value"] == 2.0 and "Amendment" in cap["source_title"]      # inherits the AMENDED value
     sow = client.get(f"/api/contracts/{rows['SOW 1 – Last-Mile Delivery – Meridian Logistics']['id']}").json()
