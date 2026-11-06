@@ -124,3 +124,12 @@ class LlmCall(Base):
     output_tokens: Mapped[int] = mapped_column(Integer, default=0)
     latency_ms: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class AskCache(Base):
+    __tablename__ = "ask_cache"
+    question_key: Mapped[str] = mapped_column(Text, primary_key=True)
+    question: Mapped[str] = mapped_column(Text)
+    response: Mapped[dict] = mapped_column(JSONB)
+    source: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

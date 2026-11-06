@@ -10,9 +10,18 @@ class Settings(BaseSettings):
     model_extract: str = "claude-sonnet-5-5"
     model_ask: str = "claude-sonnet-5-5"
     model_redline: str = "claude-sonnet-5-5"
-    embedding_provider: str = "local"
+    embedding_provider: str = "auto"  # auto | local (sentence-transformers) | hash (offline)
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    data_dir: str = "/data"
     embedding_dim: int = 384  # must match the vector(N) column in migration 0001
 
 
 settings = Settings()
+
+
+def data_path():
+    """Docker mounts ./data at /data; fall back to the repo's ./data when run on the host."""
+    from pathlib import Path
+
+    p = Path(settings.data_dir)
+    return p if p.exists() else Path(__file__).resolve().parents[2] / "data"

@@ -27,18 +27,23 @@ def _effective_terms_sql() -> str:
         )
     return f"""
 CREATE VIEW v_effective_terms AS
+SELECT t.*,
+       -- Uncapped = a cap clause says "Unlimited". NDAs/SOWs/DPAs with no cap clause are NOT uncapped.
+       (t.liability_cap_multiple IS NULL AND t.liability_cap_text ILIKE 'unlimited%') AS liability_uncapped
+FROM (
 WITH latest_override AS (
   SELECT DISTINCT ON (a.parent_id, f.field) a.parent_id, f.field, a.id AS src
   FROM contracts a CROSS JOIN LATERAL unnest(a.overrides) AS f(field)
   WHERE a.type = 'Amendment' AND a.parent_id IS NOT NULL
   ORDER BY a.parent_id, f.field, a.effective_date DESC, a.id DESC
 )
-SELECT c.id AS contract_id, c.title, c.vendor, c.category, c.type, c.parent_id, c.status,
+SELECT c.id AS contract_id, c.title, c.vendor, c.effective_date, c.category, c.type, c.parent_id, c.status,
        c.currency, c.processes_personal_data, c.has_dpa, c.owner,
        {", ".join(selects)}
 FROM contracts c
 {" ".join(joins)}
 WHERE c.type <> 'Amendment'
+) t
 """
 
 
@@ -97,7 +102,7 @@ CREATE TABLE llm_calls (
     op.execute("""
 CREATE VIEW v_renewals AS
 SELECT contract_id, title, vendor, category, type, annual_value, currency, auto_renew,
-       expiry_date, notice_period_days,
+       expiry_date, notice_period_days, owner, liability_uncapped, termination_for_convenience,
        (expiry_date - COALESCE(notice_period_days, 0)) AS notice_deadline,
        (expiry_date - CURRENT_DATE) AS days_left,
        ((expiry_date - COALESCE(notice_period_days, 0)) - CURRENT_DATE) AS notice_days_left,
