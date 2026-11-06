@@ -25,6 +25,10 @@ STD: dict[str, str | int] = dict(
     audit_freq="once per year",
     cure_days=30,
     accept_days=10,
+    warranty_days=90,
+    insurance_cover="INR 5 crore",
+    fm_days=60,
+    kp_days=15,
 )
 
 
@@ -309,6 +313,99 @@ CLAUSES: dict[str, ClauseDef] = {
             "",
             "medium",
         ),
+        C(
+            "services",
+            "Services",
+            "The Supplier shall provide the services described in each Statement of Work signed "
+            "under this {doc} with reasonable skill and care, using suitably qualified personnel.",
+            "Services are procured only through signed Statements of Work and Work Orders.",
+            "",
+            "medium",
+        ),
+        C(
+            "order_of_precedence",
+            "Order of Precedence",
+            "If there is a conflict, the terms of this {doc} prevail over any Statement of Work, "
+            "and a Statement of Work prevails over any Work Order, unless the later document "
+            "expressly and specifically overrides a named clause of this {doc}.",
+            "The MSA must prevail over SOWs and Work Orders; lower documents may not dilute MSA "
+            "liability, IP, data protection or audit terms.",
+            "",
+            "high",
+            by_doc={
+                "SOW": "This {doc} is issued under, and governed by, the Master Services Agreement. "
+                "If there is a conflict, the Master Services Agreement prevails over this {doc}. "
+                "The liability, indemnity, intellectual property, confidentiality, data protection, "
+                "audit and governing law terms of the Master Services Agreement apply to this {doc}.",
+                "Work Order": "This {doc} is issued under the Statement of Work and the Master "
+                "Services Agreement named above. If there is a conflict, the Master Services "
+                "Agreement prevails, then the Statement of Work, then this {doc}.",
+            },
+        ),
+        C(
+            "warranties",
+            "Warranties",
+            "The Supplier warrants that the services will be performed with reasonable skill and "
+            "care and will conform to the applicable Statement of Work, and shall correct any "
+            "non-conforming services free of charge for {warranty_days} days after acceptance.",
+            "90-day warranty with free re-performance; no blanket disclaimers.",
+            "A 60-day warranty period.",
+            "medium",
+        ),
+        C(
+            "insurance",
+            "Insurance",
+            "The Supplier shall maintain professional indemnity and commercial general liability "
+            "insurance of at least {insurance_cover} per claim throughout the term and provide "
+            "certificates on request.",
+            "Minimum INR 5 crore per claim.",
+            "INR 2 crore per claim for engagements under INR 1 crore a year.",
+            "medium",
+        ),
+        C(
+            "force_majeure",
+            "Force Majeure",
+            "Neither party is liable for delay caused by events beyond its reasonable control, "
+            "provided it notifies the other promptly and uses reasonable efforts to resume "
+            "performance. Either party may terminate the affected services if the event continues "
+            "for more than {fm_days} days.",
+            "Narrow force majeure: supplier staffing and subcontractor failures are not force "
+            "majeure; termination right after 60 days.",
+            "Termination right after 90 days.",
+            "medium",
+        ),
+        C(
+            "dispute_resolution",
+            "Dispute Resolution",
+            "Disputes shall first be escalated to the parties' senior management for resolution "
+            "within 15 days, and then referred to mediation before either party commences court "
+            "proceedings.",
+            "Escalate, then mediate, then Mumbai courts. Foreign arbitration needs Legal approval.",
+            "",
+            "low",
+        ),
+        C(
+            "key_personnel",
+            "Key Personnel",
+            "The Supplier shall assign the key personnel named in this {doc} and shall not replace "
+            "them without the Customer's prior written consent, and shall provide a replacement of "
+            "equivalent skill within {kp_days} days of any departure.",
+            "Named key personnel; replacement only with consent and equal or better skill.",
+            "Replacement on 15 days' notice with a handover.",
+            "medium",
+        ),
+        C(
+            "governance",
+            "Governance and Reporting",
+            "The parties shall hold a monthly service review meeting, and the Supplier shall "
+            "provide a written monthly report of progress against milestones and service levels.",
+            "Monthly governance meeting and written report.",
+            "",
+            "low",
+        ),
+        C("msa_reference", "Master Agreement Reference", "{msa_reference_text}", variable=True),
+        C("sow_reference", "Statement of Work Reference", "{sow_reference_text}", variable=True),
+        C("deliverables", "Deliverables and Milestones", "{deliverables_text}", variable=True),
     ]
 }
 HEADING_TO_TYPE = {c.heading: c.ctype for c in CLAUSES.values()}
@@ -535,23 +632,81 @@ VARIANTS: dict[str, dict[str, Variant]] = {
     },
 }
 
+VARIANTS.update(
+    {
+        "warranties": {
+            "short": V(
+                "short", "medium", "Warranty period cut to 30 days (standard: 90)",
+                ctx={"warranty_days": 30},
+            ),
+            "disclaim": V(
+                "disclaim", "high", "All warranties disclaimed",
+                text="The Supplier disclaims all warranties, express or implied, in relation to the "
+                "services.",
+            ),
+        },
+        "insurance": {
+            "low": V(
+                "low", "medium", "Insurance cover only INR 50 lakh (standard: INR 5 crore)",
+                ctx={"insurance_cover": "INR 50 lakh"},
+            )
+        },
+        "force_majeure": {
+            "broad": V(
+                "broad", "medium", "Supplier excused for subcontractor and staffing failures",
+                text="The Supplier is excused from any delay or failure, including delay caused by "
+                "its subcontractors or labour shortages, and the Customer has no right to "
+                "terminate for force majeure.",
+            )
+        },
+        "dispute_resolution": {
+            "arbitration": V(
+                "arbitration", "medium", "Disputes go to arbitration in London (standard: Mumbai courts)",
+                text="Disputes shall be finally settled by arbitration in London under the ICC "
+                "rules, and the courts of England have no jurisdiction.",
+            )
+        },
+        "order_of_precedence": {
+            "sow_prevails": V(
+                "sow_prevails", "high", "The SOW overrides the MSA in a conflict",
+                text="In case of conflict, this {doc} prevails over the Master Services Agreement.",
+            )
+        },
+        "key_personnel": {
+            "free": V(
+                "free", "medium", "Supplier may replace key personnel at any time without notice",
+                text="The Supplier may replace any personnel at any time and without notice to the "
+                "Customer.",
+            )
+        },
+    }
+)
+
 TEMPLATES: dict[str, dict] = {
+    # Typical enterprise templates. SOWs and Work Orders inherit from their parent agreement
+    # (order_of_precedence + references) and are built on top of the MSA terms.
     "MSA": dict(
         name="Master Services Agreement",
         doc="Agreement",
         clauses=[
             "term",
             "renewal",
+            "services",
+            "order_of_precedence",
             "payment",
             "termination_for_convenience",
             "termination_for_cause",
+            "warranties",
             "liability_cap",
             "indemnity",
+            "insurance",
             "ip_ownership",
             "confidentiality",
             "data_protection",
             "audit_rights",
             "assignment",
+            "force_majeure",
+            "dispute_resolution",
             "non_solicit",
             "governing_law",
             "execution",
@@ -561,13 +716,18 @@ TEMPLATES: dict[str, dict] = {
         name="Statement of Work",
         doc="SOW",
         clauses=[
+            "msa_reference",
             "scope",
+            "deliverables",
             "term",
             "fees",
             "payment",
+            "key_personnel",
             "acceptance",
             "sla",
+            "governance",
             "change_control",
+            "order_of_precedence",
             "termination_for_convenience",
             "liability_cap",
             "execution",
@@ -576,7 +736,18 @@ TEMPLATES: dict[str, dict] = {
     "WO": dict(
         name="Work Order",
         doc="Work Order",
-        clauses=["scope", "term", "fees", "payment", "acceptance", "change_control", "execution"],
+        clauses=[
+            "sow_reference",
+            "scope",
+            "deliverables",
+            "term",
+            "fees",
+            "payment",
+            "acceptance",
+            "change_control",
+            "order_of_precedence",
+            "execution",
+        ],
     ),
     "NDA": dict(
         name="Non-Disclosure Agreement",
@@ -631,10 +802,13 @@ TEMPLATES: dict[str, dict] = {
 }
 # Columns of the key-clauses matrix (variable/deal-specific clauses excluded). `execution` means
 # "signed by both parties".
-KEY_CLAUSES = ["term", "renewal", "payment", "termination_for_convenience", "termination_for_cause",
-               "liability_cap", "indemnity", "ip_ownership", "confidentiality", "data_protection",
-               "audit_rights", "assignment", "non_solicit", "governing_law", "sla", "security",
-               "data_return", "execution"]
+KEY_CLAUSES = [
+    "term", "renewal", "order_of_precedence", "payment", "termination_for_convenience",
+    "termination_for_cause", "warranties", "liability_cap", "indemnity", "insurance",
+    "ip_ownership", "confidentiality", "data_protection", "audit_rights", "assignment",
+    "force_majeure", "dispute_resolution", "non_solicit", "governing_law", "sla", "security",
+    "data_return", "execution",
+]
 OPTIONAL = {"dpa_reference"}  # present only when a DPA exists; not "missing" when absent
 
 
@@ -658,6 +832,9 @@ def standard_text(ctype: str, doc: str) -> str:
         data_scope_text="[Description of personal data processed, if any]",
         dpa_date="[date]",
         execution_text="[Signature blocks: Customer and Supplier signatories and dates]",
+        msa_reference_text="[Reference to the governing Master Services Agreement and its date]",
+        sow_reference_text="[Reference to the governing Statement of Work and Master Services Agreement]",
+        deliverables_text="[Deliverables and milestones with dates and acceptance criteria]",
         notice_period_days="[notice]",
     )
     return clause_text(ctype, doc, ph)

@@ -36,7 +36,7 @@ CONTRACTS: list[dict] = [
         total=120 * L,
         scope="Application maintenance and L3 support "
         "for Arcadia's merchandising and POS applications.",
-        dev=["acceptance:deemed"],
+        dev=["acceptance:deemed", "key_personnel:free"],
     ),
     dict(
         key="bluepeak_sow2",
@@ -103,6 +103,8 @@ CONTRACTS: list[dict] = [
             "termination_for_convenience:none",
             "governing_law:england",
             "indemnity:one_way",
+            "insurance:low",
+            "warranties:short",
         ],
     ),
     dict(
@@ -119,7 +121,7 @@ CONTRACTS: list[dict] = [
         annual=1 * CR + 80 * L,
         total=3 * CR + 60 * L,
         scope="Last-mile delivery for " "e-commerce orders across six metro regions.",
-        dev=["payment:net30"],
+        dev=["payment:net30", "order_of_precedence:sow_prevails"],
     ),
     dict(
         key="meridian_sow2",

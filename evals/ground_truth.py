@@ -229,3 +229,12 @@ def bluepeak_msa_clause_count():
 
 def work_orders():
     return {c["title"] for c in load()[1].values() if c["type"] == "Work Order"}
+
+
+def vendors_expiring_90():
+    seed, eff, _ = load()
+    return {c["vendor"] for c in eff.values() if 0 <= (_d(c["expiry_date"]) - seed).days <= 90}
+
+
+def bluepeak_docs():
+    return {c["title"] for c in load()[1].values() if "Bluepeak" in c["vendor"]}

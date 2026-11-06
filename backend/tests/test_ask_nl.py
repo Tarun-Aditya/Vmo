@@ -135,7 +135,7 @@ def test_single_document_question_returns_its_clauses(monkeypatch, seeded):
     r = ask.answer("Show the key clauses in the Bluepeak MSA", False)
     t = r["tables"][0]
     assert [c["label"] for c in t["columns"]] == ["Contract", "Clause", "Page", "Clause text"]
-    assert len(t["rows"]) == 15 and {x["title"] for x in t["rows"]} == {"Master Services Agreement – Bluepeak Technologies"}
+    assert len(t["rows"]) == 21 and {x["title"] for x in t["rows"]} == {"Master Services Agreement – Bluepeak Technologies"}
     assert t["rows"][-1]["clause"] == "Execution"
 
 
@@ -145,3 +145,22 @@ def test_thinking_hides_sql_from_the_answer_but_keeps_it_inspectable(monkeypatch
     assert "SELECT" not in r["answer"] and r["tables"][0]["columns"][0]["label"] == "Vendor"
     assert any(s.get("sql", "").startswith("SELECT") for s in r["thinking"])
     assert r["thinking"][-1]["title"] == "Composed the answer"
+
+
+def test_vendor_level_questions(monkeypatch, seeded):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    r = ask.answer("How many vendors have contracts expiring in the next 90 days?", False)
+    assert r["answer"].startswith("6 vendors with contracts expiring")
+    assert [t["label"] for t in r["tiles"]] == ["Contracts", "Vendors", "Annual value"]
+    assert r["tables"][0]["title"] == "Vendors" and len(r["tables"][0]["rows"]) == 6
+    r = ask.answer("Which vendors have auto-renewing contracts?", False)
+    assert r["answer"].startswith("5 vendors with auto-renewing contracts")
+
+
+def test_new_clause_words_and_work_orders(monkeypatch, seeded):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    p = P("Which contracts do not have an insurance clause?")
+    assert "NOT has_insurance" in p["where"]
+    assert "NOT has_force_majeure" in P("contracts without a force majeure clause")["where"]
+    r = ask.answer("Show all Bluepeak contracts with start date, end date and annual value", False)
+    assert len(r["tables"][0]["rows"]) == 7

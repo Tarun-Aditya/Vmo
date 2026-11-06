@@ -8,8 +8,8 @@ type Cell = { present: boolean; expected: boolean; heading: string; page: number
 type Row = { id: number; title: string; vendor: string; type: string; kind: "contract" | "draft"; cells: Record<string, Cell>; present_count: number; gap_count: number };
 type M = { columns: { key: string; label: string }[]; groups: { name: string; rows: Row[] }[]; totals: Record<string, number>; executed_count: number };
 
-export default function Clauses() {
-  const q = useQuery({ queryKey: ["matrix"], queryFn: () => api<M>("/api/clause-matrix") });
+export function ClauseMatrix({ vendor }: { vendor?: string }) {
+  const q = useQuery({ queryKey: ["matrix", vendor ?? ""], queryFn: () => api<M>(`/api/clause-matrix${vendor ? `?vendor=${encodeURIComponent(vendor)}` : ""}`) });
   const [tip, setTip] = useState<{ row: Row; col: string; x: number; y: number } | null>(null);
   const [onlyGaps, setOnlyGaps] = useState(false);
   if (!q.data) return <Loading q={q} />;
@@ -20,7 +20,7 @@ export default function Clauses() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="text-xl font-semibold">Key contract clauses across all documents</h1>
+          {vendor ? <h2 className="text-lg font-semibold">Key clauses in {vendor}&rsquo;s documents</h2> : <h1 className="text-xl font-semibold">Key contract clauses across all documents</h1>}
           <p className="text-sm text-slate-500">One row per document, one column per key clause. Hover a mark to see the citation (or why it is absent).</p>
         </div>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={onlyGaps} onChange={(e) => setOnlyGaps(e.target.checked)} /> Highlight gaps only</label>
@@ -41,7 +41,7 @@ export default function Clauses() {
                 <th className="p-2 text-left align-bottom text-xs">Present</th>
               </tr>
             </thead>
-            {m.groups.map((g) => (
+            {m.groups.filter((g) => g.rows.length > 0).map((g) => (
               <tbody key={g.name}>
                 <tr><td colSpan={m.columns.length + 2} className="bg-slate-100 p-2 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-900 dark:text-slate-300">{g.name} ({g.rows.length})</td></tr>
                 {g.rows.map((r) => (
@@ -89,4 +89,8 @@ export default function Clauses() {
       )}
     </div>
   );
+}
+
+export default function Clauses() {
+  return <ClauseMatrix />;
 }

@@ -50,3 +50,7 @@
    check: {kind: rowcount, column: clause, expected: bluepeak_msa_clause_count}}
 - {id: list_work_orders, question: "List all work orders", type: sql,
    check: {kind: set, column: title, expected: work_orders}}
+- {id: vendors_expiring_90, question: "Which vendors have contracts expiring in the next 90 days?", type: sql,
+   check: {kind: set, column: vendor, expected: vendors_expiring_90}}
+- {id: bluepeak_docs, question: "Show all Bluepeak contracts with start date, end date and annual value", type: sql,
+   check: {kind: set, column: title, expected: bluepeak_docs}}

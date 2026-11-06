@@ -174,6 +174,21 @@ def get_contract(cid: int):
     for d in devs:
         d["heading"] = CLAUSES[d["clause_type"]].heading
     devs.sort(key=lambda d: -SEV_RANK[d["severity"]])
+    lineage, cur = [], c
+    while cur["parent_id"] and cur["type"] in ("SOW", "Work Order", "Amendment", "NDA", "DPA"):
+        cur = q1("SELECT id, title, type, parent_id FROM contracts WHERE id = :i", i=cur["parent_id"])
+        lineage.insert(0, {"id": cur["id"], "title": cur["title"], "type": cur["type"]})
+    inherited = []
+    if c["type"] in ("SOW", "Work Order") and lineage and lineage[0]["type"] == "MSA":
+        m = q1("SELECT * FROM v_effective_terms WHERE contract_id = :i", i=lineage[0]["id"])
+        for label, field, text_field in (
+            ("Liability cap", "liability_cap_multiple", "liability_cap_text"),
+            ("Governing law", "governing_law", None),
+            ("Payment terms (days)", "payment_terms_days", None),
+            ("Termination for convenience", "termination_for_convenience", None),
+        ):
+            inherited.append({"label": label, "value": m[text_field] if text_field and m[field] is None else m[field],
+                              "source_id": m[f"{field}_source"], "source_title": titles.get(m[f"{field}_source"])})
     sig = {
         k: c[k]
         for k in (
@@ -183,6 +198,8 @@ def get_contract(cid: int):
     }
     return {
         "signatures": sig,
+        "lineage": lineage,
+        "inherited_terms": inherited,
         "contract": {k: v for k, v in c.items()},
         "clauses": clauses,
         "fields": fields,
@@ -237,7 +254,7 @@ def _cell(ct, clause, expected, doc_name, tpl_name, signed=None, draft=False) ->
 
 
 @router.get("/clause-matrix")
-def clause_matrix():
+def clause_matrix(vendor: str | None = None):
     """Every document (rows) x key clause (columns): present or absent, with a citation."""
     cols = [{"key": c, "label": SHORT.get(c, CLAUSES[c].heading)} for c in KEY_CLAUSES]
     clause_idx = {
@@ -248,8 +265,9 @@ def clause_matrix():
     for c in q(
         """SELECT c.id, c.title, c.vendor, c.type, c.fully_executed, t.type AS tpl, t.name AS tpl_name
            FROM contracts c JOIN templates t ON t.id = c.template_id
-           WHERE c.type <> 'Amendment'
-           ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, c.title"""
+           WHERE c.type <> 'Amendment' AND (CAST(:vendor AS text) IS NULL OR c.vendor = :vendor)
+           ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, c.title""",
+        vendor=vendor,
     ):
         exp = set(TEMPLATES[c["tpl"]]["clauses"])
         cells = {
@@ -261,7 +279,9 @@ def clause_matrix():
     draft_rows = []
     for d in q(
         """SELECT d.id, d.title, d.vendor, d.body_md, t.type AS tpl, t.name AS tpl_name
-           FROM drafts d JOIN templates t ON t.id = d.template_id ORDER BY d.id"""
+           FROM drafts d JOIN templates t ON t.id = d.template_id
+           WHERE (CAST(:vendor AS text) IS NULL OR d.vendor = :vendor) ORDER BY d.id""",
+        vendor=vendor,
     ):
         _, cl = parse_document(d["body_md"])
         idx = {c["clause_type"]: c for c in cl}
@@ -289,6 +309,97 @@ def clause_matrix():
         "totals": totals,
         "executed_count": len(rows),
     }
+
+
+# ------------------------------------------------------------------ vendors
+def _vendor_flags(v: dict) -> list[dict]:
+    """Plain-language risk flags (severity encoded as in the rest of the UI), most severe first."""
+    f = []
+    if v["uncapped"]:
+        f.append({"key": "uncapped", "severity": "critical", "label": f"{v['uncapped']} uncapped liability"})
+    if v["pd_no_dpa"]:
+        f.append({"key": "pd_no_dpa", "severity": "critical", "label": "personal data, no DPA"})
+    if v["notice_passed"]:
+        f.append({"key": "notice_passed", "severity": "critical", "label": "renewal notice deadline passed"})
+    if v["unsigned"]:
+        f.append({"key": "unsigned", "severity": "high", "label": f"{v['unsigned']} not fully signed"})
+    if v["no_tfc"]:
+        f.append({"key": "no_tfc", "severity": "high", "label": "no termination for convenience"})
+    if v["dev_critical"] or v["dev_high"]:
+        f.append({"key": "deviations", "severity": "high",
+                  "label": f"{v['dev_critical'] + v['dev_high']} high/critical deviations"})
+    if v["notice_soon"]:
+        f.append({"key": "notice_soon", "severity": "medium", "label": "renewal notice due within 30 days"})
+    if v["expiring_30"]:
+        f.append({"key": "expiring_30", "severity": "medium", "label": f"{v['expiring_30']} expiring within 30 days"})
+    f.sort(key=lambda x: -SEV_RANK[x["severity"]])
+    return f
+
+
+VENDOR_SQL = """
+SELECT e.vendor,
+       array_agg(DISTINCT e.category ORDER BY e.category) AS categories,
+       count(*) AS contracts,
+       (SELECT count(*) FROM contracts c WHERE c.vendor = e.vendor) AS documents,
+       coalesce(sum(e.annual_value), 0) AS annual_value,
+       coalesce(sum(e.total_value) FILTER (WHERE e.type = 'Work Order'), 0) AS work_order_value,
+       count(*) FILTER (WHERE e.auto_renew) AS auto_renewals,
+       count(*) FILTER (WHERE e.liability_uncapped) AS uncapped,
+       count(*) FILTER (WHERE e.termination_for_convenience = false) AS no_tfc,
+       count(*) FILTER (WHERE e.processes_personal_data AND NOT e.has_dpa AND e.type <> 'DPA') AS pd_no_dpa,
+       count(*) FILTER (WHERE NOT e.fully_executed) AS unsigned,
+       count(*) FILTER (WHERE r.days_left BETWEEN 0 AND 30) AS expiring_30,
+       count(*) FILTER (WHERE r.auto_renew AND r.notice_days_left < 0) AS notice_passed,
+       count(*) FILTER (WHERE r.auto_renew AND r.notice_days_left BETWEEN 0 AND 30) AS notice_soon,
+       min(e.expiry_date) FILTER (WHERE e.expiry_date >= current_date) AS next_expiry,
+       (SELECT count(*) FROM clause_deviations d JOIN contracts c ON c.id = d.contract_id
+          WHERE c.vendor = e.vendor AND d.severity = 'critical') AS dev_critical,
+       (SELECT count(*) FROM clause_deviations d JOIN contracts c ON c.id = d.contract_id
+          WHERE c.vendor = e.vendor AND d.severity = 'high') AS dev_high,
+       (SELECT count(*) FROM clause_deviations d JOIN contracts c ON c.id = d.contract_id
+          WHERE c.vendor = e.vendor) AS deviations
+FROM v_effective_terms e LEFT JOIN v_renewals r ON r.contract_id = e.contract_id
+WHERE e.status = 'active' {where}
+GROUP BY e.vendor ORDER BY coalesce(sum(e.annual_value), 0) DESC, e.vendor
+"""
+
+
+def _vendor_rows(vendor: str | None = None) -> list[dict]:
+    rows = q(VENDOR_SQL.format(where="AND e.vendor = :v" if vendor else ""), **({"v": vendor} if vendor else {}))
+    today = dt.date.today()
+    for v in rows:
+        v["flags"] = _vendor_flags(v)
+        v["risk"] = v["flags"][0]["severity"] if v["flags"] else "low"
+        v["next_expiry_days"] = (v["next_expiry"] - today).days if v["next_expiry"] else None
+    return rows
+
+
+@router.get("/vendors")
+def vendors():
+    return _vendor_rows()
+
+
+@router.get("/vendors/{vendor}")
+def vendor_profile(vendor: str):
+    rows = _vendor_rows(vendor)
+    if not rows:
+        raise HTTPException(404, "vendor not found")
+    docs = list_contracts(vendor=vendor)
+    devs = q(
+        """SELECT c.id AS contract_id, c.title, c.type, tc.clause_type, d.severity, d.deviation_summary
+           FROM clause_deviations d JOIN contracts c ON c.id = d.contract_id
+           JOIN template_clauses tc ON tc.id = d.template_clause_id WHERE c.vendor = :v""",
+        v=vendor,
+    )
+    for d in devs:
+        d["heading"] = CLAUSES[d["clause_type"]].heading
+    devs.sort(key=lambda d: (-SEV_RANK[d["severity"]], d["title"]))
+    upcoming = q(
+        """SELECT contract_id AS id, title, type, expiry_date, notice_deadline, auto_renew, days_left, notice_days_left
+           FROM v_renewals WHERE vendor = :v ORDER BY expiry_date""",
+        v=vendor,
+    )
+    return {"summary": rows[0], "documents": docs, "deviations": devs, "upcoming": upcoming}
 
 
 # ------------------------------------------------------------------ dashboard

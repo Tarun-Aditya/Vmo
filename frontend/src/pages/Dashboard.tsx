@@ -56,7 +56,7 @@ export default function Dashboard() {
                         <Link to={`/contracts/${i.id}`} className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">{i.title}</Link>
                         <span className="shrink-0 rounded bg-slate-200 px-1.5 py-0.5 text-[10px] font-semibold dark:bg-slate-700">{i.type}</span>
                       </div>
-                      <div className="text-xs text-slate-500">{i.vendor} · {i.owner}</div>
+                      <div className="text-xs text-slate-500"><Link to={`/vendors/${encodeURIComponent(i.vendor)}`} className="hover:underline">{i.vendor}</Link> · {i.owner}</div>
                       <div className="mt-2 flex items-end justify-between">
                         <div><div className="text-[11px] uppercase text-slate-500">End date</div><div className="font-semibold tabular-nums">{fmtDate(i.expiry_date)}</div><div className="text-xs text-slate-500">{daysLabel(i.days_left)}</div></div>
                         <div className="text-right"><div className="text-[11px] uppercase text-slate-500">Annual value</div><div className="font-semibold tabular-nums">{inr(i.annual_value)}</div></div>

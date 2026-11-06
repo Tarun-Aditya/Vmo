@@ -46,7 +46,7 @@ function TreeNode({ n, depth }: { n: Node; depth: number }) {
   );
 }
 
-function Hierarchy({ rows }: { rows: Row[] }) {
+export function Hierarchy({ rows }: { rows: Row[] }) {
   const forest = useMemo(() => {
     const byId = new Map<number, Node>(rows.map((r) => [r.id, { ...r, children: [] }]));
     const roots: Node[] = [];
@@ -61,7 +61,7 @@ function Hierarchy({ rows }: { rows: Row[] }) {
     <div className="space-y-4">
       <p className="text-xs text-slate-500">MSA → SOW → Work Order · amendments, NDAs and DPAs sit under the agreement they belong to. Dates show start → end (effective, after amendments).</p>
       {forest.map(([vendor, nodes]) => (
-        <Card key={vendor} title={vendor}>{nodes.map((n) => <TreeNode key={n.id} n={n} depth={0} />)}</Card>
+        <Card key={vendor} title={<Link to={`/vendors/${encodeURIComponent(vendor)}`} className="hover:underline">{vendor}</Link>}>{nodes.map((n) => <TreeNode key={n.id} n={n} depth={0} />)}</Card>
       ))}
     </div>
   );
@@ -107,7 +107,7 @@ export default function Contracts() {
             <tbody>
               {q.data.map((c) => (
                 <tr key={c.id} className="border-t border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/40">
-                  <Td><Link to={`/contracts/${c.id}`} className={`font-medium text-indigo-600 hover:underline dark:text-indigo-400 ${c.parent_id ? "pl-4" : ""}`}>{c.parent_id ? "↳ " : ""}{c.title}</Link><div className="text-xs text-slate-500">{c.vendor}</div></Td>
+                  <Td><Link to={`/contracts/${c.id}`} className={`font-medium text-indigo-600 hover:underline dark:text-indigo-400 ${c.parent_id ? "pl-4" : ""}`}>{c.parent_id ? "↳ " : ""}{c.title}</Link><Link to={`/vendors/${encodeURIComponent(c.vendor)}`} className="block text-xs text-slate-500 hover:underline">{c.vendor}</Link></Td>
                   <Td><TypeBadge t={c.type} /></Td><Td>{c.category}</Td><Td>{c.owner}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.effective_date)}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.expiry_date)}</Td>

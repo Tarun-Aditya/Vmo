@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Col, Step, Table, api, fmtDate, inr, useSetting } from "../lib";
 import { Card, Td, Th } from "../ui";
 
@@ -86,6 +86,8 @@ export default function Ask() {
   const m = useMutation({ mutationFn: (qn: string) => api<Res>("/api/ask", { method: "POST", body: JSON.stringify({ question: qn, demo_mode: demo }) }) });
   const go = (qn: string) => { setQuestion(qn); if (qn.trim()) m.mutate(qn); };
   const r = m.data;
+  const [params] = useSearchParams();
+  useEffect(() => { const qp = params.get("q"); if (qp) go(qp); /* eslint-disable-next-line */ }, [params]);
   return (
     <div className="mx-auto max-w-6xl space-y-4">
       <h1 className="text-xl font-semibold">Ask your vendor portfolio</h1>

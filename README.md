@@ -30,17 +30,20 @@ run `make seed` + `make eval` with a key to measure the real thing.
 1. **Problem (30s)** — "Arcadia's VMO tracks vendor contracts across Excel and SharePoint and missed 2 auto-renewals."
 2. **Expiry dashboard (1m)** — three lanes: expiring in 0–30 / 31–60 / 61–90 days (4 / 1 / 3 contracts, ₹ at stake per lane).
    AdSpark is flagged "notice deadline passed"; the 12-month chart; uncapped liability; PulseHR processes personal data with no DPA.
-3. **Repository + hierarchy (1m)** — Table: start / end dates, value, signature status, flags. Switch to **Hierarchy**:
+3. **Vendors (1m)** — the vendor list (spend bars, next end date, risk flags), then a vendor profile: tiles, MSA → SOW → Work Order tree,
+   key dates, deviations, key-clause coverage for that vendor, and "Ask about this vendor".
+   Open a Work Order → **Built on top of its parent agreements** (it inherits the MSA's amended terms); Meridian SOW 1 overrides the MSA (planted).
+4. **Repository + hierarchy (1m)** — Table: start / end dates, value, signature status, flags. Switch to **Hierarchy**:
    MSA → SOW → **Work Order**, with amendments, NDAs and DPAs under their agreement. Work Order 2 is ✗ pending (supplier has not countersigned).
-4. **Contract detail (1m)** — signatures card; click "Payment terms" → source clause highlights; effective terms show 45→30 "Overridden by Amendment No. 1".
-5. **Key clauses (1.5m)** — every document × every key clause, green ✓ / red ✗. Hover a ✓ for the citation (clause text + page); hover a ✗ for why it is absent.
+5. **Contract detail (1m)** — signatures card; click "Payment terms" → source clause highlights; effective terms show 45→30 "Overridden by Amendment No. 1".
+6. **Key clauses (1.5m)** — every document × every key clause, green ✓ / red ✗. Hover a ✓ for the citation (clause text + page); hover a ✗ for why it is absent.
    Boxed ✗ = the standard template requires it (a gap), e.g. the Quantum draft has no Return of Data clause.
-6. **Ask (2.5m)** — answers are tables; the SQL is under a collapsed **Thinking** section.
+7. **Ask (2.5m)** — answers are tables; the SQL is under a collapsed **Thinking** section.
    "Show start date, end date and signatures for all contracts" · "Which contracts are not fully signed?" ·
    "Which contracts do not have an audit rights clause?" · "Show the key clauses in the Bluepeak MSA" ·
    aggregate: "How many contracts are expiring in the next quarter?" (tiles → breakdown → list). Open **Thinking** to show the steps.
-7. **Redline (1.5m)** — Zenith MSA: 5 deviations; the clean control: none. **Templates (1m)** — heatmap of where contracts drifted.
-8. **Close (30s)** — roadmap: upload + OCR, alerts, integrations, multi-tenant.
+8. **Redline (1.5m)** — Zenith MSA: 5 deviations; the clean control: none. **Templates (1m)** — heatmap of where contracts drifted.
+9. **Close (30s)** — roadmap: upload + OCR, alerts, integrations, multi-tenant.
 
 `NODE_PATH=$(npm root -g) node scripts/demo_smoke.js` walks every screen and fails on any console error (run it twice before going on stage).
 

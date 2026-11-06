@@ -65,6 +65,11 @@ CLAUSE_WORDS = [
     (r"renewal clause", "renewal"),
     (r"payment clause", "payment"),
     (r"governing law clause", "governing_law"),
+    (r"warrant(?:y|ies)", "warranties"),
+    (r"insurance", "insurance"),
+    (r"force majeure", "force_majeure"),
+    (r"dispute resolution|arbitration", "dispute_resolution"),
+    (r"order of precedence|precedence clause", "order_of_precedence"),
 ]
 ATTRS = [  # question words -> columns to show
     (r"start date|effective date|commenc|\bstarts?\b|\bstarting\b", ["effective_date"]),
@@ -256,6 +261,16 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None) -> di
         q,
     )
     group = (g.group(1) or g.group(2)) if g else None
+    # vendor-level questions: "which vendors ...", "how many vendors ..."
+    vendor_level = bool(
+        re.search(
+            r"how many vendors|which vendors|what vendors|list (?:all )?(?:the )?vendors|"
+            r"vendors (?:with|that|having|who|have)",
+            q,
+        )
+    )
+    if vendor_level and not group:
+        group = "vendor"
 
     doc_clauses = bool(
         re.search(r"\bclauses?\b|what does .* say|terms of", q)
@@ -286,7 +301,7 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None) -> di
     return dict(
         where=where, adj=adj, suffix=suffix, win=win, metric=metric, group=group, datecol=datecol,
         notice=notice, cols=cols, doc_clauses=doc_clauses, all_clauses=all_clauses,
-        want_cols=want_cols, has_filters=has_filter_clauses,
+        want_cols=want_cols, has_filters=has_filter_clauses, vendor_level=vendor_level,
     )
 
 
@@ -304,9 +319,10 @@ def build_sql(plan: dict) -> dict[str, str]:
     dim = plan["group"] or ("type" if pinned_cat else "category")
     dim_sql = DIMS[dim].format(d=d)
     avg = ", ROUND(AVG(annual_value)) AS avg_annual_value" if plan["metric"] == "avg" else ""
+    nv = ", COUNT(DISTINCT vendor) AS vendors" if plan.get("vendor_level") else ""
     cols = ", ".join(["contract_id"] + [_col_sql(c) for c in plan["cols"]])
     return {
-        "aggregate": f"SELECT COUNT(*) AS contracts, COALESCE(SUM(annual_value), 0) AS total_annual_value{avg} FROM {BASE} {w}",
+        "aggregate": f"SELECT COUNT(*) AS contracts{nv}, COALESCE(SUM(annual_value), 0) AS total_annual_value{avg} FROM {BASE} {w}",
         "breakdown": f"SELECT {dim_sql} AS {dim}, COUNT(*) AS contracts, COALESCE(SUM(annual_value), 0) AS total_annual_value FROM {BASE} {w} GROUP BY 1 ORDER BY 2 DESC, 1",
         "list": f"SELECT {cols} FROM {BASE} {w} ORDER BY {d}, title",
         "doc_clauses": (
@@ -374,12 +390,23 @@ def answer(question: str, today: dt.date | None = None) -> dict | None:
         }
     aggregate = plan["metric"] != "list" or plan["group"]
     agg = _run("agg", sql["aggregate"], calls, "Headline numbers")[0]
-    if plan["metric"] == "list":
+    if plan["metric"] == "list" and not plan.get("vendor_level"):
         calls[-1]["no_tiles"] = True  # a plain list needs a count in the text, not headline tiles
     n, total = agg["contracts"], float(agg["total_annual_value"] or 0)
     if n == 0:
         return {"answer": f"No {describe(plan)} found.", "tool_calls": calls, "plan_steps": steps}
     desc = describe(plan)
+    if plan.get("vendor_level"):
+        _run("br", sql["breakdown"], calls, "Vendors", True)
+        nv = agg["vendors"]
+        when = ""
+        if plan["win"]:
+            when = (" with a notice deadline " if plan["notice"] else " expiring ") + plan["win"]["label"]
+        head = (
+            f"{nv} vendor{'s' if nv != 1 else ''} with {subject_of(plan)}{when}, "
+            f"{n} contract{'s' if n != 1 else ''} carrying {money(total)} in annual value."
+        )
+        return {"answer": head, "tool_calls": calls, "plan_steps": steps}
     if plan["metric"] == "sum":
         head = f"Total annual value of {desc} is {money(total)} across {n} contract{'s' if n != 1 else ''}."
     elif plan["metric"] == "avg":

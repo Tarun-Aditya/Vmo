@@ -15,7 +15,8 @@ v_key_clauses  -- one row per non-amendment contract (join USING (contract_id)) 
   has_term, has_renewal, has_payment, has_termination_for_convenience, has_termination_for_cause,
   has_liability_cap, has_indemnity, has_ip_ownership, has_confidentiality, has_data_protection,
   has_audit_rights, has_assignment, has_non_solicit, has_governing_law, has_sla, has_security,
-  has_data_return, has_execution (= fully signed). false = the clause is absent from that document.
+  has_data_return, has_order_of_precedence, has_warranties, has_insurance, has_force_majeure,
+  has_dispute_resolution, has_execution (= fully signed). false = the clause is absent from that document.
 v_renewals  -- active contracts with renewal maths. Columns: contract_id, title, vendor, category, type,
   annual_value, auto_renew, expiry_date, notice_period_days, owner, liability_uncapped,
   termination_for_convenience, notice_deadline (= expiry_date - notice_period_days; equals expiry when

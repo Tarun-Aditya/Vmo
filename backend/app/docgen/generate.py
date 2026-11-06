@@ -70,6 +70,41 @@ def _layout(title: str, header: list[str], clauses: list[tuple[str, str]]) -> st
     return "\n".join(out)
 
 
+def inheritance_ctx(spec: dict, seed: date, by_key: dict[str, dict]) -> dict:
+    """Text that ties a SOW to its MSA and a Work Order to its SOW (and MSA): built on top of the
+    parent documents, so the references always name real parents and dates."""
+    parent = by_key.get(spec.get("parent", ""), {})
+    out: dict = {}
+    if spec["type"] == "SOW" and parent:
+        out["msa_reference_text"] = (
+            f"This SOW is issued under the Master Services Agreement dated "
+            f"{long_date(seed + timedelta(days=parent['eff']))} between the parties "
+            f"({parent['title']}). Capitalised terms have the meaning given in that agreement."
+        )
+    if spec["type"] == "Work Order" and parent:
+        msa = by_key.get(parent.get("parent", ""), {})
+        out["sow_reference_text"] = (
+            f"This Work Order is issued under {parent['title']} (effective "
+            f"{long_date(seed + timedelta(days=parent['eff']))})"
+            + (
+                f" and the Master Services Agreement dated "
+                f"{long_date(seed + timedelta(days=msa['eff']))}."
+                if msa
+                else "."
+            )
+        )
+    eff, exp = seed + timedelta(days=spec["eff"]), seed + timedelta(days=spec["exp"])
+    span = (exp - eff).days
+    d1, d2 = eff + timedelta(days=14), eff + timedelta(days=min(90, span // 2))
+    d3 = eff + timedelta(days=min(180, max(span - 14, 30)))
+    out["deliverables_text"] = (
+        f"Milestone 1: mobilisation and delivery plan by {long_date(d1)}. Milestone 2: core "
+        f"delivery by {long_date(d2)}. Milestone 3: handover and written acceptance by "
+        f"{long_date(d3)}."
+    )
+    return out
+
+
 def execution_block(spec: dict, eff: date) -> tuple[str, dict]:
     """Signature clause text + the signature labels. The Supplier may be unsigned (planted)."""
     cust = CUSTOMER_SIGNERS["legal" if spec["type"] in ("NDA", "DPA") else "default"]
@@ -196,6 +231,7 @@ def build_contract(spec: dict, seed: date, by_key: dict[str, dict]) -> tuple[str
         notice_period_days=spec.get("notice"),
         dpa_date=long_date(eff + timedelta(days=14)),
         execution_text=exec_text,
+        **inheritance_ctx(spec, seed, by_key),
         data_scope_text=(
             f"The services involve the processing of personal data of the "
             f"Customer's {spec.get('subjects')}."
@@ -280,6 +316,9 @@ def build_draft(spec: dict) -> tuple[str, dict]:
         notice_period_days=60,
         execution_text="Signature blocks: [Customer signatory: to be signed] [Supplier "
         "signatory: to be signed]. This draft has not been executed.",
+        msa_reference_text="This SOW is issued under the Master Services Agreement between the "
+        "parties. Capitalised terms have the meaning given in that agreement.",
+        deliverables_text="Deliverables and milestones to be agreed.",
     )
     seq = []
     for c in tdef["clauses"]:

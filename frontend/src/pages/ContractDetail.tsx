@@ -12,6 +12,8 @@ type Detail = {
   effective_terms: { field: string; value: unknown; source_id: number; source_title: string; overridden: boolean }[];
   hierarchy: Node; deviations: { severity: Sev; deviation_summary: string; heading: string }[];
   is_amendment: boolean; overrides: string[]; parent: { id: number; title: string } | null;
+  lineage: { id: number; title: string; type: string }[];
+  inherited_terms: { label: string; value: unknown; source_id: number; source_title: string }[];
   signatures: { customer_signatory: string | null; customer_signed_date: string | null; supplier_signatory: string | null; supplier_signed_date: string | null; fully_executed: boolean };
 };
 
@@ -22,7 +24,8 @@ const LABEL: Record<string, string> = {
   processes_personal_data: "Processes personal data", has_dpa: "Has DPA",
   customer_signatory: "Customer signatory", supplier_signatory: "Supplier signatory", customer_signed_date: "Customer signed", supplier_signed_date: "Supplier signed", fully_executed: "Fully signed",
 };
-function show(field: string, v: unknown): string {
+function show(field: string, v: unknown, inherits = false): string {
+  if (inherits && (v === null || v === undefined || v === "null") && ["liability_cap_multiple", "governing_law"].includes(field)) return "Inherited from MSA";
   if (v === null || v === undefined || v === "null") return field === "liability_cap_multiple" ? "Uncapped / n.a." : "—";
   if (field.endsWith("_date")) return fmtDate(String(v));
   if (field.endsWith("_value")) return inr(v as number);
@@ -63,6 +66,30 @@ export default function ContractDetail() {
       </div>
       <div className="grid gap-4 lg:grid-cols-5">
         <div className="space-y-4 lg:col-span-2">
+          {d.lineage.length > 0 && !d.is_amendment && (
+            <Card title={d.inherited_terms.length ? "Built on top of its parent agreements" : "Parent agreements"}>
+              <ol className="mb-2 space-y-1 text-sm">
+                {d.lineage.map((l, i) => (
+                  <li key={l.id} style={{ paddingLeft: i * 14 }}>
+                    <span className="mr-1 text-slate-400">{i === 0 ? "" : "↳"}</span>
+                    <span className="mr-1 rounded bg-slate-200 px-1 text-[10px] font-semibold uppercase dark:bg-slate-700">{l.type}</span>
+                    <Link className="text-indigo-600 hover:underline dark:text-indigo-400" to={`/contracts/${l.id}`}>{l.title}</Link>
+                  </li>
+                ))}
+                <li style={{ paddingLeft: d.lineage.length * 14 }}><span className="mr-1 text-slate-400">↳</span><b>{c.title}</b> <span className="text-xs text-slate-500">(this document)</span></li>
+              </ol>
+              {d.inherited_terms.length > 0 && (
+                <table className="w-full text-sm"><thead><tr><Th>Inherited term</Th><Th>Value</Th><Th>From</Th></tr></thead><tbody>
+                  {d.inherited_terms.map((t) => (
+                    <tr key={t.label} className="border-t border-slate-100 dark:border-slate-700"><Td className="text-slate-500">{t.label}</Td>
+                      <Td className="font-medium">{typeof t.value === "boolean" ? (t.value ? "Yes" : "No") : t.value === null ? "Uncapped / n.a." : String(t.value)}</Td>
+                      <Td className="text-xs"><Link className="text-indigo-600 hover:underline" to={`/contracts/${t.source_id}`}>{t.source_title}</Link></Td></tr>))}
+                </tbody></table>
+              )}
+              <p className="mt-2 text-xs text-slate-500">The MSA prevails in a conflict (order of precedence); liability, indemnity, IP, confidentiality, data protection, audit and governing law flow down.</p>
+            </Card>
+          )}
+
           <Card title="Signatures" right={d.signatures.fully_executed ? <span className="font-bold text-emerald-600">✓ fully signed</span> : <span className="font-bold text-red-600">✗ not fully signed</span>}>
             <table className="w-full text-sm"><tbody>
               {([["Arcadia Retail Ltd", d.signatures.customer_signatory, d.signatures.customer_signed_date], [c.vendor, d.signatures.supplier_signatory, d.signatures.supplier_signed_date]] as [string, string | null, string | null][]).map(([party, who, when]) => (
@@ -77,7 +104,7 @@ export default function ContractDetail() {
                 <tr key={f.field} onClick={() => f.source_clause_id && setHl(f.source_clause_id)}
                   className={`border-t border-slate-100 dark:border-slate-700 ${f.source_clause_id ? "cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700" : ""} ${hl && hl === f.source_clause_id ? "bg-yellow-50 dark:bg-yellow-900/30" : ""}`}>
                   <Td className="text-slate-500">{LABEL[f.field] ?? f.field}</Td>
-                  <Td className="font-medium tabular-nums">{show(f.field, f.value)}</Td>
+                  <Td className="font-medium tabular-nums">{show(f.field, f.value, d.lineage.length > 0 && ["SOW", "Work Order"].includes(c.type))}</Td>
                   <Td className="text-right"><ConfidenceBadge v={f.confidence} />
                     <div className="text-[11px] text-slate-500">{f.source_heading ? `${f.source_heading} · p.${f.source_page}` : `header · p.${f.source_page ?? 1}`}</div></Td>
                 </tr>
@@ -93,7 +120,7 @@ export default function ContractDetail() {
                   {d.effective_terms.filter((e) => e.field !== "liability_cap_text").map((e) => (
                     <tr key={e.field} className={`border-t border-slate-100 dark:border-slate-700 ${e.overridden ? "bg-indigo-50 dark:bg-indigo-950/40" : ""}`}>
                       <Td className="text-slate-500">{LABEL[e.field]}</Td>
-                      <Td className="font-medium tabular-nums">{show(e.field, e.value)}</Td>
+                      <Td className="font-medium tabular-nums">{show(e.field, e.value, d.lineage.length > 0 && ["SOW", "Work Order"].includes(c.type))}</Td>
                       <Td className="text-xs">{e.overridden
                         ? <Link to={`/contracts/${e.source_id}`} className="font-medium text-indigo-700 hover:underline dark:text-indigo-300">⟲ Overridden by {e.source_title}</Link>
                         : <span className="text-slate-500">Original contract</span>}</Td>

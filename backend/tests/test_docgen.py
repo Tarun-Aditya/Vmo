@@ -71,6 +71,25 @@ def test_extraction_matches_labels(tmp_path):
             assert got[f]["value"] == want, (m["key"], f)
 
 
+def test_templates_are_typical_and_children_build_on_parents(tmp_path):
+    from app.docgen.library import TEMPLATES
+
+    assert len(TEMPLATES["MSA"]["clauses"]) == 21 and len(TEMPLATES["SOW"]["clauses"]) == 15
+    for needed in ("order_of_precedence", "warranties", "insurance", "force_majeure", "dispute_resolution"):
+        assert needed in TEMPLATES["MSA"]["clauses"]
+    assert {"key_personnel", "governance", "deliverables", "msa_reference"} <= set(TEMPLATES["SOW"]["clauses"])
+    assert {"sow_reference", "order_of_precedence"} <= set(TEMPLATES["WO"]["clauses"])
+    gen(tmp_path)
+    sow = (tmp_path / "docs/contracts/meridian_sow1.md").read_text()
+    assert "issued under the Master Services Agreement dated 2 " in sow and "Meridian Logistics" in sow
+    wo = (tmp_path / "docs/contracts/bluepeak_wo1.md").read_text()
+    assert "issued under SOW 2 – Managed Network" in wo and "Master Services Agreement dated" in wo
+    assert "the Master Services Agreement prevails over this SOW" in (
+        tmp_path / "docs/contracts/bluepeak_sow2.md").read_text()
+    # planted: this SOW overrides the MSA instead
+    assert "this SOW prevails over the Master Services Agreement" in sow
+
+
 def test_page_markers_and_clause_split(tmp_path):
     gen(tmp_path)
     _, clauses = parse_document((tmp_path / "docs/contracts/pulsehr.md").read_text())
