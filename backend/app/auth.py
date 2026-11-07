@@ -21,7 +21,7 @@ from app.db import SessionLocal
 
 RANK = {"viewer": 0, "reviewer": 1, "admin": 2}
 SESSION_HOURS = 12
-PUBLIC = ("/health", "/api/auth/login", "/api/auth/config", "/api/auth/bootstrap", "/api/meta", "/api/shared", "/api/sign", "/api/signatures/webhook", "/sim")        # /api/shared/<token>: the link itself is the credential, checked per request
+PUBLIC = ("/health", "/api/auth/login", "/api/auth/config", "/api/auth/bootstrap", "/api/auth/oidc", "/api/meta", "/api/shared", "/api/sign", "/api/signatures/webhook", "/sim")        # /api/shared/<token>: the link itself is the credential, checked per request
 READ_LIKE_POSTS = ("/api/ask", "/api/chat")         # POSTs that only read (questions): viewers may ask
 
 
@@ -91,9 +91,12 @@ _jwks: dict = {"at": 0.0, "keys": None, "url": None}
 
 def oidc_config() -> dict | None:
     iss = os.environ.get("OIDC_ISSUER")
+    if not iss and os.environ.get("SIMULATORS", "0") == "1":                # demo: the built-in identity provider stands in until a real one is configured
+        base = os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
+        return {"issuer": f"{base}/sim/idp", "audience": "contractiq-demo", "roles_claim": "roles", "default_role": "viewer", "jwks_url": f"{base}/sim/idp/jwks", "simulated": True}
     if not iss:
         return None
-    return {"issuer": iss.rstrip("/"), "audience": os.environ.get("OIDC_AUDIENCE"), "roles_claim": os.environ.get("OIDC_ROLES_CLAIM", "roles"),
+    return {"issuer": iss.rstrip("/"), "audience": os.environ.get("OIDC_AUDIENCE") or os.environ.get("OIDC_CLIENT_ID"), "roles_claim": os.environ.get("OIDC_ROLES_CLAIM", "roles"),
             "default_role": os.environ.get("OIDC_DEFAULT_ROLE", "viewer"), "jwks_url": os.environ.get("OIDC_JWKS_URL")}
 
 

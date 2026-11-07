@@ -173,3 +173,26 @@ def test_channel(cid: int):
     if not cur:
         raise HTTPException(404, "channel not found")
     return alerts.send(cur[0], {"title": "Test alert from ContractIQ", "body": "If you can read this, the channel works.", "severity": "low", "link": "/alerts", "vendor": None})
+
+
+@router.post("/admin/alert-channels/demo")
+def demo_channels():
+    """Demo: channels that deliver to the built-in simulated Slack, Teams, webhook and SMTP sinks (see /sim/outbox). Needs SIMULATORS=1."""
+    import os
+
+    if os.environ.get("SIMULATORS", "0") != "1":
+        raise HTTPException(409, "the simulators are switched off (set SIMULATORS=1)")
+    base = os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
+    spec = [("Slack #vmo-alerts (simulated)", "slack", {}, {"url": f"{base}/sim/hook/slack"}, "medium"), ("Teams VMO channel (simulated)", "teams", {}, {"url": f"{base}/sim/hook/teams"}, "high"),
+            ("Webhook to ticketing (simulated)", "webhook", {}, {"url": f"{base}/sim/hook/ticketing"}, "high"),
+            ("E-mail to the VMO (simulated)", "email", {"host": "127.0.0.1", "port": int(os.environ.get("SIM_SMTP_PORT", "2525")), "to": "vmo@arcadia.demo", "from": "contractiq@arcadia.demo"}, {}, "high")]
+    made = []
+    for name, kind, cfg, sec, sev in spec:
+        if rows("SELECT 1 FROM alert_channels WHERE name=:n", n=name):
+            continue
+        with SessionLocal() as s:
+            s.execute(text("INSERT INTO alert_channels (name, kind, config, secrets_enc, enabled, min_severity) VALUES (:n,:k,CAST(:c AS jsonb),:s,true,:m)"),
+                      {"n": name, "k": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec) if sec else None, "m": sev})
+            s.commit()
+        made.append(name)
+    return {"created": made}

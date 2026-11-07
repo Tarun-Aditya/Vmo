@@ -150,3 +150,111 @@ def test_contract_pulls_from_all_three_systems_match_the_erp_records(client, see
         for n in ("coupa-simulated", "sap-s-4hana-simulated"):
             shutil.rmtree(feeds.feeds_dir() / n, ignore_errors=True)
         feeds.recompute()
+
+
+def test_simulated_google_drive_onedrive_and_sharepoint(client, seeded, live, monkeypatch):
+    """The demo cloud-storage stand-ins, mounted in the app, feed the real Drive and Microsoft Graph connectors."""
+    import shutil
+
+    monkeypatch.setenv("PUBLIC_API_URL", live)
+    # the live server was started with the default public address: rebuild its state for this address
+    r = httpx.post(f"{live}/api/connectors/demo-cloud", timeout=120)
+    assert r.status_code == 200, r.text
+    try:
+        by = {c["name"]: c for c in r.json()["connectors"]}
+        assert by["Google Drive (simulated)"]["status"] == "ok" and by["Google Drive (simulated)"]["new"] == 2
+        assert by["OneDrive (simulated)"]["new"] == 1 and by["SharePoint (simulated)"]["new"] == 1
+        with SessionLocal() as s:
+            rows_ = {x["vendor"]: dict(x) for x in s.execute(text("SELECT vendor, type, status, origin FROM contracts WHERE origin LIKE 'connector:%(simulated)'")).mappings()}
+        assert {"Lumenfield Software Inc", "Cobalt Ridge Partners LLC", "Westbay Cleaning Services Ltd", "Ironvale Networks Inc"} <= set(rows_)
+        assert rows_["Ironvale Networks Inc"]["status"] == "draft" and rows_["Lumenfield Software Inc"]["status"] != "draft"          # SharePoint feeds the draft review queue
+        assert all(c["new"] == 0 for c in httpx.post(f"{live}/api/connectors/demo-cloud", timeout=120).json()["connectors"])
+    finally:
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM connectors WHERE name LIKE '%(simulated)'"))
+            s.execute(text("DELETE FROM contracts WHERE origin LIKE 'connector:%(simulated)'"))
+            root = pipeline.inbox_path(s)
+            s.commit()
+        for d in ("contracts", "drafts"):
+            for n in ("google-drive-simulated", "onedrive-simulated", "sharepoint-simulated"):
+                shutil.rmtree(root / d / n, ignore_errors=True)
+
+
+def test_simulated_mailbox_intake_with_the_real_imap_connector(client, seeded, live):
+    """A real imaplib session against the simulated mailbox: attachments become contracts, mail is marked read, a second sync finds nothing."""
+    import shutil
+
+    r = client.post("/api/connectors/demo-mailbox")
+    assert r.status_code == 200, r.text
+    try:
+        c = r.json()["connectors"][0]
+        assert c["status"] == "ok" and c["new"] == 2, c
+        with SessionLocal() as s:
+            vendors = {x[0] for x in s.execute(text("SELECT vendor FROM contracts WHERE origin LIKE 'connector:Mailbox intake%'"))}
+            root = pipeline.inbox_path(s)
+        assert {"Foxglove Marketing Ltd", "Redwood Biotech Inc"} <= vendors
+        assert client.post("/api/connectors/demo-mailbox").json()["connectors"][0]["new"] == 0
+    finally:
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM connectors WHERE name LIKE 'Mailbox intake%'"))
+            s.execute(text("DELETE FROM contracts WHERE origin LIKE 'connector:Mailbox intake%'"))
+            s.commit()
+        shutil.rmtree(root / "contracts" / "mailbox-intake-simulated", ignore_errors=True)
+
+
+def test_alerts_reach_the_simulated_slack_teams_webhook_and_smtp(client, seeded, live, monkeypatch):
+    from app import alerts
+    from app.simulators import mail as sim_mail
+
+    monkeypatch.setenv("PUBLIC_API_URL", live)
+    sim_mail.OUTBOX.clear()
+    with SessionLocal() as s:
+        s.execute(text("DELETE FROM alert_channels"))
+        s.execute(text("DELETE FROM alerts"))
+        s.commit()
+    try:
+        assert len(client.post("/api/admin/alert-channels/demo").json()["created"]) == 4
+        res = alerts.evaluate()
+        assert res["new"] > 0 and res["delivered"] > 0
+        kinds = {m["channel"] for m in sim_mail.OUTBOX}
+        assert {"slack", "teams", "ticketing"} <= kinds and "email" in kinds                                              # the SMTP sink is part of the same outbox
+        assert any(m["kind"] == "email" and "vmo@arcadia.demo" in m["to"] for m in sim_mail.OUTBOX)
+        assert httpx.get(f"{live}/sim/outbox").json()[0]["channel"]
+    finally:
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM alert_channels"))
+            s.execute(text("DELETE FROM alerts"))
+            s.commit()
+        alerts.evaluate(deliver=False)
+
+
+def test_single_sign_on_through_the_simulated_identity_provider(client, seeded, live, monkeypatch):
+    monkeypatch.setenv("PUBLIC_API_URL", live)
+    monkeypatch.setenv("WEB_URL", "http://web.test")
+    from app import auth
+
+    auth._jwks.update(keys=None)
+    assert client.get("/api/auth/config").json()["oidc"] is True                                                         # demo mode advertises SSO
+    c = httpx.Client(follow_redirects=False, timeout=30)
+    r = c.get(f"{live}/api/auth/oidc/login")
+    assert r.status_code == 302 and "/sim/idp/authorize" in r.headers["location"]
+    page = c.get(r.headers["location"]).text
+    assert "Simulated identity provider" in page and "Meera Shah" in page
+    q = httpx.URL(r.headers["location"]).params
+    r2 = c.post(f"{live}/sim/idp/authorize", data={"redirect_uri": q["redirect_uri"], "state": q["state"], "nonce": q["nonce"], "user": "meera@arcadia.demo"})
+    assert r2.status_code == 303
+    r3 = c.get(r2.headers["location"])
+    assert r3.status_code == 302 and r3.headers["location"].startswith("http://web.test/?sso_token=")
+    tok = r3.headers["location"].split("sso_token=")[1]
+    monkeypatch.setenv("AUTH_MODE", "on")
+    try:
+        me = client.get("/api/auth/me", headers={"Authorization": f"Bearer {tok}"}).json()
+        assert me["email"] == "meera@arcadia.demo" and me["role"] == "reviewer" and me["auth_required"] is True      # the role came from the identity provider's claim
+        assert client.get("/api/users", headers={"Authorization": f"Bearer {tok}"}).status_code == 403
+        assert c.post(f"{live}/sim/idp/token", data={"grant_type": "authorization_code", "code": "stolen", "client_id": "contractiq-demo", "client_secret": "demo-sso-secret"}).status_code == 400
+    finally:
+        monkeypatch.delenv("AUTH_MODE")
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM users"))
+            s.execute(text("DELETE FROM audit_log"))
+            s.commit()

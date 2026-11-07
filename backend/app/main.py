@@ -38,6 +38,15 @@ async def lifespan(app: FastAPI):
         with SessionLocal() as s:
             kcc.ensure_defaults(s)
             s.commit()
+        if os.environ.get("SIMULATORS", "0") == "1":
+            try:
+                from app.simulators import mail as sim_mail
+
+                srv, _ = await sim_mail.serve_imap(int(os.environ.get("SIM_IMAP_PORT", "1143")))
+                app.state.sim_imap = srv
+                app.state.sim_smtp = sim_mail.start_smtp_sink(int(os.environ.get("SIM_SMTP_PORT", "2525")))
+            except OSError:
+                log.warning("simulated mail servers not started (port in use)")
         if os.environ.get("SCHEDULER_ENABLED", "1") == "1":
             task = asyncio.create_task(scheduler.scheduler_loop())
     except Exception:  # DB not migrated yet: the API still starts, /health tells the story
@@ -136,6 +145,15 @@ if os.environ.get('SIMULATORS', '0') == '1':        # stand-ins for ERP and e-si
 
     app.include_router(sim_erp)
     app.include_router(sim_esign)
+    from app.simulators import cloud as sim_cloud
+
+    from app.simulators import mail as sim_mail
+    from app.simulators import sso as sim_sso
+
+    app.include_router(sim_mail.router)
+    app.include_router(sim_sso.idp)
+    app.mount('/sim/gdrive', sim_cloud.Lazy(0))
+    app.mount('/sim/graph', sim_cloud.Lazy(1))
 app.include_router(vmo_router)
 
 

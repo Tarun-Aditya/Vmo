@@ -81,6 +81,21 @@ function Channels() {
   );
 }
 
+function Sim() {
+  const qc = useQueryClient();
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ simulators?: boolean }>("/api/meta") });
+  const out = useQuery({ queryKey: ["sim-outbox"], queryFn: () => api<{ channel: string; kind: string; text: string | null }[]>("/sim/outbox"), enabled: !!meta.data?.simulators, refetchInterval: 5000 });
+  const add = useMutation({ mutationFn: () => api("/api/admin/alert-channels/demo", { method: "POST" }), onSuccess: () => qc.invalidateQueries({ queryKey: ["alert-channels"] }) });
+  const run = useMutation({ mutationFn: () => api("/api/alerts/evaluate", { method: "POST" }), onSuccess: () => qc.invalidateQueries({ queryKey: ["sim-outbox"] }) });
+  if (!meta.data?.simulators) return null;
+  return (
+    <Card title="Demo: simulated Slack, Teams, webhook and e-mail" right={<div className="flex gap-2"><Btn kind="ghost" onClick={() => add.mutate()}>Add demo channels</Btn><Btn kind="ghost" onClick={() => run.mutate()}>Check alerts now</Btn></div>}>
+      <p className="mb-2 text-sm text-slate-500">These channels deliver to sinks built into the app. Whatever they receive shows here, as it would arrive in the real service.</p>
+      <ul className="max-h-60 space-y-0.5 overflow-auto text-xs">{(out.data ?? []).map((m, i) => <li key={i}><b>{m.channel}</b> <span className="text-slate-500">({m.kind})</span> {m.text}</li>)}{out.data?.length === 0 && <li className="text-slate-500">Nothing received yet.</li>}</ul>
+    </Card>
+  );
+}
+
 export default function AlertSettings() {
-  return <div className="space-y-4"><Rules /><Channels /></div>;
+  return <div className="space-y-4"><Sim /><Rules /><Channels /></div>;
 }

@@ -1,6 +1,8 @@
 """Auth API: login / bootstrap / me, user management, API tokens, audit log. Enforcement lives in the middleware (app.main)."""
 from __future__ import annotations
 
+import os
+
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
@@ -271,3 +273,50 @@ def unlock(uid: int):
         s.execute(text("UPDATE users SET failed_logins = 0, locked_until = NULL, mfa_enabled = false, mfa_secret_enc = NULL, recovery_hashes = '{}' WHERE id = :i"), {"i": uid})
         s.commit()
     return {"ok": True}
+
+
+# ------------------------------------------------------------------ single sign-on (OpenID Connect authorization-code flow)
+def _sso_client() -> tuple[str, str]:
+    cfg = auth.oidc_config() or {}
+    return (os.environ.get("OIDC_CLIENT_ID") or ("contractiq-demo" if cfg.get("simulated") else ""), os.environ.get("OIDC_CLIENT_SECRET") or ("demo-sso-secret" if cfg.get("simulated") else ""))
+
+
+def _public() -> str:
+    return os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
+
+
+@router.get("/auth/oidc/login")
+def oidc_login():
+    """Send the browser to the identity provider (discovered from the issuer)."""
+    import secrets as _s
+    from urllib.parse import urlencode
+
+    import httpx
+    from fastapi.responses import RedirectResponse
+
+    cfg, (cid, _) = auth.oidc_config(), _sso_client()
+    if not cfg or not cid:
+        raise HTTPException(409, "single sign-on is not configured (OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET)")
+    meta = httpx.get(cfg["issuer"] + "/.well-known/openid-configuration", timeout=10).json()
+    q = urlencode({"response_type": "code", "client_id": cid, "redirect_uri": f"{_public()}/api/auth/oidc/callback", "scope": "openid email profile", "state": _s.token_urlsafe(8), "nonce": _s.token_urlsafe(8)})
+    return RedirectResponse(f"{meta['authorization_endpoint']}?{q}", status_code=302)
+
+
+@router.get("/auth/oidc/callback")
+def oidc_callback(code: str = "", state: str = ""):
+    import httpx
+    from fastapi.responses import RedirectResponse
+
+    cfg, (cid, secret) = auth.oidc_config(), _sso_client()
+    if not cfg or not code:
+        raise HTTPException(400, "missing code")
+    meta = httpx.get(cfg["issuer"] + "/.well-known/openid-configuration", timeout=10).json()
+    r = httpx.post(meta["token_endpoint"], data={"grant_type": "authorization_code", "code": code, "client_id": cid, "client_secret": secret, "redirect_uri": f"{_public()}/api/auth/oidc/callback"}, timeout=15)
+    if r.status_code != 200:
+        raise HTTPException(401, "the identity provider refused the sign-in")
+    user = auth.identify(r.json()["id_token"])             # verifies the signature, issuer, audience and expiry; creates / updates the account and its role
+    if not user:
+        raise HTTPException(401, "the identity token could not be verified, or the account is disabled")
+    auth.audit(user, "GET", "/api/auth/oidc/callback", 200, None, "sso_login")
+    web = os.environ.get("WEB_URL", "http://localhost:5173").rstrip("/")
+    return RedirectResponse(f"{web}/?sso_token={auth.make_session(user['email'], user['role'])}", status_code=302)

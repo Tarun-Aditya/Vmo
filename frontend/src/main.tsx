@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./index.css";
-import { api } from "./lib";
+import { api, setToken } from "./lib";
 import { Layout } from "./ui";
 import Dashboard from "./pages/Dashboard";
 import Contracts from "./pages/Contracts";
@@ -44,12 +44,16 @@ const qc = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: 
 /** AUTH_MODE=off (demo): straight in. AUTH_MODE=on: sign in (or create the first administrator) first. */
 function Gate({ children }: { children: React.ReactNode }) {
   const [n, setN] = React.useState(0);
-  const cfg = useQuery({ queryKey: ["auth-config", n], queryFn: () => api<{ auth_required: boolean; needs_bootstrap: boolean }>("/api/auth/config"), staleTime: 0 });
+  React.useEffect(() => {      // single sign-on returns here with ?sso_token=...
+    const u = new URL(window.location.href), t = u.searchParams.get("sso_token");
+    if (t) { setToken(t); u.searchParams.delete("sso_token"); window.history.replaceState({}, "", u.pathname + u.search); setN((x) => x + 1); }
+  }, []);
+  const cfg = useQuery({ queryKey: ["auth-config", n], queryFn: () => api<{ auth_required: boolean; needs_bootstrap: boolean; oidc?: boolean }>("/api/auth/config"), staleTime: 0 });
   const me = useQuery({ queryKey: ["me", n], queryFn: () => api<{ email: string }>("/api/auth/me"), enabled: !!cfg.data?.auth_required, retry: false, staleTime: 0 });
   React.useEffect(() => { const f = () => setN((x) => x + 1); window.addEventListener("ciq-signed-out", f); return () => window.removeEventListener("ciq-signed-out", f); }, []);
   if ((window.location.pathname.startsWith("/shared/") || window.location.pathname.startsWith("/sign/"))) return <>{children}</>;      // a share link is its own credential
   if (!cfg.data) return <div className="p-8 text-sm text-slate-500">Loading…</div>;
-  if (cfg.data.auth_required && (me.isLoading || me.isError)) return me.isLoading ? <div className="p-8 text-sm text-slate-500">Loading…</div> : <Login bootstrap={cfg.data.needs_bootstrap} onDone={() => { qc.clear(); setN((x) => x + 1); }} />;
+  if (cfg.data.auth_required && (me.isLoading || me.isError)) return me.isLoading ? <div className="p-8 text-sm text-slate-500">Loading…</div> : <Login bootstrap={cfg.data.needs_bootstrap} sso={cfg.data.oidc} onDone={() => { qc.clear(); setN((x) => x + 1); }} />;
   return <>{children}</>;
 }
 

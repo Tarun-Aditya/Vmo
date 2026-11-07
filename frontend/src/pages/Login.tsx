@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { Btn, Field, inputCls } from "../forms";
-import { api, setToken } from "../lib";
+import { API, api, setToken } from "../lib";
 
-export default function Login({ bootstrap, onDone }: { bootstrap: boolean; onDone: () => void }) {
+export default function Login({ bootstrap, onDone, sso }: { bootstrap: boolean; onDone: () => void; sso?: boolean }) {
   const [f, setF] = useState({ email: "", password: "", name: "", code: "" });
   const go = useMutation({
     mutationFn: () => api<{ token: string }>(bootstrap ? "/api/auth/bootstrap" : "/api/auth/login", { method: "POST", body: JSON.stringify(f) }),
@@ -20,6 +20,7 @@ export default function Login({ bootstrap, onDone }: { bootstrap: boolean; onDon
         {!bootstrap && (go.error?.message?.includes("6-digit") || f.code) && <Field label="Authenticator code (or recovery code)"><input className={inputCls} autoComplete="one-time-code" aria-label="Authenticator code" value={f.code} onChange={(e) => setF({ ...f, code: e.target.value })} /></Field>}
         {go.error && <p role="alert" className="text-sm text-red-600">{String(go.error).replace("Error: ", "")}</p>}
         <Btn type="submit" disabled={!f.email || !f.password || go.isPending}>{bootstrap ? "Create administrator" : "Sign in"}</Btn>
+        {!bootstrap && sso && <a className="block rounded border border-slate-300 px-3 py-1.5 text-center text-sm font-medium hover:bg-slate-100 dark:border-slate-600 dark:hover:bg-slate-700" href={`${API}/api/auth/oidc/login`}>Sign in with single sign-on</a>}
       </form>
     </div>
   );

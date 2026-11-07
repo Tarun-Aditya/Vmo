@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import threading
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
 
@@ -146,3 +146,58 @@ def connect_demo_erp():
                 s.commit()
         out.append({"name": name, "id": cid, **service.sync(cid, "demo")})
     return {"connectors": out}
+
+
+@router.post("/connectors/demo-cloud")
+def connect_demo_cloud(request: Request):
+    """Demo: register simulated Google Drive, OneDrive and SharePoint (built into this app, same API shapes as the real services) as connectors and sync once. Needs SIMULATORS=1."""
+    import os
+
+    if os.environ.get("SIMULATORS", "0") != "1":
+        raise HTTPException(409, "the simulators are switched off (set SIMULATORS=1)")
+    base = os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
+    from app.simulators import cloud as sim_cloud
+
+    try:
+        sa = sim_cloud.demo(base)[2]
+    except Exception as e:                     # the demo documents need pandoc
+        raise HTTPException(409, f"the cloud simulators could not start: {e}")
+    spec = [("Google Drive (simulated)", "gdrive", "contracts", {"folder": "root1", "api_base": f"{base}/sim/gdrive/drive/v3", "token_url": f"{base}/sim/gdrive/token"}, {"service_account_json": sa}),
+            ("OneDrive (simulated)", "onedrive", "contracts", {"tenant_id": "demo-tenant", "user": "legal@arcadia.demo", "folder": "Contracts", "api_base": f"{base}/sim/graph/v1.0", "login_base": f"{base}/sim/graph"},
+             {"client_id": "demo-app", "client_secret": "demo-secret"}),
+            ("SharePoint (simulated)", "sharepoint", "drafts", {"tenant_id": "demo-tenant", "site_url": "https://arcadia.sharepoint.demo/sites/Legal", "library": "Documents", "folder": "Vendor Agreements",
+                                                                 "api_base": f"{base}/sim/graph/v1.0", "login_base": f"{base}/sim/graph"}, {"client_id": "demo-app", "client_secret": "demo-secret"})]
+    out = []
+    for name, kind, target, cfg, sec in spec:
+        ex = rows("SELECT id FROM connectors WHERE name=:n", n=name)
+        if ex:
+            cid = ex[0]["id"]
+        else:
+            with SessionLocal() as s:
+                cid = s.execute(text("""INSERT INTO connectors (name, type, config, secrets_enc, target, enabled, trigger_mode, interval_minutes, next_sync_at)
+                                        VALUES (:n,:t,CAST(:c AS jsonb),:s,:tg,true,'manual',60, now()) RETURNING id"""), {"n": name, "t": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec), "tg": target}).scalar()
+                s.commit()
+        out.append({"name": name, "id": cid, **service.sync(cid, "demo")})
+    return {"connectors": out}
+
+
+@router.post("/connectors/demo-mailbox")
+def connect_demo_mailbox():
+    """Demo: register the simulated IMAP mailbox (two unread mails with contract attachments) as an intake connector and sync it."""
+    import os
+
+    if os.environ.get("SIMULATORS", "0") != "1":
+        raise HTTPException(409, "the simulators are switched off (set SIMULATORS=1)")
+    from app.simulators import mail as sim_mail
+
+    name = "Mailbox intake (simulated)"
+    cfg = {"host": "127.0.0.1", "port": int(os.environ.get("SIM_IMAP_PORT", "1143")), "ssl": False, "username": sim_mail.DEMO_USER, "folder": "INBOX"}
+    ex = rows("SELECT id FROM connectors WHERE name=:n", n=name)
+    if ex:
+        cid = ex[0]["id"]
+    else:
+        with SessionLocal() as s:
+            cid = s.execute(text("""INSERT INTO connectors (name, type, config, secrets_enc, target, enabled, trigger_mode, interval_minutes, next_sync_at)
+                                    VALUES (:n,'imap',CAST(:c AS jsonb),:s,'contracts',true,'manual',60, now()) RETURNING id"""), {"n": name, "c": json.dumps(cfg), "s": crypto.encrypt({"password": sim_mail.DEMO_PASS})}).scalar()
+            s.commit()
+    return {"connectors": [{"name": name, "id": cid, **service.sync(cid, "demo")}]}
