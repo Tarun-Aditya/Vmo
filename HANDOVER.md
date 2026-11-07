@@ -94,3 +94,22 @@ field names and auth are modelled on their public documentation and must still b
 `python evals/cuad_eval.py <CUAD_v1 folder> --n 150 --seed 7`. Held-out results: offline rules governing law 72%, effective date 55%, termination-for-convenience recall 33%; **Claude (60 contracts): governing law 98%,
 effective date 96%, termination for convenience precision 0.76 / recall 0.81**. Clause detection (rules, both modes), held-out: audit rights recall 0.76, assignment 0.79, insurance 0.81, liability cap 0.52, termination for
 convenience precision 0.46. Use Claude mode for real customer contracts. CUAD is mostly licence / distribution agreements, not vendor MSAs.
+
+## Update: embeddings, live collaboration, simulated external systems, real-contract accuracy
+**Real sentence embeddings** (`fastembed`, BAAI/bge-small-en-v1.5, ONNX, no torch; falls back to hashed vectors offline): clause-search top-3 accuracy on 20 plain-English questions 40% -> 85% (`evals/retrieval_eval.py`).
+
+**Live collaboration** (WebSocket `/ws/documents/<id>`): presence, instant push of comments, suggestions and new versions; *Suggesting* mode (propose a replacement, others accept / reject, accepted text becomes a new version); a save made from an out-of-date version is
+refused with a conflict instead of overwriting a colleague. **Not built: character-level simultaneous typing in the same text (needs a CRDT editor).**
+
+**Simulated external systems** (`SIMULATORS=1`, `PUBLIC_API_URL`; every one is exercised end to end through the real connector / client code over HTTP, `tests/test_simulators.py`):
+Coupa- and SAP-shaped invoice APIs generated from your loaded contracts; **contract pulls** from Coupa, SAP and Ariba (documents + metadata, cross-checked: dates / auto-renew read from each pulled document equal the ERP record);
+DocuSign-compatible envelopes with signing page and webhook; Google Drive, OneDrive and SharePoint; an IMAP mailbox; SMTP / Slack / Teams / webhook sinks (`/sim/outbox`); an OpenID Connect identity provider with a real SSO login flow.
+One-click buttons: Admin -> Connectors (ERP, cloud drives, mailbox), Admin -> Alerts (demo channels), login page (SSO). These prove our side of each integration, not that a real tenant behaves identically.
+
+**Real-contract accuracy (CUAD, 510 public contracts; 70% train / 30% hold-out fixed by file-name hash, hold-out never tuned on).** Hold-out, offline rules (133 contracts):
+termination-for-convenience F1 0.66 (was 0.54), liability cap 0.87 (was 0.65), audit rights 0.88 (0.82), assignment 0.94 (0.87), insurance 0.90 (0.79), IP ownership 0.72 (0.67), non-solicit 0.81 (0.67); governing law 77% (72%), effective date 76% (55%), termination-for-convenience as a field: precision 0.71 / recall 0.63 (was 0.33).
+Hold-out, Claude (60 contracts): governing law 98%, effective date 94%, termination for convenience precision 0.88 / recall 0.70. Services / maintenance / outsourcing / hosting subset (42 hold-out contracts): liability cap F1 0.91, assignment 0.92, non-solicit 0.95; IP ownership precision stays low (0.44).
+Fixes that mattered: text before the first heading is no longer dropped, clauses are also found by sentence (not only by heading), loosely matched clauses must pass a sentence check, governing law is read from the governing-law sentence, effective date from the first "This ... Agreement" sentence.
+Remaining gaps: IP ownership precision (licence wording), termination for convenience recall, governing law with several jurisdictions, offline effective date on messy exhibits. **CUAD has no VMO templates; the VMO-type subset above is the closest proxy, and results on real vendor MSAs from your customer are still unmeasured.**
+
+**Other:** Claude module eval 60/62 (misses are answer-format only), lint now enforces real defects (`ruff` F/B/I), 161 backend tests pass.

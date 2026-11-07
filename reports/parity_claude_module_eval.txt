@@ -17,6 +17,8 @@ PASS [claude-subscription] sla.breaches
 PASS [claude-subscription] sla.by_vendor            
 PASS [claude-subscription] sla.vendors              
 PASS [claude-subscription] sla.doc                  
+PASS [claude-subscription] sla.credits              
+PASS [claude-subscription] sla.credits_by_vendor    
 PASS [claude-subscription] spend.billed             
 PASS [claude-subscription] spend.off_contract       
 PASS [claude-subscription] spend.by_vendor          
@@ -32,7 +34,7 @@ PASS [claude-subscription] risk.by_tier
 PASS [claude-subscription] risk.top3                
 PASS [claude-subscription] risk.avg                 
 PASS [claude-subscription] bench.payment_terms_days 
-FAIL [claude-subscription] bench.warranty_days      What is the longest warranty period? -> want 90; numbers []
+PASS [claude-subscription] bench.warranty_days      
 PASS [claude-subscription] bench.confidentiality_years 
 PASS [claude-subscription] review.waiting           
 PASS [claude-subscription] review.dev_by_sev        
@@ -40,7 +42,7 @@ PASS [claude-subscription] review.checks
 PASS [claude-subscription] alerts.open              
 PASS [claude-subscription] alerts.by_sev            
 PASS [claude-subscription] alerts.critical_vendors  
-PASS [claude-subscription] tpl.count                
+FAIL [claude-subscription] tpl.count                How many templates do we have? -> want 6; numbers []
 PASS [claude-subscription] tpl.msa_clauses          
 PASS [claude-subscription] tpl.deviating            
 PASS [claude-subscription] obl.overdue_p            
@@ -53,8 +55,8 @@ PASS [claude-subscription] spend.at_risk_p
 PASS [claude-subscription] spend.late_p             
 PASS [claude-subscription] spend.by_month_p         
 PASS [claude-subscription] risk.high_p              
-FAIL [claude-subscription] risk.top1_p              Which vendor has the highest risk score? -> want ['Helix Digital Consulting Inc'](1); closest ['Atlas Facilities Tech Inc', 'Bluepeak Analytics Inc', 'Helix Digital Consulting Inc', 'Ironbridge Data Centers Inc', 'Kestrel Marketing Cloud Inc', 'Lumina Learning Systems Inc', 'Meridian Cloud Services LLC', 'Orion Cybersecurity Partners LLP'](10)
-FAIL [claude-subscription] alerts.crit_p            Show critical alerts -> want 8; numbers []
+PASS [claude-subscription] risk.top1_p              
+FAIL [claude-subscription] alerts.crit_p            Show critical alerts -> want 10; numbers []
 PASS [claude-subscription] review.deviations_p      
 PASS [claude-subscription] tpl.count_p              
 PASS [claude-subscription] vend.risk_count_p        
@@ -63,11 +65,11 @@ PASS [claude-subscription] vend.risk_count_p
   vend       3/3
   clauses    1/1
   obl        11/11
-  sla        5/5
+  sla        7/7
   spend      15/15
-  risk       5/6
-  bench      2/3
+  risk       6/6
+  bench      3/3
   review     4/4
   alerts     3/4
-  tpl        4/4
-OVERALL 57/60 = 95.0%
+  tpl        3/4
+OVERALL 60/62 = 96.8%
