@@ -1,0 +1,9 @@
+PASS [claude-subscription] uncapped         
+PASS [claude-subscription] saas_no_dpa      
+PASS [claude-subscription] no_tfc           
+PASS [claude-subscription] auto_renewals    
+PASS [claude-subscription] expire_90        
+PASS [claude-subscription] total_value      
+PASS [claude-subscription] top5_vendors     
+PASS [claude-subscription] non_ny_law       
+8/8 correct

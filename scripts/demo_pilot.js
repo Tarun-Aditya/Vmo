@@ -43,9 +43,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await visit('/contracts', 'Contract repository');
   await step('Repository — every document: executed contracts and drafts, filterable', '02-contracts');
   await check('repository lists every document', async () => (await p.locator('tbody tr').count()) >= live.length);
-  const withUrl = live.find((c) => c.source_path && /\.(pdf|docx)$/.test(c.source_path)) || live[0];
+  const withUrl = live.find((c) => c.type === 'SOW') || live[0];
   await p.goto(U + `/contracts/${withUrl.id}`); await p.waitForSelector('text=Ask about this document'); await sleep(1200);
-  await step(`Contract detail (${withUrl.source_path.split('.').pop().toUpperCase()} original): terms, signatures, checklist, effective terms`, '03-detail');
+  await step('Contract detail: terms, signatures, checklist, effective terms with provenance', '03-detail');
   const det = await api(`/api/contracts/${withUrl.id}`);
   await check('detail loads extracted fields and clauses', async () => !!det.contract && det.clauses.length > 3);
 
@@ -53,7 +53,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await visit('/vendors', 'Vendors');
   await step('Vendors — portfolio spend, next dates, risk', '04-vendors');
   const vendors = await api('/api/vendors');
-  await p.locator('tbody tr a, tbody tr').first().click(); await p.waitForSelector('text=Risk scorecard', { timeout: 15000 }); await sleep(900);
+  await p.goto(U + '/vendors/' + encodeURIComponent(live[0].vendor)); await p.waitForSelector('text=Risk scorecard', { timeout: 15000 }); await sleep(900);
   await step('Vendor profile: agreement tree, risk scorecard with drivers, spend exceptions', '05-vendor');
   await check('vendor list matches API', async () => (vendors.vendors || vendors).length > 3);
 
@@ -70,7 +70,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await step('Review queue — vendor drafts are redlined against the standard and wait for review', '07-redline', 2600);
   const dr = drafts[0];
   await check('tracked-changes .docx export', async () => { const r = await p.request.get(`${A}/api/redline/${dr.id}/export.docx`); const buf = await r.body(); return r.ok() && buf.slice(0, 2).toString() === 'PK' && Number(r.headers()['x-tracked-changes']) >= 0; });
-  await check('original document download link on a connector/inbox file', async () => true);
 
   // 6 VMO depth
   for (const [path, h, cap, n] of [['/obligations', 'Obligations & SLAs', 'Obligations & SLAs — what each party must do, read from the contracts', '08-obligations'],
@@ -96,8 +95,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
                                         ['/admin/access', 'Users, roles, API tokens and the audit log', '16-access', 'Audit log']]) {
     await p.goto(U + path); await p.waitForSelector(`text=${expect}`, { timeout: 15000 }); await sleep(900); await step(cap, n, 2200);
   }
-  await p.click('text=+ Add connector'); await sleep(500);
-  await p.getByLabel('Service').selectOption('sharepoint'); await step('Add a connector: pick the service, enter the tenant and library, test the connection, sync now', '17-add-connector', 2600);
+  await p.goto(U + '/admin/connectors'); await p.waitForSelector('text=+ Add connector'); await p.click('text=+ Add connector'); await sleep(500);
+  await p.getByLabel('Service', { exact: true }).selectOption('sharepoint'); await step('Add a connector: pick the service, enter the tenant and library, test the connection, sync now', '17-add-connector', 2600);
 
   await check('no browser errors', async () => errs.length === 0 || errs.join(' | ').slice(0, 300));
   await caption('Done'); await sleep(800);
