@@ -1,0 +1,36 @@
+Pilot corpus: 36 documents (0 not ingested: [])
+  effective_date                  36/ 36  100.0%
+  expiry_date                     36/ 36  100.0%
+  notice_period_days              35/ 35  100.0%
+  auto_renew                      35/ 35  100.0%
+  annual_value                    35/ 35  100.0%
+  total_value                     35/ 35  100.0%
+  payment_terms_days              28/ 28  100.0%
+  liability_cap_multiple          13/ 13  100.0%
+  liability_cap_text              27/ 27  100.0%
+  termination_for_convenience     16/ 16  100.0%
+  governing_law                   35/ 35  100.0%
+  processes_personal_data         31/ 35   88.6%
+  has_dpa                         32/ 35   91.4%
+  customer_signatory              35/ 35  100.0%
+  supplier_signatory              35/ 35  100.0%
+  fully_executed                  35/ 35  100.0%
+FIELDS       499/506 = 98.6%
+META         141/144 = 97.9%
+VALUES       105/109 = 96.3%
+MILESTONES   24/24 = 100.0%
+  MISS ('helix_wo1', 'processes_personal_data', True, False)
+  MISS ('tatva_msa', 'has_dpa', False, True)
+  MISS ('tatva_msa', 'value.tfc_notice_days', 90.0, 60)
+  MISS ('meridian_msa', 'value.tfc_notice_days', 120.0, 90)
+  MISS ('orion_nda', 'meta.parent', True, False)
+  MISS ('quill_sow', 'processes_personal_data', True, False)
+  MISS ('meridian_sow1', 'has_dpa', True, False)
+  MISS ('vantage_sow1', 'processes_personal_data', True, False)
+  MISS ('atlas_nda', 'meta.parent', True, False)
+  MISS ('draft_saas_nimbus', 'value.incident_notice_hours', 720.0, 168)
+  MISS ('draft_saas_nimbus', 'value.renewal_notice_days', None, 120)
+  MISS ('draft_sow_cobalt', 'processes_personal_data', True, False)
+  MISS ('draft_sow_cobalt', 'meta.vendor', 'Unknown vendor', 'Cobalt Applications Group')
+  MISS ('draft_msa_vertex', 'has_dpa', False, True)
+OVERALL 769/783 = 98.2% (threshold 80%)

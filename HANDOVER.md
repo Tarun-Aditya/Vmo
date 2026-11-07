@@ -13,17 +13,29 @@ Everything is derived from the loaded documents plus admin configuration; nothin
 | The 36 pilot documents | **Fictional**, written by Claude from a spec in eight drafting styles; not real redacted customer contracts |
 | Thresholds, obligation rules, risk weights, key clauses, metrics | Admin configuration (defaults shipped, editable) |
 
-## Measured results (36-document pilot corpus, 2026-11-07)
-| | Offline engine | Claude (subscription) |
+## Parity: offline engine vs Claude (36-document pilot corpus, 2026-11-07)
+| Eval | Offline | Claude (subscription) |
 |---|---|---|
-| Extraction vs spec labels (`evals/pilot_eval.py`) | 774/783 (98.9%) | 769/783 (98.2%) |
-| Ask, 8 portfolio questions (`evals/pilot_ask_eval.py`) | 8/8 | 8/8 |
-| Browser walkthrough (`scripts/demo_pilot.js`) | 10/10 checks | 11/11 checks |
-| Backend tests (synthetic corpus, offline) | 116 passed | – |
+| Contract extraction vs spec labels (`evals/pilot_eval.py`, 783 fields) | 774 (98.9%) | 769 (98.2%) |
+| Ask over portfolio, 8 questions (`evals/pilot_ask_eval.py`) | 8/8 | 8/8 |
+| **Ask over every module, cross-validated against the page APIs** (`evals/module_eval.py`, 60 cases incl. 15 paraphrases, aggregate / group / list, whole portfolio and one document) | **60/60** | **57/60** |
+| Invoices, SLA reports, acceptance certificates read from documents (`evals/ops_eval.py`, 573-589 fields, md/docx/pdf) | 100% | 100% |
+| Scanned (OCR) contracts vs the digital original (`evals/ocr_eval.py`, 3 noisy scans x 10 fields) | 30/30 | 29/30 |
+| Tests (`pytest`, synthetic corpus, offline) | all passing | – |
 
-Raw output: `reports/pilot_eval_*.txt`, `reports/pilot_ask_claude.txt`; videos and screenshots: `reports/walkthrough-claude/`, `reports/walkthrough-offline/`; UI screenshots of alerts and access: `reports/shots/`.
-Claude numbers on extraction were produced partly from the on-disk result cache (same prompts, same documents); the Ask run was live.
-The Claude extraction score was last measured before the total-fee extraction fix and the hybrid gap-fill landed in the *rules*; re-run `python evals/pilot_eval.py` to refresh.
+Claude's 3 module misses are answer-format cases, not wrong data: "Show critical alerts" returned the list (not a count), "highest risk score" returned the ranked list with the right vendor first,
+and "longest warranty period" answered in text without a result table. The checker accepts only a matching number / set in a result table. The one OCR difference is `auto_renew` left empty by Claude on a scan.
+Module questions are checked against what each page shows (obligations, SLA, spend, exceptions, risk, benchmarks, review queue, alerts, templates, dashboard, vendors, key clauses), not against Ask's own SQL.
+Ask over modules uses views `v_obligations, v_sla, v_invoices, v_spend_exceptions, v_vendor_scores, v_alerts, v_reviews, v_deviations, v_values` (offline: `app/ask_modules.py`; Claude: `prompts/schema.md`).
+Known gap: estimated service credits are computed by the SLA page from Admin thresholds and are not queryable in Ask.
+
+Raw output: `reports/parity_offline_*.txt`, `reports/parity_claude_*.txt`; earlier walkthrough videos in `reports/walkthrough-*/` (recorded before the document-derived feeds and module Ask).
+
+## Where data comes from (no static rows)
+Contracts, clauses, terms, obligations, redlines and checklist results: the contract documents. Invoices, monthly SLA reports and milestone acceptance certificates: **documents in `data/feeds/`**
+(PDF, Word, Markdown, scans; or CSV exports) read by `app/opsdocs.py` and matched to contracts by vendor and reference. Thresholds, rules, risk weights, metrics: Admin configuration.
+The fictional invoices / reports in the demo are *fixture documents* written by `app/docgen/ops_fixtures.py` for demos and tests only; the product never reads fixture rows, only the files.
+Real invoices and SLA actuals cannot be derived from contracts: they must come from the customer's documents, exports or connectors.
 
 ## Run
 `make dev`, then `make seed-pilot` (or `make seed` for the synthetic corpus). Without Docker: see README "Tests"/"Two corpora".
@@ -32,7 +44,7 @@ Swapping the Claude subscription for an API key: set `ANTHROPIC_API_KEY`; nothin
 
 ## Known limits (be honest with the pilot customer)
 1. **Connectors are verified only against local Google Drive / Microsoft Graph stand-ins**, never a live tenant. Expect to debug permissions (Drive sharing, Graph app consent) on first real connection.
-2. **OCR** for scanned PDFs is implemented (needs `tesseract` + `pdftoppm`); not exercised here because tesseract is not installed in this sandbox. The Docker image now installs it, untested.
+2. **OCR** is tested here with tesseract on clean and noisy image-only PDFs (contracts and invoices). Real scans (stamps, handwriting, low resolution) will be worse; Docker image installs tesseract but was not built here.
 3. **Docker changes** (apt packages, `corpus/` mount, `make seed-pilot`) were written but not run: there was no Docker in the build environment.
 4. **Embeddings** are the hashed offline kind; install `sentence-transformers` (`pip install -e ".[local-embeddings]"`) for real semantic clause search. Not validated here.
 5. The ~2% extraction misses are mostly: unusual NDA/DPA parent references, personal-data flags on SOWs, a draft whose vendor is named only in a table, and non-standard notice wording.

@@ -1,0 +1,73 @@
+PASS [offline-planner   ] dash.expiring_90         
+PASS [offline-planner   ] dash.uncapped            
+PASS [scripted          ] dash.annual_value        
+PASS [offline-planner   ] repo.by_type             
+PASS [offline-planner   ] vend.count               
+PASS [offline-planner   ] vend.no_tfc              
+PASS [offline-planner   ] clauses.indemnity        
+PASS [offline-modules   ] obl.overdue              
+PASS [offline-modules   ] obl.open                 
+PASS [offline-modules   ] obl.overdue_by_vendor    
+PASS [offline-modules   ] obl.by_kind              
+PASS [offline-modules   ] obl.milestones_overdue   
+PASS [offline-modules   ] obl.due_30               
+PASS [offline-modules   ] obl.supplier             
+PASS [offline-modules   ] obl.doc_list             
+PASS [offline-modules   ] sla.breaches             
+PASS [offline-modules   ] sla.by_vendor            
+PASS [offline-modules   ] sla.vendors              
+PASS [offline-modules   ] sla.doc                  
+PASS [offline-modules   ] spend.billed             
+PASS [offline-modules   ] spend.off_contract       
+PASS [offline-modules   ] spend.by_vendor          
+PASS [offline-modules   ] spend.exceptions         
+PASS [offline-modules   ] spend.by_kind            
+PASS [offline-modules   ] spend.paid_late          
+PASS [scripted          ] spend.duplicates         
+PASS [offline-modules   ] spend.critical_at_risk   
+PASS [offline-modules   ] spend.unpaid             
+PASS [offline-modules   ] spend.doc_total          
+PASS [offline-modules   ] risk.critical            
+PASS [offline-modules   ] risk.by_tier             
+PASS [offline-modules   ] risk.top3                
+PASS [offline-modules   ] risk.avg                 
+PASS [offline-modules   ] bench.payment_terms_days 
+PASS [offline-modules   ] bench.warranty_days      
+PASS [offline-modules   ] bench.confidentiality_years 
+PASS [offline-modules   ] review.waiting           
+PASS [offline-modules   ] review.dev_by_sev        
+PASS [offline-planner   ] review.checks            
+PASS [offline-modules   ] alerts.open              
+PASS [offline-modules   ] alerts.by_sev            
+PASS [offline-modules   ] alerts.critical_vendors  
+PASS [offline-modules   ] tpl.count                
+PASS [offline-modules   ] tpl.msa_clauses          
+PASS [offline-modules   ] tpl.deviating            
+PASS [offline-modules   ] obl.overdue_p            
+PASS [offline-modules   ] obl.by_vendor_p          
+PASS [offline-modules   ] obl.by_party_p           
+PASS [offline-modules   ] sla.vendors_p            
+PASS [offline-modules   ] spend.off_contract_p     
+PASS [offline-modules   ] spend.by_sev_p           
+PASS [offline-modules   ] spend.at_risk_p          
+PASS [offline-modules   ] spend.late_p             
+PASS [offline-modules   ] spend.by_month_p         
+PASS [offline-modules   ] risk.high_p              
+PASS [offline-modules   ] risk.top1_p              
+PASS [offline-modules   ] alerts.crit_p            
+PASS [offline-modules   ] review.deviations_p      
+PASS [offline-modules   ] tpl.count_p              
+PASS [offline-modules   ] vend.risk_count_p        
+  dash       3/3
+  repo       1/1
+  vend       3/3
+  clauses    1/1
+  obl        11/11
+  sla        5/5
+  spend      15/15
+  risk       6/6
+  bench      3/3
+  review     4/4
+  alerts     4/4
+  tpl        4/4
+OVERALL 60/60 = 100.0%

@@ -1,0 +1,4 @@
+DIFF [llm] quill_nda: 9/10 fields same as the digital original {'auto_renew': (None, False)}
+PASS [llm] bluepeak_saas: 10/10 fields same as the digital original 
+PASS [llm] helix_sow1: 10/10 fields same as the digital original 
+OVERALL 29/30 = 96.7%
