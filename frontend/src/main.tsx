@@ -27,6 +27,7 @@ import ApprovalRules from "./pages/admin/ApprovalRules";
 import Login from "./pages/Login";
 import SharedDoc from "./pages/Shared";
 import Sign from "./pages/Sign";
+import Security from "./pages/Security";
 import RiskWeights from "./pages/admin/RiskWeights";
 import Connectors from "./pages/admin/Connectors";
 import Thresholds from "./pages/admin/Thresholds";
@@ -76,6 +77,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="spend" element={<Spend />} />
             <Route path="risk" element={<Risk />} />
             <Route path="alerts" element={<Alerts />} />
+            <Route path="security" element={<Security />} />
             <Route path="documents/:id/edit" element={<DocumentEditor />} />
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<Pipeline />} />

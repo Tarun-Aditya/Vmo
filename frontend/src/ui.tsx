@@ -109,7 +109,7 @@ export function Layout() {
             <NavLink to="/admin" title="Pipeline, key clauses, values & limits, checklist" className={({ isActive }) => `rounded px-2 py-1 ${isActive ? "bg-slate-200 font-medium dark:bg-slate-700" : "text-slate-500 hover:underline"}`}>⚙ Admin</NavLink>
             {who.data?.auth_required && (
               <span className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-300" title={who.data.email}>{who.data.name || who.data.email} · {who.data.role}
-                <button className="ml-1 rounded border px-1.5 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => { setToken(null); qc.clear(); window.dispatchEvent(new Event("ciq-signed-out")); }}>Sign out</button></span>)}
+                <NavLink to="/security" className="ml-1 underline">Security</NavLink><button className="ml-1 rounded border px-1.5 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => { setToken(null); qc.clear(); window.dispatchEvent(new Event("ciq-signed-out")); }}>Sign out</button></span>)}
             <button onClick={() => setDark(!dark)} className="rounded border px-2 py-1" aria-label="Toggle theme">{dark ? "☀ Light" : "☾ Dark"}</button>
           </div>
         </div>

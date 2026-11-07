@@ -17,6 +17,7 @@ from app.routes_alerts import router as alerts_router
 from app.routes_approvals import router as approvals_router
 from app.routes_auth import router as auth_router
 from app.routes_quality import router as quality_router
+from app.routes_scim import router as scim_router
 from app.routes_signatures import router as signatures_router
 from app.routes_comments import router as comments_router
 from app.routes_chat import router as chat_router
@@ -45,6 +46,18 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ContractIQ API", version="0.2.0", lifespan=lifespan)
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    resp = await call_next(request)
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    resp.headers.setdefault("Referrer-Policy", "no-referrer")
+    resp.headers.setdefault("Cache-Control", "no-store") if request.url.path.startswith("/api/") else None
+    if os.environ.get("HSTS", "0") == "1":
+        resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return resp
+
+
 @app.middleware("http")
 async def access_control(request: Request, call_next):
     """AUTH_MODE=on: every /api call needs a login or API token with a high enough role; every change (and every refusal) is written to the audit log."""
@@ -86,6 +99,7 @@ app.include_router(comments_router)
 app.include_router(approvals_router)
 app.include_router(signatures_router)
 app.include_router(quality_router)
+app.include_router(scim_router)
 app.include_router(vmo_router)
 
 

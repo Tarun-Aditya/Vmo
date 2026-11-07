@@ -33,7 +33,9 @@ def required(method: str, path: str) -> str | None:
     """The minimum role for a request, or None if it is public."""
     if method == "OPTIONS" or any(path == p or path.startswith(p + "/") for p in PUBLIC):
         return None
-    if path.startswith(("/api/admin", "/api/connectors", "/api/users", "/api/audit")):
+    if path.startswith("/api/auth/mfa"):
+        return "viewer"                                      # everyone manages their own second factor
+    if path.startswith(("/api/admin", "/api/connectors", "/api/users", "/api/audit", "/api/scim")):
         return "admin"
     if method in ("GET", "HEAD") or path.startswith(READ_LIKE_POSTS):
         return "viewer"

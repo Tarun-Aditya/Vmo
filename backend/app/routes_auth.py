@@ -24,7 +24,7 @@ def me(request: Request) -> dict:
 @router.get("/auth/config")
 def config():
     n = rows("SELECT count(*) AS n FROM users")[0]["n"]
-    return {"auth_required": auth.mode() == "on", "needs_bootstrap": auth.mode() == "on" and n == 0, "oidc": bool(auth.oidc_config()), "roles": ROLES}
+    return {"auth_required": auth.mode() == "on", "min_password": MIN_PASSWORD, "needs_bootstrap": auth.mode() == "on" and n == 0, "oidc": bool(auth.oidc_config()), "roles": ROLES}
 
 
 @router.get("/auth/me")
@@ -35,15 +35,55 @@ def whoami(request: Request):
 class LoginIn(BaseModel):
     email: str
     password: str
+    code: str | None = None
 
 
-def _login(email: str, pw: str, ip: str | None) -> dict:
+MAX_FAILED, LOCK_MINUTES, MIN_PASSWORD = 5, 15, 10
+
+
+def password_problem(pw: str, email: str = "") -> str | None:
+    """The password policy: at least 10 characters, not the e-mail's name, not a single repeated character."""
+    if len(pw or "") < MIN_PASSWORD:
+        return f"password must be at least {MIN_PASSWORD} characters"
+    if email and email.split("@")[0].lower() in pw.lower() and len(email.split("@")[0]) >= 4:
+        return "password must not contain your e-mail name"
+    if len(set(pw)) < 4:
+        return "password is too simple"
+    return None
+
+
+def _login(email: str, pw: str, ip: str | None, code: str | None = None) -> dict:
+    from datetime import datetime, timezone
+
+    from app import mfa
+
     u = rows("SELECT * FROM users WHERE email = :e AND source = 'local'", e=email.strip().lower())
+    if u and u[0]["locked_until"] and u[0]["locked_until"] > datetime.now(timezone.utc):
+        auth.audit({"email": email}, "POST", "/api/auth/login", 423, ip, "login_locked")
+        raise HTTPException(423, f"Too many failed attempts: try again in {LOCK_MINUTES} minutes")
     if not u or not u[0]["active"] or not auth.check_password(pw, u[0]["password_hash"]):
+        if u:
+            with SessionLocal() as s:
+                s.execute(text("UPDATE users SET failed_logins = failed_logins + 1, locked_until = CASE WHEN failed_logins + 1 >= :m THEN now() + make_interval(mins => :l) ELSE locked_until END WHERE id = :i"),
+                          {"m": MAX_FAILED, "l": LOCK_MINUTES, "i": u[0]["id"]})
+                s.commit()
         auth.audit({"email": email}, "POST", "/api/auth/login", 401, ip, "login_failed")
         raise HTTPException(401, "Wrong e-mail or password")
+    if u[0]["mfa_enabled"]:
+        secret = auth.crypto.decrypt(u[0]["mfa_secret_enc"]).get("s", "")
+        ok = bool(code) and mfa.verify(secret, code)
+        if not ok and code:                                           # a recovery code works once
+            h = mfa.hash_code(code)
+            if h in (u[0]["recovery_hashes"] or []):
+                with SessionLocal() as s:
+                    s.execute(text("UPDATE users SET recovery_hashes = array_remove(recovery_hashes, :h) WHERE id = :i"), {"h": h, "i": u[0]["id"]})
+                    s.commit()
+                ok = True
+        if not ok:
+            auth.audit({"email": email}, "POST", "/api/auth/login", 401, ip, "mfa_failed" if code else "mfa_required")
+            raise HTTPException(401, "Enter the 6-digit code from your authenticator app" if not code else "That code is not valid")
     with SessionLocal() as s:
-        s.execute(text("UPDATE users SET last_login_at = now() WHERE id = :i"), {"i": u[0]["id"]})
+        s.execute(text("UPDATE users SET last_login_at = now(), failed_logins = 0, locked_until = NULL WHERE id = :i"), {"i": u[0]["id"]})
         s.commit()
     auth.audit(u[0], "POST", "/api/auth/login", 200, ip, "login")
     return {"token": auth.make_session(u[0]["email"], u[0]["role"]), "user": {"email": u[0]["email"], "name": u[0]["name"], "role": u[0]["role"]}}
@@ -51,7 +91,7 @@ def _login(email: str, pw: str, ip: str | None) -> dict:
 
 @router.post("/auth/login")
 def login(b: LoginIn, request: Request):
-    return _login(b.email, b.password, request.client.host if request.client else None)
+    return _login(b.email, b.password, request.client.host if request.client else None, b.code)
 
 
 class UserIn(BaseModel):
@@ -65,8 +105,10 @@ class UserIn(BaseModel):
 def _check(u: UserIn, creating: bool) -> None:
     if u.role not in ROLES or "@" not in u.email:
         raise HTTPException(422, "a valid e-mail and a role of viewer, reviewer or admin are required")
-    if (creating and not u.password) or (u.password and len(u.password) < 8):
-        raise HTTPException(422, "password of at least 8 characters required")
+    if creating and not u.password:
+        raise HTTPException(422, "a password is required")
+    if u.password and (msg := password_problem(u.password, u.email)):
+        raise HTTPException(422, msg)
 
 
 @router.post("/auth/bootstrap")
@@ -170,3 +212,62 @@ def audit_log(limit: int = 200, user: str | None = None, event: str | None = Non
         w.append("event = :e")
         p["e"] = event
     return rows(f"SELECT id, ts, user_email, role, method, path, status, ip, event, detail FROM audit_log {'WHERE ' + ' AND '.join(w) if w else ''} ORDER BY id DESC LIMIT :l", **p)
+
+
+# ------------------------------------------------------------------ MFA (each person manages their own)
+class CodeIn(BaseModel):
+    code: str
+
+
+@router.post("/auth/mfa/setup")
+def mfa_setup(request: Request):
+    from app import mfa
+
+    u = me(request)
+    if u.get("source") == "open":
+        raise HTTPException(409, "sign-in is switched off")
+    secret = mfa.new_secret()
+    with SessionLocal() as s:
+        s.execute(text("UPDATE users SET mfa_secret_enc = :s, mfa_enabled = false WHERE email = :e"), {"s": auth.crypto.encrypt({"s": secret}), "e": u["email"]})
+        s.commit()
+    return {"secret": secret, "otpauth_uri": mfa.uri(secret, u["email"]), "note": "Add it to an authenticator app, then confirm with a code to switch MFA on."}
+
+
+@router.post("/auth/mfa/enable")
+def mfa_enable(b: CodeIn, request: Request):
+    from app import mfa
+
+    u = me(request)
+    r = rows("SELECT mfa_secret_enc FROM users WHERE email = :e", e=u["email"])
+    if not r or not r[0]["mfa_secret_enc"] or not mfa.verify(auth.crypto.decrypt(r[0]["mfa_secret_enc"]).get("s", ""), b.code):
+        raise HTTPException(422, "that code is not valid: check the app's clock and try the current code")
+    codes = mfa.new_recovery_codes()
+    with SessionLocal() as s:
+        s.execute(text("UPDATE users SET mfa_enabled = true, recovery_hashes = :h WHERE email = :e"), {"h": [mfa.hash_code(c) for c in codes], "e": u["email"]})
+        s.commit()
+    auth.audit(u, "POST", "/api/auth/mfa/enable", 200, None, "mfa_enabled")
+    return {"enabled": True, "recovery_codes": codes, "note": "Store these recovery codes now: each works once and they are not shown again."}
+
+
+@router.post("/auth/mfa/disable")
+def mfa_disable(b: CodeIn, request: Request):
+    from app import mfa
+
+    u = me(request)
+    r = rows("SELECT mfa_secret_enc, mfa_enabled FROM users WHERE email = :e", e=u["email"])
+    if not r or not r[0]["mfa_enabled"] or not mfa.verify(auth.crypto.decrypt(r[0]["mfa_secret_enc"]).get("s", ""), b.code):
+        raise HTTPException(422, "a current code is needed to switch MFA off")
+    with SessionLocal() as s:
+        s.execute(text("UPDATE users SET mfa_enabled = false, mfa_secret_enc = NULL, recovery_hashes = '{}' WHERE email = :e"), {"e": u["email"]})
+        s.commit()
+    auth.audit(u, "POST", "/api/auth/mfa/disable", 200, None, "mfa_disabled")
+    return {"enabled": False}
+
+
+@router.post("/users/{uid}/unlock")
+def unlock(uid: int):
+    """Administrator: clear a lockout and, if a person lost their device, switch their MFA off so they can enrol again."""
+    with SessionLocal() as s:
+        s.execute(text("UPDATE users SET failed_logins = 0, locked_until = NULL, mfa_enabled = false, mfa_secret_enc = NULL, recovery_hashes = '{}' WHERE id = :i"), {"i": uid})
+        s.commit()
+    return {"ok": True}

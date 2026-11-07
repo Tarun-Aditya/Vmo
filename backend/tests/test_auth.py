@@ -47,7 +47,7 @@ def test_open_by_default(client, seeded):
 
 def test_everything_needs_a_login_and_first_admin_bootstrap(secured):
     c = secured
-    assert c.get("/health").status_code == 200 and c.get("/api/auth/config").json() == {"auth_required": True, "needs_bootstrap": True, "oidc": False, "roles": ["viewer", "reviewer", "admin"]}
+    assert c.get("/health").status_code == 200 and c.get("/api/auth/config").json() == {"auth_required": True, "min_password": 10, "needs_bootstrap": True, "oidc": False, "roles": ["viewer", "reviewer", "admin"]}
     assert c.get("/api/contracts").status_code == 401
     assert c.post("/api/auth/bootstrap", json={"email": "root@arcadia.test", "password": "short"}).status_code == 422
     r = c.post("/api/auth/bootstrap", json={"email": "root@arcadia.test", "password": "correct-horse"})

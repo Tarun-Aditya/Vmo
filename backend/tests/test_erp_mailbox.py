@@ -13,17 +13,25 @@ from app.db import SessionLocal
 
 @pytest.fixture()
 def con(client, seeded):
-    made = []
+    made, names = [], []
 
     def make(body):
         r = client.post("/api/connectors", json=body)
         assert r.status_code == 200, r.text
         made.append(r.json()["id"])
+        names.append(body["name"])
         return r.json()
 
     yield make
+    import shutil
+
+    from app import feeds
+    from app.connectors.service import slug
+
     for i in made:
         client.delete(f"/api/connectors/{i}")
+    for n in names:                                                         # files a connector wrote are not part of the shared test data
+        shutil.rmtree(feeds.feeds_dir() / slug(n), ignore_errors=True)
     with SessionLocal() as s:
         s.execute(text("DELETE FROM invoices WHERE external_id LIKE 'coupa:%' OR external_id LIKE 'sap:%'"))
         s.commit()

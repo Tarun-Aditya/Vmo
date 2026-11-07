@@ -57,6 +57,9 @@ async def scheduler_loop() -> None:
             from app import alerts
 
             await asyncio.to_thread(alerts.evaluate)
+            from app import retention
+
+            await asyncio.to_thread(retention.purge)
             for k in due_keys():
                 with SessionLocal() as s:
                     mode = s.execute(text("SELECT trigger_mode FROM pipeline_config WHERE key=:k"), {"k": k}).scalar()

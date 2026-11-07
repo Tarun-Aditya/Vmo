@@ -65,6 +65,7 @@ function Users() {
                 <div className="text-xs text-slate-500">{u.last_login_at ? `last sign-in ${ago(u.last_login_at)}` : "never signed in"}</div></div>
               <select className={`${inputCls} w-32`} aria-label={`${u.email} role`} value={u.role} onChange={(e) => upd.mutate({ ...u, role: e.target.value as User["role"] })}>{["viewer", "reviewer", "admin"].map((r) => <option key={r}>{r}</option>)}</select>
               <button className="text-xs text-indigo-600 hover:underline dark:text-indigo-400" onClick={() => setOpen(open === u.id ? null : u.id)}>API tokens ({u.tokens})</button>
+              <button className="text-xs text-slate-600 hover:underline dark:text-slate-300" title="Clear a lockout and switch off their two-factor" onClick={() => window.confirm(`Unlock ${u.email} and reset their two-factor?`) && api(`/api/users/${u.id}/unlock`, { method: "POST" }).then(refresh)}>Unlock / reset MFA</button>
               <button className="text-xs text-red-600 hover:underline" onClick={() => window.confirm(`Delete ${u.email}?`) && del.mutate(u.id)}>Delete</button>
             </div>
             {open === u.id && <Tokens u={u} />}
