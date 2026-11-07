@@ -146,6 +146,25 @@ def structure_text(text: str) -> str:
     return "\n".join(out)
 
 
+INLINE_BOLD = re.compile(r"^(\d{1,2})\.\s+\*\*([^*]{3,80}?)\.?\*\*\.?\s*(.*)$")
+INLINE_PLAIN = re.compile(r"^(\d{1,2})\.\s+([A-Z][A-Za-z ,&/'\-]{2,60}?)\.\s+([A-Z].{30,})$")
+
+
+def split_inline_headings(text: str) -> str:
+    """Short-form agreements put the heading inside the paragraph ('13. **Termination for Convenience.** Customer may...' or
+    '3. Fees. The Customer shall...'): make each of them a '## 13. Termination for Convenience' clause."""
+    out = []
+    for ln in text.split("\n"):
+        m = INLINE_BOLD.match(ln) or INLINE_PLAIN.match(ln)
+        if m and len(m.group(2).split()) <= 8:
+            out.append(f"## {m.group(1)}. {m.group(2).strip()}")
+            if m.group(3).strip():
+                out.append(m.group(3).strip())
+        else:
+            out.append(ln)
+    return "\n".join(out)
+
+
 def load_document(path: Path) -> str:
     """The text of a file as internal Markdown. Raises ValueError with a clear message when it cannot be read."""
     ext = path.suffix.lower()
@@ -161,6 +180,7 @@ def load_document(path: Path) -> str:
         raise ValueError(f"unsupported file type {ext}")
     text = re.sub(r"\\\n", "\n", text)                      # pandoc hard line breaks
     text = re.sub(r"^\s*\\([\[\]*_])", r"\1", text, flags=re.M)
+    text = split_inline_headings(text)
     has_title = bool(re.search(r"^# \S", text, re.M))
     has_clauses = bool(re.search(r"^##\s+\S", text, re.M))
     if not (has_title and has_clauses):          # already structured (Markdown, Word heading styles): leave alone

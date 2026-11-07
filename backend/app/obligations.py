@@ -10,6 +10,7 @@ from datetime import date, timedelta
 from sqlalchemy import text
 
 from app import llm
+from app import textutil as tu
 
 MONTHS = "january february march april may june july august september october november december".split()
 
@@ -59,6 +60,25 @@ def rule_obligations(c: dict, clauses: list[dict], vals: list[dict], today: date
             if d:
                 out.append(dict(key=f"milestone:{n}", kind="milestone", party="Supplier", title=f"Milestone {n}: {desc.strip().rstrip('.')}", due_date=d,
                                 frequency="once", target_value=None, target_unit=None, metric_key=None, page=cl.get("page"), clause_type=cl.get("clause_type"), detail=None))
+    seen_dates = {o["due_date"] for o in out if o["kind"] == "milestone"}
+    for cl in clauses:                       # any other dated milestone / deliverable (tables, schedules, 'due 12 March 2026'...)
+        head = (cl.get("heading") or "").lower()
+        body = tu.normalize(cl["text"])
+        if not (re.search(r"milestone|deliverable|schedule|timeline|project plan|go-live|acceptance", head) or re.search(r"milestone", body, re.I)):
+            continue
+        if re.search(r"^(?:term|renewal|governing law|execution|signatures?)$", head.strip()):
+            continue
+        for pos, d0 in tu.find_dates(body):
+            if d0 in seen_dates:
+                continue
+            ctx = body[max(0, pos - 110):pos]
+            if re.search(r"effective date|dated|expires?|until|initial term|commenc|signed|executed|terminat", ctx[-60:], re.I):
+                continue
+            title = re.sub(r"\s+", " ", re.sub(r"[|_*`]+|\b(?:due|by|on|date|no\.?|milestone|key deliverables?)\b[:]?", " ", ctx[-90:], flags=re.I)).strip(" .,;:-–")
+            title = re.sub(r"^\d+\s+", "", title)[-80:].strip()
+            seen_dates.add(d0)
+            out.append(dict(key=f"milestone:{d0.isoformat()}", kind="milestone", party="Supplier", title=("Milestone: " + title) if title else "Milestone", due_date=d0, frequency="once",
+                            target_value=None, target_unit=None, metric_key=None, page=cl.get("page"), clause_type=cl.get("clause_type"), detail=None))
     exp, notice = c.get("expiry_date"), c.get("notice_period_days")
     if c.get("auto_renew") and exp and notice:
         out.append(dict(key="renewal:notice", kind="renewal", party="Customer", title=f"Give non-renewal notice ({notice} days) or the contract renews automatically",

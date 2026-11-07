@@ -10,9 +10,9 @@ from sqlalchemy import text
 from app import textutil as tu
 from app.extract_rules import customer_markers
 
-SUFFIX = r"(?:Inc\.?|LLC|L\.L\.C\.|LLP|Ltd\.?|Limited|Corp\.?|Corporation|Pte\.? Ltd\.?|GmbH|PLC|plc|LP|Co\.|Company|AG|S\.A\.|B\.V\.|Pty Ltd)"
+SUFFIX = r"(?i:Inc\.?|LLC|L\.L\.C\.|LLP|Ltd\.?|Limited|Corp\.?|Corporation|Pte\.? Ltd\.?|GmbH|PLC|LP|Co\.|Company|AG|S\.A\.|B\.V\.|Pty Ltd)(?![A-Za-z])"
 COMPANY = re.compile(rf"([A-Z][\w&'\-]*(?:\s+(?:&\s+)?[A-Z][\w&'\-]*){{0,5}}?(?:\s+{SUFFIX}))")
-TYPE_RULES = [(r"amendment", "Amendment"), (r"data processing", "DPA"), (r"non-?disclosure|confidentiality agreement|\bnda\b", "NDA"), (r"work order", "Work Order"),
+TYPE_RULES = [(r"amendment", "Amendment"), (r"data (?:processing|protection) (?:agreement|addendum)|data processing", "DPA"), (r"non-?disclosure|confidentiality agreement|\bnda\b", "NDA"), (r"work order", "Work Order"),
               (r"statement of work|\bsow\b", "SOW"), (r"subscription|software as a service|\bsaas\b|order form|license and support|licence and support|master subscription", "SaaS"),
               (r"master services|master agreement|\bmsa\b|services agreement|framework agreement", "MSA")]
 GENERIC_TITLE = re.compile(r"^(?:(?:mutual |draft )?(?:master (?:services|subscription) agreement|statement of work(?: no\.? ?\d+)?|work order(?: no\.? ?\d+)?|(?:mutual )?non-?disclosure agreement|data processing (?:agreement|addendum)|"
@@ -24,7 +24,11 @@ def vendor_short(v: str) -> str:
 
 
 def clean_vendor(v: str) -> str:
-    return re.sub(r"\s+", " ", v).strip(" ,.;")
+    v = re.sub(r"\s+", " ", v).strip(" ,.;")
+    v = re.sub(r"^(?:Supplier|Vendor|Provider|Contractor|Client|Customer|Party|Between|And|The)\s+", "", v)
+    if v.isupper():                              # 'TATVA INFOSYSTEMS LTD' -> 'Tatva Infosystems Ltd'
+        v = " ".join(w if w in ("LLC", "LLP", "PLC", "LP", "AG", "GmbH") else w.capitalize() for w in v.split())
+    return v
 
 
 def find_vendor(md: str, header: dict, sidecar: dict) -> str | None:
@@ -64,15 +68,16 @@ def find_type(title: str, md: str) -> str:
     return "MSA"
 
 
+PARENT_TABLE_RX = re.compile(r"Parent (?:Agreement|Contract)\W{1,6}(?P<what>Master Services Agreement|Master Subscription Agreement|Master Agreement|Software[- ]as[- ]a[- ]Service Agreement|SaaS Agreement|Subscription Agreement|Services Agreement|Statement of Work(?:\s+(?:No\.?\s*)?\d+)?|SOW(?:\s+(?:No\.?\s*)?\d+)?)[^.]{0,40}?(?:dated|effective)(?:\s+as of)?\s+(?P<date>[A-Za-z0-9,/ .\-]{6,30})", re.I)
 PARENT_RX = re.compile(r"(?:under|pursuant to|issued under|governed by|subject to|forms? part of|supplements?|amends?|amending|in connection with|to the|of the)\s+(?:the\s+)?(?:that certain\s+)?"
-                       r"(?P<what>Master Services Agreement|Master Subscription Agreement|Master Agreement|Subscription Agreement|Services Agreement|MSA|Statement of Work(?:\s+(?:No\.?\s*)?\d+)?|SOW(?:\s+(?:No\.?\s*)?\d+)?|Work Order(?:\s+(?:No\.?\s*)?\d+)?)"
+                       r"(?P<what>Master Services Agreement|Master Subscription Agreement|Master Agreement|Software[- ]as[- ]a[- ]Service Agreement|SaaS Agreement|Subscription Agreement|Services Agreement|MSA|Statement of Work(?:\s+(?:No\.?\s*)?\d+)?|SOW(?:\s+(?:No\.?\s*)?\d+)?|Work Order(?:\s+(?:No\.?\s*)?\d+)?)"
                        r"[^.]{0,80}?(?:dated|effective)(?:\s+as of)?\s+(?P<date>[A-Za-z0-9,/ .\-]{6,30})", re.I)
-TYPE_OF = [(r"statement of work|^sow", "SOW"), (r"work order", "Work Order"), (r"subscription|saas", "SaaS"), (r"master|services agreement|^msa", "MSA")]
+TYPE_OF = [(r"statement of work|^sow", "SOW"), (r"work order", "Work Order"), (r"subscription|saas|software[- ]as", "SaaS"), (r"master|services agreement|^msa", "MSA")]
 
 
 def parent_ref(md: str, doc_type: str) -> dict | None:
     head = re.sub(r"\s+", " ", re.sub(r"[*_`|]", " ", re.sub(r"<!--.*?-->", " ", md)))[:3500]
-    for m in PARENT_RX.finditer(head):
+    for m in list(PARENT_TABLE_RX.finditer(head)) + list(PARENT_RX.finditer(head)):
         what = m.group("what")
         ty = next((t for rx, t in TYPE_OF if re.search(rx, what, re.I)), None)
         if not ty or ty == doc_type and doc_type not in ("Amendment",):

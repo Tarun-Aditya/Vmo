@@ -118,9 +118,9 @@ def default_metrics() -> list[dict]:
         _m("tfc_notice_days", "Termination for convenience notice", "termination_for_convenience", r"(\d+) days['’]? (?:prior )?(?:written )?notice", "number", "days", "Notice the Customer must give to terminate for convenience"),
         _m("renewal_notice_days", "Non-renewal notice period", "renewal", r"(?:at least|not less than|no later than)\s+(\d+)\s+days", "number", "days", "Notice needed to stop an auto-renewal"),
         _m("insurance_cover_usd", "Insurance cover per claim", "insurance", r"USD\s*([\d,]{5,})", "money", "USD", "Minimum professional indemnity cover per claim"),
-        _m("warranty_days", "Warranty period", "warranties", r"(\d+)\s*days?\s+(?:after|from|following)\s+(?:acceptance|delivery|completion|go-live)|warranty period of (\d+) days", "number", "days", "Free-of-charge correction period after acceptance"),
+        _m("warranty_days", "Warranty period", "warranties", r"(\d+)\s*days?\s+(?:after|from|following)\s+(?:the\s+(?:date|day)\s+)?(?:of\s+)?(?:acceptance|delivery|completion|go-live|performance|[^.]{0,50}(?:delivered|accepted|performed))|warranty period of (\d+) days|(?:for a period of|period of)\s+(\d+)\s*days[^.]{0,40}(?:performance|delivery|acceptance)", "number", "days", "Free-of-charge correction period after acceptance"),
         _m("confidentiality_years", "Confidentiality survival", "confidentiality", r"(?:for|period of|survive[sd]? for|continue[sd]? for)\s+(?:a period of\s+)?(\d+)\s+years?", "number", "years", "Years confidentiality survives the agreement"),
-        _m("sla_availability_pct", "Service availability", "sla", r"([\d.]+)\s*%\s*(?:availability|uptime|monthly)|availability[^.]{0,60}?([\d.]+)\s*%", "number", "%", "Monthly availability commitment"),
+        _m("sla_availability_pct", "Service availability", "sla", r"([\d.]+)\s*%\s*(?:availability|uptime|monthly|of (?:each|every|the) (?:calendar )?(?:month|time))|(?:availability|uptime|available)[^.]{0,80}?([\d.]+)\s*%", "number", "%", "Monthly availability commitment"),
         _m("incident_notice_hours", "Security incident notice", "security", r"within (\d+) (hours|days)", "number", "hours", "Time to notify a security incident"),
         _m("breach_notice_hours", "Personal data breach notice", "breach_notification", r"within (\d+) (hours|days)", "number", "hours", "Time to notify a personal data breach"),
         _m("cure_period_days", "Cure period for breach", "termination_for_cause", r"within (\d+) days", "number", "days", "Days to remedy a material breach"),
@@ -302,6 +302,12 @@ def extract_metrics(clauses: list[dict], metrics: list[dict], kcc_cfg: list[dict
     for c in clauses:
         by_type.setdefault(c["clause_type"], []).append(c)
     kw = {k["key"]: [w for w in (k.get("keywords") or []) if w and _safe_re(w)] for k in (kcc_cfg or [])}
+    names = {k["key"]: k["name"] for k in (kcc_cfg or [])}
+    for m in metrics:       # the words of the metric's own and its clause's name (stems) also mark a sentence as relevant: 'availability' ~ 'available'
+        stems = {w[:6] for w in re.findall(r"[a-z]{5,}", f"{m['name']} {names.get(m['kcc_key'], '')}".lower())}
+        if m["kcc_key"] and stems:
+            kw.setdefault(m["kcc_key"], [])
+            kw[m["kcc_key"]] = list(dict.fromkeys(kw[m["kcc_key"]] + [rf"\b{x}\w*" for x in stems]))
     out = []
     for m in metrics:
         if not _safe_re(m["pattern"]):

@@ -32,7 +32,7 @@ def _add_months(d: date, n: int) -> date:
 class Doc:
     def __init__(self, md: str, header: dict, clauses: list[dict], doc_type: str):
         self.md, self.header, self.clauses, self.type = md, header, clauses, doc_type
-        self.body = tu.normalize(re.sub(r"<!--.*?-->", " ", md))
+        self.body = tu.normalize(re.sub(r"\*\*|__|`", "", re.sub(r"<!--.*?-->", " ", md)))
         self.flat = re.sub(r"\s+", " ", self.body)
         self.by = {}
         for c in clauses:
@@ -71,7 +71,10 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     # ---- effective date
     head = _first_para(d)
     eff = None
-    for rx in (r"(?:effective (?:as of|on|date)|entered into (?:as of|on)|made (?:as of|on|and entered into on)|is dated|dated as of|as of|commenc\w+ on|starts? on)[:\s|*]*([^.;]{0,40})",
+    dm = re.search(r"([A-Za-z0-9,/ .\-]{6,30}?)\s*\(\s*(?:the\s+|this\s+)?[\"“”']?(?:Effective Date|Commencement Date|Start Date)[\"“”']?\s*\)", head, re.I)
+    if dm:
+        eff = tu.first_date(dm.group(1))
+    for rx in () if eff else (r"(?:effective (?:as of|on|date)|entered into (?:as of|on)|made (?:as of|on|and entered into on)|is dated|dated as of|as of|commenc\w+ on|starts? on)[:\s|*]*([^.;]{0,40})",
                r"Effective Date[\s|:*]+([^\n|]{4,40})", r"Period[\s|:*]+([^\n|]{4,40}?)(?:\s+(?:to|through|until|–|-)\s+)"):
         for m in re.finditer(rx, head, re.I):
             eff = tu.first_date(m.group(1))
@@ -85,11 +88,11 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
 
     # ---- expiry
     expiry, ec = None, "term"
-    m, ec = d.search(r"(?:now expires? on|extended to|until|expires? on|expiring on|ends? on|end date[:\s|]*|continues? (?:in (?:full )?(?:force|effect) )?until|through|terminat\w+ on)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", ("term",))
+    m, ec = d.search(r"(?:now expires? on|extended to|until|expires? on|expiring on|ends? on|ending on|end date[:\s|]*|continues? (?:in (?:full )?(?:force|effect) )?until|through|terminat\w+ on)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", ("term",))
     if m:
         expiry = tu.first_date(m.group(1))
     if not expiry:
-        m, ec = d.search(r"(?:initial term|term of|period of|for a term of|for an initial period of|for)\s+(?:this agreement\s+)?(?:is\s+)?(\d+(?:\.\d+)?)\s+(months?|years?)", ("term",))
+        m, ec = d.search(r"(?:initial term|term of|initial period of|period of|for a term of|for an initial (?:term|period) of)\s+(?:this agreement\s+)?(?:is\s+)?(?:of\s+)?(\d+(?:\.\d+)?)\s+(months?|years?)", ("term",))
         if m and eff:
             n = float(m.group(1)) * (12 if m.group(2).lower().startswith("y") else 1)
             expiry = _add_months(eff, int(round(n)))
@@ -162,7 +165,8 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
         lc = "liability_cap" if "liability_cap" in d.by else None
         if ltxt:
             low = ltxt.lower()
-            if re.search(r"unlimited|no (?:limit|cap)|not be (?:subject to any )?(?:limit|cap)|uncapped|without (?:any )?limit", low) and not re.search(r"nothing in this agreement (?:shall|will) (?:limit|exclude)", low[:0]):
+            numeric = re.search(r"(\d+(?:\.\d+)?)\s*(?:x|times)\b|(\d+)\s*%\s*of|(?:fees|charges|amounts?)\s+(?:paid|payable|paid or payable)[^.]{0,80}(?:12|twelve)\s+months|\bone[- ]half\b", low)
+            if not numeric and re.search(r"\bunlimited\b|\bno (?:limit|cap)\b|\bnot be (?:subject to any )?(?:limit|cap)|\buncapped\b|\bwithout (?:any )?limit", low):
                 put("liability_cap_multiple", None, 0.9, lc)
                 put("liability_cap_text", "Unlimited", 0.9, lc)
             else:
@@ -227,36 +231,66 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
 NAME = r"[A-Z][A-Za-z.'\-]+(?:\s+[A-Z][A-Za-z.'\-]+){1,3}"
 
 
+def _cells(line: str, labels: str) -> list[str]:
+    """Split a table-like line into per-column values: '| Name: A | Name: B |', 'Name   A   B', 'Name: A     Name: B'."""
+    raw = line.strip()
+    if "|" in raw:
+        parts = [c for c in raw.strip("|").split("|")]
+    else:
+        parts = re.split(r"\s{3,}", raw)
+    if len(parts) > 1 and re.fullmatch(rf"\W*(?:{labels})\W*", parts[0].strip(), re.I):
+        parts = parts[1:]                                   # a bare label cell ('Name | A | B') is not a column
+    out = []
+    for c in parts:
+        c = re.sub(rf"^\W*(?:{labels})\b\W*", "", c.strip(), flags=re.I).strip(" *_\\")
+        out.append(c)
+    return out
+
+
 def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
-    """(customer, supplier) -> (name, date | None) or None. Handles 'Signed ... by X, Title, on DATE' sentences, By/Name/Title/Date blocks and tables."""
+    """(customer, supplier) -> (name, date | None) or None. Handles 'Signed ... by X, Title, on DATE' sentences, By/Name/Title/Date blocks,
+    two-column signature tables (Markdown, Word, PDF layout) and unsigned blocks (blank Name)."""
     cm = customer_markers()
-    tail = d.md[-6000:]
+    tail = d.md[-7000:]
     res: dict[str, tuple] = {}
-    # sentence form
     for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^,\n]{{2,70}}?),?\s*(?i:on|dated)\s+(?P<date>[A-Za-z0-9,/ \-]{{6,24}})", tail):
         role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
         res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
-    # blocks: lines with Name:
-    lines = [re.sub(r"[|*_`]", " ", ln).strip() for ln in tail.splitlines()]
+    lines = [re.sub(r"[*_`]", "", ln).rstrip() for ln in tail.splitlines()]
+    is_name = re.compile(r"^\W*(?:Printed\s+)?Name\b", re.I)
     for i, ln in enumerate(lines):
-        mm = re.match(rf"^(?:Printed )?Name\s*[:\-]?\s*(?P<name>{NAME})\s*$", ln)
-        if not mm:
+        if not is_name.match(ln.strip()):
             continue
-        window = lines[max(0, i - 9):i + 6]
-        date_ = None
-        for w in lines[i:i + 6]:
-            dm = re.match(r"^Date(?: signed)?\s*[:\-]?\s*(.+)$", w)
-            if dm:
-                date_ = tu.first_date(dm.group(1))
+        names = _cells(ln, r"Printed\s+Name|Name")
+        names = [n if re.fullmatch(NAME, n or "") else "" for n in names]
+        if not any(names) and len(names) <= 1:
+            continue
+        dates: list[date | None] = [None] * len(names)
+        for w in lines[i + 1:i + 7]:
+            if re.match(r"^\W*Date\b", w.strip(), re.I):
+                cells = _cells(w, r"Date(?: signed)?")
+                dates = [tu.first_date(c) for c in cells][:len(names)] + [None] * (len(names) - len(cells))
                 break
-        ctx = " ".join(lines[max(0, i - 9):i]).lower()
-        role = "customer" if any(k in ctx[-300:] for k in cm + ["customer", "client"]) and not any(k in ctx[-120:] for k in ("supplier", "vendor")) else "supplier"
-        if ctx.rfind(cm[0]) > ctx.rfind("supplier"):
-            role = "customer"
-        res.setdefault(role, (mm.group("name").strip(), date_))
-        _ = window
-    # form: 'Signed: Name  Date: ...' inside a table row
-    for m in re.finditer(rf"(?P<party>Customer|Client|Supplier|Vendor|Arcadia[^|\n]*)\s*\|\s*(?P<name>{NAME})\s*\|[^|\n]*\|\s*(?P<date>[A-Za-z0-9,/ .\-]{{6,30}})", tail):
-        role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
-        res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
+        hdr_lines: list[str] = []
+        for w in reversed(lines[max(0, i - 10):i]):          # the header of this signature block only (stop at the previous heading / long paragraph)
+            if w.lstrip().startswith("#") or len(w) > 170:
+                break
+            hdr_lines.insert(0, w)
+        before = " ".join(hdr_lines).lower()
+        cpos = min([before.find(k) for k in cm + ["customer", "client"] if before.find(k) >= 0] or [10**9])
+        header = " ".join(hdr_lines)
+        others = [m.start() for m in COMPANY_RX.finditer(header) if not any(k in m.group(0).lower() for k in cm)]
+        spos = min([p for p in [before.find("supplier"), before.find("vendor"), before.find("provider")] + [o for o in others] if p >= 0] or [10**9])
+        if cpos == 10**9 and spos == 10**9:
+            order = ["customer", "supplier"]
+        else:
+            order = ["customer", "supplier"] if cpos <= spos else ["supplier", "customer"]
+        if len(names) == 1:
+            order = ["customer" if cpos < spos else "supplier"]
+        for role, nm, dt_ in zip(order, names, dates):
+            if nm:
+                res.setdefault(role, (nm.strip(), dt_))
     return res.get("customer"), res.get("supplier")
+
+
+COMPANY_RX = re.compile(r"[A-Z][\w&'\-]*(?:\s+(?:&\s+)?[A-Z][\w&'\-]*){0,5}?\s+(?:Inc\.?|LLC|LLP|Ltd\.?|Limited|Corp\.?|Corporation|Pte Ltd|GmbH|PLC|LP|Group|Co\.)")

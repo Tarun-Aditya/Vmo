@@ -1,20 +1,12 @@
 contract_title,key,status,completed_on,note
-SOW 1 – Application Managed Services – Accentia Technology Services,milestone:1,done,2026-02-19,Accepted by the business
-SOW 1 – Application Managed Services – Accentia Technology Services,milestone:2,done,2026-04-30,Accepted by the business
-SOW 2 – AWS Cloud Migration and Platform Engineering – Accentia Technology Services,milestone:1,done,2026-08-10,Accepted by the business
-SOW 3 – Service Desk Staff Augmentation – Accentia Technology Services,milestone:1,done,2025-12-14,Accepted by the business
-SOW 3 – Service Desk Staff Augmentation – Accentia Technology Services,milestone:2,done,2026-02-27,Accepted by the business
-SOW 3 – Service Desk Staff Augmentation – Accentia Technology Services,milestone:3,done,2026-06-05,Accepted by the business
-Work Order 1 – Data Center Exit Wave 2 – Accentia Technology Services,milestone:1,done,2026-09-22,Accepted by the business
-Work Order 2 – Endpoint Security Hardening – Accentia Technology Services,milestone:1,done,2026-10-31,Accepted by the business
-"SOW 1 – SAP S/4HANA Transformation, Phase 1 – Delmont Consulting",milestone:1,done,2026-01-24,Accepted by the business
-"SOW 1 – SAP S/4HANA Transformation, Phase 1 – Delmont Consulting",milestone:2,done,2026-04-08,Accepted by the business
-"SOW 1 – SAP S/4HANA Transformation, Phase 1 – Delmont Consulting",milestone:3,done,2026-07-09,Accepted by the business
-SOW 2 – Cybersecurity Posture Assessment and Roadmap – Delmont Consulting,milestone:1,done,2026-10-27,Accepted by the business
-Work Order 1 – Incident Response Retainer – Delmont Consulting,milestone:1,done,2026-10-30,Accepted by the business
-SOW 1 – Application Development and Maintenance (Offshore) – Taraka Consultancy Services,milestone:1,done,2026-03-26,Accepted by the business
-SOW 1 – Application Development and Maintenance (Offshore) – Taraka Consultancy Services,milestone:2,done,2026-06-14,Accepted by the business
-SOW 1 – Application Development and Maintenance (Offshore) – Taraka Consultancy Services,milestone:3,done,2026-09-06,Accepted by the business
-SOW 2 – QA and Test Automation Centre of Excellence – Taraka Consultancy Services,milestone:1,done,2026-07-21,Accepted by the business
-SOW 2 – QA and Test Automation Centre of Excellence – Taraka Consultancy Services,milestone:2,done,2026-10-06,Accepted by the business
-Work Order 1 – Mainframe Modernization Assessment – Taraka Consultancy Services,milestone:1,done,2026-10-06,Accepted by the business
+Statement of Work No. 1 – Helix Digital Consulting,milestone:2025-11-22,done,2025-11-26,Accepted by the business
+Statement of Work No. 1 – Helix Digital Consulting,milestone:2026-03-02,done,2026-02-27,Accepted by the business
+Statement of Work No. 1 -- Data Platform and Analytics Services,milestone:2026-05-21,done,2026-05-25,Accepted by the business
+Statement of Work No. 1,milestone:2026-08-19,done,2026-08-23,Accepted by the business
+Statement of Work No. 1,milestone:2026-10-28,done,2026-10-24,Accepted by the business
+Statement of Work No. 1 -- Cybersecurity Assessment and Remediation Services,milestone:2026-08-09,done,2026-08-09,Accepted by the business
+Statement of Work No. 1 -- Cybersecurity Assessment and Remediation Services,milestone:2026-10-18,done,2026-10-23,Accepted by the business
+Statement of Work No. 1,milestone:2026-03-12,done,2026-03-09,Accepted by the business
+Statement of Work No. 1,milestone:2026-04-21,done,2026-04-24,Accepted by the business
+Statement of Work No. 1 – QA Centre of Excellence and Test,milestone:2026-09-18,done,2026-09-14,Accepted by the business
+Statement of Work No. 1 – Vantage Telecom Services,milestone:2026-09-28,done,2026-09-27,Accepted by the business

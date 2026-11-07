@@ -313,13 +313,19 @@ def precompute_demo_answers(log=print) -> int:
             return q, answer(q["question"], demo_mode=False)
         except Exception as e:      # the LLM failed for this question: keep the demo safe with the offline answer
             log(f"  LLM failed for {q['question']!r} ({type(e).__name__}); using the offline engine")
-            return q, answer(q["question"], demo_mode=False, force_offline=True)
+            try:
+                return q, answer(q["question"], demo_mode=False, force_offline=True)
+            except Exception as e2:          # a scripted plan that does not fit this corpus (it names its documents): leave it uncached
+                log(f"  no cached answer for {q['question']!r} ({type(e2).__name__})")
+                return q, None
 
     from concurrent.futures import ThreadPoolExecutor
 
     with ThreadPoolExecutor(3 if llm.available() else 1) as ex:
         done = list(ex.map(one, qs))
     for q, res in done:
+        if res is None:
+            continue
         with SessionLocal() as s:
             s.execute(
                 text("INSERT INTO ask_cache VALUES (:k,:q,CAST(:r AS jsonb),:src,now())"),

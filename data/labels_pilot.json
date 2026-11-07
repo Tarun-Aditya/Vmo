@@ -1,0 +1,1418 @@
+{
+ "seed_date": "2026-11-07",
+ "contracts": {
+  "helix_msa": {
+   "effective_date": "2025-09-13",
+   "expiry_date": "2028-09-13",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "New York",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2025-09-03",
+   "supplier_signatory": "Richard Hale",
+   "supplier_signed_date": "2025-09-06",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45,
+    "insurance_cover_usd": 5000000,
+    "warranty_days": 90,
+    "confidentiality_years": 3,
+    "tfc_notice_days": 30
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "helix_msa",
+    "type": "MSA",
+    "vendor": "Helix Digital Consulting Inc",
+    "status": "active",
+    "parent": null,
+    "category": "IT Services",
+    "owner": "Jordan Blake"
+   }
+  },
+  "helix_sow1": {
+   "effective_date": "2025-10-23",
+   "expiry_date": "2027-04-23",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 6400000,
+   "total_value": 9600000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2025-10-13",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2025-10-16",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45
+   },
+   "milestones": [
+    {
+     "title": "Mobilisation and delivery plan accepted",
+     "date": "2025-11-22"
+    },
+    {
+     "title": "Design complete and signed off",
+     "date": "2026-03-02"
+    },
+    {
+     "title": "Wave 1 go-live",
+     "date": "2026-09-08"
+    },
+    {
+     "title": "Wave 2 go-live and handover",
+     "date": "2027-02-05"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "helix_sow1",
+    "type": "SOW",
+    "vendor": "Helix Digital Consulting Inc",
+    "status": "active",
+    "parent": "helix_msa",
+    "category": "IT Services",
+    "owner": "Jordan Blake"
+   }
+  },
+  "helix_sow2": {
+   "effective_date": "2026-04-21",
+   "expiry_date": "2028-04-21",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 3100000,
+   "total_value": 6200000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-04-11",
+   "supplier_signatory": "Daniel Okafor",
+   "supplier_signed_date": "2026-04-14",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45
+   },
+   "milestones": [
+    {
+     "title": "Data platform architecture approved",
+     "date": "2026-05-21"
+    },
+    {
+     "title": "Core pipelines in production",
+     "date": "2026-09-28"
+    },
+    {
+     "title": "Analytics handover and knowledge transfer",
+     "date": "2027-05-26"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "helix_sow2",
+    "type": "SOW",
+    "vendor": "Helix Digital Consulting Inc",
+    "status": "active",
+    "parent": "helix_msa",
+    "category": "IT Services",
+    "owner": "Priya Nair"
+   }
+  },
+  "helix_wo1": {
+   "effective_date": "2026-09-23",
+   "expiry_date": "2027-03-23",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": 420000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": "Richard Hale",
+   "supplier_signed_date": "2026-09-16",
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 45
+   },
+   "milestones": [
+    {
+     "title": "Interface specification delivered",
+     "date": "2026-11-27"
+    },
+    {
+     "title": "Cutover rehearsal complete",
+     "date": "2027-01-06"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "helix_wo1",
+    "type": "Work Order",
+    "vendor": "Helix Digital Consulting Inc",
+    "status": "active",
+    "parent": "helix_sow1",
+    "category": "IT Services",
+    "owner": "Priya Nair"
+   }
+  },
+  "helix_amd1": {
+   "effective_date": "2026-07-10",
+   "payment_terms_days": 60,
+   "expiry_date": "2029-09-13",
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-06-30",
+   "supplier_signatory": "Kenji Watanabe",
+   "supplier_signed_date": "2026-07-03",
+   "fully_executed": true,
+   "values": {},
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "helix_amd1",
+    "type": "Amendment",
+    "vendor": "Helix Digital Consulting Inc",
+    "status": "active",
+    "parent": "helix_msa",
+    "category": "IT Services",
+    "owner": "Jordan Blake"
+   }
+  },
+  "tatva_msa": {
+   "effective_date": "2026-01-11",
+   "expiry_date": "2029-01-11",
+   "notice_period_days": 90,
+   "auto_renew": true,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": 2.0,
+   "liability_cap_text": "2 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "England and Wales",
+   "processes_personal_data": true,
+   "has_dpa": true,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-01-01",
+   "supplier_signatory": "Richard Hale",
+   "supplier_signed_date": "2026-01-04",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "insurance_cover_usd": 2000000,
+    "warranty_days": 60,
+    "confidentiality_years": 5,
+    "renewal_notice_days": 90,
+    "tfc_notice_days": 60
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "tatva_msa",
+    "type": "MSA",
+    "vendor": "Tatva Infosystems Ltd",
+    "status": "active",
+    "parent": null,
+    "category": "IT Services",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "tatva_sow1": {
+   "effective_date": "2026-01-21",
+   "expiry_date": "2028-01-21",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 4200000,
+   "total_value": 8400000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "England and Wales",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-01-11",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-01-14",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "sla_availability_pct": 99.0
+   },
+   "milestones": [
+    {
+     "title": "Knowledge transition complete",
+     "date": "2026-03-12"
+    },
+    {
+     "title": "Steady-state operations begin",
+     "date": "2026-04-21"
+    },
+    {
+     "title": "First annual benchmarking review",
+     "date": "2027-01-21"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "tatva_sow1",
+    "type": "SOW",
+    "vendor": "Tatva Infosystems Ltd",
+    "status": "active",
+    "parent": "tatva_msa",
+    "category": "IT Services",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "tatva_wo1": {
+   "effective_date": "2026-09-08",
+   "expiry_date": "2027-02-08",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": 260000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "England and Wales",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-08-29",
+   "supplier_signatory": "Richard Hale",
+   "supplier_signed_date": "2026-09-01",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30
+   },
+   "milestones": [
+    {
+     "title": "Mainframe assessment report",
+     "date": "2026-12-12"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "tatva_wo1",
+    "type": "Work Order",
+    "vendor": "Tatva Infosystems Ltd",
+    "status": "active",
+    "parent": "tatva_sow1",
+    "category": "IT Services",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "meridian_msa": {
+   "effective_date": "2025-06-25",
+   "expiry_date": "2029-06-25",
+   "notice_period_days": 120,
+   "auto_renew": true,
+   "annual_value": 2400000,
+   "total_value": 9600000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "Delaware",
+   "processes_personal_data": true,
+   "has_dpa": true,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2025-06-15",
+   "supplier_signatory": "Sofia Marchetti",
+   "supplier_signed_date": "2025-06-18",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45,
+    "sla_availability_pct": 99.95,
+    "incident_notice_hours": 24,
+    "insurance_cover_usd": 5000000,
+    "warranty_days": 90,
+    "confidentiality_years": 3,
+    "renewal_notice_days": 120,
+    "tfc_notice_days": 90
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "meridian_msa",
+    "type": "MSA",
+    "vendor": "Meridian Cloud Services LLC",
+    "status": "active",
+    "parent": null,
+    "category": "Cloud",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "meridian_dpa": {
+   "effective_date": "2025-06-30",
+   "expiry_date": "2029-06-30",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "Delaware",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2025-06-20",
+   "supplier_signatory": "Sofia Marchetti",
+   "supplier_signed_date": "2025-06-23",
+   "fully_executed": true,
+   "values": {},
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "meridian_dpa",
+    "type": "DPA",
+    "vendor": "Meridian Cloud Services LLC",
+    "status": "active",
+    "parent": "meridian_msa",
+    "category": "Cloud",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "zenith_saas": {
+   "effective_date": "2026-06-10",
+   "expiry_date": "2027-06-10",
+   "notice_period_days": 60,
+   "auto_renew": true,
+   "annual_value": 360000,
+   "total_value": 360000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": false,
+   "governing_law": "California",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-05-31",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-06-03",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "sla_availability_pct": 99.9,
+    "incident_notice_hours": 48,
+    "insurance_cover_usd": 2000000,
+    "warranty_days": 30,
+    "confidentiality_years": 3,
+    "renewal_notice_days": 60
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "zenith_saas",
+    "type": "SaaS",
+    "vendor": "Zenith Software Ltd",
+    "status": "active",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Jordan Blake"
+   }
+  },
+  "bluepeak_saas": {
+   "effective_date": "2026-03-02",
+   "expiry_date": "2028-03-02",
+   "notice_period_days": 90,
+   "auto_renew": true,
+   "annual_value": 540000,
+   "total_value": 1080000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": 2.0,
+   "liability_cap_text": "2 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "New York",
+   "processes_personal_data": true,
+   "has_dpa": true,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-02-20",
+   "supplier_signatory": "Kenji Watanabe",
+   "supplier_signed_date": "2026-02-23",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45,
+    "sla_availability_pct": 99.5,
+    "incident_notice_hours": 72,
+    "insurance_cover_usd": 3000000,
+    "warranty_days": 60,
+    "confidentiality_years": 3,
+    "renewal_notice_days": 90,
+    "tfc_notice_days": 30
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "bluepeak_saas",
+    "type": "SaaS",
+    "vendor": "Bluepeak Analytics Inc",
+    "status": "active",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Priya Nair"
+   }
+  },
+  "bluepeak_dpa": {
+   "effective_date": "2026-03-07",
+   "expiry_date": "2028-03-07",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-02-25",
+   "supplier_signatory": "Sofia Marchetti",
+   "supplier_signed_date": "2026-02-28",
+   "fully_executed": true,
+   "values": {},
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "bluepeak_dpa",
+    "type": "DPA",
+    "vendor": "Bluepeak Analytics Inc",
+    "status": "active",
+    "parent": "bluepeak_saas",
+    "category": "SaaS",
+    "owner": "Priya Nair"
+   }
+  },
+  "kestrel_saas": {
+   "effective_date": "2025-12-07",
+   "expiry_date": "2026-12-07",
+   "notice_period_days": 45,
+   "auto_renew": true,
+   "annual_value": 210000,
+   "total_value": 210000,
+   "payment_terms_days": 60,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Unlimited",
+   "termination_for_convenience": false,
+   "governing_law": "Delaware",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2025-11-27",
+   "supplier_signatory": "Sofia Marchetti",
+   "supplier_signed_date": "2025-11-30",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 60,
+    "sla_availability_pct": 99.0,
+    "incident_notice_hours": 96,
+    "warranty_days": 30,
+    "confidentiality_years": 2,
+    "renewal_notice_days": 45
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "kestrel_saas",
+    "type": "SaaS",
+    "vendor": "Kestrel Marketing Cloud Inc",
+    "status": "active",
+    "parent": null,
+    "category": "Marketing",
+    "owner": "Lena Fischer"
+   }
+  },
+  "coreledger_saas": {
+   "effective_date": "2026-07-30",
+   "expiry_date": "2029-07-30",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 780000,
+   "total_value": 2340000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "Singapore",
+   "processes_personal_data": true,
+   "has_dpa": true,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-07-20",
+   "supplier_signatory": "Grace Mbeki",
+   "supplier_signed_date": "2026-07-23",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "sla_availability_pct": 99.9,
+    "incident_notice_hours": 24,
+    "insurance_cover_usd": 5000000,
+    "warranty_days": 90,
+    "confidentiality_years": 5,
+    "tfc_notice_days": 60
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "coreledger_saas",
+    "type": "SaaS",
+    "vendor": "CoreLedger Payments Pte Ltd",
+    "status": "active",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Lena Fischer"
+   }
+  },
+  "coreledger_dpa": {
+   "effective_date": "2026-08-04",
+   "expiry_date": "2029-08-04",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "Singapore",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-07-25",
+   "supplier_signatory": "Kenji Watanabe",
+   "supplier_signed_date": "2026-07-28",
+   "fully_executed": true,
+   "values": {},
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "coreledger_dpa",
+    "type": "DPA",
+    "vendor": "CoreLedger Payments Pte Ltd",
+    "status": "active",
+    "parent": "coreledger_saas",
+    "category": "SaaS",
+    "owner": "Lena Fischer"
+   }
+  },
+  "orion_msa": {
+   "effective_date": "2026-02-20",
+   "expiry_date": "2029-02-20",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Unlimited",
+   "termination_for_convenience": false,
+   "governing_law": "England and Wales",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-02-10",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-02-13",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "insurance_cover_usd": 10000000,
+    "warranty_days": 60,
+    "confidentiality_years": 7
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "orion_msa",
+    "type": "MSA",
+    "vendor": "Orion Cybersecurity Partners LLP",
+    "status": "active",
+    "parent": null,
+    "category": "Security",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "orion_sow1": {
+   "effective_date": "2026-07-10",
+   "expiry_date": "2027-07-10",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 950000,
+   "total_value": 950000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "England and Wales",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-06-30",
+   "supplier_signatory": "Daniel Okafor",
+   "supplier_signed_date": "2026-07-03",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30
+   },
+   "milestones": [
+    {
+     "title": "Baseline assessment report",
+     "date": "2026-08-09"
+    },
+    {
+     "title": "Remediation roadmap delivered",
+     "date": "2026-10-18"
+    },
+    {
+     "title": "Retest and closure report",
+     "date": "2027-04-06"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "orion_sow1",
+    "type": "SOW",
+    "vendor": "Orion Cybersecurity Partners LLP",
+    "status": "active",
+    "parent": "orion_msa",
+    "category": "Security",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "orion_nda": {
+   "effective_date": "2026-01-31",
+   "expiry_date": "2029-01-31",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "England and Wales",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-01-21",
+   "supplier_signatory": "Grace Mbeki",
+   "supplier_signed_date": "2026-01-24",
+   "fully_executed": true,
+   "values": {
+    "confidentiality_years": 7
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "orion_nda",
+    "type": "NDA",
+    "vendor": "Orion Cybersecurity Partners LLP",
+    "status": "active",
+    "parent": null,
+    "category": "Security",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "vantage_msa": {
+   "effective_date": "2024-12-07",
+   "expiry_date": "2029-12-07",
+   "notice_period_days": 180,
+   "auto_renew": true,
+   "annual_value": 1320000,
+   "total_value": 6600000,
+   "payment_terms_days": 60,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": false,
+   "governing_law": "Texas",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2024-11-27",
+   "supplier_signatory": "Richard Hale",
+   "supplier_signed_date": "2024-11-30",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 60,
+    "sla_availability_pct": 99.99,
+    "incident_notice_hours": 4,
+    "insurance_cover_usd": 5000000,
+    "confidentiality_years": 3,
+    "renewal_notice_days": 180
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "vantage_msa",
+    "type": "MSA",
+    "vendor": "Vantage Telecom Services Inc",
+    "status": "active",
+    "parent": null,
+    "category": "Telecom",
+    "owner": "Jordan Blake"
+   }
+  },
+  "quill_sow": {
+   "effective_date": "2026-10-08",
+   "expiry_date": "2027-10-08",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 780000,
+   "total_value": 780000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-10-01",
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 30,
+    "tfc_notice_days": 14
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "quill_sow",
+    "type": "SOW",
+    "vendor": "Quill Staffing Group Ltd",
+    "status": "active",
+    "parent": null,
+    "category": "Staffing",
+    "owner": "Lena Fischer"
+   }
+  },
+  "quill_nda": {
+   "effective_date": "2026-09-28",
+   "expiry_date": "2028-09-28",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-09-18",
+   "supplier_signatory": "Grace Mbeki",
+   "supplier_signed_date": "2026-09-21",
+   "fully_executed": true,
+   "values": {
+    "confidentiality_years": 2
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "quill_nda",
+    "type": "NDA",
+    "vendor": "Quill Staffing Group Ltd",
+    "status": "active",
+    "parent": null,
+    "category": "Staffing",
+    "owner": "Lena Fischer"
+   }
+  },
+  "ironbridge_msa": {
+   "effective_date": "2024-02-01",
+   "expiry_date": "2027-02-01",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 1800000,
+   "total_value": 5400000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": false,
+   "governing_law": "Virginia",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2024-01-22",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2024-01-25",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45,
+    "sla_availability_pct": 99.99,
+    "incident_notice_hours": 12,
+    "insurance_cover_usd": 5000000,
+    "confidentiality_years": 3
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "ironbridge_msa",
+    "type": "MSA",
+    "vendor": "Ironbridge Data Centers Inc",
+    "status": "active",
+    "parent": null,
+    "category": "Cloud",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "atlas_saas": {
+   "effective_date": "2025-12-17",
+   "expiry_date": "2026-12-17",
+   "notice_period_days": 30,
+   "auto_renew": true,
+   "annual_value": 96000,
+   "total_value": 96000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "Illinois",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2025-12-07",
+   "supplier_signatory": "Daniel Okafor",
+   "supplier_signed_date": "2025-12-10",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "sla_availability_pct": 99.5,
+    "incident_notice_hours": 48,
+    "warranty_days": 30,
+    "confidentiality_years": 2,
+    "renewal_notice_days": 30,
+    "tfc_notice_days": 30
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "atlas_saas",
+    "type": "SaaS",
+    "vendor": "Atlas Facilities Tech Inc",
+    "status": "active",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Priya Nair"
+   }
+  },
+  "sable_nda": {
+   "effective_date": "2026-04-21",
+   "expiry_date": "2028-04-21",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-04-11",
+   "supplier_signatory": "Sofia Marchetti",
+   "supplier_signed_date": "2026-04-14",
+   "fully_executed": true,
+   "values": {
+    "confidentiality_years": 1
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "sable_nda",
+    "type": "NDA",
+    "vendor": "Sable Legal Tech Inc",
+    "status": "active",
+    "parent": null,
+    "category": "Legal",
+    "owner": "Lena Fischer"
+   }
+  },
+  "lumina_saas": {
+   "effective_date": "2026-09-08",
+   "expiry_date": "2028-09-08",
+   "notice_period_days": 60,
+   "auto_renew": true,
+   "annual_value": 275000,
+   "total_value": 550000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": 0.5,
+   "liability_cap_text": "0.5 times annual fees",
+   "termination_for_convenience": false,
+   "governing_law": "Massachusetts",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-08-29",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-09-01",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "sla_availability_pct": 99.0,
+    "incident_notice_hours": 96,
+    "warranty_days": 30,
+    "confidentiality_years": 2,
+    "renewal_notice_days": 60
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "lumina_saas",
+    "type": "SaaS",
+    "vendor": "Lumina Learning Systems Inc",
+    "status": "active",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Jordan Blake"
+   }
+  },
+  "helix_wo2": {
+   "effective_date": "2026-10-23",
+   "expiry_date": "2027-02-23",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": 185000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "New York",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2026-10-13",
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-10-16",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45
+   },
+   "milestones": [
+    {
+     "title": "Test automation framework delivered",
+     "date": "2026-12-27"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "helix_wo2",
+    "type": "Work Order",
+    "vendor": "Helix Digital Consulting Inc",
+    "status": "active",
+    "parent": "helix_sow2",
+    "category": "IT Services",
+    "owner": "Priya Nair"
+   }
+  },
+  "tatva_sow2": {
+   "effective_date": "2026-08-09",
+   "expiry_date": "2027-08-09",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 1850000,
+   "total_value": 1850000,
+   "payment_terms_days": 30,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "England and Wales",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-07-30",
+   "supplier_signatory": "Daniel Okafor",
+   "supplier_signed_date": "2026-08-02",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 30,
+    "sla_availability_pct": 99.5
+   },
+   "milestones": [
+    {
+     "title": "QA centre of excellence established",
+     "date": "2026-09-18"
+    },
+    {
+     "title": "Automation coverage reaches 60 percent",
+     "date": "2026-12-17"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "tatva_sow2",
+    "type": "SOW",
+    "vendor": "Tatva Infosystems Ltd",
+    "status": "active",
+    "parent": "tatva_msa",
+    "category": "IT Services",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "meridian_sow1": {
+   "effective_date": "2026-07-20",
+   "expiry_date": "2027-04-20",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 900000,
+   "total_value": 675000,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "Delaware",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Michael Brennan",
+   "customer_signed_date": "2026-07-10",
+   "supplier_signatory": "Kenji Watanabe",
+   "supplier_signed_date": "2026-07-13",
+   "fully_executed": true,
+   "values": {
+    "payment_terms_days": 45
+   },
+   "milestones": [
+    {
+     "title": "Landing zone ready",
+     "date": "2026-08-19"
+    },
+    {
+     "title": "Workload migration wave 1",
+     "date": "2026-10-28"
+    },
+    {
+     "title": "Workload migration wave 2",
+     "date": "2027-01-16"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "meridian_sow1",
+    "type": "SOW",
+    "vendor": "Meridian Cloud Services LLC",
+    "status": "active",
+    "parent": "meridian_msa",
+    "category": "Cloud",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "vantage_sow1": {
+   "effective_date": "2026-08-29",
+   "expiry_date": "2027-06-29",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": 540000,
+   "payment_terms_days": 60,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Governed by MSA",
+   "termination_for_convenience": null,
+   "governing_law": "Texas",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": "Anika Rao",
+   "supplier_signed_date": "2026-08-22",
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 60
+   },
+   "milestones": [
+    {
+     "title": "Site survey complete",
+     "date": "2026-09-28"
+    },
+    {
+     "title": "Circuit installation complete",
+     "date": "2027-01-01"
+    }
+   ],
+   "deviations": [],
+   "meta": {
+    "key": "vantage_sow1",
+    "type": "SOW",
+    "vendor": "Vantage Telecom Services Inc",
+    "status": "active",
+    "parent": "vantage_msa",
+    "category": "Telecom",
+    "owner": "Jordan Blake"
+   }
+  },
+  "atlas_nda": {
+   "effective_date": "2025-12-02",
+   "expiry_date": "2027-12-02",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "Illinois",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": "Helena Cruz",
+   "customer_signed_date": "2025-11-22",
+   "supplier_signatory": "Grace Mbeki",
+   "supplier_signed_date": "2025-11-25",
+   "fully_executed": true,
+   "values": {
+    "confidentiality_years": 3
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "atlas_nda",
+    "type": "NDA",
+    "vendor": "Atlas Facilities Tech Inc",
+    "status": "active",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Priya Nair"
+   }
+  }
+ },
+ "drafts": {
+  "granite_draft_msa": {
+   "effective_date": "2026-11-22",
+   "expiry_date": "2028-11-22",
+   "notice_period_days": 30,
+   "auto_renew": true,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": 15,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Unlimited",
+   "termination_for_convenience": false,
+   "governing_law": "Georgia",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": null,
+   "supplier_signed_date": null,
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 15,
+    "insurance_cover_usd": 500000,
+    "confidentiality_years": 1,
+    "renewal_notice_days": 30
+   },
+   "milestones": [],
+   "deviations": [
+    "payment_terms",
+    "liability_cap",
+    "termination_for_convenience",
+    "renewal",
+    "governing_law"
+   ],
+   "meta": {
+    "key": "granite_draft_msa",
+    "type": "MSA",
+    "vendor": "Granite Network Integrators Inc",
+    "status": "draft",
+    "parent": null,
+    "category": "IT Services",
+    "owner": "Sam Ortiz"
+   }
+  },
+  "draft_saas_nimbus": {
+   "effective_date": "2026-11-27",
+   "expiry_date": "2029-11-27",
+   "notice_period_days": 120,
+   "auto_renew": true,
+   "annual_value": 480000,
+   "total_value": 1440000,
+   "payment_terms_days": 20,
+   "liability_cap_multiple": 0.25,
+   "liability_cap_text": "0.25 times annual fees",
+   "termination_for_convenience": false,
+   "governing_law": "Delaware",
+   "processes_personal_data": true,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": null,
+   "supplier_signed_date": null,
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 20,
+    "sla_availability_pct": 97.0,
+    "incident_notice_hours": 168,
+    "confidentiality_years": 1,
+    "renewal_notice_days": 120
+   },
+   "milestones": [],
+   "deviations": [
+    "payment_terms",
+    "liability_cap",
+    "termination_for_convenience",
+    "renewal",
+    "sla",
+    "data_protection",
+    "warranties"
+   ],
+   "meta": {
+    "key": "draft_saas_nimbus",
+    "type": "SaaS",
+    "vendor": "Nimbus Workflow Inc",
+    "status": "draft",
+    "parent": null,
+    "category": "SaaS",
+    "owner": "Priya Nair"
+   }
+  },
+  "draft_sow_cobalt": {
+   "effective_date": "2026-12-02",
+   "expiry_date": "2027-12-02",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": 1100000,
+   "total_value": 1100000,
+   "payment_terms_days": 15,
+   "liability_cap_multiple": null,
+   "liability_cap_text": "Unlimited",
+   "termination_for_convenience": null,
+   "governing_law": "Florida",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": null,
+   "supplier_signed_date": null,
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 15
+   },
+   "milestones": [],
+   "deviations": [
+    "payment_terms",
+    "liability_cap",
+    "ip_ownership"
+   ],
+   "meta": {
+    "key": "draft_sow_cobalt",
+    "type": "SOW",
+    "vendor": "Cobalt Applications Group",
+    "status": "draft",
+    "parent": null,
+    "category": "IT Services",
+    "owner": "Jordan Blake"
+   }
+  },
+  "draft_nda_pinecrest": {
+   "effective_date": "2026-11-17",
+   "expiry_date": "2031-11-17",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": null,
+   "liability_cap_multiple": null,
+   "liability_cap_text": null,
+   "termination_for_convenience": null,
+   "governing_law": "Ohio",
+   "processes_personal_data": false,
+   "has_dpa": false,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": null,
+   "supplier_signed_date": null,
+   "fully_executed": false,
+   "values": {
+    "confidentiality_years": 10
+   },
+   "milestones": [],
+   "deviations": [
+    "confidentiality",
+    "governing_law",
+    "non_solicit"
+   ],
+   "meta": {
+    "key": "draft_nda_pinecrest",
+    "type": "NDA",
+    "vendor": "Pinecrest Advisory LLP",
+    "status": "draft",
+    "parent": null,
+    "category": "Consulting",
+    "owner": "Lena Fischer"
+   }
+  },
+  "draft_msa_vertex": {
+   "effective_date": "2026-12-07",
+   "expiry_date": "2029-12-07",
+   "notice_period_days": null,
+   "auto_renew": false,
+   "annual_value": null,
+   "total_value": null,
+   "payment_terms_days": 45,
+   "liability_cap_multiple": 1.0,
+   "liability_cap_text": "1 times annual fees",
+   "termination_for_convenience": true,
+   "governing_law": "New York",
+   "processes_personal_data": true,
+   "has_dpa": true,
+   "customer_signatory": null,
+   "customer_signed_date": null,
+   "supplier_signatory": null,
+   "supplier_signed_date": null,
+   "fully_executed": false,
+   "values": {
+    "payment_terms_days": 45,
+    "insurance_cover_usd": 5000000,
+    "warranty_days": 90,
+    "confidentiality_years": 3,
+    "tfc_notice_days": 30
+   },
+   "milestones": [],
+   "deviations": [],
+   "meta": {
+    "key": "draft_msa_vertex",
+    "type": "MSA",
+    "vendor": "Vertex Managed Services Inc",
+    "status": "draft",
+    "parent": null,
+    "category": "IT Services",
+    "owner": "Sam Ortiz"
+   }
+  }
+ }
+}

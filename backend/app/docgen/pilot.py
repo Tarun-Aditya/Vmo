@@ -262,6 +262,6 @@ def render(root: Path, seed: date, formats: bool = True) -> dict:
         target.with_suffix(".meta.json").write_text(json.dumps({"category": sp["cat"], "owner": sp["owner"]}))
         n += 1
     lab = labels(seed)
-    (root / "labels.json").write_text(json.dumps(lab, indent=1))
-    (root / "manifest.json").write_text(json.dumps({"seed_date": seed.isoformat(), "customer": CUSTOMER, "corpus": "pilot", "documents": n, "format_fallbacks": fallbacks}, indent=1))
+    (root / "labels_pilot.json").write_text(json.dumps(lab, indent=1))
+    (root / "manifest_pilot.json").write_text(json.dumps({"seed_date": seed.isoformat(), "customer": CUSTOMER, "corpus": "pilot", "documents": n, "format_fallbacks": fallbacks}, indent=1))
     return {"documents": n, "format_fallbacks": fallbacks}
