@@ -279,7 +279,14 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
         for w in lines[i + 1:i + 7]:
             if re.match(r"^\W*Date\b", w.strip(), re.I):
                 cells = _cells(w, r"Date(?: signed)?")
-                dates = [tu.first_date(c) for c in cells][:len(names)] + [None] * (len(names) - len(cells))
+                if len(cells) == 1 and len([d for _, d in tu.find_dates(cells[0])]) >= 2:      # columns collapsed by OCR / text extraction: 'September 18, 2026 September 21, 2026'
+                    ds = [d for _, d in tu.find_dates(cells[0])][:2]
+                    if len(names) == 1 and len(names[0].split()) in (4, 6):                       # '... Helena Cruz Grace Mbeki' -> two signatories
+                        w_ = names[0].split()
+                        names = [" ".join(w_[:len(w_) // 2]), " ".join(w_[len(w_) // 2:])]
+                    dates = ds + [None] * (len(names) - 2)
+                else:
+                    dates = [tu.first_date(c) for c in cells][:len(names)] + [None] * (len(names) - len(cells))
                 break
         hdr_lines: list[str] = []
         for w in reversed(lines[max(0, i - 10):i]):          # the header of this signature block only (stop at the previous heading / long paragraph)
@@ -293,6 +300,22 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
         header = " ".join(hdr_lines)
         others = [m.start() for m in COMPANY_RX.finditer(header) if not any(k in m.group(0).lower() for k in cm)]
         spos = min([p for p in [before.find("supplier"), before.find("vendor"), before.find("provider")] + [o for o in others] if p >= 0] or [10**9])
+        for ln_ in reversed(hdr_lines):                  # the line carrying our company: text after it = the other column's wrapped name, so ours is the first column
+            low = ln_.lower()
+            km = [(low.find(k), k) for k in cm if low.find(k) >= 0]
+            if km and "|" not in ln_:                       # (markdown table rows keep their own, reliable header order)
+                pos, k = min(km)
+                cells_ = [c for c in re.split(r"\s{3,}|\|", ln_.strip()) if c.strip()]
+                if len(cells_) > 2 and not COMPANY_RX.search(cells_[0]) and not any(x in cells_[0].lower() for x in cm):
+                    cells_ = cells_[1:]                      # a row label ('Party', 'Company') is not a column
+                ci = next((n for n, c in enumerate(cells_) if k in c.lower()), 0)
+                mm = COMPANY_RX.search(ln_[pos:])
+                tail = ln_[pos + mm.end():].strip(" |") if mm and len(names) > 1 else ""
+                if len(cells_) > 1 and ci > 0:
+                    cpos, spos = 10**8, 0
+                elif len(cells_) > 1 or tail:
+                    cpos, spos = 0, 10**8
+                break
         tag_c, tag_s = before.find("(customer)"), before.find("(supplier)")
         if tag_c >= 0 and tag_s >= 0:                    # 'Vantage Telecom Services Inc (Supplier)   Arcadia Retail Inc. (Customer)'
             cpos, spos = tag_c, tag_s
