@@ -3,15 +3,18 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app import kcc, scheduler
+from app import auth, kcc, scheduler
 from app.db import SessionLocal, engine
 from app.routes import router
 from app.routes_admin import router as admin_router
 from app.routes_alerts import router as alerts_router
+from app.routes_auth import router as auth_router
 from app.routes_chat import router as chat_router
 from app.routes_connectors import router as connectors_router
 from app.routes_docs import router as docs_router
@@ -38,9 +41,32 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ContractIQ API", version="0.2.0", lifespan=lifespan)
+@app.middleware("http")
+async def access_control(request: Request, call_next):
+    """AUTH_MODE=on: every /api call needs a login or API token with a high enough role; every change (and every refusal) is written to the audit log."""
+    path, method = request.url.path, request.method
+    need = auth.required(method, path)
+    user = None
+    if auth.mode() == "on" and need is not None:
+        h = request.headers.get("authorization", "")
+        tok = h[7:] if h.lower().startswith("bearer ") else request.query_params.get("access_token")
+        user = await run_in_threadpool(auth.identify, tok)
+        if user is None or auth.RANK[user["role"]] < auth.RANK[need]:
+            code = 401 if user is None else 403
+            ip = request.client.host if request.client else None
+            await run_in_threadpool(auth.audit, user, method, path, code, ip, "denied")
+            return JSONResponse({"detail": "Sign in required" if code == 401 else f"This needs the {need} role"}, status_code=code)
+        request.state.user = user
+    resp = await call_next(request)
+    if method not in ("GET", "HEAD", "OPTIONS") or "/export" in path:
+        if not path.startswith("/api/auth/login") and not (path.startswith("/api/chat") and resp.status_code < 400):
+            await run_in_threadpool(auth.audit, user, method, path, resp.status_code, request.client.host if request.client else None)
+    return resp
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=os.environ.get("CORS_ORIGINS", "http://localhost:5173").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -51,6 +77,7 @@ app.include_router(docs_router)
 app.include_router(chat_router)
 app.include_router(connectors_router)
 app.include_router(alerts_router)
+app.include_router(auth_router)
 app.include_router(vmo_router)
 
 

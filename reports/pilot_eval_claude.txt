@@ -1,5 +1,5 @@
 Pilot corpus: 36 documents (0 not ingested: [])
-  effective_date                  35/ 36   97.2%
+  effective_date                  36/ 36  100.0%
   expiry_date                     36/ 36  100.0%
   notice_period_days              35/ 35  100.0%
   auto_renew                      35/ 35  100.0%
@@ -10,38 +10,27 @@ Pilot corpus: 36 documents (0 not ingested: [])
   liability_cap_text              27/ 27  100.0%
   termination_for_convenience     16/ 16  100.0%
   governing_law                   35/ 35  100.0%
-  processes_personal_data         30/ 35   85.7%
-  has_dpa                         29/ 35   82.9%
-  customer_signatory              34/ 35   97.1%
-  supplier_signatory              34/ 35   97.1%
-  fully_executed                  34/ 35   97.1%
-FIELDS       491/506 = 97.0%
+  processes_personal_data         31/ 35   88.6%
+  has_dpa                         32/ 35   91.4%
+  customer_signatory              35/ 35  100.0%
+  supplier_signatory              35/ 35  100.0%
+  fully_executed                  35/ 35  100.0%
+FIELDS       499/506 = 98.6%
 META         141/144 = 97.9%
-VALUES       96/109 = 88.1%
+VALUES       105/109 = 96.3%
 MILESTONES   24/24 = 100.0%
   MISS ('helix_wo1', 'processes_personal_data', True, False)
-  MISS ('helix_amd1', 'effective_date', None, '2026-07-10')
   MISS ('tatva_msa', 'has_dpa', False, True)
   MISS ('tatva_msa', 'value.tfc_notice_days', 90.0, 60)
-  MISS ('meridian_msa', 'customer_signatory', None, 'Helena Cruz')
-  MISS ('meridian_msa', 'supplier_signatory', None, 'Sofia Marchetti')
-  MISS ('meridian_msa', 'fully_executed', False, True)
   MISS ('meridian_msa', 'value.tfc_notice_days', 120.0, 90)
-  MISS ('meridian_dpa', 'has_dpa', True, False)
-  MISS ('bluepeak_saas', 'value.warranty_days', None, 60)
-  MISS ('bluepeak_dpa', 'has_dpa', True, False)
-  MISS ('kestrel_saas', 'value.warranty_days', None, 30)
-  MISS ('coreledger_saas', 'value.warranty_days', None, 90)
-  MISS ('coreledger_dpa', 'has_dpa', True, False)
   MISS ('orion_nda', 'meta.parent', True, False)
-  MISS ('orion_nda', 'value.confidentiality_years', None, 7)
   MISS ('quill_sow', 'processes_personal_data', True, False)
-  MISS ('quill_nda', 'value.confidentiality_years', None, 2)
-  MISS ('atlas_saas', 'value.warranty_days', None, 30)
-  MISS ('sable_nda', 'value.confidentiality_years', None, 1)
-  MISS ('lumina_saas', 'value.warranty_days', None, 30)
   MISS ('meridian_sow1', 'has_dpa', True, False)
   MISS ('vantage_sow1', 'processes_personal_data', True, False)
   MISS ('atlas_nda', 'meta.parent', True, False)
-  MISS ('atlas_nda', 'value.confidentiality_years', None, 3)
-OVERALL 752/783 = 96.0% (threshold 80%)
+  MISS ('draft_saas_nimbus', 'value.incident_notice_hours', 720.0, 168)
+  MISS ('draft_saas_nimbus', 'value.renewal_notice_days', None, 120)
+  MISS ('draft_sow_cobalt', 'processes_personal_data', True, False)
+  MISS ('draft_sow_cobalt', 'meta.vendor', 'Unknown vendor', 'Cobalt Applications Group')
+  MISS ('draft_msa_vertex', 'has_dpa', False, True)
+OVERALL 769/783 = 98.2% (threshold 80%)

@@ -14,7 +14,7 @@ QUESTIONS = {
     "uncapped": "Which vendors have uncapped liability?",
     "saas_no_dpa": "Which SaaS vendors process personal data without a DPA?",
     "no_tfc": "Which contracts can't be terminated for convenience?",
-    "bluepeak_payment": "What are the current effective payment terms on the Accentia MSA after amendments?",
+    "bluepeak_payment": "What are the current effective payment terms on the {msa_vendor} MSA after amendments?",
     "top5_vendors": "Who are the top 5 vendors by annual value and what are their renewal dates?",
     "nda_before_msa": "Which NDAs expire before their related MSA?",
     "auto_renewals": "Which contracts auto-renew, and by when must we give notice?",
@@ -28,6 +28,23 @@ QUESTIONS = {
     "sla_breaches": "Which vendors missed their availability SLA in the last 6 months?",
     "duplicate_invoices": "Which vendors sent duplicate invoices?",
 }
+
+
+def msa_vendor() -> str:
+    """The short name of a vendor whose MSA has been amended (read from the loaded contracts, nothing hardcoded)."""
+    from sqlalchemy import text
+
+    from app.db import SessionLocal
+
+    with SessionLocal() as s:
+        v = s.execute(text("""SELECT m.vendor FROM contracts m JOIN contracts a ON a.parent_id = m.id AND a.type = 'Amendment'
+                              WHERE m.type = 'MSA' AND a.status <> 'draft' ORDER BY m.id LIMIT 1""")).scalar()
+    return re.sub(r"\s+(?:Inc|LLC|LLP|Ltd|Limited|Corp|Corporation|Group)\.?$", "", v or "the").strip()
+
+
+def questions() -> dict[str, str]:
+    mv = msa_vendor()
+    return {k: v.replace("{msa_vendor}", mv) for k, v in QUESTIONS.items()}
 
 
 def money(n) -> str:
@@ -115,17 +132,16 @@ def _plan(key: str, r: Run) -> str:
     if key == "bluepeak_payment":
         d = rows(
             r.sql(
-                """SELECT e.contract_id, e.title, e.payment_terms_days AS effective_payment_terms_days,
+                f"""SELECT e.contract_id, e.title, e.payment_terms_days AS effective_payment_terms_days,
               s.title AS set_by, s.type AS set_by_type
             FROM v_effective_terms e JOIN contracts s ON s.id = e.payment_terms_days_source
-            WHERE e.type='MSA' AND e.vendor ILIKE '%Accentia%'"""
+            WHERE e.type='MSA' AND e.vendor ILIKE '%{re.sub(r"[^A-Za-z0-9 ]", "", msa_vendor())}%'"""
             )
         )
+        if not d:
+            return "No amended MSA was found."
         x = d[0]
-        return (
-            f"The effective payment term on {x['title']} is {x['effective_payment_terms_days']} days, "
-            f"set by {x['set_by']} (the original MSA said 45)."
-        )
+        return f"The effective payment term on {x['title']} is {x['effective_payment_terms_days']} days, set by {x['set_by']}."
     if key == "top5_vendors":
         d = rows(
             r.sql(
@@ -245,7 +261,7 @@ def _plan(key: str, r: Run) -> str:
 def match(question: str) -> str | None:
     q = set(norm_key(question).split())
     best, score = None, 0.0
-    for k, t in QUESTIONS.items():
+    for k, t in questions().items():
         tt = set(norm_key(t).split())
         j = len(q & tt) / len(q | tt)
         if j > score:

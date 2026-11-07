@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import DocEditor from "../components/DocEditor";
 import { Btn, inputCls } from "../forms";
-import { API, api, when } from "../lib";
+import { api, authUrl, when } from "../lib";
 import { Card, Loading, Sev, SeverityChip } from "../ui";
 
 type Content = { id: number; title: string; vendor: string; type: string; status: string; md: string; editable: boolean; version: number; versions: { version: number; note: string | null; created_at: string; chars: number }[] };
@@ -36,7 +36,7 @@ export default function DocumentEditor() {
         <h1 className="text-xl font-semibold">{d.title}</h1>
         <span className="rounded bg-slate-200 px-1.5 text-xs font-semibold uppercase dark:bg-slate-700">{d.type}</span>
         <span className={`rounded px-1.5 text-xs font-semibold ${d.editable ? "bg-amber-100 text-amber-900" : "bg-slate-200 text-slate-700"}`}>{d.editable ? "DRAFT" : "EXECUTED · read only"}</span>
-        <span className="ml-auto flex gap-3 text-sm"><a className="text-indigo-600 hover:underline" href={`${API}/api/documents/${d.id}/export.docx`} download>⬇ Download .docx</a><Link className="text-indigo-600 hover:underline" to={`/redline/${d.id}`}>Review redline</Link><Link className="text-indigo-600 hover:underline" to={`/contracts/${d.id}`}>Open details</Link></span>
+        <span className="ml-auto flex gap-3 text-sm"><a className="text-indigo-600 hover:underline" href={authUrl(`/api/documents/${d.id}/export.docx`)} download>⬇ Download .docx</a><Link className="text-indigo-600 hover:underline" to={`/redline/${d.id}`}>Review redline</Link><Link className="text-indigo-600 hover:underline" to={`/contracts/${d.id}`}>Open details</Link></span>
       </div>
       <div className="grid gap-4 lg:grid-cols-4">
         <div className="lg:col-span-3">

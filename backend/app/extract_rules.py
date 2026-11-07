@@ -196,7 +196,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             put("liability_cap_text", None, 0.6)
     # ---- termination for convenience
     if not amend:
-        ttxt = d.scoped("termination_for_convenience") or " ".join(re.findall(r"[^.]*\bconvenience\b[^.]*\.", d.flat))
+        ttxt = d.scoped("termination_for_convenience") or " ".join(re.findall(r"[^.]*\b(?:convenience|without cause|for any reason|without reason)\b[^.]*\.", d.flat))
         tc = "termination_for_convenience" if "termination_for_convenience" in d.by else None
         if re.search(r"neither party (?:may|shall|will|can) terminate[^.]{0,80}convenience|(?:no|not)[^.]{0,40}(?:right|entitled|permitted)[^.]{0,40}terminate[^.]{0,60}(?:convenience|without cause)|only (?:for|upon) (?:cause|material breach)|not (?:be )?(?:entitled|permitted)[^.]{0,40}convenience|(?:cannot|may not|shall not) be terminated for convenience|no (?:termination|right to terminate) for convenience", ttxt, re.I):
             put("termination_for_convenience", False, 0.92, tc)
@@ -257,15 +257,22 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
         role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
         res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
     lines = [re.sub(r"[*_`]", "", ln).rstrip() for ln in tail.splitlines()]
-    is_name = re.compile(r"^\W*(?:Printed\s+)?Name\b", re.I)
+    is_name = re.compile(r"^\W*(?:Printed\s+Name|Signed\s+by|Name)\b", re.I)
     for i, ln in enumerate(lines):
         if not is_name.match(ln.strip()):
             continue
-        names = _cells(ln, r"Printed\s+Name|Name")
+        names = _cells(ln, r"Printed\s+Name|Signed\s+by|Name")
+        inline_date = None
+        for k, n in enumerate(names):                    # 'Name: Anika Rao Title: Authorised Signatory Date: 16 October 2026' flattened onto one line
+            mt = re.search(r"\s+(?:Title|Date|Signature)\b\s*:?", n or "")
+            if mt:
+                if k == 0 and (dm := re.search(r"Date\s*:?\s*([A-Za-z0-9,/ \-]{6,24})$", n)):
+                    inline_date = tu.first_date(dm.group(1))
+                names[k] = n[:mt.start()].strip()
         names = [n if re.fullmatch(NAME, n or "") else "" for n in names]
         if not any(names) and len(names) <= 1:
             continue
-        dates: list[date | None] = [None] * len(names)
+        dates: list[date | None] = [inline_date] + [None] * (len(names) - 1) if names else []
         for w in lines[i + 1:i + 7]:
             if re.match(r"^\W*Date\b", w.strip(), re.I):
                 cells = _cells(w, r"Date(?: signed)?")
@@ -277,10 +284,15 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
                 break
             hdr_lines.insert(0, w)
         before = " ".join(hdr_lines).lower()
+        if len(names) == 1:                              # a single block: only the nearest heading says whose it is
+            before = " ".join(hdr_lines[-2:]).lower()
         cpos = min([before.find(k) for k in cm + ["customer", "client"] if before.find(k) >= 0] or [10**9])
         header = " ".join(hdr_lines)
         others = [m.start() for m in COMPANY_RX.finditer(header) if not any(k in m.group(0).lower() for k in cm)]
         spos = min([p for p in [before.find("supplier"), before.find("vendor"), before.find("provider")] + [o for o in others] if p >= 0] or [10**9])
+        tag_c, tag_s = before.find("(customer)"), before.find("(supplier)")
+        if tag_c >= 0 and tag_s >= 0:                    # 'Vantage Telecom Services Inc (Supplier)   Arcadia Retail Inc. (Customer)'
+            cpos, spos = tag_c, tag_s
         if cpos == 10**9 and spos == 10**9:
             order = ["customer", "supplier"]
         else:

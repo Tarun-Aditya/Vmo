@@ -1,4 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { NavLink, Outlet } from "react-router-dom";
+import { api } from "../../lib";
 
 const TABS: [string, string, string][] = [
   ["/admin", "Pipeline", "Folder watch, schedule, run history"],
@@ -10,10 +12,14 @@ const TABS: [string, string, string][] = [
   ["/admin/obligations", "Obligation rules", "Which values become tracked duties"],
   ["/admin/thresholds", "Thresholds", "Spend checks, risk points, SLA credits"],
   ["/admin/risk", "Risk scoring", "Weights of the vendor risk score"],
+  ["/admin/access", "Users & audit", "Roles, API tokens, who changed what"],
   ["/admin/usage", "AI usage", "Calls, tokens, cost"],
 ];
 
 export default function AdminLayout() {
+  const who = useQuery({ queryKey: ["whoami"], queryFn: () => api<{ role: string; auth_required: boolean }>("/api/auth/me") });
+  if (who.data && who.data.role !== "admin")
+    return <div className="rounded-lg border border-amber-400 bg-amber-50 p-4 text-sm text-amber-900" role="alert"><b>Admin only.</b> Your role is {who.data.role}; configuration, connectors, users and the audit log need the admin role.</div>;
   return (
     <div className="space-y-4">
       <div>

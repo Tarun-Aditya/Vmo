@@ -13,6 +13,8 @@ dependencies = [
   "pydantic-settings>=2.4",     # typed .env config
   "anthropic>=0.40",            # Claude API
   "pyyaml>=6",                  # evals/questions.yaml
+  "pyjwt[crypto]>=2.8",         # OpenID Connect token checks
+  "cryptography>=42",           # encrypted connector secrets, JWT keys
 ]
 
 [project.optional-dependencies]

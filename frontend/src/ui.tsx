@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Status, ago, api, inFuture, useSetting } from "./lib";
+import { Status, ago, api, inFuture, setToken, useSetting } from "./lib";
 
 export type Sev = "low" | "medium" | "high" | "critical";
 
@@ -67,6 +67,7 @@ export function Layout() {
   const qc = useQueryClient();
   const st = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/api/status"), refetchInterval: 10000 });
   const al = useQuery({ queryKey: ["alerts-summary"], queryFn: () => api<{ unread: number; open: number; critical: number }>("/api/alerts/summary"), refetchInterval: 30000 });
+  const who = useQuery({ queryKey: ["whoami"], queryFn: () => api<{ email: string; name?: string; role: string; auth_required: boolean }>("/api/auth/me") });
   const lastRun = useRef<number | null>(null);
   useEffect(() => {
     // A pipeline run finished: refresh every screen, so all modules show the same new data.
@@ -106,6 +107,9 @@ export function Layout() {
               {meta.data ? meta.data.llm_label : "…"}
             </span>
             <NavLink to="/admin" title="Pipeline, key clauses, values & limits, checklist" className={({ isActive }) => `rounded px-2 py-1 ${isActive ? "bg-slate-200 font-medium dark:bg-slate-700" : "text-slate-500 hover:underline"}`}>⚙ Admin</NavLink>
+            {who.data?.auth_required && (
+              <span className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-300" title={who.data.email}>{who.data.name || who.data.email} · {who.data.role}
+                <button className="ml-1 rounded border px-1.5 py-0.5 hover:bg-slate-100 dark:hover:bg-slate-800" onClick={() => { setToken(null); qc.clear(); window.dispatchEvent(new Event("ciq-signed-out")); }}>Sign out</button></span>)}
             <button onClick={() => setDark(!dark)} className="rounded border px-2 py-1" aria-label="Toggle theme">{dark ? "☀ Light" : "☾ Dark"}</button>
           </div>
         </div>

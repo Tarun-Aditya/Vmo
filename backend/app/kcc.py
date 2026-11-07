@@ -51,7 +51,7 @@ KEYWORDS: dict[str, list[str]] = {
     "term": ["commences on", "expires on", "initial term"],
     "renewal": ["renews automatically", "non-renewal", "auto-renew"],
     "payment": ["undisputed invoices", "payment terms", "valid invoice"],
-    "termination_for_convenience": ["for convenience"],
+    "termination_for_convenience": ["for convenience", "without cause", "for any reason", "without reason"],
     "termination_for_cause": ["material breach", "not remedied within"],
     "liability_cap": ["aggregate liability", "limitation of liability", "liability is unlimited", "liability under this"],
     "indemnity": ["shall indemnify", "indemnification", "third-party claims"],
@@ -118,7 +118,7 @@ def default_metrics() -> list[dict]:
         _m("tfc_notice_days", "Termination for convenience notice", "termination_for_convenience", r"(\d+) days['’]? (?:prior )?(?:written )?notice", "number", "days", "Notice the Customer must give to terminate for convenience"),
         _m("renewal_notice_days", "Non-renewal notice period", "renewal", r"(?:at least|not less than|no later than)\s+(\d+)\s+days", "number", "days", "Notice needed to stop an auto-renewal"),
         _m("insurance_cover_usd", "Insurance cover per claim", "insurance", r"USD\s*([\d,]{5,})", "money", "USD", "Minimum professional indemnity cover per claim"),
-        _m("warranty_days", "Warranty period", "warranties", r"(\d+)\s*days?\s+(?:after|from|following)\s+(?:the\s+(?:date|day)\s+)?(?:of\s+)?(?:acceptance|delivery|completion|go-live|performance|[^.]{0,50}(?:delivered|accepted|performed))|warranty period of (\d+) days|(?:for a period of|period of)\s+(\d+)\s*days[^.]{0,40}(?:performance|delivery|acceptance)", "number", "days", "Free-of-charge correction period after acceptance"),
+        _m("warranty_days", "Warranty period", "warranties", r"(\d+)\s*days?\s+(?:after|from|following)\s+(?:the\s+(?:date|day)\s+)?(?:of\s+)?(?:acceptance|delivery|completion|go-live|performance|[^.]{0,50}(?:delivered|accepted|performed))|warranty period of (\d+) days|(?:for a period of|period of)\s+(\d+)\s*days[^.]{0,40}(?:performance|delivery|acceptance)|warrant\w*[^.]{0,120}?(?:period of|for)\s+(\d+)\s*days|(\d+)\s*days[^.]{0,80}warranty period", "number", "days", "Free-of-charge correction period after acceptance"),
         _m("confidentiality_years", "Confidentiality survival", "confidentiality", r"(?:for|period of|survive[sd]? for|continue[sd]? for)\s+(?:a period of\s+)?(\d+)\s+years?", "number", "years", "Years confidentiality survives the agreement"),
         _m("sla_availability_pct", "Service availability", "sla", r"([\d.]+)\s*%\s*(?:availability|uptime|monthly|of (?:each|every|the) (?:calendar )?(?:month|time))|(?:availability|uptime|available)[^.]{0,80}?([\d.]+)\s*%", "number", "%", "Monthly availability commitment"),
         _m("incident_notice_hours", "Security incident notice", "security", r"within (\d+) (hours|days)", "number", "hours", "Time to notify a security incident"),
@@ -315,35 +315,40 @@ def extract_metrics(clauses: list[dict], metrics: list[dict], kcc_cfg: list[dict
     for m in metrics:
         if not _safe_re(m["pattern"]):
             continue
-        pool = by_type.get(m["kcc_key"]) if m["kcc_key"] else clauses
-        sentence_mode = False
-        if not pool and m["kcc_key"] and kw.get(m["kcc_key"]):
-            pool, sentence_mode = clauses, True
-        for c in pool or []:
-            text_ = tu.normalize(c["text"])
-            if sentence_mode:
-                sents = [x for x in re.split(r"(?<=[.;])\s+", text_) if any(re.search(w, x, re.I) for w in kw[m["kcc_key"]])]
-                text_ = " ".join(sents)
-            mt = re.search(m["pattern"], text_, re.I)
-            if not mt:
-                continue
-            g = next((x for x in mt.groups() if x and re.search(r"\d|\w", x)), None)
-            if g is None:
-                continue
-            row = dict(metric_key=m["key"], value_num=None, value_text=None, clause_id=c.get("id"), page=c.get("page"), confidence=0.85 if sentence_mode else 0.92)
-            if m["kind"] == "text":
-                row["value_text"] = g.strip()
-            else:
-                try:
-                    v = float(g.replace(",", "")) * float(m.get("scale") or 1)
-                except ValueError:
+        typed = by_type.get(m["kcc_key"]) if m["kcc_key"] else clauses
+        attempts = [(typed, False)] if typed else []
+        if m["kcc_key"] and kw.get(m["kcc_key"]):      # the clause may be missing or merged / mis-typed: also try the keyword sentences of the whole document
+            attempts.append((clauses, True))
+        found = False
+        for pool, sentence_mode in attempts:
+            for c in pool:
+                text_ = tu.normalize(c["text"])
+                if sentence_mode:
+                    sents = [x for x in re.split(r"(?<=[.;])\s+", text_) if any(re.search(w, x, re.I) for w in kw[m["kcc_key"]])]
+                    text_ = " ".join(sents)
+                mt = re.search(m["pattern"], text_, re.I)
+                if not mt:
                     continue
-                unit_g = mt.group(2) if mt.lastindex and mt.lastindex >= 2 else None
-                if unit_g and unit_g.lower().startswith("day") and (m.get("unit") or "") == "hours":
-                    v *= 24
-                row["value_num"] = v
-            out.append(row)
-            break
+                g = next((x for x in mt.groups() if x and re.search(r"\d|\w", x)), None)
+                if g is None:
+                    continue
+                row = dict(metric_key=m["key"], value_num=None, value_text=None, clause_id=c.get("id"), page=c.get("page"), confidence=0.85 if sentence_mode else 0.92)
+                if m["kind"] == "text":
+                    row["value_text"] = g.strip()
+                else:
+                    try:
+                        v = float(g.replace(",", "")) * float(m.get("scale") or 1)
+                    except ValueError:
+                        continue
+                    unit_g = mt.group(2) if mt.lastindex and mt.lastindex >= 2 else None
+                    if unit_g and unit_g.lower().startswith("day") and (m.get("unit") or "") == "hours":
+                        v *= 24
+                    row["value_num"] = v
+                out.append(row)
+                found = True
+                break
+            if found:
+                break
     return out
 
 

@@ -170,3 +170,13 @@ def test_sla_direction_and_benchmarks_follow_the_metrics_table(client):
         assert client.post("/api/sla/measurements", json={"contract_id": 1, "metric_key": "renewal_price_cap", "period": "2026-10-01", "actual": 5}).status_code == 422   # not an SLA metric
     finally:
         client.delete("/api/admin/metrics/renewal_price_cap")
+
+
+def test_llm_result_gaps_are_filled_by_the_rule_reader_but_never_the_liability_cap():
+    from app import extraction
+
+    md = "# Agreement\n\n## Signatures\n\n| | **Customer** | **Supplier** |\n|---|---|---|\n| **Party** | Arcadia Retail Inc. | Sable Legal Tech Inc |\n| **Signed by** | Helena Cruz | Sofia Marchetti |\n| **Date** | April 11, 2026 | April 14, 2026 |\n"
+    llm_out = {"customer_signatory": {"value": None, "confidence": 0.3}, "liability_cap_multiple": {"value": None, "confidence": 0.9}}
+    out = extraction._fill_gaps(dict(llm_out), md, {}, [], "NDA")
+    assert out["customer_signatory"]["value"] == "Helena Cruz" and out["supplier_signatory"]["value"] == "Sofia Marchetti"
+    assert out["liability_cap_multiple"] == llm_out["liability_cap_multiple"]          # 'uncapped' stays the model's call

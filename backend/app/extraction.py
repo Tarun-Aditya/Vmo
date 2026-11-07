@@ -207,13 +207,36 @@ def llm_extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> di
     return out
 
 
+GAP_FIELDS = ("customer_signatory", "supplier_signatory", "customer_signed_date", "supplier_signed_date", "effective_date", "expiry_date", "governing_law",
+              "payment_terms_days", "notice_period_days")
+
+
+def _fill_gaps(fields: dict, md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
+    """Hybrid: where the model returned nothing for a field that a deterministic reader can find exactly (signature blocks, dates, governing law),
+    use the rule extractor's answer. A missing liability cap is never filled: for that field 'nothing' means 'uncapped'."""
+    from app import extract_rules
+
+    try:
+        rules = extract_rules.extract(md, header, clauses, doc_type)
+    except Exception:
+        return fields
+    empty = lambda f: f not in fields or fields[f].get("value") in (None, "")  # noqa: E731
+    sig_gap = empty("customer_signatory") or empty("supplier_signatory")
+    for f in GAP_FIELDS:
+        if empty(f) and rules.get(f, {}).get("value") not in (None, ""):
+            fields[f] = rules[f]
+    if sig_gap and not fields.get("fully_executed", {}).get("value") and rules.get("fully_executed", {}).get("value"):
+        fields["fully_executed"] = rules["fully_executed"]
+    return fields
+
+
 def extract(
     md: str, header: dict, clauses: list[dict], doc_type: str, mode: str = "auto"
 ) -> tuple[dict, str]:
     use_llm = mode == "llm" or (mode == "auto" and llm.available())
     if use_llm:
         try:
-            return llm_extract(md, header, clauses, doc_type), "llm"
+            return _fill_gaps(llm_extract(md, header, clauses, doc_type), md, header, clauses, doc_type), "llm"
         except Exception as e:          # limit reached / network: never lose the document, fall back to the offline extractor
             llm.note_failure(e)
             from app import extract_rules

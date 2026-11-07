@@ -2,11 +2,19 @@ import { useEffect, useState } from "react";
 
 export const API = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 
+export const TOKEN_KEY = "ciq_token";
+export const getToken = (): string | null => { try { return localStorage.getItem(TOKEN_KEY); } catch { return null; } };
+export const setToken = (t: string | null) => { try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch { /* private mode */ } };
+/** Download / open links cannot send headers: the token travels as a query parameter instead. */
+export const authUrl = (path: string) => { const t = getToken(); return `${API}${path}${t ? `${path.includes("?") ? "&" : "?"}access_token=${encodeURIComponent(t)}` : ""}`; };
+
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const tok = getToken();
   const r = await fetch(`${API}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+    headers: { "Content-Type": "application/json", ...(tok ? { Authorization: `Bearer ${tok}` } : {}), ...(init?.headers ?? {}) },
   });
+  if (r.status === 401 && tok) { setToken(null); window.dispatchEvent(new Event("ciq-signed-out")); }
   if (!r.ok) {
     const body = await r.text();
     let msg = body;

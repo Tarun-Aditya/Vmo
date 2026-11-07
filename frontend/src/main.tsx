@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./index.css";
+import { api } from "./lib";
 import { Layout } from "./ui";
 import Dashboard from "./pages/Dashboard";
 import Contracts from "./pages/Contracts";
@@ -20,6 +21,8 @@ import Spend from "./pages/Spend";
 import Risk from "./pages/Risk";
 import Alerts from "./pages/Alerts";
 import AlertSettings from "./pages/admin/AlertSettings";
+import Access from "./pages/admin/Access";
+import Login from "./pages/Login";
 import RiskWeights from "./pages/admin/RiskWeights";
 import Connectors from "./pages/admin/Connectors";
 import Thresholds from "./pages/admin/Thresholds";
@@ -33,9 +36,21 @@ import Usage from "./pages/admin/Usage";
 
 const qc = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1, staleTime: 5000 } } });
 
+/** AUTH_MODE=off (demo): straight in. AUTH_MODE=on: sign in (or create the first administrator) first. */
+function Gate({ children }: { children: React.ReactNode }) {
+  const [n, setN] = React.useState(0);
+  const cfg = useQuery({ queryKey: ["auth-config", n], queryFn: () => api<{ auth_required: boolean; needs_bootstrap: boolean }>("/api/auth/config"), staleTime: 0 });
+  const me = useQuery({ queryKey: ["me", n], queryFn: () => api<{ email: string }>("/api/auth/me"), enabled: !!cfg.data?.auth_required, retry: false, staleTime: 0 });
+  React.useEffect(() => { const f = () => setN((x) => x + 1); window.addEventListener("ciq-signed-out", f); return () => window.removeEventListener("ciq-signed-out", f); }, []);
+  if (!cfg.data) return <div className="p-8 text-sm text-slate-500">Loading…</div>;
+  if (cfg.data.auth_required && (me.isLoading || me.isError)) return me.isLoading ? <div className="p-8 text-sm text-slate-500">Loading…</div> : <Login bootstrap={cfg.data.needs_bootstrap} onDone={() => { qc.clear(); setN((x) => x + 1); }} />;
+  return <>{children}</>;
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={qc}>
+      <Gate>
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
@@ -65,11 +80,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="alerts" element={<AlertSettings />} />
               <Route path="thresholds" element={<Thresholds />} />
               <Route path="obligations" element={<ObligationRules />} />
+              <Route path="access" element={<Access />} />
               <Route path="usage" element={<Usage />} />
             </Route>
           </Route>
         </Routes>
       </BrowserRouter>
+      </Gate>
     </QueryClientProvider>
   </React.StrictMode>
 );

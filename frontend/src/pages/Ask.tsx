@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { API, Col, Step, Table, ago, api, fmtDate, usd, useSetting } from "../lib";
+import { API, Col, getToken, Step, Table, ago, api, fmtDate, usd, useSetting } from "../lib";
 import { Card, Sev, SeverityChip, Td, Th } from "../ui";
 
 type Res = {
@@ -165,7 +165,7 @@ export default function Ask() {
     const ac = new AbortController();
     abort.current = ac;
     try {
-      const resp = await fetch(`${API}/api/chat/stream`, { method: "POST", signal: ac.signal, headers: { "Content-Type": "application/json" },
+      const resp = await fetch(`${API}/api/chat/stream`, { method: "POST", signal: ac.signal, headers: { "Content-Type": "application/json", ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}) },
         body: JSON.stringify({ question: qn, conversation_id: convId, demo_mode: demo, contract_ids: scope.length ? scope : null }) });
       if (!resp.ok || !resp.body) throw new Error(await resp.text());
       const reader = resp.body.getReader();
