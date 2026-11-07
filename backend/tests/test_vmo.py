@@ -44,9 +44,12 @@ def test_spend_exceptions_find_every_planted_problem(client):
     assert {"no_contract", "unsigned_contract", "duplicate", "above_run_rate", "billed_before_effective", "over_contract_value"} <= kinds
     assert ex[0]["severity"] == "critical" and "not fully signed" in ex[0]["detail"]
     off = [e for e in ex if e["kind"] == "no_contract"]
-    import csv
+    import json
 
-    csv_off = sum(float(r["amount"]) for r in csv.DictReader((feeds.feeds_dir() / "invoices.csv").open()) if not r["contract_title"].strip())
+    from app.config import data_path
+
+    labels = json.loads((data_path() / "labels_ops.json").read_text())["invoices"]          # ground truth written from the fixture rows, not from the documents read by the product
+    csv_off = sum(float(v["amount"]) for v in labels.values() if not (v.get("contract_title") or "").strip())
     with SessionLocal() as s_:
         contracted = {r[0] for r in s_.execute(text("SELECT vendor FROM contracts WHERE status <> 'draft' AND type NOT IN ('NDA','DPA')"))}
     assert off and {e["vendor"] for e in off}.isdisjoint(contracted) and sum(e["amount_at_risk"] for e in off) == csv_off     # from the feed file, not hardcoded
@@ -57,9 +60,9 @@ def test_spend_exceptions_find_every_planted_problem(client):
 
 
 def test_feed_loading_is_idempotent_and_upload_validates(client):
-    csv_text = (feeds.feeds_dir() / "invoices.csv").read_text()
-    again = feeds.load_csv("invoices.csv", csv_text)
-    assert again["new"] == 0 and again["rows"] > 20
+    again = feeds.run_feeds("manual")                                  # every invoice / report / certificate document is already loaded
+    assert again["new_docs"] == 0 and again["scanned"] > 100 and again["failed"] == 0
+    csv_text = ",".join(feeds.INVOICE_COLS) + "\n"
     assert client.post("/api/feeds/upload", json={"name": "notes.txt", "content": "x"}).status_code == 422
     with SessionLocal() as s:
         before = s.execute(text("SELECT count(*) FROM invoices")).scalar()

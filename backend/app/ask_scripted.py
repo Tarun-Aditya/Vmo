@@ -47,6 +47,16 @@ def questions() -> dict[str, str]:
     return {k: v.replace("{msa_vendor}", mv) for k, v in QUESTIONS.items()}
 
 
+def sla_key() -> str:
+    """The availability-type service level in the Values & limits configuration (a percentage SLA metric), not a fixed key."""
+    from sqlalchemy import text
+
+    from app.db import SessionLocal
+
+    with SessionLocal() as s:
+        return s.execute(text("SELECT key FROM metrics WHERE sla AND enabled ORDER BY (unit = '%') DESC, (name ILIKE '%availab%') DESC, key LIMIT 1")).scalar() or "sla_availability_pct"
+
+
 def money(n) -> str:
     n = float(n or 0)
     if n >= 1e6:
@@ -248,9 +258,9 @@ def _plan(key: str, r: Run) -> str:
         tot = sum(float(x["off_contract_spend"] or 0) for x in d)
         return f"{money(tot)} was invoiced by {len(d)} vendors that have no contract on file: {_list([x['vendor'] for x in d])}."
     if key == "sla_breaches":
-        d = rows(r.sql("""SELECT DISTINCT ON (vendor, period) vendor, title, period, actual, target, shortfall FROM v_sla
-            WHERE breach AND metric_key = 'sla_availability_pct' AND period >= current_date - 183 ORDER BY vendor, period DESC"""))
-        r.sql("""SELECT vendor, COUNT(*) AS breach_months, MIN(actual) AS worst_actual FROM v_sla WHERE breach AND metric_key = 'sla_availability_pct' AND period >= current_date - 183 GROUP BY vendor ORDER BY 2 DESC""")
+        d = rows(r.sql(f"""SELECT DISTINCT ON (vendor, period) vendor, title, period, actual, target, shortfall FROM v_sla
+            WHERE breach AND metric_key = '{sla_key()}' AND period >= current_date - 183 ORDER BY vendor, period DESC"""))
+        r.sql(f"""SELECT vendor, COUNT(*) AS breach_months, MIN(actual) AS worst_actual FROM v_sla WHERE breach AND metric_key = '{sla_key()}' AND period >= current_date - 183 GROUP BY vendor ORDER BY 2 DESC""")
         return f"{len({x['vendor'] for x in d})} vendors missed their availability target in the last 6 months."
     if key == "duplicate_invoices":
         d = rows(r.sql("""SELECT vendor, contract_title, invoice_no, invoice_date, invoice_amount, amount_at_risk FROM v_spend_exceptions WHERE kind = 'duplicate' ORDER BY invoice_date DESC"""))

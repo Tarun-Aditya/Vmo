@@ -1,0 +1,9 @@
+PASS [scripted] uncapped         
+PASS [scripted] saas_no_dpa      
+PASS [offline-planner] no_tfc           
+PASS [offline-planner] auto_renewals    
+PASS [offline-planner] expire_90        
+PASS [scripted] total_value      
+PASS [offline-planner] top5_vendors     
+PASS [offline-planner] non_ny_law       
+8/8 correct

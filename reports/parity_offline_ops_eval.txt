@@ -1,0 +1,12 @@
+  acceptance.completed_on     11/ 11  100.0%
+  invoice.amount              51/ 51  100.0%
+  invoice.due_date            51/ 51  100.0%
+  invoice.invoice_date        51/ 51  100.0%
+  invoice.invoice_no          51/ 51  100.0%
+  invoice.paid_date           51/ 51  100.0%
+  invoice.recognised          51/ 51  100.0%
+  invoice.reference           47/ 47  100.0%
+  invoice.vendor              51/ 51  100.0%
+  sla.period                  79/ 79  100.0%
+  sla.rows                    79/ 79  100.0%
+OVERALL 573/573 = 100.0%

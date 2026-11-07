@@ -239,6 +239,8 @@ def _cells(line: str, labels: str) -> list[str]:
     raw = line.strip()
     if "|" in raw:
         parts = [c for c in raw.strip("|").split("|")]
+    elif len(re.findall(rf"(?:^|\s)(?:{labels})\s*:", raw, re.I)) >= 2:       # 'Name: A Name: B': columns collapsed to single spaces (OCR, plain-text export)
+        parts = [x for x in re.split(rf"(?=(?:^|\s)(?:{labels})\s*:)", raw, flags=re.I) if x.strip()]
     else:
         parts = re.split(r"\s{3,}", raw)
     if len(parts) > 1 and re.fullmatch(rf"\W*(?:{labels})\W*", parts[0].strip(), re.I):

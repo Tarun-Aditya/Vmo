@@ -10,14 +10,15 @@ type Run = { id: number; pipeline: string; started_at: string; finished_at: stri
 type Ev = { id: number; path: string; contract_id: number | null; action: string; detail: string; created_at: string };
 
 const FREQ: [number, string][] = [[15, "Every 15 minutes"], [30, "Every 30 minutes"], [60, "Every hour"], [120, "Every 2 hours (default)"], [360, "Every 6 hours"], [720, "Every 12 hours"], [1440, "Daily"]];
-const SAMPLE = `# NDA – Example Supplier
+const inDays = (n: number) => { const d = new Date(Date.now() + n * 864e5); return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }); };
+const SAMPLE = () => `# NDA – Example Supplier
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Example Supplier Inc (the "Supplier")
-**Effective Date:** 1 December 2026
+**Effective Date:** ${inDays(30)}
 **Document Type:** NDA
 
 ## 1. Term
-This NDA commences on 1 December 2026 and, unless terminated earlier in accordance with its terms, expires on 1 December 2028.
+This NDA commences on ${inDays(30)} and, unless terminated earlier in accordance with its terms, expires on 1 December 2028.
 
 ## 2. Confidentiality
 Each party shall keep the other party's Confidential Information confidential, use it only for the purposes of this NDA, and continue to do so for 3 years after the NDA ends.
@@ -78,7 +79,7 @@ export default function Pipeline() {
   const runs = useQuery({ queryKey: ["runs"], queryFn: () => api<Run[]>("/api/admin/pipeline/runs"), refetchInterval: 4000 });
   const [open, setOpen] = useState<number | null>(null);
   const events = useQuery({ queryKey: ["events", open], enabled: open !== null, queryFn: () => api<Ev[]>(`/api/admin/pipeline/runs/${open}/events`) });
-  const [doc, setDoc] = useState({ filename: "new-nda.md", content: SAMPLE, category: "Legal", owner: "Legal Operations", status: "active" });
+  const [doc, setDoc] = useState({ filename: "new-nda.md", content: SAMPLE(), category: "", owner: "", status: "active" });
   const refresh = () => { qc.invalidateQueries(); };
   const upload = useMutation({ mutationFn: () => api<{ run: { new_docs?: number; updated?: number } }>("/api/admin/pipeline/upload", { method: "POST", body: JSON.stringify(doc) }), onSuccess: refresh });
   if (!q.data) return <Loading q={q} />;
