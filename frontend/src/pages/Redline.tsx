@@ -7,12 +7,12 @@ import { API, api, when } from "../lib";
 import { Card, Loading, Sev, SeverityChip, sevStripe } from "../ui";
 
 type RStatus = "pending" | "in_review" | "changes_requested" | "approved";
-type Doc = { id: number; title: string; vendor: string; type: string; status: string; origin: string; deviations: number; counts: Record<Sev, number>; checks_failed: number; check_counts: Record<Sev, number>; review_status: RStatus };
+type Doc = { id: number; title: string; vendor: string; type: string; status: string; origin: string; deviations: number; counts: Record<Sev, number>; checks_failed: number; check_counts: Record<Sev, number>; review_status: RStatus; assignee?: string | null; due_date?: string | null };
 type Item = { clause_type: string; heading: string; status: "changed" | "missing"; draft_text: string; standard_position: string; deviation: string; severity: Sev; suggested_text: string; diff: [string, string][]; page: number | null };
 type Check = { rule_key: string; name: string; description: string | null; status: "pass" | "fail" | "na"; severity: Sev; actual: string | null; expected: string | null; page: number | null; excerpt: string | null; suggested_text: string | null };
 type Red = { id: number; title: string; vendor: string; type: string; status: string; body_md: string; template: { name: string } | null; items: Item[]; counts: Record<Sev, number>; source: string; elapsed_ms?: number;
   checklist: Check[]; checklist_summary: { pass: number; fail: number; na: number }; checklist_fail_counts: Record<Sev, number>;
-  review: { status: RStatus; note: string | null; reviewer: string | null; updated_at: string | null }; decisions: Record<string, "accepted" | "rejected"> };
+  review: { status: RStatus; note: string | null; reviewer: string | null; assignee: string | null; due_date: string | null; updated_at: string | null }; decisions: Record<string, "accepted" | "rejected"> };
 
 const ORDER: Sev[] = ["critical", "high", "medium", "low"];
 const STATUS: Record<RStatus, { label: string; cls: string }> = {
@@ -122,6 +122,7 @@ export default function Redline() {
   const rerun = useMutation({ mutationFn: () => api<Red>(`/api/redline/${id}/rerun`, { method: "POST" }), onSuccess: (d) => { qc.setQueryData(["redline", id], d); qc.invalidateQueries({ queryKey: ["redline-docs"] }); } });
   const decide = useMutation({ mutationFn: (v: { clause_type: string; decision: string | null }) => api(`/api/redline/${id}/decision`, { method: "PUT", body: JSON.stringify(v) }), onSuccess: refresh });
   const review = useMutation({ mutationFn: (status: RStatus) => api(`/api/redline/${id}/review`, { method: "PUT", body: JSON.stringify({ status, note: note || null }) }), onSuccess: refresh });
+  const assign = useMutation({ mutationFn: (v: { assignee?: string; due_date?: string }) => api(`/api/redline/${id}/review`, { method: "PUT", body: JSON.stringify({ status: r?.review.status ?? "pending", ...v }) }), onSuccess: refresh });
   const apply = useMutation({ mutationFn: () => api<{ applied: number; version: number }>(`/api/redline/${id}/apply`, { method: "POST" }), onSuccess: () => { qc.invalidateQueries(); } });
   const [onlyFail, setOnlyFail] = useState(false);
   const r = red.data;
@@ -148,6 +149,7 @@ export default function Redline() {
             <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-slate-500">
               <span className="rounded bg-slate-200 px-1 font-semibold uppercase dark:bg-slate-700">{d.type}</span>
               <span className={`rounded px-1 font-medium ${STATUS[d.review_status].cls}`}>{STATUS[d.review_status].label}</span>
+              {d.assignee && <span title={d.due_date ? `due ${d.due_date}` : undefined}>→ {d.assignee}{d.due_date ? ` · ${d.due_date}` : ""}</span>}
               {d.origin === "generated" && <span className="rounded border border-indigo-400 px-1 text-indigo-700 dark:text-indigo-300">from template</span>}
               {d.origin === "upload" && <span className="rounded border border-slate-400 px-1">uploaded</span>}
             </div>
@@ -181,6 +183,8 @@ export default function Redline() {
                 <Btn onClick={() => review.mutate("approved")} disabled={review.isPending}>✓ Approve</Btn>
                 <Btn kind="ghost" onClick={() => review.mutate("changes_requested")} disabled={review.isPending}>Request changes</Btn>
                 <Btn kind="ghost" onClick={() => review.mutate("pending")} disabled={review.isPending}>Reset</Btn>
+                <input className={`${inputCls} w-32`} aria-label="Assignee" placeholder="Assign to…" defaultValue={r.review.assignee ?? ""} key={`a${r.id}-${r.review.assignee}`} onBlur={(e) => e.target.value !== (r.review.assignee ?? "") && assign.mutate({ assignee: e.target.value })} />
+                <input className={`${inputCls} w-36`} type="date" aria-label="Review due date" defaultValue={r.review.due_date ?? ""} key={`d${r.id}-${r.review.due_date}`} onChange={(e) => e.target.value && assign.mutate({ due_date: e.target.value })} />
                 {r.review.updated_at && <span className="text-xs text-slate-500">updated {when(r.review.updated_at)}</span>}
               </div>
             </Card>

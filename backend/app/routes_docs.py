@@ -89,6 +89,8 @@ class ReviewIn(BaseModel):
     status: str
     note: str | None = None
     reviewer: str | None = None
+    assignee: str | None = None
+    due_date: str | None = None
 
 
 @router.put("/redline/{cid}/review")
@@ -97,17 +99,18 @@ def review_put(cid: int, r: ReviewIn):
     if r.status not in REVIEW:
         raise HTTPException(422, f"status must be one of {', '.join(REVIEW)}")
     with SessionLocal() as s:
-        s.execute(text("""INSERT INTO contract_reviews (contract_id, status, note, reviewer) VALUES (:i,:s,:n,:r)
-                          ON CONFLICT (contract_id) DO UPDATE SET status=:s, note=COALESCE(:n, contract_reviews.note), reviewer=COALESCE(:r, contract_reviews.reviewer), updated_at=now()"""),
-                  {"i": cid, "s": r.status, "n": r.note, "r": r.reviewer})
+        s.execute(text("""INSERT INTO contract_reviews (contract_id, status, note, reviewer, assignee, due_date) VALUES (:i,:s,:n,:r,:a,CAST(:d AS date))
+                          ON CONFLICT (contract_id) DO UPDATE SET status=:s, note=COALESCE(:n, contract_reviews.note), reviewer=COALESCE(:r, contract_reviews.reviewer),
+                          assignee=COALESCE(:a, contract_reviews.assignee), due_date=COALESCE(CAST(:d AS date), contract_reviews.due_date), updated_at=now()"""),
+                  {"i": cid, "s": r.status, "n": r.note, "r": r.reviewer, "a": r.assignee, "d": r.due_date or None})
         s.commit()
     return review_get(cid)
 
 
 def review_get(cid: int) -> dict:
-    r = one("SELECT status, note, reviewer, updated_at FROM contract_reviews WHERE contract_id=:i", i=cid)
+    r = one("SELECT status, note, reviewer, assignee, due_date, updated_at FROM contract_reviews WHERE contract_id=:i", i=cid)
     dec = {x["clause_type"]: x["decision"] for x in rows("SELECT clause_type, decision FROM redline_decisions WHERE contract_id=:i", i=cid)}
-    return {"review": r or {"status": "pending", "note": None, "reviewer": None, "updated_at": None}, "decisions": dec}
+    return {"review": r or {"status": "pending", "note": None, "reviewer": None, "assignee": None, "due_date": None, "updated_at": None}, "decisions": dec}
 
 
 class DecisionIn(BaseModel):

@@ -3,9 +3,12 @@ import { NavLink, Outlet } from "react-router-dom";
 const TABS: [string, string, string][] = [
   ["/admin", "Pipeline", "Folder watch, schedule, run history"],
   ["/admin/connectors", "Connectors", "Google Drive, OneDrive, SharePoint"],
+  ["/admin/alerts", "Alerts", "Rules and e-mail / Slack / Teams / webhook channels"],
   ["/admin/clauses", "Key clause library", "What clauses to identify"],
   ["/admin/values", "Values & limits", "What numbers to extract"],
   ["/admin/checklist", "Redline checklist", "Rules to run before signing"],
+  ["/admin/obligations", "Obligation rules", "Which values become tracked duties"],
+  ["/admin/thresholds", "Thresholds", "Spend checks, risk points, SLA credits"],
   ["/admin/risk", "Risk scoring", "Weights of the vendor risk score"],
   ["/admin/usage", "AI usage", "Calls, tokens, cost"],
 ];

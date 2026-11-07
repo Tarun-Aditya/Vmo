@@ -15,6 +15,22 @@ from app import textutil as tu
 MONTHS = "january february march april may june july august september october november december".split()
 
 
+
+def _milestone_title(ctx: str) -> str:
+    """A readable milestone name from the text before a date: start at the last table-row number or sentence start, never mid-word, at most ~9 words."""
+    t = re.sub(r"\s+", " ", re.sub(r"[|_*`]+|\b(?:due|by|on|date|no\.?|milestone|key deliverables?)\b[:]?", " ", ctx, flags=re.I)).strip(" .,;:-–")
+    rows = list(re.finditer(r"(?:^|\s)\d{1,2}\s+(?=[A-Z])", t))
+    if rows:
+        t = t[rows[-1].end():]
+    else:
+        sent = re.split(r"(?<=[.;:])\s+", t)
+        t = sent[-1]
+    words = t.split()
+    while words and not (words[0][0].isupper() or words[0][0].isdigit()):       # drop a leading fragment cut mid-word / mid-sentence
+        words.pop(0)
+    return " ".join(words[:9]).strip(" .,;:-–")
+
+
 def _date(s: str) -> date | None:
     m = re.match(r"\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})", s)
     if not m or m.group(2).lower() not in MONTHS:
@@ -70,8 +86,7 @@ def rule_obligations(c: dict, clauses: list[dict], vals: list[dict], today: date
             ctx = body[max(0, pos - 110):pos]
             if re.search(r"effective date|dated|expires?|until|initial term|commenc|signed|executed|terminat", ctx[-60:], re.I):
                 continue
-            title = re.sub(r"\s+", " ", re.sub(r"[|_*`]+|\b(?:due|by|on|date|no\.?|milestone|key deliverables?)\b[:]?", " ", ctx[-90:], flags=re.I)).strip(" .,;:-–")
-            title = re.sub(r"^\d+\s+", "", title)[-80:].strip()
+            title = _milestone_title(ctx)
             seen_dates.add(d0)
             out.append(dict(key=f"milestone:{d0.isoformat()}", kind="milestone", party="Supplier", title=("Milestone: " + title) if title else "Milestone", due_date=d0, frequency="once",
                             target_value=None, target_unit=None, metric_key=None, page=cl.get("page"), clause_type=cl.get("clause_type"), detail=None))

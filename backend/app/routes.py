@@ -499,7 +499,7 @@ def _sev_counts(items: list[dict]) -> dict:
 def redline_documents():
     out = []
     for d in q(
-        """SELECT c.id, c.title, c.vendor, c.type, c.status, c.origin, r.items, COALESCE(v.status, 'pending') AS review_status,
+        """SELECT c.id, c.title, c.vendor, c.type, c.status, c.origin, r.items, COALESCE(v.status, 'pending') AS review_status, v.assignee, v.due_date,
                   c.source_path, c.created_at
            FROM contracts c LEFT JOIN redlines r ON r.contract_id = c.id LEFT JOIN contract_reviews v ON v.contract_id = c.id
            WHERE c.type <> 'Amendment'

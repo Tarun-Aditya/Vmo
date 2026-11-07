@@ -18,8 +18,12 @@ import DocumentEditor from "./pages/DocumentEditor";
 import Obligations from "./pages/Obligations";
 import Spend from "./pages/Spend";
 import Risk from "./pages/Risk";
+import Alerts from "./pages/Alerts";
+import AlertSettings from "./pages/admin/AlertSettings";
 import RiskWeights from "./pages/admin/RiskWeights";
 import Connectors from "./pages/admin/Connectors";
+import Thresholds from "./pages/admin/Thresholds";
+import ObligationRules from "./pages/admin/ObligationRules";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Pipeline from "./pages/admin/Pipeline";
 import Kcc from "./pages/admin/Kcc";
@@ -49,6 +53,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="obligations" element={<Obligations />} />
             <Route path="spend" element={<Spend />} />
             <Route path="risk" element={<Risk />} />
+            <Route path="alerts" element={<Alerts />} />
             <Route path="documents/:id/edit" element={<DocumentEditor />} />
             <Route path="admin" element={<AdminLayout />}>
               <Route index element={<Pipeline />} />
@@ -57,6 +62,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="checklist" element={<Checklist />} />
               <Route path="risk" element={<RiskWeights />} />
               <Route path="connectors" element={<Connectors />} />
+              <Route path="alerts" element={<AlertSettings />} />
+              <Route path="thresholds" element={<Thresholds />} />
+              <Route path="obligations" element={<ObligationRules />} />
               <Route path="usage" element={<Usage />} />
             </Route>
           </Route>

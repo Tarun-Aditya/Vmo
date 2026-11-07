@@ -14,3 +14,7 @@ data/docs/
 data/manifest.json
 data/labels.json
 data/.cache/
+
+data/inbox/
+data/feeds/
+data_test/

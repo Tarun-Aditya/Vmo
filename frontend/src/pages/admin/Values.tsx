@@ -5,10 +5,10 @@ import { api } from "../../lib";
 import { Btn, Field, Toggle, inputCls } from "../../forms";
 import { Card, Loading, Td, Th } from "../../ui";
 
-type M = { key: string; name: string; description: string | null; kcc_key: string | null; pattern: string; kind: string; unit: string | null; scale: number; enabled: boolean; builtin: boolean; documents: number };
+type M = { key: string; name: string; description: string | null; kcc_key: string | null; pattern: string; kind: string; unit: string | null; scale: number; enabled: boolean; builtin: boolean; documents: number; better: string | null; sla: boolean };
 type K = { key: string; name: string };
 type Test = { matches: number; examples: { title: string; value: string | number; page: number; excerpt: string }[] };
-const BLANK = { key: "", name: "", description: "", kcc_key: "", pattern: "", kind: "number", unit: "", scale: 1, enabled: true };
+const BLANK = { key: "", name: "", description: "", kcc_key: "", pattern: "", kind: "number", unit: "", scale: 1, enabled: true, better: "", sla: false };
 
 export default function Values() {
   const qc = useQueryClient();
@@ -17,13 +17,13 @@ export default function Values() {
   const [edit, setEdit] = useState<string | "new" | null>(null);
   const [f, setF] = useState(BLANK);
   const [test, setTest] = useState<Test | null>(null);
-  const body = () => ({ ...f, key: f.key || undefined, kcc_key: f.kcc_key || null, scale: Number(f.scale) || 1 });
+  const body = () => ({ ...f, key: f.key || undefined, kcc_key: f.kcc_key || null, scale: Number(f.scale) || 1, better: f.better || null });
   const done = () => { qc.invalidateQueries(); setEdit(null); setTest(null); };
   const save = useMutation({ mutationFn: () => edit === "new" ? api("/api/admin/metrics", { method: "POST", body: JSON.stringify(body()) }) : api(`/api/admin/metrics/${edit}`, { method: "PUT", body: JSON.stringify(body()) }), onSuccess: done });
   const del = useMutation({ mutationFn: (k: string) => api(`/api/admin/metrics/${k}`, { method: "DELETE" }), onSuccess: done });
   const quick = useMutation({ mutationFn: (m: M) => api(`/api/admin/metrics/${m.key}`, { method: "PUT", body: JSON.stringify({ ...m, enabled: !m.enabled }) }), onSuccess: () => qc.invalidateQueries() });
   const run = useMutation({ mutationFn: () => api<Test>("/api/admin/metrics/test", { method: "POST", body: JSON.stringify(body()) }), onSuccess: setTest });
-  const open = (m: M | null) => { setTest(null); if (!m) { setF(BLANK); setEdit("new"); return; } setF({ key: m.key, name: m.name, description: m.description ?? "", kcc_key: m.kcc_key ?? "", pattern: m.pattern, kind: m.kind, unit: m.unit ?? "", scale: m.scale, enabled: m.enabled }); setEdit(m.key); };
+  const open = (m: M | null) => { setTest(null); if (!m) { setF(BLANK); setEdit("new"); return; } setF({ key: m.key, name: m.name, description: m.description ?? "", kcc_key: m.kcc_key ?? "", pattern: m.pattern, kind: m.kind, unit: m.unit ?? "", scale: m.scale, enabled: m.enabled, better: m.better ?? "", sla: m.sla }); setEdit(m.key); };
   if (!list.data) return <Loading q={list} />;
   const kname = (k: string | null) => kccs.data?.find((x) => x.key === k)?.name ?? (k || "any clause");
   return (
@@ -42,6 +42,8 @@ export default function Values() {
             <Field label="Type"><select className={inputCls} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })}>{["number", "money", "text"].map((k) => <option key={k}>{k}</option>)}</select></Field>
             <Field label="Pattern" hint="A regular expression with ONE capture group around the value." className="md:col-span-2"><input className={`${inputCls} font-mono`} value={f.pattern} onChange={(e) => setF({ ...f, pattern: e.target.value })} placeholder="increase of (\d+)% per year" /></Field>
             <Field label="Unit"><input className={inputCls} value={f.unit} onChange={(e) => setF({ ...f, unit: e.target.value })} placeholder="days, %, USD, hours" /></Field>
+            <Field label="Which way is good?" hint="Used for benchmarks and SLA breach direction."><select className={inputCls} aria-label="Which way is good" value={f.better} onChange={(e) => setF({ ...f, better: e.target.value })}><option value="">Not applicable</option><option value="higher">Higher is better (e.g. availability)</option><option value="lower">Lower is better (e.g. response time)</option></select></Field>
+            <Field label="Measured monthly (SLA)" hint="Actuals arrive in the monitoring feed (sla*.csv) and are tracked against the contract's target."><label className="flex items-center gap-2 pt-1"><input type="checkbox" checked={f.sla} onChange={(e) => setF({ ...f, sla: e.target.checked })} />Track as an SLA</label></Field>
             <Field label="Description" className="md:col-span-3"><input className={inputCls} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} /></Field>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">

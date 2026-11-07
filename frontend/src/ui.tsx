@@ -66,6 +66,7 @@ export function Layout() {
   const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ llm_available: boolean; llm_label: string; llm_provider: string; today: string }>("/api/meta") });
   const qc = useQueryClient();
   const st = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/api/status"), refetchInterval: 10000 });
+  const al = useQuery({ queryKey: ["alerts-summary"], queryFn: () => api<{ unread: number; open: number; critical: number }>("/api/alerts/summary"), refetchInterval: 30000 });
   const lastRun = useRef<number | null>(null);
   useEffect(() => {
     // A pipeline run finished: refresh every screen, so all modules show the same new data.
@@ -95,6 +96,9 @@ export function Layout() {
                 {!st.data.running && st.data.config.enabled && <span className="text-slate-500">· next {inFuture(st.data.config.next_run_at)}</span>}
               </NavLink>
             )}
+            <NavLink to="/alerts" className="relative rounded px-2 py-1 text-base" aria-label={`Alerts${al.data?.unread ? `, ${al.data.unread} unread` : ""}`} title="Notification centre">
+              🔔{!!al.data?.unread && <span className="absolute -right-1 -top-1 min-w-[1.1rem] rounded-full bg-red-600 px-1 text-center text-[10px] font-bold leading-4 text-white">{al.data.unread > 99 ? "99+" : al.data.unread}</span>}
+            </NavLink>
             <label className="flex cursor-pointer items-center gap-2" title="Use cached AI results where available, so the demo is fast and works offline">
               <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Demo mode
             </label>
