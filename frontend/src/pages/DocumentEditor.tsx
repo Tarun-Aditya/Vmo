@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import Comments from "../components/Comments";
 import DocEditor from "../components/DocEditor";
 import ShareDialog from "../components/ShareDialog";
+import SignaturePanel from "../components/SignaturePanel";
 import { Btn, inputCls } from "../forms";
 import { api, authUrl, when } from "../lib";
 import { Card, Loading, Sev, SeverityChip } from "../ui";
@@ -47,6 +48,7 @@ export default function DocumentEditor() {
         <div className="space-y-3">
           <Comments docId={String(d.id)} endpoints={{ list: `/api/documents/${d.id}/threads`, add: `/api/documents/${d.id}/threads`, reply: (t) => `/api/threads/${t}/comments`, patch: (t) => `/api/threads/${t}` }} />
           {d.editable && <ShareDialog docId={String(d.id)} />}
+          {d.editable && <SignaturePanel docId={String(d.id)} />}
           {d.editable && (
             <Card title="Save">
               <input className={inputCls} placeholder="What changed? (optional)" aria-label="Version note" value={note} onChange={(e) => setNote(e.target.value)} />

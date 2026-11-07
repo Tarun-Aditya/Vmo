@@ -25,6 +25,7 @@ import Access from "./pages/admin/Access";
 import ApprovalRules from "./pages/admin/ApprovalRules";
 import Login from "./pages/Login";
 import SharedDoc from "./pages/Shared";
+import Sign from "./pages/Sign";
 import RiskWeights from "./pages/admin/RiskWeights";
 import Connectors from "./pages/admin/Connectors";
 import Thresholds from "./pages/admin/Thresholds";
@@ -44,7 +45,7 @@ function Gate({ children }: { children: React.ReactNode }) {
   const cfg = useQuery({ queryKey: ["auth-config", n], queryFn: () => api<{ auth_required: boolean; needs_bootstrap: boolean }>("/api/auth/config"), staleTime: 0 });
   const me = useQuery({ queryKey: ["me", n], queryFn: () => api<{ email: string }>("/api/auth/me"), enabled: !!cfg.data?.auth_required, retry: false, staleTime: 0 });
   React.useEffect(() => { const f = () => setN((x) => x + 1); window.addEventListener("ciq-signed-out", f); return () => window.removeEventListener("ciq-signed-out", f); }, []);
-  if (window.location.pathname.startsWith("/shared/")) return <>{children}</>;      // a share link is its own credential
+  if ((window.location.pathname.startsWith("/shared/") || window.location.pathname.startsWith("/sign/"))) return <>{children}</>;      // a share link is its own credential
   if (!cfg.data) return <div className="p-8 text-sm text-slate-500">Loading…</div>;
   if (cfg.data.auth_required && (me.isLoading || me.isError)) return me.isLoading ? <div className="p-8 text-sm text-slate-500">Loading…</div> : <Login bootstrap={cfg.data.needs_bootstrap} onDone={() => { qc.clear(); setN((x) => x + 1); }} />;
   return <>{children}</>;
@@ -57,6 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <Routes>
           <Route path="shared/:token" element={<SharedDoc />} />
+          <Route path="sign/:token" element={<Sign />} />
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="contracts" element={<Contracts />} />

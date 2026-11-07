@@ -21,7 +21,7 @@ from app.db import SessionLocal
 
 RANK = {"viewer": 0, "reviewer": 1, "admin": 2}
 SESSION_HOURS = 12
-PUBLIC = ("/health", "/api/auth/login", "/api/auth/config", "/api/auth/bootstrap", "/api/meta", "/api/shared")        # /api/shared/<token>: the link itself is the credential, checked per request
+PUBLIC = ("/health", "/api/auth/login", "/api/auth/config", "/api/auth/bootstrap", "/api/meta", "/api/shared", "/api/sign")        # /api/shared/<token>: the link itself is the credential, checked per request
 READ_LIKE_POSTS = ("/api/ask", "/api/chat")         # POSTs that only read (questions): viewers may ask
 
 
