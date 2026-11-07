@@ -6,7 +6,7 @@ import re
 import threading
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
 
@@ -119,13 +119,27 @@ def pipelines_put(key: str, c: PipelineTrigger):
     return pipelines_get()
 
 
+class ModeIn(BaseModel):
+    demo: bool
+
+
+@router.put("/admin/mode")
+def set_mode(b: ModeIn, request: Request):
+    """Demo (no Claude, simulated systems) <-> Live (every module LLM-based)."""
+    from app import llm, mode
+    from app.routes_auth import me
+
+    mode.set_demo(b.demo, me(request).get("email"))
+    return {"demo_mode": b.demo, "engine": llm.provider(), "note": "Stored documents keep the data of the engine that read them. Re-extract to refresh them with the current engine."}
+
+
 @router.post("/admin/pipelines/{key}/run")
-def pipelines_run(key: str):
+def pipelines_run(key: str, force: bool = False):
     if not rows("SELECT 1 FROM pipeline_config WHERE key=:k", k=key):
         raise HTTPException(404, "unknown pipeline")
     if pipeline._lock.locked():
         return {"started": False, "message": "a run is already in progress"}
-    threading.Thread(target=pipeline.run_pipeline, kwargs={"trigger": "manual", "pipeline_key": key}, daemon=True).start()
+    threading.Thread(target=pipeline.run_pipeline, kwargs={"trigger": "manual" if not force else "re-extract", "pipeline_key": key, "force": force}, daemon=True).start()
     return {"started": True}
 
 

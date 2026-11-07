@@ -170,18 +170,18 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
     return {"values": len(vals), "checks": len(results), "deviations": len(items), "obligations": n_obl}
 
 
-def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", redline_mode: str = "auto") -> dict:
+def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", redline_mode: str = "auto", force: bool = False) -> dict:
     rel = str(path.relative_to(root))
     st = path.stat()
     prior = s.query(Contract).filter(Contract.source_path == rel).first()
-    if prior and prior.source_mtime_ns == st.st_mtime_ns and prior.source_size == st.st_size and prior.content_hash:
+    if not force and prior and prior.source_mtime_ns == st.st_mtime_ns and prior.source_size == st.st_size and prior.content_hash:
         # incremental: size and modification time are as at the last run, so the file is not even read (the hash stays the identity if they differ)
         return {"action": "unchanged", "contract_id": prior.id, "path": rel, "reason": "untouched since the last run (size and modified time)", "hash": prior.content_hash, "size": st.st_size}
     raw = path.read_bytes()
     chash = hashlib.sha256(raw).hexdigest()
     base = {"hash": chash, "size": len(raw)}
     existing = s.query(Contract).filter(Contract.source_path == rel).first()
-    if existing and existing.content_hash == chash:
+    if not force and existing and existing.content_hash == chash:
         existing.source_size, existing.source_mtime_ns = st.st_size, st.st_mtime_ns        # touched but identical: remember the new stamp
         return {"action": "unchanged", "contract_id": existing.id, "path": rel, "reason": "same content hash as the last run", **base}
     twin = None if existing or path.with_suffix(".meta.json").exists() else s.query(Contract).filter(Contract.content_hash == chash).first()
@@ -249,7 +249,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         s.add(FieldExtraction(contract_id=contract.id, field=f, value=None if d["value"] is None else str(d["value"]), corrected=bool(d.get("corrected")),
                               confidence=d["confidence"], source_clause_id=by_type.get(d["clause_type"]), source_page=d["page"]))
     stats = derive(s, contract, db_clauses, cfg, meta["template_key"], redline_mode if redline_mode != "auto" else "auto")
-    return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "reason": "new content hash" if action == "new" else "content hash changed", **base, "parent_title": meta["parent_title"] or meta.get("parent_ref"),
+    return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "reason": "new content hash" if action == "new" else ("re-extracted on request" if force else "content hash changed"), **base, "parent_title": meta["parent_title"] or meta.get("parent_ref"),
             "extractor": mode, **stats}
 
 
@@ -308,7 +308,7 @@ def pipeline_folders(s, key: str) -> list[str]:
 
 # ------------------------------------------------------------------ a run
 def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Path] | None = None, log=lambda *_: None,
-                 pipeline_key: str | None = None) -> dict:
+                 pipeline_key: str | None = None, force: bool = False) -> dict:
     """Process the inbox (or one pipeline's folders, or only the given files). Safe to call from the scheduler, the API and the seed."""
     if pipeline_key == "feeds":
         from app import feeds
@@ -336,14 +336,14 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
         def work(f: Path) -> None:
             try:
                 with SessionLocal() as s:
-                    r = ingest_file(s, f, root, cfg, extractor)
+                    r = ingest_file(s, f, root, cfg, extractor, force=force)
                     if r["action"] in ("new", "updated"):
                         with lk:
                             pending[r["contract_id"]] = r.get("parent_title")
                     s.execute(text("INSERT INTO pipeline_events (run_id, path, contract_id, action, detail, content_hash, size_bytes, reason) VALUES (:r,:p,:c,:a,:d,:h,:z,:w)"),
                               {"r": run_id, "p": r["path"], "c": r["contract_id"], "a": r["action"], "h": r["hash"], "z": r["size"], "w": r["reason"],
                                "d": (f"{r.get('title', '')} · {r.get('values', 0)} values, {r.get('checks', 0)} checks, "
-                                     f"{r.get('deviations', 0)} deviations") if r["action"] in ("new", "updated") else r["reason"]})
+                                     f"{r.get('deviations', 0)} deviations · read by {r.get('extractor', '?')}") if r["action"] in ("new", "updated") else r["reason"]})
                     s.commit()
                 with lk:
                     counts[{"new": "new_docs", "updated": "updated", "unchanged": "unchanged", "moved": "unchanged"}[r["action"]]] += 1

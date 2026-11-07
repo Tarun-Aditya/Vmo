@@ -356,3 +356,22 @@ def test_claude_tags_a_custom_clause_in_any_wording_and_the_matrix_cites_it(clie
             s.execute(text("DELETE FROM kcc_ai_cache"))
             s.execute(text("DELETE FROM contracts WHERE vendor ILIKE 'Aitag%'"))
             s.commit()
+
+
+def test_demo_mode_switch_turns_claude_off_everywhere_and_back(client, seeded, monkeypatch):
+    """Demo ON: provider offline whatever is configured. Demo OFF: the configured backend (Claude) is used by every module."""
+    from app import llm, mode
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "llm_provider", "api")
+    monkeypatch.setattr(settings, "anthropic_api_key", "sk-test")
+    try:
+        assert client.put("/api/admin/mode", json={"demo": False}).json()["engine"] == "api"
+        m = client.get("/api/meta").json()
+        assert m["demo_mode"] is False and m["llm_provider"] == "api" and llm.available()
+        r = client.put("/api/admin/mode", json={"demo": True}).json()
+        assert r["demo_mode"] is True and r["engine"] == "offline"
+        m = client.get("/api/meta").json()
+        assert m["demo_mode"] is True and m["llm_provider"] == "offline" and not llm.available()
+    finally:
+        mode.set_demo(False)

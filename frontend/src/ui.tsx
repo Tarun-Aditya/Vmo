@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Status, ago, api, inFuture, setToken, useSetting } from "./lib";
 
 export type Sev = "low" | "medium" | "high" | "critical";
@@ -61,10 +61,10 @@ const NAV = [["/", "Dashboard"], ["/contracts", "Contracts"], ["/vendors", "Vend
 
 export function Layout() {
   const [dark, setDark] = useSetting("dark", window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false);
-  const [demo, setDemo] = useSetting("demo", true);
-  document.documentElement.classList.toggle("dark", dark);
-  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ llm_available: boolean; llm_label: string; llm_provider: string; today: string }>("/api/meta") });
+    document.documentElement.classList.toggle("dark", dark);
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ demo_mode: boolean; llm_available: boolean; llm_label: string; llm_provider: string; today: string }>("/api/meta") });
   const qc = useQueryClient();
+  const modeSw = useMutation({ mutationFn: (demo: boolean) => api("/api/admin/mode", { method: "PUT", body: JSON.stringify({ demo }) }), onSuccess: () => qc.invalidateQueries() });
   const st = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/api/status"), refetchInterval: 10000 });
   const al = useQuery({ queryKey: ["alerts-summary"], queryFn: () => api<{ unread: number; open: number; critical: number }>("/api/alerts/summary"), refetchInterval: 30000 });
   const who = useQuery({ queryKey: ["whoami"], queryFn: () => api<{ email: string; name?: string; role: string; auth_required: boolean }>("/api/auth/me") });
@@ -100,11 +100,11 @@ export function Layout() {
             <NavLink to="/alerts" className="relative rounded px-2 py-1 text-base" aria-label={`Alerts${al.data?.unread ? `, ${al.data.unread} unread` : ""}`} title="Notification centre">
               🔔{!!al.data?.unread && <span className="absolute -right-1 -top-1 min-w-[1.1rem] rounded-full bg-red-600 px-1 text-center text-[10px] font-bold leading-4 text-white">{al.data.unread > 99 ? "99+" : al.data.unread}</span>}
             </NavLink>
-            <label className="flex cursor-pointer items-center gap-2" title="Use cached AI results where available, so the demo is fast and works offline">
-              <input type="checkbox" checked={demo} onChange={(e) => setDemo(e.target.checked)} /> Demo mode
+            <label className="flex cursor-pointer items-center gap-2" title="ON: demo mode, no Claude anywhere (offline engine, cached results, simulated external systems). OFF: live, every module is LLM-based.">
+              <input type="checkbox" aria-label="Demo mode" checked={!!meta.data?.demo_mode} disabled={!meta.data || modeSw.isPending} onChange={(e) => modeSw.mutate(e.target.checked)} /> Demo mode
             </label>
             <span className={`rounded px-2 py-0.5 text-xs ${meta.data?.llm_available ? "bg-emerald-100 text-emerald-900" : "bg-slate-200 text-slate-700"}`}>
-              {meta.data ? meta.data.llm_label : "…"}
+              {meta.data ? (meta.data.demo_mode ? "Demo · no Claude" : `Live · ${meta.data.llm_label}`) : "…"}
             </span>
             <NavLink to="/admin" title="Pipeline, key clauses, values & limits, checklist" className={({ isActive }) => `rounded px-2 py-1 ${isActive ? "bg-slate-200 font-medium dark:bg-slate-700" : "text-slate-500 hover:underline"}`}>⚙ Admin</NavLink>
             {who.data?.auth_required && (

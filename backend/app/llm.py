@@ -21,6 +21,10 @@ def provider() -> str:
       claude_code  - the Claude Code CLI / Agent SDK, billed to the logged-in Claude subscription (no key needed)
       offline      - no LLM: rule-based extractor, pattern redline, scripted Ask planner
     LLM_PROVIDER=auto picks api when a key is set, else claude_code when the `claude` CLI is installed, else offline."""
+    from app import mode
+
+    if mode.demo_on():       # Demo mode: no Claude anywhere
+        return "offline"
     want = (settings.llm_provider or "auto").lower()
     if want == "offline":
         return "offline"

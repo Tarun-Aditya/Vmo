@@ -38,7 +38,7 @@ function PipelineCard({ pl, running }: { pl: Pl; running: boolean }) {
       api(`/api/admin/pipelines/${pl.key}`, { method: "PUT", body: JSON.stringify({ enabled: pl.enabled, trigger_mode: mode, interval_minutes: mins, folders, ...v }) }),
     onSuccess: () => qc.invalidateQueries(),
   });
-  const run = useMutation({ mutationFn: () => api(`/api/admin/pipelines/${pl.key}/run`, { method: "POST" }), onSuccess: () => setTimeout(() => qc.invalidateQueries(), 1500) });
+  const run = useMutation({ mutationFn: (force?: boolean) => api(`/api/admin/pipelines/${pl.key}/run${force === true ? "?force=true" : ""}`, { method: "POST" }), onSuccess: () => setTimeout(() => qc.invalidateQueries(), 1500) });
   const freq = FREQ.some(([m]) => m === mins) ? String(mins) : "custom";
   return (
     <Card title={pl.name} right={<Toggle checked={pl.enabled} label={`${pl.name} enabled`} onChange={(v) => save.mutate({ enabled: v })} />}>
@@ -65,7 +65,8 @@ function PipelineCard({ pl, running }: { pl: Pl; running: boolean }) {
           <dt className="text-slate-500">Last run</dt><dd>{when(pl.last_run_at)}</dd>
           <dt className="text-slate-500">Next run</dt><dd>{!pl.enabled ? "paused" : mode === "manual" ? "manual" : mode === "on_change" ? "on next change" : `${when(pl.next_run_at)} (${inFuture(pl.next_run_at)})`}</dd>
         </dl>
-        <Btn onClick={() => run.mutate()} disabled={running || run.isPending}>{running ? "Running…" : "▶ Run now"}</Btn>
+        <Btn onClick={() => run.mutate(false)} disabled={running || run.isPending}>{running ? "Running…" : "▶ Run now"}</Btn>
+        <Btn kind="ghost" onClick={() => { if (window.confirm("Re-read every document with the current engine (Demo = offline, Live = Claude)? Corrections you made are kept.")) run.mutate(true); }} disabled={running || run.isPending} title="Ignore the 'unchanged' shortcut and extract everything again with the engine that is active now">↻ Re-extract all</Btn>
         {save.error && <p className="text-sm text-red-600">{String(save.error)}</p>}
       </div>
     </Card>

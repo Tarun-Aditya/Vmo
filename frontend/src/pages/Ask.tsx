@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { API, Col, getToken, Step, Table, ago, api, fmtDate, usd, useSetting } from "../lib";
+import { API, Col, getToken, Step, Table, ago, api, fmtDate, usd } from "../lib";
 import { Card, Sev, SeverityChip, Td, Th } from "../ui";
 
 type Res = {
@@ -134,7 +134,7 @@ function Answer({ m }: { m: Extract<Msg, { role: "assistant" }> }) {
 }
 
 export default function Ask() {
-  const [demo] = useSetting("demo", true);
+  const demo = !!useQuery({ queryKey: ["meta"], queryFn: () => api<{ demo_mode: boolean }>("/api/meta") }).data?.demo_mode;
   const qc = useQueryClient();
   const [params] = useSearchParams();
   const [question, setQuestion] = useState("");

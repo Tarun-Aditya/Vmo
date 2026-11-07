@@ -35,6 +35,7 @@ def meta():
 
     row = q1("SELECT min(created_at) AS seeded_at FROM contracts")
     return {
+        "demo_mode": __import__("app.mode", fromlist=["demo_on"]).demo_on(),
         "llm_available": llm.available(),
         "llm_provider": llm.provider(),
         "llm_label": llm.status()["label"] + (" · paused (limit), offline fallback" if llm.status()["paused"] else ""),
