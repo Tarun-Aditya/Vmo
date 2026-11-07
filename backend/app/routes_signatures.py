@@ -79,7 +79,7 @@ def request_signatures(cid: int, b: RequestIn, request: Request):
 
         try:
             ds = esign.DocuSign()
-            eid = ds.send(d["title"], docx_export.md_to_docx(d["body_md"]), "contract.docx", [s.model_dump() for s in b.signers])
+            eid, sim_links = ds.send(d["title"], docx_export.md_to_docx(d["body_md"]), "contract.docx", [s.model_dump() for s in b.signers])
         except (httpx.HTTPError, RuntimeError) as e:
             with SessionLocal() as s:
                 s.execute(text("DELETE FROM signature_requests WHERE id=:i"), {"i": rid})
@@ -88,7 +88,8 @@ def request_signatures(cid: int, b: RequestIn, request: Request):
         with SessionLocal() as s:
             s.execute(text("UPDATE signature_requests SET external_id=:e WHERE id=:i"), {"e": eid, "i": rid})
             s.commit()
-    return {**_req(rid), "links": [{"email": sg.email, "path": f"/sign/{tok}"} for sg, tok in zip(b.signers, tokens)] if b.provider == "internal" else []}
+    links = [{"email": sg.email, "path": f"/sign/{tok}"} for sg, tok in zip(b.signers, tokens)] if b.provider == "internal" else [{"email": x["email"], "path": x["url"], "external": True} for x in locals().get("sim_links", [])]
+    return {**_req(rid), "links": links}
 
 
 @router.get("/documents/{cid}/signatures")
@@ -200,6 +201,27 @@ def sync_docusign(rid: int):
             s.execute(text("UPDATE signature_requests SET status='declined' WHERE id=:i"), {"i": rid})
             s.commit()
     return {"docusign_status": status, "request": _req(rid)["status"]}
+
+
+@router.post("/signatures/webhook/docusign")
+async def docusign_webhook(request: Request):
+    """DocuSign Connect-style callback: verified with an HMAC of the body (DOCUSIGN_CONNECT_SECRET), then the request is synced."""
+    import base64
+    import hmac
+    import os
+
+    body = await request.body()
+    secret = os.environ.get("DOCUSIGN_CONNECT_SECRET") or ("sim-secret" if esign.simulated() else "")
+    want = base64.b64encode(hmac.new(secret.encode(), body, hashlib.sha256).digest()).decode() if secret else None
+    if not want or not hmac.compare_digest(want, request.headers.get("x-docusign-signature-1", "")):
+        raise HTTPException(401, "bad signature")
+    env = (json.loads(body).get("data") or {}).get("envelopeId")
+    r = rows("SELECT id FROM signature_requests WHERE external_id=:e", e=env)
+    if not r:
+        raise HTTPException(404, "unknown envelope")
+    from starlette.concurrency import run_in_threadpool
+
+    return await run_in_threadpool(sync_docusign, r[0]["id"])           # it calls DocuSign over HTTP: never block the event loop
 
 
 @router.post("/documents/{cid}/execute")

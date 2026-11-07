@@ -39,6 +39,7 @@ def meta():
         "llm_provider": llm.provider(),
         "llm_label": llm.status()["label"] + (" · paused (limit), offline fallback" if llm.status()["paused"] else ""),
         "embedding_provider": embeddings.provider(),
+        "simulators": __import__("os").environ.get("SIMULATORS", "0") == "1",
         "today": dt.date.today().isoformat(),
         "seeded_at": row and row["seeded_at"],
     }

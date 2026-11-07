@@ -130,6 +130,12 @@ app.include_router(approvals_router)
 app.include_router(signatures_router)
 app.include_router(quality_router)
 app.include_router(scim_router)
+if os.environ.get('SIMULATORS', '0') == '1':        # stand-ins for ERP and e-signature services, for demos and tests only
+    from app.simulators.erp import router as sim_erp
+    from app.simulators.esign import router as sim_esign
+
+    app.include_router(sim_erp)
+    app.include_router(sim_esign)
 app.include_router(vmo_router)
 
 

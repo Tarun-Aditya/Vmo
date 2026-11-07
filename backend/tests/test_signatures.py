@@ -73,6 +73,7 @@ def test_decline_and_bad_inputs(client, draft):
 
 
 def test_docusign_provider_against_a_stand_in(client, draft, monkeypatch):
+    monkeypatch.setenv("SIMULATORS", "0")                      # this test is about the real client talking to a configured service, not demo mode
     seen = {}
 
     class H(BaseHTTPRequestHandler):

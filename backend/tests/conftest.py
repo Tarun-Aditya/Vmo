@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import text
 
 os.environ["LLM_PROVIDER"] = "offline"      # tests are deterministic: no LLM, whatever is installed
+os.environ.setdefault("SIMULATORS", "1")       # the built-in ERP and e-signature stand-ins are mounted so their tests can run
 
 
 @pytest.fixture(scope="session")

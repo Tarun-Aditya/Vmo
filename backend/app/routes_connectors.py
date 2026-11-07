@@ -119,3 +119,27 @@ def sync_now(cid: int, wait: bool = False):
 @router.get("/connectors/{cid}/files")
 def files(cid: int):
     return rows("SELECT path, status, modified, size, web_url, last_seen FROM connector_files WHERE connector_id=:c ORDER BY path", c=cid)
+
+
+@router.post("/connectors/demo-erp")
+def connect_demo_erp():
+    """Demo: register the built-in simulated Coupa and SAP systems as connectors (the real connector code talks to them over HTTP) and sync once. Needs SIMULATORS=1."""
+    import os
+
+    if os.environ.get("SIMULATORS", "0") != "1":
+        raise HTTPException(409, "the simulators are switched off (set SIMULATORS=1)")
+    base = os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
+    spec = [("Coupa (simulated)", "coupa", {"base_url": f"{base}/sim/coupa", "page_size": 50}, {"client_id": "demo-client", "client_secret": "demo-secret"}),
+            ("SAP S/4HANA (simulated)", "sap", {"base_url": f"{base}/sim/sap"}, {"api_key": "demo-sap-key"})]
+    out = []
+    for name, kind, cfg, sec in spec:
+        ex = rows("SELECT id FROM connectors WHERE name=:n", n=name)
+        if ex:
+            cid = ex[0]["id"]
+        else:
+            with SessionLocal() as s:
+                cid = s.execute(text("""INSERT INTO connectors (name, type, config, secrets_enc, target, enabled, trigger_mode, interval_minutes, next_sync_at)
+                                        VALUES (:n,:t,CAST(:c AS jsonb),:s,'feeds',true,'manual',60, now()) RETURNING id"""), {"n": name, "t": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec)}).scalar()
+                s.commit()
+        out.append({"name": name, "id": cid, **service.sync(cid, "demo")})
+    return {"connectors": out}

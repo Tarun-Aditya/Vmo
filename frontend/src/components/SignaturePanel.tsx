@@ -7,7 +7,7 @@ import { Card } from "../ui";
 
 type Signer = { id: number; seq: number; name: string; email: string; role: string; status: string; signed_at: string | null };
 type Req = { id: number; status: string; provider: string; external_id: string | null; sequential: boolean; executed_contract_id: number | null; signers: Signer[] };
-type Made = Req & { links: { email: string; path: string }[] };
+type Made = Req & { links: { email: string; path: string; external?: boolean }[] };
 const blank = () => ({ name: "", email: "", role: "customer" });
 
 /** Send the draft for signature, watch each signer, hand out personal links, and mark the signed draft as an executed contract. */
@@ -29,7 +29,7 @@ export default function SignaturePanel({ docId }: { docId: string }) {
       {last ? (
         <div className="space-y-2 text-sm">
           <ol className="space-y-0.5">{last.signers.map((s) => <li key={s.id}><b className={s.status === "signed" ? "text-emerald-600" : s.status === "declined" ? "text-red-600" : "text-slate-500"}>{s.status === "signed" ? "✓" : s.status === "declined" ? "✗" : "○"}</b> {s.seq}. {s.name} <span className="text-xs text-slate-500">({s.role}) {s.email}{s.signed_at ? ` · signed ${when(s.signed_at)}` : ""}</span></li>)}</ol>
-          {links.length > 0 && <div role="status" className="rounded border border-emerald-500 bg-emerald-50 p-2 text-xs text-emerald-900">Personal signing links, shown once: {links.map((l) => <div key={l.path} className="break-all">{l.email}: <a className="underline" href={window.location.origin + l.path}>{window.location.origin + l.path}</a></div>)}</div>}
+          {links.length > 0 && <div role="status" className="rounded border border-emerald-500 bg-emerald-50 p-2 text-xs text-emerald-900">Signing links (a real service e-mails these; shown once here): {links.map((l) => <div key={l.path} className="break-all">{l.email}: <a className="underline" target="_blank" rel="noreferrer" href={l.path.startsWith("http") ? l.path : window.location.origin + l.path}>{l.path.startsWith("http") ? l.path : window.location.origin + l.path}</a></div>)}</div>}
           <div className="flex flex-wrap gap-2">
             {active && last.provider === "docusign" && <Btn kind="ghost" onClick={() => sync.mutate(last.id)}>Check DocuSign status</Btn>}
             {active && <Btn kind="danger" onClick={() => cancel.mutate(last.id)}>Cancel request</Btn>}
@@ -47,7 +47,7 @@ export default function SignaturePanel({ docId }: { docId: string }) {
               <select className={`${inputCls} w-28`} aria-label={`Signer ${i + 1} role`} value={s.role} onChange={(e) => setSigners(signers.map((x, j) => j === i ? { ...x, role: e.target.value } : x))}><option value="customer">Customer</option><option value="supplier">Supplier</option><option value="other">Other</option></select>
             </div>))}
           <div className="flex items-center gap-2"><button className="text-xs text-indigo-600 hover:underline" onClick={() => setSigners([...signers, blank()])}>+ signer</button>
-            <select className={`${inputCls} w-40`} aria-label="Signature provider" value={provider} onChange={(e) => setProvider(e.target.value)}><option value="internal">ContractIQ (click to sign)</option><option value="docusign">DocuSign</option></select>
+            <select className={`${inputCls} w-40`} aria-label="Signature provider" value={provider} onChange={(e) => setProvider(e.target.value)}><option value="internal">ContractIQ (click to sign)</option><option value="docusign">DocuSign (or its demo stand-in)</option></select>
             <Btn onClick={() => send.mutate()} disabled={send.isPending || signers.some((s) => !s.name.trim() || !s.email.includes("@"))}>Send for signature</Btn></div>
           {send.error && <p role="alert" className="text-sm text-red-600">{String(send.error).replace("Error: ", "")}</p>}
         </div>)}

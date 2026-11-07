@@ -37,6 +37,10 @@ export default function Connectors() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["connectors"], queryFn: () => api<{ connectors: Conn[]; types: Record<string, string> }>("/api/connectors"), refetchInterval: 5000 });
   const [edit, setEdit] = useState<Draft | null>(null);
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ simulators?: boolean }>("/api/meta") });
+  const demo = useMutation({ mutationFn: () => api<{ connectors: { name: string; status: string; new: number }[] }>("/api/connectors/demo-erp", { method: "POST" }),
+    onSuccess: (r) => { setDemoMsg(r.connectors.map((c) => `${c.name}: ${c.new} new invoice(s)`).join(" · ")); qc.invalidateQueries(); } });
+  const [demoMsg, setDemoMsg] = useState("");
   const [open, setOpen] = useState<number | null>(null);
   const [msg, setMsg] = useState<Record<number, { ok: boolean; text: string }>>({});
   const save = useMutation({
@@ -52,9 +56,12 @@ export default function Connectors() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="max-w-3xl text-sm text-slate-500">Connect a Google Drive folder, a OneDrive folder or a SharePoint library. New and changed contracts (PDF, Word, Markdown, text) are copied into the inbox on a schedule and run through the pipeline; the original link is kept on each contract. Credentials are stored encrypted and never shown again.</p>
-        <Btn onClick={() => setEdit(blank())}>+ Add connector</Btn>
+        <div className="flex gap-2">
+          {meta.data?.simulators && <Btn kind="ghost" onClick={() => demo.mutate()} disabled={demo.isPending} title="Registers a simulated Coupa and a simulated SAP S/4HANA (built into this app) and syncs them: the real connectors run against them over HTTP">{demo.isPending ? "Connecting…" : "Connect demo ERP (simulated Coupa + SAP)"}</Btn>}
+          <Btn onClick={() => setEdit(blank())}>+ Add connector</Btn></div>
       </div>
 
+      {demoMsg && <p role="status" className="rounded border border-emerald-500 bg-emerald-50 p-2 text-sm text-emerald-900">{demoMsg}. Open <a className="underline" href="/spend">Spend</a> and <a className="underline" href="/alerts">Alerts</a> to see what they changed.</p>}
       {edit && f && (
         <Card title={edit.id ? `Edit ${edit.name}` : "New connector"}>
           <div className="grid gap-3 md:grid-cols-3">

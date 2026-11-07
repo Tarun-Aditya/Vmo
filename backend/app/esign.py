@@ -15,6 +15,11 @@ import httpx
 import jwt
 
 
+def simulated() -> bool:
+    """Demo mode: no DocuSign credentials are set and SIMULATORS=1, so the built-in stand-in service is used."""
+    return os.environ.get("SIMULATORS", "0") == "1" and not os.environ.get("DOCUSIGN_ACCOUNT_ID")
+
+
 def doc_hash(md: str) -> str:
     return hashlib.sha256((md or "").encode()).hexdigest()
 
@@ -33,18 +38,21 @@ def signature_block(signers: list[dict]) -> str:
 # ------------------------------------------------------------------ DocuSign
 class DocuSign:
     def __init__(self):
-        self.base = os.environ.get("DOCUSIGN_BASE_URI", "https://demo.docusign.net/restapi").rstrip("/")
-        self.account = os.environ.get("DOCUSIGN_ACCOUNT_ID", "")
+        sim = simulated()
+        self.base = (os.environ.get("DOCUSIGN_BASE_URI") or (os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/") + "/sim/docusign/restapi" if sim else "https://demo.docusign.net/restapi")).rstrip("/")
+        self.account = os.environ.get("DOCUSIGN_ACCOUNT_ID") or ("sim-account" if sim else "")
         self.oauth = os.environ.get("DOCUSIGN_OAUTH_HOST", "https://account-d.docusign.com").rstrip("/")
         self._tok: tuple[str, float] | None = None
 
     @staticmethod
     def configured() -> bool:
-        return bool(os.environ.get("DOCUSIGN_ACCOUNT_ID") and (os.environ.get("DOCUSIGN_ACCESS_TOKEN") or os.environ.get("DOCUSIGN_PRIVATE_KEY")))
+        return bool(os.environ.get("DOCUSIGN_ACCOUNT_ID") and (os.environ.get("DOCUSIGN_ACCESS_TOKEN") or os.environ.get("DOCUSIGN_PRIVATE_KEY"))) or simulated()
 
     def token(self) -> str:
         if os.environ.get("DOCUSIGN_ACCESS_TOKEN"):
             return os.environ["DOCUSIGN_ACCESS_TOKEN"]
+        if simulated() and not os.environ.get("DOCUSIGN_PRIVATE_KEY"):
+            return "sim-token"
         if self._tok and self._tok[1] > time.time() + 60:
             return self._tok[0]
         now = int(time.time())
@@ -58,14 +66,17 @@ class DocuSign:
     def _h(self) -> dict:
         return {"Authorization": f"Bearer {self.token()}"}
 
-    def send(self, title: str, pdf_or_docx: bytes, filename: str, signers: list[dict]) -> str:
+    def send(self, title: str, pdf_or_docx: bytes, filename: str, signers: list[dict]) -> tuple[str, list[dict]]:
         ext = filename.rsplit(".", 1)[-1]
         body = {"emailSubject": f"Please sign: {title}", "status": "sent",
                 "documents": [{"documentBase64": base64.b64encode(pdf_or_docx).decode(), "name": title, "fileExtension": ext, "documentId": "1"}],
                 "recipients": {"signers": [{"email": s["email"], "name": s["name"], "recipientId": str(i + 1), "routingOrder": str(i + 1)} for i, s in enumerate(signers)]}}
+        if os.environ.get("PUBLIC_API_URL"):                  # DocuSign Connect: tell us when the envelope changes
+            body["eventNotification"] = {"url": os.environ["PUBLIC_API_URL"].rstrip("/") + "/api/signatures/webhook/docusign", "requireAcknowledgment": "true", "envelopeEvents": [{"envelopeEventStatusCode": "completed"}, {"envelopeEventStatusCode": "declined"}]}
         r = httpx.post(f"{self.base}/v2.1/accounts/{self.account}/envelopes", json=body, headers=self._h(), timeout=60)
         r.raise_for_status()
-        return r.json()["envelopeId"]
+        j = r.json()
+        return j["envelopeId"], (j.get("simulator") or {}).get("signing_links", [])
 
     def status(self, envelope_id: str) -> dict:
         r = httpx.get(f"{self.base}/v2.1/accounts/{self.account}/envelopes/{envelope_id}", headers=self._h(), timeout=30)
