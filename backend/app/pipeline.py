@@ -180,7 +180,8 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     sidecar = json.loads(sc.read_text()) if sc.exists() else {}
     classify = lambda h, t: kcc.classify(h, t, cfg["kcc"])  # noqa: E731
     header, clauses = parse_document(md, classify)
-    clauses += kcc.detect_in_text(clauses, md, {c["clause_type"] for c in clauses}, {k["key"] for k in cfg["kcc"] if k.get("enabled", True)})
+    clauses += kcc.detect_in_text(clauses, md, {c["clause_type"] for c in clauses}, {k["key"] for k in cfg["kcc"] if k.get("enabled", True)},
+                                  _custom_keywords(cfg))     # clauses added in Admin are found by sentence too
     meta = infer_metadata(md, header, clauses, sidecar, rel)
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
     corrections = {r[0]: r[1] for r in s.execute(text("SELECT field, corrected_value FROM field_corrections WHERE source_path=:p"), {"p": rel})}
@@ -373,6 +374,11 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
         _lock.release()
 
 
+def _custom_keywords(cfg: dict) -> dict[str, list[str]]:
+    """Clauses an admin added (not built-in): they are also found by sentence, wherever they sit in a document."""
+    return {k["key"]: list(k["keywords"]) for k in cfg["kcc"] if not k.get("builtin") and k["key"] not in kcc.PRESENCE and k.get("keywords") and k.get("enabled", True)}
+
+
 def reprocess_all(extractor: str = "auto") -> dict:
     """After admin edits to the KCC / metrics / checklist: re-classify stored clauses and recompute
     values, deviations and checks for every document (no files are re-read)."""
@@ -384,9 +390,22 @@ def reprocess_all(extractor: str = "auto") -> dict:
             rows = s.execute(text("SELECT id, heading, text, page FROM clauses WHERE contract_id=:c ORDER BY id"), {"c": c.id}).mappings().all()
             db = []
             for r in rows:
+                if str(r["heading"]).endswith("(found in text)"):      # synthetic rows are rebuilt below
+                    s.execute(text("DELETE FROM clauses WHERE id=:i"), {"i": r["id"]})
+                    continue
                 t = kcc.classify(r["heading"], r["text"], cfg["kcc"])
                 s.execute(text("UPDATE clauses SET clause_type=:t WHERE id=:i"), {"t": t, "i": r["id"]})
                 db.append({"id": r["id"], "clause_type": t, "heading": r["heading"], "text": r["text"], "page": r["page"]})
+            extra = _custom_keywords(cfg)
+            found = kcc.detect_in_text(db, c.body_md or "", {d["clause_type"] for d in db},
+                                       {k["key"] for k in cfg["kcc"] if k.get("enabled", True)}, extra)
+            if found:
+                vecs = embeddings.embed([f"{f['heading']}. {f['text']}" for f in found])
+                for f, v in zip(found, vecs):
+                    row = Clause(contract_id=c.id, clause_type=f["clause_type"], heading=f["heading"], text=f["text"], page=f["page"], embedding=v)
+                    s.add(row)
+                    s.flush()
+                    db.append({"id": row.id, "clause_type": f["clause_type"], "heading": f["heading"], "text": f["text"], "page": f["page"]})
             derive(s, c, db, cfg, TEMPLATE_KEY.get(c.type, "MSA"), "auto")
             n += 1
         s.commit()

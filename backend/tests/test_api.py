@@ -1,6 +1,8 @@
 """API tests against the seeded database (skipped when no DB / not seeded)."""
 from sqlalchemy import text
 
+from app.db import SessionLocal
+
 ACC = "Accentia Technology Services Inc"
 
 
@@ -255,3 +257,28 @@ def test_new_contract_from_template_preview_edit_create(client, clean_docs):
     assert float(d["contract"]["annual_value"]) == 1_800_000
     assert any(x["id"] == made["contract_id"] for x in client.get("/api/redline/documents").json())     # appears in Redline
     assert client.post("/api/generator/preview", json={"template": "SOW", "params": {}}).status_code == 422   # vendor required
+
+
+def test_a_clause_added_in_admin_is_found_on_the_next_run_even_without_its_own_heading(client, seeded):
+    """Add a key clause with keywords, the pipeline re-runs over every document, and a sentence buried under an unrelated heading is identified."""
+    from app import pipeline
+
+    cid = client.post("/api/redline/upload", json={"filename": "residency_demo.md", "owner": "Legal", "category": "Legal", "content":
+                      "# Services Agreement – Residency Demo\n\n**Parties:** Arcadia Retail Inc. (the \"Customer\") and Residency Demo Inc (the \"Supplier\")\n\n## Payment\nThe Customer shall pay undisputed invoices within 30 days of receipt of a valid invoice. The Supplier shall keep all Customer Data stored in the European Union.\n"}).json()["contract_id"]
+    body = {"name": "Data Residency", "keywords": ["stored in the european union", "data residency"], "heading_aliases": ["Data Residency"], "severity_if_missing": "medium", "applies_to": ["MSA", "SOW", "SaaS", "NDA"]}
+    try:
+        before = [c for c in client.get(f"/api/contracts/{cid}").json()["clauses"] if c["clause_type"] == "data_residency"]
+        assert before == []
+        assert client.post("/api/admin/kcc", json=body).status_code == 200                       # saving re-runs the pipeline over all documents
+        found = [c for c in client.get(f"/api/contracts/{cid}").json()["clauses"] if c["clause_type"] == "data_residency"]
+        assert found and "European Union" in found[0]["text"] and "found in text" in found[0]["heading"]
+        with SessionLocal() as s:
+            assert s.execute(text("SELECT has_data_residency FROM v_key_clauses WHERE contract_id=:c"), {"c": cid}).scalar() is True
+    finally:
+        client.delete("/api/admin/kcc/data_residency")
+        with SessionLocal() as s:
+            root = pipeline.inbox_path(s)
+            s.execute(text("DELETE FROM contracts WHERE vendor ILIKE '%Residency Demo%'"))
+            s.commit()
+        for f in list(root.rglob("residency_demo*")):
+            f.unlink()

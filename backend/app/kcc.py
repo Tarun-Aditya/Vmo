@@ -450,16 +450,17 @@ def sentence_hits(key: str, text_: str) -> list[str]:
     return [s for s in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text_)) if cre.search(s) and not (neg and neg.search(s))]
 
 
-def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: set[str] | None = None) -> list[dict]:
+def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: set[str] | None = None, extra: dict[str, list[str]] | None = None) -> list[dict]:
     """Extra clause records for key clauses that no heading-based clause carries, found by sentence in the clause texts (or, when the document yielded no clauses, in its paragraphs).
     Each record keeps the matching sentence(s) as its text and the page of the clause it came from, so the matrix, checklist and Ask can cite it."""
     pools = [(c["text"], c.get("page", 1), c.get("heading") or "Text") for c in clauses] or [(p, 1, "Text") for p in re.split(r"\n\s*\n", md)]
     out: list[dict] = []
-    for key, rx in PRESENCE.items():
+    patterns = {**{k: None for k in PRESENCE}, **{k: re.compile("|".join(f"(?:{kw})" for kw in kws if _safe_re(kw)), re.I) for k, kws in (extra or {}).items() if any(_safe_re(kw) for kw in kws)}}
+    for key, custom in patterns.items():
         if key in have_types or (enabled is not None and key not in enabled):
             continue
         for text_, page, head in pools:
-            hit = sentence_hits(key, text_)
+            hit = sentence_hits(key, text_) if custom is None else [s for s in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text_)) if custom.search(s)]
             if hit:
                 out.append({"clause_type": key, "heading": f"{head[:60]} (found in text)", "text": " ".join(hit[:2])[:900], "page": page, "idx": 0})
                 break
