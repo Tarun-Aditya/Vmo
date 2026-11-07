@@ -98,6 +98,10 @@ def review_put(cid: int, r: ReviewIn):
     _doc(cid)
     if r.status not in REVIEW:
         raise HTTPException(422, f"status must be one of {', '.join(REVIEW)}")
+    if r.status == "approved":
+        open_n = one("SELECT count(*) AS n FROM comment_threads WHERE contract_id=:i AND status='open'", i=cid)["n"]
+        if open_n:
+            raise HTTPException(409, f"{open_n} comment thread{'s are' if open_n != 1 else ' is'} still open: resolve {'them' if open_n != 1 else 'it'} before approving")
     with SessionLocal() as s:
         s.execute(text("""INSERT INTO contract_reviews (contract_id, status, note, reviewer, assignee, due_date) VALUES (:i,:s,:n,:r,:a,CAST(:d AS date))
                           ON CONFLICT (contract_id) DO UPDATE SET status=:s, note=COALESCE(:n, contract_reviews.note), reviewer=COALESCE(:r, contract_reviews.reviewer),
