@@ -1,0 +1,9 @@
+# Ask questions over the pilot corpus; answers computed from data/labels_pilot.json by evals/pilot_gt.py
+- {id: uncapped, question: "Which vendors have uncapped liability?", type: sql, check: {kind: set, column: vendor, expected: uncapped}}
+- {id: saas_no_dpa, question: "Which SaaS vendors process personal data without a DPA?", type: sql, check: {kind: set, column: vendor, expected: saas_no_dpa}}
+- {id: no_tfc, question: "Which vendors can't we terminate for convenience?", type: sql, check: {kind: set, column: vendor, expected: no_tfc}}
+- {id: auto_renewals, question: "Which vendors have auto-renewing contracts?", type: sql, check: {kind: set, column: vendor, expected: auto_renewals}}
+- {id: expire_90, question: "Which vendors have contracts expiring in the next 90 days?", type: sql, check: {kind: set, column: vendor, expected: expire_90}}
+- {id: total_value, question: "What is the total annual value of all active contracts?", type: sql, check: {kind: number, column: total_annual_value, expected: total_value}}
+- {id: top5_vendors, question: "Who are the top 5 vendors by annual value?", type: sql, check: {kind: set, column: vendor, expected: top5_vendors}}
+- {id: non_ny_law, question: "Which vendors have contracts governed by a law other than New York law?", type: sql, check: {kind: set, column: vendor, expected: non_ny_law}}

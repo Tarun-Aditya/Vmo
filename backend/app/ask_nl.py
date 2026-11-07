@@ -184,7 +184,7 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     elif "personal data" in q:
         where.append("processes_personal_data")
         suffix.append("processing personal data")
-    if re.search(r"(?:can't|cannot|can not|unable to) be terminated for convenience|no termination for convenience", q):
+    if re.search(r"(?:can't|cannot|can not|unable to|not able to)\s+(?:we\s+|us\s+)?(?:be\s+)?terminat\w*\s+(?:\w+\s+)?for convenience|no termination for convenience|no (?:right|ability) to terminate for convenience", q):
         where.append("termination_for_convenience = false")
         suffix.append("that cannot be terminated for convenience")
     if re.search(r"unsigned|not (?:yet |fully )?signed|pending (?:signature|countersign)|not fully executed|awaiting signature|missing signature|not countersigned", q):
@@ -246,6 +246,11 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         where.append(f"annual_value {op} {_num(cmp_.group(2), cmp_.group(3)):g}")
         suffix.append(f"with annual value {op} {money(_num(cmp_.group(2), cmp_.group(3)))}")
 
+    gl = re.search(r"(?:other than|except|not governed by|outside of?)\s+(?:the\s+)?([a-z][a-z ]{2,24}?)(?:\s+law|\s+courts?|\?|$)", q) if re.search(r"govern|law|jurisdiction", q) else None
+    if gl:
+        where.append(f"governing_law IS NOT NULL AND governing_law NOT ILIKE '%{re.sub(r'[^a-z ]', '', gl.group(1)).strip()}%'")
+        suffix.append(f"not governed by {gl.group(1).strip().title()} law")
+
     # checklist / policy questions
     checks = bool(re.search(r"\b(checklist|polic(?:y|ies)|non-?compliant|compliance|violat\w+|fail(?:s|ing|ed)?|redline|pass(?:es|ing)?)\b", q))
     rule_hits = [r["key"] for r in rules if r["name"].lower() in q]
@@ -253,6 +258,10 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
               else "avg" if re.search(r"average|\bavg\b|mean", q) else "list")
     g = re.search(r"\bby (category|vendor|type|owner|status|month|quarter)\b|(?:each|per) (category|vendor|type|owner|status|month|quarter)", q)
     group = (g.group(1) or g.group(2)) if g else None
+    topn = re.search(r"\btop\s+(\d+)\s+vendors?\b|\b(?:largest|biggest)\s+(\d+)\s+vendors?\b", q)
+    top = int(topn.group(1) or topn.group(2)) if topn else None
+    if top:
+        group, metric = "vendor", "sum"
     vendor_level = bool(re.search(r"how many vendors|which vendors|what vendors|list (?:all )?(?:the )?vendors|vendors (?:with|that|having|who|have)", q))
     if vendor_level and not group:
         group = "vendor"
@@ -283,7 +292,7 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     sev = [w for w in SEV_WORDS if re.search(rf"\b{w}\b", q)]
     return dict(where=where, adj=adj, suffix=suffix, win=win, metric=metric, group=group, datecol=datecol, notice=notice, cols=cols,
                 doc_clauses=intent == "doc_clauses", all_clauses=all_clauses, want_cols=want_cols, has_filters=has_filter_clauses,
-                vendor_level=vendor_level, intent=intent, base=base, bname=bname, scope=scope, mets=mets, overview=overview,
+                vendor_level=vendor_level, top=top, intent=intent, base=base, bname=bname, scope=scope, mets=mets, overview=overview,
                 severities=sev, rule_hits=rule_hits, only_pass=bool(re.search(r"\bpass(?:es|ing)?\b", q) and not re.search(r"\bfail", q)),
                 drafts=drafts, clause_keys=[c[4:] for c in want_cols if c.startswith("has_")], question=question)
 
@@ -318,7 +327,7 @@ def build_sql(plan: dict) -> dict[str, str]:
     doc_from = "v_document_terms" if plan["scope"] else "v_effective_terms"
     return {
         "aggregate": f"SELECT COUNT(*) AS contracts{nv}, COALESCE(SUM(annual_value), 0) AS total_annual_value{avg} FROM {base} {w}",
-        "breakdown": f"SELECT {dim_sql} AS {dim}, COUNT(*) AS contracts, COALESCE(SUM(annual_value), 0) AS total_annual_value FROM {base} {w} GROUP BY 1 ORDER BY 2 DESC, 1",
+        "breakdown": f"SELECT {dim_sql} AS {dim}, COUNT(*) AS contracts, COALESCE(SUM(annual_value), 0) AS total_annual_value FROM {base} {w} GROUP BY 1 ORDER BY {'3 DESC, 1' if plan.get('top') else '2 DESC, 1'}{' LIMIT ' + str(int(plan['top'])) if plan.get('top') else ''}",
         "list": f"SELECT {cols} FROM {base} {w} ORDER BY {d}, title",
         "card": f"SELECT {card} FROM {base} {w}",
         "doc_clauses": ("SELECT e.contract_id, e.title, cl.heading AS clause, cl.page, cl.text FROM clauses cl "

@@ -128,11 +128,14 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
                 continue
             amounts.append((v, before, after))
         annual = total = None
+        explicit_total = False
         for v, before, after in amounts:
             ca = max((x.end() for x in re.finditer(A_CUE, before)), default=-1)
             ct = max((x.end() for x in re.finditer(T_CUE, before)), default=-1)
             if re.search(r"per year|annually|a year|per annum|each year|/yr", after):
                 ca = max(ca, len(before))
+            elif re.match(r"\s*\(\s*(?:the\s+)?(?:total|fixed|aggregate|not[- ]to[- ]exceed)\b", after):      # 'USD 540,000 (total contract value)'
+                ct, explicit_total = len(before) + 1, True
             if ca > ct and annual is None:
                 annual = v
             elif ct > ca and total is None:
@@ -142,7 +145,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
         elif annual is not None and total is None and eff and expiry and doc_type in ("SaaS", "SOW"):
             months = round((expiry - eff).days / 30.44)
             total = round(annual * months / 12, 2) if months not in (0, 12) else annual
-        elif total is not None and annual is None and eff and expiry and (expiry - eff).days <= 380:
+        elif total is not None and annual is None and eff and expiry and (expiry - eff).days <= 380 and not explicit_total:
             annual = total if doc_type != "Work Order" else None
         put("annual_value", annual, 0.88 if annual else 0.5, "fees" if "fees" in d.by else None)
         put("total_value", total, 0.88 if total else 0.5, "fees" if "fees" in d.by else None)

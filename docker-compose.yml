@@ -21,7 +21,7 @@ services:
     depends_on:
       db: { condition: service_healthy }
     ports: ["8000:8000"]
-    volumes: ["./backend:/app", "./data:/data", "./scripts:/scripts", "./evals:/evals"]
+    volumes: ["./backend:/app", "./data:/data", "./corpus:/corpus", "./scripts:/scripts", "./evals:/evals"]
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   web:

@@ -5,11 +5,23 @@ a global systems integrator, a Big-4-style consultancy, an offshore IT services 
 vendor and SaaS suppliers (all **fictional lookalikes** — no real company names). 32 documents: 6 standard templates,
 27 executed contracts (MSA → SOW → Work Order, amendments, NDAs, DPAs, SaaS) and 5 vendor drafts. See `CLAUDE.md` for scope.
 
+## Two corpora
+* **Pilot corpus (recommended for evaluation)** — `make seed-pilot`: 36 realistic fictional contracts (MSAs, SOWs, work orders, amendments, NDAs, DPAs, SaaS, drafts) written
+  in eight drafting styles and delivered as **PDF, Word and Markdown**, with signature tables in several layouts, short-form and unnumbered headings, number words and mixed
+  date formats, no sidecar metadata. Source: `corpus/pilot/*.md` (date tokens), spec: `backend/app/docgen/pilot_spec.py`. Ground truth is computed from the spec
+  (`data/labels_pilot.json`), never from the document text. `evals/pilot_eval.py` scores extraction; `evals/pilot_ask_eval.py` scores Ask.
+* **Synthetic corpus** — `make seed` (the default below): 32 generated documents; deterministic, used by `make test` and `scripts/demo_walkthrough.js`.
+
+Nothing in the product is tied to either: vendors, categories, obligations, SLA metrics, spend rules and risk points all come from the loaded documents and from
+configuration (Admin → Values, Obligation rules, Thresholds, Risk scoring). Feed CSVs (invoices, SLA, obligation status) are generated *from the loaded contracts*.
+
 ## Run it
 ```bash
 cp .env.example .env          # add ANTHROPIC_API_KEY for the live Claude path (optional, see below)
 make dev                      # db + api + web  ->  http://localhost:5173  (api: :8000/health)
-make seed                     # generate the corpus into the inbox folder and run the pipeline (idempotent)
+make seed                     # synthetic corpus into the inbox folder and run the pipeline (idempotent)
+make seed-pilot               # the 36-document pilot corpus (PDF / Word / Markdown) instead
+python -m app.seed --pilot    # same, outside Docker (set DATABASE_URL, DATA_DIR)
 make eval                     # extraction, redline and Ask evals
 make test                     # pytest
 ```
@@ -91,6 +103,25 @@ Offline: 442/442, 18/18, 27/27. `make test` seeds offline first (the tests asser
 questions need **Demo mode off** to go live; with it on, preloaded questions are served from the cache that the seed generated with Claude.
 
 The header badge shows the engine in use. Offline eval scores prove the plumbing and data, not Claude's quality; the Claude scores above do.
+
+## Connectors, alerts, access (Admin)
+* **Connectors** (Admin → Connectors): Google Drive (service-account key or OAuth refresh token), OneDrive and SharePoint (Microsoft Graph, app registration with
+  `Files.Read.All`/`Sites.Read.All`). New and changed PDF / Word / Markdown / text files are copied into the inbox on a schedule (or *Sync now*), processed like any dropped file,
+  and each contract keeps a link to the original. Secrets are encrypted (`SECRET_KEY` or `data/.secret_key`) and never shown again. Tested against local Drive/Graph stand-ins
+  (auth flows, paging, redirects, Google-native export, changed/removed files); **not yet exercised against a live Google or Microsoft tenant**.
+* **Alerts** (bell, `/alerts`; rules and channels in Admin → Alerts): 11 rules over the live data (renewal notice passed / due, expiring 30 / 90 days, obligation overdue / due,
+  SLA breach, serious spend exception, vendor risk tier, draft waiting for review, connector failure). Each event is raised once; deliver to e-mail (SMTP), Slack, Teams or any webhook, with a
+  minimum severity per channel. Review assignments (assignee, due date) live on the Redline screen.
+* **Access** (Admin → Users & audit): `AUTH_MODE=off` (default, demo) is open; `AUTH_MODE=on` requires sign-in (first start creates the administrator), roles **viewer < reviewer < admin**,
+  API tokens (`Authorization: Bearer ciq_…`, never outranking their owner), optional **OpenID Connect** (`OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_ROLES_CLAIM`; RS256/ES256 tokens verified against the issuer's JWKS),
+  and an audit log of every change, sign-in and refusal. This is application-level access control; SSO provisioning (SCIM), MFA and per-tenant isolation are not built.
+* **Word**: every draft / document exports to `.docx`; the redline exports with real tracked changes (`w:ins` / `w:del`) that Word shows as accept / reject.
+
+## Tests
+`make test` (offline, synthetic corpus: 116 tests including connectors, alerts, access control, real PDF/Word ingestion). Outside Docker use a separate database and data folder
+for tests (`DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`) so they never touch a demo database.
+Pilot evals: `python evals/pilot_eval.py`, `python evals/pilot_ask_eval.py` (run with `LLM_PROVIDER=offline` or unset for Claude). Browser walkthrough over any corpus:
+`NODE_PATH=$(npm root -g) node scripts/demo_pilot.js out/ "Claude mode"`.
 
 ## Demo script (~10 min)
 1. **Dashboard (1m)** — USD; contracts expiring in the next 30 / 60 / 90 days with $ at stake; AdSpark's notice deadline has passed.
