@@ -231,7 +231,11 @@ def export_docx(cid: int):
         data = docx_export.md_to_docx(d["body_md"])
     except RuntimeError as e:
         raise HTTPException(501, str(e))
-    return Response(data, media_type=DOCX, headers={"Content-Disposition": f'attachment; filename="{_fname(d["title"])}"'})
+    from app import docx_comments
+    from app.routes_comments import threads_of
+
+    data, n = docx_comments.add_comments(data, threads_of(cid))
+    return Response(data, media_type=DOCX, headers={"Content-Disposition": f'attachment; filename="{_fname(d["title"])}"', "X-Comments": str(n)})
 
 
 @router.get("/redline/{cid}/export.docx")
@@ -243,4 +247,8 @@ def export_redline_docx(cid: int):
         data, stats = docx_export.redline_docx(d["body_md"], (red or {}).get("items") or [], review_get(cid)["decisions"])
     except RuntimeError as e:
         raise HTTPException(501, str(e))
-    return Response(data, media_type=DOCX, headers={"Content-Disposition": f'attachment; filename="{_fname(d["title"], "_redline")}"', "X-Tracked-Changes": str(stats["changes"] + stats["inserted_clauses"])})
+    from app import docx_comments
+    from app.routes_comments import threads_of
+
+    data, n = docx_comments.add_comments(data, threads_of(cid))
+    return Response(data, media_type=DOCX, headers={"Content-Disposition": f'attachment; filename="{_fname(d["title"], "_redline")}"', "X-Tracked-Changes": str(stats["changes"] + stats["inserted_clauses"]), "X-Comments": str(n)})

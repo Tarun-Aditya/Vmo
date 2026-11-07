@@ -84,3 +84,30 @@ def test_guest_links_work_with_sign_in_required(client, draft, monkeypatch):
     assert client.get("/api/contracts").status_code == 401                                              # the app is closed...
     assert client.get(f"/api/shared/{link['token']}").status_code == 200                               # ...the link is its own credential
     assert client.post(f"/api/documents/{draft}/share", json={"level": "view"}).status_code == 401
+
+
+def test_comments_travel_in_the_word_file_and_come_back(client, draft):
+    import base64
+    import io
+    import zipfile
+
+    md = client.get(f"/api/documents/{draft}/content").json()["md"]
+    para = next(x for x in md.split("\n") if len(x) > 60 and not x.startswith("#"))
+    t = client.post(f"/api/documents/{draft}/threads", json={"body": "Reword this please.", "anchor_text": para[:50]}).json()
+    client.post(f"/api/threads/{t['id']}/comments", json={"body": "Done, see v2."})
+    r = client.get(f"/api/documents/{draft}/export.docx")
+    assert r.status_code == 200 and r.headers["x-comments"] == "2"
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    cx = z.read("word/comments.xml").decode()
+    assert "Reword this please." in cx and "Done, see v2." in cx and "commentRangeStart" in z.read("word/document.xml").decode() and "comments+xml" in z.read("[Content_Types].xml").decode()
+    # a colleague returns the file: its comments arrive as threads, once
+    with SessionLocal() as s:
+        s.execute(text("DELETE FROM comment_threads WHERE contract_id=:c"), {"c": draft})
+        s.commit()
+    b64 = base64.b64encode(r.content).decode()
+    out = client.post(f"/api/documents/{draft}/comments/import", json={"filename": "back.docx", "content_b64": b64}).json()
+    assert out["found"] == 2 and out["imported"] == 2
+    assert client.post(f"/api/documents/{draft}/comments/import", json={"filename": "back.docx", "content_b64": b64}).json()["imported"] == 0
+    ts = client.get(f"/api/documents/{draft}/threads").json()["threads"]
+    assert {c["body"] for t_ in ts for c in t_["comments"]} == {"Reword this please.", "Done, see v2."} and all(t_["created_by"].endswith("(Word)") for t_ in ts)
+    assert client.post(f"/api/documents/{draft}/comments/import", json={"filename": "x.docx", "content_b64": base64.b64encode(b"nope").decode()}).status_code == 422

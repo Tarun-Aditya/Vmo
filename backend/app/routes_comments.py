@@ -274,3 +274,27 @@ def shared_save(token: str, b: GuestSave):
     from app.routes_docs import save_document
 
     return save_document(ln["contract_id"], b.md, f"Edited by {b.name.strip()[:60]} (shared link)", "share")
+
+
+class ImportIn(BaseModel):
+    filename: str
+    content_b64: str
+
+
+@router.post("/documents/{cid}/comments/import")
+def import_comments(cid: int, b: ImportIn, request: Request):
+    """Bring in the comments of a .docx that came back from a colleague or the vendor (Word / Google Docs) as threads; the same comment is never imported twice."""
+    import base64
+
+    from app import docx_comments
+
+    _doc(cid)
+    try:
+        found = docx_comments.read_comments(base64.b64decode(b.content_b64))
+    except Exception:
+        raise HTTPException(422, "that file is not a readable .docx")
+    made = 0
+    for c in found:
+        key = "docx:" + hashlib.sha1(f"{c['author']}|{c['anchor_text']}|{c['body']}".encode()).hexdigest()[:20]
+        made += bool(create_thread(cid, ThreadIn(body=c["body"] or "(empty comment)", anchor_text=c["anchor_text"] or None), f"{c['author']} (Word)", "user", key))
+    return {"found": len(found), "imported": made}
