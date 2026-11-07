@@ -60,10 +60,30 @@ def _hash_embed(text: str) -> list[float]:
     return [v / norm for v in vec]
 
 
+_fe = None
+BGE_QUERY = "Represent this sentence for searching relevant passages: "
+
+
+def _fastembed():
+    global _fe
+    if _fe is None:
+        from fastembed import TextEmbedding
+
+        _fe = TextEmbedding(settings.fastembed_model)       # ONNX, no torch: BAAI/bge-small-en-v1.5 (384 dimensions, downloaded once)
+    return _fe
+
+
 def provider() -> str:
     global _model
     if settings.embedding_provider == "hash":
         return "hash"
+    if settings.embedding_provider in ("auto", "fastembed"):
+        try:
+            _fastembed()
+            return "fastembed"
+        except Exception:
+            if settings.embedding_provider == "fastembed":
+                raise
     try:
         if _model is None:
             from sentence_transformers import SentenceTransformer
@@ -76,7 +96,16 @@ def provider() -> str:
         return "hash"
 
 
+def embed_query(text: str) -> list[float]:
+    """A search query: BGE models are trained to see queries with an instruction prefix, passages without."""
+    if provider() == "fastembed":
+        return [float(x) for x in next(iter(_fastembed().embed([BGE_QUERY + text])))]
+    return embed([text])[0]
+
+
 def embed(texts: list[str]) -> list[list[float]]:
+    if provider() == "fastembed":
+        return [[float(x) for x in v] for v in _fastembed().embed(texts)]
     if provider() == "local":
         return [list(map(float, v)) for v in _model.encode(texts, normalize_embeddings=True)]
     return [_hash_embed(t) for t in texts]

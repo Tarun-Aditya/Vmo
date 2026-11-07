@@ -13,6 +13,7 @@ dependencies = [
   "pydantic-settings>=2.4",     # typed .env config
   "anthropic>=0.40",            # Claude API
   "pyyaml>=6",                  # evals/questions.yaml
+  "fastembed>=0.3",             # real sentence embeddings (ONNX, BAAI/bge-small-en-v1.5, no torch); falls back to hashed vectors offline
   "pyjwt[crypto]>=2.8",         # OpenID Connect token checks
   "cryptography>=42",           # encrypted connector secrets, JWT keys
 ]

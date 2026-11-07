@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     llm_provider: str = "auto"  # auto | api | claude_code | offline
     model_ask: str = "claude-sonnet-5-5"
     model_redline: str = "claude-sonnet-5-5"
-    embedding_provider: str = "auto"  # auto | local (sentence-transformers) | hash (offline)
+    embedding_provider: str = "auto"  # auto (fastembed, then sentence-transformers, then hash) | fastembed | local (sentence-transformers) | hash (offline)
+    fastembed_model: str = "BAAI/bge-small-en-v1.5"
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     data_dir: str = "/data"
     embedding_dim: int = 384  # must match the vector(N) column in migration 0001

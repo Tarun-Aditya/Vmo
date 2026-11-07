@@ -104,7 +104,7 @@ def search_clauses(
     query: str, clause_type: str | None = None, vendor: str | None = None, top_k: int = 5,
     contract_ids: list[int] | None = None,
 ) -> dict:
-    vec = embeddings.embed([query])[0]
+    vec = embeddings.embed_query(query)
     where, params = [], {"v": str(vec), "k": max(1, min(int(top_k or 5), 15))}
     if clause_type:
         where.append("cl.clause_type = :ct")

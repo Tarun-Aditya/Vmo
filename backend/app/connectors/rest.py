@@ -30,6 +30,18 @@ PRESETS = {
 }
 
 
+# contract documents: list the contract records, download each attachment (the system's own file, e.g. the signed Word / PDF)
+CONTRACT_PRESETS = {
+    "coupa": {"path": "/api/contracts", "items_path": "", "id": "id", "supplier": "supplier.name", "etag": "updated-at", "files_path": "attachments", "file_name": "file-name", "file_url": "url",
+              "page_param": "offset", "page_size": 50, "scope": "core.contract.read", "params": {"limit": "50"}},
+    "sap": {"path": "/sap/opu/odata/sap/API_PURCHASECONTRACT_PROCESS_SRV/A_PurchaseContract", "items_path": "d.results", "id": "PurchaseContract", "supplier": "Supplier", "etag": "LastChangeDate",
+            "files_path": "", "file_name": "AttachmentFileName", "file_url": "AttachmentUrl", "params": {"$format": "json", "$top": "100"}},
+    "ariba": {"path": "/contract-workspaces/v1/prod/workspaces", "items_path": "Payload", "id": "WorkspaceId", "supplier": "Supplier", "etag": "LastModified", "files_path": "Documents", "file_name": "FileName",
+              "file_url": "DownloadUrl", "params": {}},
+    "rest": {"path": "", "items_path": "", "id": "id", "supplier": "supplier", "etag": "", "files_path": "attachments", "file_name": "name", "file_url": "url", "params": {}},
+}
+
+
 def dig(obj, path: str):
     for part in [p for p in path.split(".") if p != ""]:
         if isinstance(obj, list):
@@ -95,6 +107,25 @@ class RestFeed(Connector):
                 return
             offset += size
 
+    def _contracts(self) -> Iterator[RemoteFile]:
+        cp = {**CONTRACT_PRESETS[self.kind], **{k: v for k, v in self.cfg.items() if k in CONTRACT_PRESETS[self.kind] and v not in (None, "")}}
+        self.p = {**self.p, **{k: cp[k] for k in ("path", "items_path", "params", "page_param", "page_size") if k in cp}, "scope": cp.get("scope", self.p.get("scope"))}
+        self._urls: dict[str, str] = {}
+        with client() as c:
+            h = self._headers(c)
+            for items in self._pages(c, h):
+                for it in items:
+                    files = dig(it, cp["files_path"]) if cp["files_path"] else [it]
+                    for f in files or []:
+                        name, url, cid = dig(f, cp["file_name"]), dig(f, cp["file_url"]), dig(it, cp["id"])
+                        if not name or not url:
+                            continue
+                        sup = re.sub(r"[^\w .-]+", "_", str(dig(it, cp["supplier"]) or "supplier"))
+                        rid = f"{self.kind}:{cid}:{name}"
+                        self._urls[rid] = url
+                        yield RemoteFile(id=rid, name=name, path=f"{sup}/{name}", etag=str(dig(it, cp["etag"]) or ""), modified=str(dig(it, cp["etag"]) or ""),
+                                         web_url=f"{self.p['base_url'].rstrip('/')}/contracts/{cid}", extra={"system": self.kind, "record": str(cid)})
+
     def test(self) -> dict:
         if not self.p.get("base_url"):
             raise ConnectorError("base_url is required")
@@ -106,6 +137,9 @@ class RestFeed(Connector):
     def list_files(self) -> Iterator[RemoteFile]:
         if not self.p.get("base_url"):
             raise ConnectorError("base_url is required")
+        if self.cfg.get("mode") == "contracts":
+            yield from self._contracts()
+            return
         with client() as c:
             h = self._headers(c)
             for items in self._pages(c, h):
@@ -128,4 +162,7 @@ class RestFeed(Connector):
                                      etag=str(dig(it, self.p.get("etag") or "") or buf.getvalue().__hash__()))
 
     def download(self, f: RemoteFile) -> bytes:
+        if f.id in getattr(self, "_urls", {}):
+            with client() as c:
+                return check(c.get(self._urls[f.id], headers=self._headers(c)), "document download").content
         return self._rows[f.id]

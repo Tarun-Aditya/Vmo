@@ -88,7 +88,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             eff = tu.first_date(head)
             if eff:
                 break
-    if not eff:     # the first sentence of the form 'This ... Agreement ... <date>' (not a redaction notice or a date elsewhere)
+    if not eff and not amend:     # the first sentence of the form 'This ... Agreement ... <date>' (not a redaction notice or a date elsewhere)
         for s_ in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", d.flat[:4000])):
             if re.search(r"\b(?:this|the)\b[^.]{0,100}\bagreement\b", s_, re.I) and (eff := tu.first_date(s_)):
                 break
@@ -375,17 +375,13 @@ def _governing_law(flat: str) -> str | None:
     sents = re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", flat))
     pri = [s for s in sents if re.search(r"\bgovern\w*\b[^.;]{0,160}\blaws?\b|\blaws?\b[^.;]{0,120}\bgovern\w*|governing law|(?:construed|interpreted|enforced)[^.;]{0,80}(?:in accordance with|under|pursuant to)[^.;]{0,40}\blaws?\b|\bapplicable law:|choice of law|laws? of (?:the )?state of", s, re.I)]
     for s in pri:
-        m = re.search(r"(?:State|Commonwealth|Province|Republic|Kingdom) of ([A-Z][A-Za-z]+(?: [A-Z][A-Za-z]+)?)", s)
-        if m and m.group(1).split(" and ")[0] in US_STATES + PLACES + [x.split()[0] for x in US_STATES if " " in x]:
-            return m.group(1)
-        low = s
-        for name in sorted(US_STATES + PLACES, key=len, reverse=True):
-            if re.search(rf"\b{re.escape(name)}\b", low):
-                return name
-        for a, full in ALIASES.items():
-            if re.search(rf"\b{re.escape(a)}\b", low):
-                return full
-        m = re.search(r"laws? of (?:the )?(People[’']s Republic of China)", s)
-        if m:
-            return "People's Republic of China"
+        k = re.search(r"govern\w*|laws? of|construed|interpreted|applicable law", s, re.I)
+        tail = s[k.start():] if k else s
+        best = None
+        for name in US_STATES + PLACES + list(ALIASES) + ["People's Republic of China", "People’s Republic of China"]:
+            mm = re.search(rf"(?<![A-Za-z]){re.escape(name)}(?![A-Za-z])", tail)
+            if mm and (best is None or mm.start() < best[0]):
+                best = (mm.start(), ALIASES.get(name, name.replace("’", "'")))
+        if best:
+            return best[1]
     return None

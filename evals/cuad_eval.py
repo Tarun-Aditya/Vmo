@@ -48,6 +48,10 @@ def main() -> int:
     else:
         keep = None
     miss: list[dict] = []
+    if "--vmo" in sys.argv:       # the CUAD agreement types closest to a VMO's world: services, maintenance, outsourcing, hosting, consulting, supply, transport
+        want_dirs = ("service", "maintenance", "outsourcing", "hosting", "consulting", "supply", "transportation", "agency")
+        vmo = {f.stem for f in (root / "full_contract_pdf").rglob("*") if f.is_file() and any(w in f.parent.name.lower() for w in want_dirs)}
+        keep = {r["Filename"] for r in csv.DictReader(open(root / "master_clauses.csv", encoding="utf-8-sig")) if Path(r["Filename"]).stem in vmo and (keep is None or r["Filename"] in keep)}
     rows = list(csv.DictReader(open(root / "master_clauses.csv", encoding="utf-8-sig")))
     random.Random(seed).shuffle(rows)
     if keep is not None:
@@ -90,13 +94,13 @@ def main() -> int:
         gl = (r.get("Governing Law-Answer") or "").strip()
         if gl:
             fld["governing_law"][1] += 1
-            fld["governing_law"][0] += bool(v("governing_law")) and (gl.lower().split(",")[0] in str(v("governing_law")).lower() or str(v("governing_law")).lower() in gl.lower())
+            fld["governing_law"][0] += bool(v("governing_law")) and (any(g.strip().lower() in str(v("governing_law")).lower() for g in re.split(r"[;,]", gl) if g.strip()) or str(v("governing_law")).lower() in gl.lower())
         ed = parse_cuad_date(r.get("Effective Date-Answer") or "") or parse_cuad_date(r.get("Agreement Date-Answer") or "")
         if ed:
             fld["effective_date"][1] += 1
             fld["effective_date"][0] += str(v("effective_date"))[:10] == ed.isoformat()
         if dump:
-            if gl and not (v("governing_law") and gl.lower().split(",")[0] in str(v("governing_law")).lower()):
+            if gl and not (v("governing_law") and any(g.strip().lower() in str(v("governing_law")).lower() for g in re.split(r"[;,]", gl) if g.strip())):
                 miss.append({"file": name, "kind": "field", "clause": "governing_law", "error": "FN", "label": gl, "ours": str(v("governing_law"))})
             if ed and str(v("effective_date"))[:10] != ed.isoformat():
                 miss.append({"file": name, "kind": "field", "clause": "effective_date", "error": "FN", "label": ed.isoformat(), "ours": str(v("effective_date")), "head": md[:300]})

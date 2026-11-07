@@ -86,3 +86,89 @@ def sap_invoices(apikey: str | None = Header(None, alias="APIKey")):
     return {"d": {"results": [{"SupplierInvoice": str(r["id"]), "FiscalYear": str(r["invoice_date"].year), "InvoicingParty": r["vendor"], "SupplierInvoiceIDByInvcgParty": r["invoice_no"],
                                "DocumentDate": _ms(r["invoice_date"]), "PaymentDueDate": _ms(r["due_date"]), "InvoiceGrossAmount": f"{r['amount']:.2f}", "DocumentCurrency": "USD",
                                "DocumentHeaderText": r["description"], "LastChangeDate": r["updated"].strftime("%Y%m%d")} for r in demo_invoices(system="sap")]}}
+
+
+# ------------------------------------------------------------------ contracts held in the systems (documents + metadata)
+from fastapi.responses import Response  # noqa: E402
+
+from app.simulators import erp_contracts  # noqa: E402
+
+
+def _docx(c: dict) -> bytes:
+    from app import docx_export
+
+    return docx_export.md_to_docx(c["md"])
+
+
+def _pick(system: str) -> list[dict]:
+    return [c for c in erp_contracts.erp_contracts() if c["system"] == system]
+
+
+def _bearer(request: Request) -> None:
+    if _TOKENS.get((request.headers.get("authorization") or "")[7:], 0) < datetime.now().timestamp():
+        raise HTTPException(401, "invalid_token")
+
+
+@router.get("/coupa/api/contracts")
+def coupa_contracts(request: Request, limit: int = 50, offset: int = 0):
+    _bearer(request)
+    base = str(request.base_url).rstrip("/")
+    return [{"id": c["id"], "name": c["name"], "status": c["status"], "start-date": c["start"].isoformat(), "end-date": c["end"].isoformat(), "supplier": {"name": c["vendor"]},
+             "updated-at": f"{c['start'].isoformat()}T09:00:00Z", "attachments": [{"id": c["id"], "file-name": c["filename"], "url": f"{base}/sim/coupa/api/attachments/{c['id']}/file"}]}
+            for c in _pick("coupa")[offset:offset + limit]]
+
+
+@router.get("/coupa/api/attachments/{aid}/file")
+def coupa_attachment(aid: int, request: Request):
+    _bearer(request)
+    c = next((x for x in erp_contracts.erp_contracts() if x["id"] == aid and x["system"] == "coupa"), None)
+    if not c:
+        raise HTTPException(404, "not found")
+    return Response(_docx(c), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@router.get("/sap/sap/opu/odata/sap/API_PURCHASECONTRACT_PROCESS_SRV/A_PurchaseContract")
+def sap_contracts(request: Request, apikey: str | None = Header(None, alias="APIKey")):
+    if apikey != SAP_KEY:
+        raise HTTPException(401, "API key is missing or invalid")
+    base = str(request.base_url).rstrip("/")
+    return {"d": {"results": [{"PurchaseContract": str(c["id"]), "PurchaseContractType": "MK", "Supplier": c["vendor"], "PurchasingDocumentName": c["name"], "ValidityStartDate": _ms(c["start"]), "ValidityEndDate": _ms(c["end"]),
+                               "LastChangeDate": c["start"].strftime("%Y%m%d"), "AttachmentFileName": c["filename"], "AttachmentUrl": f"{base}/sim/sap/sap/opu/odata/sap/API_CV_ATTACHMENT_SRV/Original/{c['id']}"}
+                              for c in _pick("sap")]}}
+
+
+@router.get("/sap/sap/opu/odata/sap/API_CV_ATTACHMENT_SRV/Original/{cid}")
+def sap_attachment(cid: int, apikey: str | None = Header(None, alias="APIKey")):
+    if apikey != SAP_KEY:
+        raise HTTPException(401, "API key is missing or invalid")
+    c = next((x for x in erp_contracts.erp_contracts() if x["id"] == cid and x["system"] == "sap"), None)
+    if not c:
+        raise HTTPException(404, "not found")
+    return Response(_docx(c), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+
+
+@router.post("/ariba/v2/oauth/token")
+def ariba_token(grant_type: str = Form(...), client_id: str = Form(""), client_secret: str = Form("")):
+    if grant_type != "client_credentials" or client_id != "demo-ariba-key" or client_secret != "demo-ariba-secret":
+        raise HTTPException(401, "invalid_client")
+    tok = secrets.token_urlsafe(24)
+    _TOKENS[tok] = datetime.now().timestamp() + 86400
+    return {"access_token": tok, "token_type": "bearer", "expires_in": 86400}
+
+
+@router.get("/ariba/contract-workspaces/v1/prod/workspaces")
+def ariba_contracts(request: Request):
+    _bearer(request)
+    base = str(request.base_url).rstrip("/")
+    return {"Payload": [{"WorkspaceId": f"CW{c['id']}", "Title": c["name"], "Supplier": c["vendor"], "AgreementDate": c["start"].isoformat(), "ExpirationDate": c["end"].isoformat(), "Status": c["status"],
+                         "LastModified": f"{c['start'].isoformat()}T09:00:00Z", "Documents": [{"FileName": c["filename"], "DownloadUrl": f"{base}/sim/ariba/contract-workspaces/v1/prod/documents/{c['id']}"}]}
+                        for c in _pick("ariba")]}
+
+
+@router.get("/ariba/contract-workspaces/v1/prod/documents/{cid}")
+def ariba_document(cid: int, request: Request):
+    _bearer(request)
+    c = next((x for x in erp_contracts.erp_contracts() if x["id"] == cid and x["system"] == "ariba"), None)
+    if not c:
+        raise HTTPException(404, "not found")
+    return Response(_docx(c), media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")

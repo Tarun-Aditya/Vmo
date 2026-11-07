@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api")
 CONFIG_FIELDS = {"gdrive": ["folder", "recursive", "api_base", "token_url"], "onedrive": ["tenant_id", "user", "drive_id", "folder", "recursive", "api_base", "login_base"],
                  "sharepoint": ["tenant_id", "site_url", "library", "folder", "recursive", "api_base", "login_base"],
                  "imap": ["host", "port", "ssl", "username", "folder", "from_filter", "subject_filter"],
-                 **{k: ["base_url", "token_url", "token_path", "scope", "path", "items_path", "params", "mapping", "page_param", "page_size", "auth", "etag"] for k in ("coupa", "sap", "ariba", "rest")}}
+                 **{k: ["base_url", "token_url", "token_path", "scope", "path", "items_path", "params", "mapping", "page_param", "page_size", "auth", "etag", "mode", "files_path", "file_name", "file_url", "id", "supplier"] for k in ("coupa", "sap", "ariba", "rest")}}
 
 
 def rows(sql: str, **p) -> list[dict]:
@@ -129,17 +129,20 @@ def connect_demo_erp():
     if os.environ.get("SIMULATORS", "0") != "1":
         raise HTTPException(409, "the simulators are switched off (set SIMULATORS=1)")
     base = os.environ.get("PUBLIC_API_URL", "http://localhost:8000").rstrip("/")
-    spec = [("Coupa (simulated)", "coupa", {"base_url": f"{base}/sim/coupa", "page_size": 50}, {"client_id": "demo-client", "client_secret": "demo-secret"}),
-            ("SAP S/4HANA (simulated)", "sap", {"base_url": f"{base}/sim/sap"}, {"api_key": "demo-sap-key"})]
+    spec = [("Coupa (simulated)", "coupa", {"base_url": f"{base}/sim/coupa", "page_size": 50}, {"client_id": "demo-client", "client_secret": "demo-secret"}, "feeds"),
+            ("SAP S/4HANA (simulated)", "sap", {"base_url": f"{base}/sim/sap"}, {"api_key": "demo-sap-key"}, "feeds"),
+            ("Coupa contracts (simulated)", "coupa", {"base_url": f"{base}/sim/coupa", "mode": "contracts"}, {"client_id": "demo-client", "client_secret": "demo-secret"}, "contracts"),
+            ("SAP contracts (simulated)", "sap", {"base_url": f"{base}/sim/sap", "mode": "contracts"}, {"api_key": "demo-sap-key"}, "contracts"),
+            ("Ariba contracts (simulated)", "ariba", {"base_url": f"{base}/sim/ariba", "mode": "contracts"}, {"client_id": "demo-ariba-key", "client_secret": "demo-ariba-secret"}, "contracts")]
     out = []
-    for name, kind, cfg, sec in spec:
+    for name, kind, cfg, sec, target in spec:
         ex = rows("SELECT id FROM connectors WHERE name=:n", n=name)
         if ex:
             cid = ex[0]["id"]
         else:
             with SessionLocal() as s:
                 cid = s.execute(text("""INSERT INTO connectors (name, type, config, secrets_enc, target, enabled, trigger_mode, interval_minutes, next_sync_at)
-                                        VALUES (:n,:t,CAST(:c AS jsonb),:s,'feeds',true,'manual',60, now()) RETURNING id"""), {"n": name, "t": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec)}).scalar()
+                                        VALUES (:n,:t,CAST(:c AS jsonb),:s,:tg,true,'manual',60, now()) RETURNING id"""), {"n": name, "t": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec), "tg": target}).scalar()
                 s.commit()
         out.append({"name": name, "id": cid, **service.sync(cid, "demo")})
     return {"connectors": out}
