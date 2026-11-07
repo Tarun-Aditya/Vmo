@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib";
 import { Card, Loading } from "../ui";
 
@@ -12,6 +12,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
   const q = useQuery({ queryKey: ["matrix", vendor ?? ""], queryFn: () => api<M>(`/api/clause-matrix${vendor ? `?vendor=${encodeURIComponent(vendor)}` : ""}`) });
   const [tip, setTip] = useState<{ row: Row; col: string; x: number; y: number } | null>(null);
   const [onlyGaps, setOnlyGaps] = useState(false);
+  const nav = useNavigate();
   if (!q.data) return <Loading q={q} />;
   const m = q.data;
   const label = (k: string) => m.columns.find((c) => c.key === k)!.label;
@@ -21,7 +22,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           {vendor ? <h2 className="text-lg font-semibold">Key clauses in {vendor}&rsquo;s documents</h2> : <h1 className="text-xl font-semibold">Key contract clauses across all documents</h1>}
-          <p className="text-sm text-slate-500">One row per document, one column per key clause. Hover a mark to see the citation (or why it is absent).</p>
+          <p className="text-sm text-slate-500">One row per document, one column per key clause. Hover a mark to see the citation (or why it is absent); click it to open the contract. Clauses you add in Admin appear as new columns, tagged by heading, keyword or (with Claude) by meaning.</p>
         </div>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={onlyGaps} onChange={(e) => setOnlyGaps(e.target.checked)} /> Highlight gaps only</label>
       </div>
@@ -59,7 +60,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
                         <td key={c.key} className="border-t border-slate-100 p-0.5 text-center dark:border-slate-700"
                           onMouseEnter={(e) => { const b = (e.currentTarget as HTMLElement).getBoundingClientRect(); setTip({ row: r, col: c.key, x: b.left + b.width / 2, y: b.top }); }}
                           onMouseLeave={() => setTip(null)}>
-                          <button type="button" aria-label={`${r.title}: ${c.label} ${ce.present ? "present" : "absent"}`}
+                          <button type="button" onClick={() => r.kind === "contract" && nav(`/contracts/${r.id}`)} aria-label={`${r.title}: ${c.label} ${ce.present ? "present" : "absent"}`}
                             onFocus={(e) => { const b = e.currentTarget.getBoundingClientRect(); setTip({ row: r, col: c.key, x: b.left + b.width / 2, y: b.top }); }} onBlur={() => setTip(null)}
                             className={`h-7 w-8 rounded text-base font-bold ${ce.present ? "text-emerald-600" : gap ? "bg-red-100 text-red-700 ring-1 ring-red-400 dark:bg-red-950 dark:text-red-300" : "text-red-400"} ${onlyGaps && !gap ? "opacity-20" : ""}`}>
                             {ce.present ? "✓" : "✗"}

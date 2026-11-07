@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date, datetime
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import ARRAY, Boolean, Date, DateTime, ForeignKey, Integer, Numeric, Text, func
+from sqlalchemy import ARRAY, BigInteger, Boolean, Date, DateTime, ForeignKey, Integer, Numeric, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -70,6 +70,8 @@ class Contract(Base):
     supplier_signed_date: Mapped[date | None] = mapped_column(Date)
     fully_executed: Mapped[bool] = mapped_column(Boolean, default=False)
     source_path: Mapped[str | None] = mapped_column(Text)
+    source_size: Mapped[int | None] = mapped_column(BigInteger)
+    source_mtime_ns: Mapped[int | None] = mapped_column(BigInteger)
     content_hash: Mapped[str | None] = mapped_column(Text)
     ingested_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     origin: Mapped[str] = mapped_column(Text, default="seed")

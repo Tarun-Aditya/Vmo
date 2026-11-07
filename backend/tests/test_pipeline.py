@@ -160,3 +160,24 @@ def test_files_are_identified_by_content_hash_not_by_name_and_every_run_is_audit
     assert dup["new_docs"] == 0 and rows("SELECT count(*) AS n FROM contracts WHERE content_hash=:h", h=ev["content_hash"])[0]["n"] == 1
     skipped = {r["path"]: r for r in rows("SELECT path, action, reason FROM pipeline_events WHERE run_id=:r", r=dup["run_id"])}
     assert all(v["action"] == "unchanged" for v in skipped.values()) and any("duplicate of" in (v["reason"] or "") for v in skipped.values())
+
+
+def test_runs_are_incremental_untouched_files_are_not_even_read(tmp_inbox, monkeypatch):
+    f = tmp_inbox / "msa.md"
+    f.write_text(MSA.format(days=20))
+    pipeline.run_pipeline("manual")
+    reads = []
+    real = pipeline.docstruct.load_document
+    monkeypatch.setattr(pipeline.docstruct, "load_document", lambda p: reads.append(p) or real(p))
+    again = pipeline.run_pipeline("manual")
+    assert again["unchanged"] >= 1 and not reads                                    # nothing parsed, nothing extracted
+    ev = rows("SELECT reason FROM pipeline_events WHERE run_id=:r AND path='pytest/msa.md'", r=again["run_id"])[0]
+    assert "untouched" in ev["reason"]
+    import os
+    st = f.stat()
+    os.utime(f, ns=(st.st_atime_ns, st.st_mtime_ns + 5_000_000_000))                # touched, same bytes: hashed, still not re-extracted
+    touched = pipeline.run_pipeline("manual")
+    assert not reads and touched["updated"] == 0
+    assert "same content hash" in rows("SELECT reason FROM pipeline_events WHERE run_id=:r AND path='pytest/msa.md'", r=touched["run_id"])[0]["reason"]
+    again = pipeline.run_pipeline("manual")                                         # and the new stamp is remembered
+    assert "untouched" in rows("SELECT reason FROM pipeline_events WHERE run_id=:r AND path='pytest/msa.md'", r=again["run_id"])[0]["reason"]

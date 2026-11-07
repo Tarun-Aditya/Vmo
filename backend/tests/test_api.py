@@ -304,3 +304,55 @@ def test_a_clause_added_in_admin_is_checked_in_redlines_with_suggested_wording(c
         with SessionLocal() as s:
             s.execute(text("DELETE FROM contracts WHERE vendor ILIKE 'Residency%'"))
             s.commit()
+
+
+def test_claude_tags_a_custom_clause_in_any_wording_and_the_matrix_cites_it(client, seeded, monkeypatch):
+    """With Claude available, a passage that no keyword matches is tagged (quote verified against the text, cached by hash); the Key clauses matrix shows it with a citation."""
+    from app import llm
+
+    calls = []
+
+    def fake(purpose, model, system, user, tool, **kw):
+        calls.append(purpose)
+        i = next(int(x.split("]")[0]) for x in user.split("[")[1:] if "Hosting" in x)
+        return {"matches": [{"key": "data_residency", "clause_index": i, "quote": "Our servers never leave the Union."},      # hallucinated: not in the clause
+                            ]} if len(calls) == 1 else {"matches": []}
+
+    cid = client.post("/api/redline/upload", json={"filename": "ai_tag.md", "owner": "Legal", "category": "Legal", "content":
+        "# Services Agreement – Aitag\n\n**Parties:** Arcadia Retail Inc. (the \"Customer\") and Aitag Inc (the \"Supplier\")\n\n## Hosting\nCustomer records remain on infrastructure located inside the member states of the EU at all times.\n"}).json()["contract_id"]
+    body = {"name": "Data Residency", "description": "Where customer data must be stored", "keywords": ["no-such-keyword"], "heading_aliases": ["Data Residency"], "severity_if_missing": "medium", "applies_to": ["Services", "MSA", "SOW", "SaaS", "NDA"]}
+    with SessionLocal() as s:
+        s.execute(text("DELETE FROM kcc_ai_cache"))
+        s.commit()
+    try:
+        import types
+
+        from app import kcc_ai
+        shim = types.SimpleNamespace(available=lambda: True, call_tool=fake, prompt=llm.prompt, note_failure=llm.note_failure)    # Claude stands in for kcc tagging only
+        monkeypatch.setattr(kcc_ai, "llm", shim)
+        client.post("/api/admin/kcc", json=body)
+        assert not [c for c in client.get(f"/api/contracts/{cid}").json()["clauses"] if c["clause_type"] == "data_residency"]      # the invented quote was rejected
+        def good(purpose, model, system, user, tool, **kw):
+            calls.append(purpose)
+            i = next((int(x.split("]")[0]) for x in user.split("[")[1:] if "Hosting" in x), None)
+            return {"matches": [] if i is None else [{"key": "data_residency", "clause_index": i, "quote": "Customer records remain on infrastructure located inside the member states of the EU at all times."}]}
+        shim.call_tool = good
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM kcc_ai_cache"))
+            s.commit()
+        assert client.put("/api/admin/kcc/data_residency", json=body).status_code == 200
+        tagged = [c for c in client.get(f"/api/contracts/{cid}").json()["clauses"] if c["clause_type"] == "data_residency"]
+        assert tagged and "AI-tagged" in tagged[0]["heading"] and "member states" in tagged[0]["text"]
+        n = calls.count("kcc_tag")
+        client.put("/api/admin/kcc/data_residency", json=body)                       # same document + same definition: answered from the cache
+        assert calls.count("kcc_tag") == n
+        m = client.get("/api/clause-matrix").json()
+        row = next(r for g in m["groups"] for r in g["rows"] if r["id"] == cid)
+        cell = row["cells"]["data_residency"]
+        assert cell["present"] and cell["page"] and "member states" in cell["text"] and "data_residency" in [c["key"] for c in m["columns"]]
+    finally:
+        client.delete("/api/admin/kcc/data_residency")
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM kcc_ai_cache"))
+            s.execute(text("DELETE FROM contracts WHERE vendor ILIKE 'Aitag%'"))
+            s.commit()

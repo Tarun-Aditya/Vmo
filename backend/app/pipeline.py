@@ -18,7 +18,7 @@ from pathlib import Path
 
 from sqlalchemy import text
 
-from app import deviations, docstruct, embeddings, extraction, kcc, llm, meta_rules, obligations
+from app import deviations, docstruct, embeddings, extraction, kcc, kcc_ai, llm, meta_rules, obligations
 from app.config import data_path
 from app.db import SessionLocal
 from app.docgen.generate import render_template
@@ -171,12 +171,18 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
 
 
 def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", redline_mode: str = "auto") -> dict:
+    rel = str(path.relative_to(root))
+    st = path.stat()
+    prior = s.query(Contract).filter(Contract.source_path == rel).first()
+    if prior and prior.source_mtime_ns == st.st_mtime_ns and prior.source_size == st.st_size and prior.content_hash:
+        # incremental: size and modification time are as at the last run, so the file is not even read (the hash stays the identity if they differ)
+        return {"action": "unchanged", "contract_id": prior.id, "path": rel, "reason": "untouched since the last run (size and modified time)", "hash": prior.content_hash, "size": st.st_size}
     raw = path.read_bytes()
     chash = hashlib.sha256(raw).hexdigest()
-    rel = str(path.relative_to(root))
     base = {"hash": chash, "size": len(raw)}
     existing = s.query(Contract).filter(Contract.source_path == rel).first()
     if existing and existing.content_hash == chash:
+        existing.source_size, existing.source_mtime_ns = st.st_size, st.st_mtime_ns        # touched but identical: remember the new stamp
         return {"action": "unchanged", "contract_id": existing.id, "path": rel, "reason": "same content hash as the last run", **base}
     twin = None if existing or path.with_suffix(".meta.json").exists() else s.query(Contract).filter(Contract.content_hash == chash).first()
     if twin and (root / (twin.source_path or "")).with_suffix(".meta.json").exists():
@@ -184,6 +190,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     if twin:                     # the same bytes under another name: identity is the hash, not the file name
         if not (root / (twin.source_path or "")).exists():
             old, twin.source_path = twin.source_path, rel
+            twin.source_size, twin.source_mtime_ns = st.st_size, st.st_mtime_ns
             return {"action": "moved", "contract_id": twin.id, "path": rel, "reason": f"same content hash; moved/renamed from {old}", **base}
         return {"action": "unchanged", "contract_id": twin.id, "path": rel, "reason": f"duplicate of {twin.source_path} (same content hash)", **base}
     md = docstruct.load_document(path)
@@ -194,6 +201,8 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     clauses += kcc.detect_in_text(clauses, md, {c["clause_type"] for c in clauses}, {k["key"] for k in cfg["kcc"] if k.get("enabled", True)},
                                   _custom_keywords(cfg))     # clauses added in Admin are found by sentence too
     meta = infer_metadata(md, header, clauses, sidecar, rel)
+    if extractor != "offline":
+        clauses += kcc_ai.tag(s, clauses, chash, kcc_ai.definitions(cfg["kcc"], {c["clause_type"] for c in clauses}), meta["type"])
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
     corrections = {r[0]: r[1] for r in s.execute(text("SELECT field, corrected_value FROM field_corrections WHERE source_path=:p"), {"p": rel})}
     for f, v in corrections.items():                 # a person's correction survives re-extraction
@@ -207,7 +216,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     attrs = dict(
         title=meta["title"], vendor=meta["vendor"], category=meta["category"], type=meta["type"], template_id=tid,
         status=meta["status"], owner=meta["owner"], body_md=md, currency="USD", source_path=rel, content_hash=chash,
-        ingested_at=datetime.now(timezone.utc), origin=sidecar.get("origin", "inbox"), source_url=sidecar.get("source_url"),
+        source_size=st.st_size, source_mtime_ns=st.st_mtime_ns, ingested_at=datetime.now(timezone.utc), origin=sidecar.get("origin", "inbox"), source_url=sidecar.get("source_url"),
         overrides=sorted(set(val) & OVERRIDABLE) if meta["type"] == "Amendment" else [],
         effective_date=val.get("effective_date"), expiry_date=val.get("expiry_date"), notice_period_days=val.get("notice_period_days"),
         auto_renew=bool(val.get("auto_renew")), annual_value=val.get("annual_value"), total_value=val.get("total_value"),
@@ -401,7 +410,7 @@ def reprocess_all(extractor: str = "auto") -> dict:
             rows = s.execute(text("SELECT id, heading, text, page FROM clauses WHERE contract_id=:c ORDER BY id"), {"c": c.id}).mappings().all()
             db = []
             for r in rows:
-                if str(r["heading"]).endswith("(found in text)"):      # synthetic rows are rebuilt below
+                if str(r["heading"]).endswith(("(found in text)", kcc_ai.TAG_SUFFIX)):      # synthetic rows are rebuilt below
                     s.execute(text("DELETE FROM clauses WHERE id=:i"), {"i": r["id"]})
                     continue
                 t = kcc.classify(r["heading"], r["text"], cfg["kcc"])
@@ -410,6 +419,8 @@ def reprocess_all(extractor: str = "auto") -> dict:
             extra = _custom_keywords(cfg)
             found = kcc.detect_in_text(db, c.body_md or "", {d["clause_type"] for d in db},
                                        {k["key"] for k in cfg["kcc"] if k.get("enabled", True)}, extra)
+            if extractor != "offline":
+                found += kcc_ai.tag(s, db, c.content_hash or "", kcc_ai.definitions(cfg["kcc"], {d["clause_type"] for d in db} | {f["clause_type"] for f in found}), c.type)
             if found:
                 vecs = embeddings.embed([f"{f['heading']}. {f['text']}" for f in found])
                 for f, v in zip(found, vecs):
