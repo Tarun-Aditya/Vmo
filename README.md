@@ -104,6 +104,16 @@ and client code runs against it over HTTP. Simulators are mounted only when `SIM
 
 Admin → Connectors has one-click "connect demo" buttons. Expect to debug permissions and consent on the first real connection.
 
+## See it working: the end-to-end video
+
+`reports/e2e/contractiq-e2e.webm` is one recording of the whole product in Demo mode (no Claude, simulated external systems), driven by
+`scripts/demo_e2e.js` against a fresh pilot seed: **22 of 22 feature steps passed**, no page errors (`reports/e2e/REPORT.md`, one screenshot per step).
+It covers: dashboard, repository, contract detail with hierarchy and effective terms, vendors, key-clause matrix, an admin adding a clause that
+every document is re-checked for, Ask (structured and clause questions), the review queue, uploading a draft and its tracked changes, the Word-style editor,
+a guest share link, DocuSign-compatible signing through to an executed contract, the hash-based incremental pipeline run with its per-file audit, simulated
+Coupa / SAP / Ariba / Drive / SharePoint / mailbox connectors, spend, obligations, risk, alerts, templates, admin configuration, the Demo/Live switch and security.
+Re-record with `make video` (app running, `SIMULATORS=1`, pilot seeded).
+
 ## Data included in this repository (so a clone is self-contained)
 
 | Path | What it is |
