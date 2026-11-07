@@ -112,6 +112,11 @@ def cases():
     add("sla.vendors", "Which vendors missed their SLA?", "set", {v for v, n in sb.items() if n})
     if sla_doc:
         add("sla.doc", "How many SLA breaches does this contract have?", "number", sla_doc["breaches"], [sla_doc["contract_id"]])
+    add("sla.credits", "What is the total estimated service credit owed?", "number", sla["summary"]["credit_usd"])
+    cv = defaultdict(float)
+    for s_ in sla["series"]:
+        cv[s_["vendor"]] += s_["credit_usd"]
+    add("sla.credits_by_vendor", "Estimated service credits by vendor", "dict", dict(cv))
     # -- spend
     add("spend.billed", "What is the total invoiced amount?", "number", sp["billed"])
     add("spend.off_contract", "How much was invoiced by vendors with no contract on file?", "number", sp["off_contract"])

@@ -42,3 +42,8 @@ Name contracts by title. Cite clause-search findings as [contract title, clause 
 
 Schema:
 {schema}
+
+Answer-shape rules (the interface shows result tables and checks numbers in them):
+- Always run the query that produces the answer and let the final result table contain the requested value itself: a count for "how many" / "show ... alerts" style questions (include COUNT(*) as a column or a separate count query), the single winner for "which vendor has the highest ..." (ORDER BY ... LIMIT 1, not the whole ranking), and "top N" means exactly N rows.
+- For "longest / shortest / highest / lowest / median / average of a term", query v_values (benchmarks) and return that single number as a column in a result table, not only in prose.
+- Money is USD; give amounts as plain numbers in the table.

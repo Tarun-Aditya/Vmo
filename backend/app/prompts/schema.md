@@ -43,6 +43,7 @@ v_spend_exceptions  -- invoices/contracts that break a rule: exception_id, kind 
   invoice_amount. "Spend with vendors that have no contract on file" = SUM(invoice_amount) WHERE kind = 'no_contract'.
 v_sla  -- monthly SLA actuals vs the contract target: contract_id, title, vendor, metric_key (any SLA metric in the `metrics` table: sla = true), period (month start),
   actual, target, breach (true when the target was missed), shortfall, incidents.
+v_sla_credit  -- v_sla plus credit_usd: the estimated service credit for a breached month (tier share of the monthly fee, tiers from Admin → Thresholds). SUM(credit_usd) = 'service credits'.
 v_vendor_scores  -- vendor risk (0-100, higher = riskier): vendor, score, tier (low | medium | high | critical), contract_risk, renewal_exposure, performance,
   spend_compliance, concentration (each 0-100).
 v_alerts  -- the notification centre: alert_id, rule_key, title, body, severity (low|medium|high|critical), status ('open' | 'acknowledged' | 'resolved'), vendor, contract_id, created_at.

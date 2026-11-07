@@ -46,11 +46,11 @@ MODULES: list[dict] = [
                   (r"\bcustomer obligations\b|owed by (?:the )?customer|we (?:must|owe)|(?:customer|arcadia) (?:must|owes?)", "party = 'Customer'", "owed by us"), (r"\bmilestones?\b", "kind = 'milestone'", "milestones"),
                   (r"\bsla obligations?\b|service level obligations?", "kind = 'sla'", "SLA"), (r"\brenewal notice|notice obligations?\b", "kind IN ('notice','renewal')", "notices"),
                   (r"\bpayment obligations?\b", "kind = 'payment'", "payment")]),
-    dict(key="sla", view="v_sla", noun="SLA measurement", base=[], vendor="vendor", cid="contract_id", date="period", future=False,
-         kw=[(r"\bsla\b|service[- ]levels?|\bavailability\b|\buptime\b|\bbreach(?:es|ed)?\b(?! of)|missed (?:their |the )?(?:target|sla)|\bshortfall\b", 3)],
+    dict(key="sla", view="v_sla_credit", noun="SLA measurement", base=[], vendor="vendor", cid="contract_id", date="period", future=False,
+         kw=[(r"\bsla\b|service[- ]levels?|\bavailability\b|\buptime\b|\bbreach(?:es|ed)?\b(?! of)|missed (?:their |the )?(?:target|sla)|\bshortfall\b", 3), (r"service credits?|\bcredits?\b", 5)],
          dims={"vendor": ("vendor", r"vendor|supplier"), "contract": ("title", r"contract|agreement|document"), "metric": ("metric_key", r"metric|service level|measure"),
                "month": ("to_char(period, 'YYYY-MM')", r"month")},
-         sums={"shortfall": ("SUM(shortfall)", "total shortfall", r"shortfall")}, cols="vendor, title, metric_key, period, actual, target, shortfall, incidents", order="period DESC, vendor",
+         sums={"shortfall": ("SUM(shortfall)", "total shortfall", r"shortfall"), "credit": ("ROUND(SUM(credit_usd))", "estimated service credits", r"credit")}, cols="vendor, title, metric_key, period, actual, target, shortfall, incidents", order="period DESC, vendor",
          filters=[(r"\bbreach(?:es|ed)?\b|missed|below (?:the )?target|failed|\bmiss\b", "breach", "breached")]),
     dict(key="exceptions", view="v_spend_exceptions", noun="spend exception", base=[], vendor="vendor", cid="contract_id", date="invoice_date", future=False,
          kw=[(r"exceptions?|anomal\w+|duplicate\w*|over[- ]?bill\w*|over (?:the )?contract value|run[- ]rate|billed (?:before|after)|unsigned contract|off[- ]contract|no contract on file", 4)],
@@ -255,7 +255,7 @@ def build(p: dict) -> dict[str, str]:
 def _fmt(p: dict, v) -> str:
     if v is None:
         return "—"
-    if p["measure"] in ("amount", "at_risk"):
+    if p["measure"] in ("amount", "at_risk", "credit"):
         return money(v)
     return f"{float(v):g}" if isinstance(v, (int, float)) or hasattr(v, "quantize") else str(v)
 
