@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import text
 
 os.environ["LLM_PROVIDER"] = "offline"      # tests are deterministic: no LLM, whatever is installed
+os.environ.setdefault("SCHEDULER_ENABLED", "0")      # no background pipeline run may race a test
 os.environ.setdefault("SIMULATORS", "1")       # the built-in ERP and e-signature stand-ins are mounted so their tests can run
 os.environ.setdefault("SIM_IMAP_PORT", "11430")
 os.environ.setdefault("SIM_SMTP_PORT", "25250")
