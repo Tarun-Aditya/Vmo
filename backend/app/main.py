@@ -1,10 +1,12 @@
 import asyncio
 import logging
 import os
+from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -46,6 +48,34 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ContractIQ API", version="0.2.0", lifespan=lifespan)
+class JsonFormatter(logging.Formatter):
+    def format(self, r: logging.LogRecord) -> str:
+        import json as _j
+
+        return _j.dumps({"ts": self.formatTime(r), "level": r.levelname, "logger": r.name, "msg": r.getMessage(), **({"exc": self.formatException(r.exc_info)} if r.exc_info else {})})
+
+
+if os.environ.get("LOG_JSON") == "1":                      # one JSON object per line for log shippers
+    _h = logging.StreamHandler()
+    _h.setFormatter(JsonFormatter())
+    logging.getLogger().handlers[:] = [_h]
+    logging.getLogger().setLevel(logging.INFO)
+
+
+@app.middleware("http")
+async def request_id(request: Request, call_next):
+    import time
+    import uuid
+
+    rid = request.headers.get("x-request-id") or uuid.uuid4().hex[:12]
+    t0 = time.time()
+    resp = await call_next(request)
+    resp.headers["X-Request-ID"] = rid
+    if request.url.path.startswith("/api/") and (resp.status_code >= 500 or time.time() - t0 > 5):
+        log.warning("slow or failed request %s %s -> %s in %.1fs [%s]", request.method, request.url.path, resp.status_code, time.time() - t0, rid)
+    return resp
+
+
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
     resp = await call_next(request)
@@ -101,6 +131,25 @@ app.include_router(signatures_router)
 app.include_router(quality_router)
 app.include_router(scim_router)
 app.include_router(vmo_router)
+
+
+_addin = Path(__file__).resolve().parents[2] / "addin"
+if _addin.exists():                       # the Word task pane (needs HTTPS in production: put the API behind your TLS proxy)
+    app.mount("/addin", StaticFiles(directory=_addin), name="addin")
+
+
+@app.get("/api/ops/metrics", response_class=PlainTextResponse)
+def metrics() -> str:
+    """Prometheus text format (admin only): counts and ages an operator alerts on."""
+    with SessionLocal() as s:
+        q = lambda sql: s.execute(text(sql)).scalar() or 0  # noqa: E731
+        g = {"contractiq_contracts": q("SELECT count(*) FROM contracts WHERE status <> 'draft'"), "contractiq_drafts": q("SELECT count(*) FROM contracts WHERE status = 'draft'"),
+             "contractiq_alerts_open": q("SELECT count(*) FROM alerts WHERE status = 'open'"), "contractiq_approvals_pending": q("SELECT count(*) FROM approvals WHERE status = 'pending'"),
+             "contractiq_open_comment_threads": q("SELECT count(*) FROM comment_threads WHERE status = 'open'"),
+             "contractiq_pipeline_failed_last_run": q("SELECT COALESCE(failed, 0) FROM pipeline_runs ORDER BY id DESC LIMIT 1"),
+             "contractiq_pipeline_last_run_age_seconds": int(q("SELECT EXTRACT(EPOCH FROM now() - max(finished_at)) FROM pipeline_runs")),
+             "contractiq_llm_calls_total": q("SELECT count(*) FROM llm_calls"), "contractiq_connectors_in_error": q("SELECT count(*) FROM connectors WHERE last_status = 'error'")}
+    return "".join(f"# TYPE {k} gauge\n{k} {v}\n" for k, v in g.items())
 
 
 @app.get("/health")

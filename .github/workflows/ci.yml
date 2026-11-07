@@ -1,0 +1,41 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env: { POSTGRES_USER: vmo, POSTGRES_PASSWORD: vmo, POSTGRES_DB: vmo }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U vmo" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql+psycopg://vmo:vmo@localhost:5432/vmo
+      READONLY_DATABASE_URL: postgresql+psycopg://vmo_readonly:vmo_readonly@localhost:5432/vmo
+      DATA_DIR: ${{ github.workspace }}/data_test
+      LLM_PROVIDER: offline
+      PYTHONPATH: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: system tools (document conversion, OCR)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pandoc poppler-utils tesseract-ocr imagemagick libreoffice-writer fonts-liberation
+      - run: pip install -e "backend[dev]"
+      - name: database roles
+        run: PGPASSWORD=vmo psql -h localhost -U vmo -d vmo -c "CREATE EXTENSION IF NOT EXISTS vector;"
+      - run: cd backend && alembic upgrade head
+      - name: seed (synthetic corpus, offline)
+        run: mkdir -p data_test && cp -r data/templates data_test/ && python -m app.seed
+        working-directory: .
+      - run: cd backend && pytest -q
+      - name: evals (offline)
+        run: cd backend && python ../evals/module_eval.py && python ../evals/ops_eval.py
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      - run: cd frontend && npm ci && npx tsc --noEmit && npm run build

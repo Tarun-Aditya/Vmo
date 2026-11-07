@@ -35,7 +35,7 @@ def required(method: str, path: str) -> str | None:
         return None
     if path.startswith("/api/auth/mfa"):
         return "viewer"                                      # everyone manages their own second factor
-    if path.startswith(("/api/admin", "/api/connectors", "/api/users", "/api/audit", "/api/scim")):
+    if path.startswith(("/api/admin", "/api/connectors", "/api/users", "/api/audit", "/api/scim", "/api/ops")):
         return "admin"
     if method in ("GET", "HEAD") or path.startswith(READ_LIKE_POSTS):
         return "viewer"

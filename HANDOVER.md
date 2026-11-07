@@ -70,3 +70,17 @@ Not yet built: comments exported into / imported from `.docx` (Word margin comme
 * **Coupa:** OAuth 2.0 client (client-credentials) created by the customer admin under Setup > OAuth2/OpenID Connect Clients; partner / demo instances are on coupacloud.com. I found no public free tier; sandbox access comes through a customer or Coupa's partner programme.
 * **SAP S/4HANA:** the SAP Business Accelerator Hub offers a free read-only sandbox API key for exploring APIs; a free S/4HANA Cloud trial exists but is limited (about 30 days, shared tenant, reduced features).
 Plan: build to files first (invoice / PO exports are already read), then a configurable REST connector with mock-server tests, then live tests with the pilot customer's sandbox credentials.
+
+## The ten gaps: status (all code committed; tests: 150 backend, offline module eval 62/62)
+| # | Gap | Status |
+|---|---|---|
+| 1 | Comments, share links, Word comments | Built: threads, AI findings as threads, approval gate, share links with guest access, comments exported to / imported from `.docx`. Not built: live multi-cursor co-editing, suggesting mode |
+| 2 | Approval routing | Built: rules by type / value / severity, ordered steps, notifications, reminders, UI |
+| 3 | E-signature | Built: personal signing links (ordered), certificate, signature block extracted as signatories, mark executed; DocuSign client tested against a stand-in |
+| 4 | Real-contract proof | Built: corrections that survive re-extraction, measured agreement, review-sheet round trip, `evals/real_eval.py`. **Needs 10-20 real contracts from you to produce the actual number** |
+| 5 | Live connectors, mailbox | Built: IMAP mailbox intake (tested against a fake IMAP). **Live Google / Microsoft / mailbox tests need credentials** |
+| 6 | Coupa / SAP / Ariba | Built: configurable REST connector with presets, OAuth client-credentials and API-key auth, paging, OData dates; tested against stand-ins. **Field names are presets to verify against the customer's instance; Ariba reporting is the least certain** |
+| 7 | Security | Built: MFA, lockout, password policy, SCIM, headers, retention (see `docs/SECURITY.md`). Not built: multi-tenancy, SOC 2, pen test |
+| 8 | Word add-in | Scaffold: manifest + task pane (comments, insert suggested wording, comment on selection) served at `/addin/`. **Not tested inside Word** |
+| 9 | Docker / CI / ops | Built: CI workflow, backup script, metrics, JSON logs. **Docker image and the CI workflow have not been run** (no Docker / GitHub runner here) |
+| 10 | Ask gaps, market table | Built: service credits queryable, answer-format rules for Claude. Market table re-checked: LinkSquares has a Word add-in with playbook redlining (our old "Authoring in Word: No" for contract-AI tools was wrong for it); most comparison material found is vendor-authored |

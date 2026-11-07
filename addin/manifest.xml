@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ContractIQ task pane for Word. Replace https://YOUR-HOST with the HTTPS address that serves the API (it serves /addin/), then sideload this file
+     (Word > Insert > My Add-ins > Upload My Add-in) or deploy it centrally from the Microsoft 365 admin centre. NOT yet tested inside Word. -->
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="TaskPaneApp">
+  <Id>6f1d7a0e-3b52-4c1a-9a7e-2f1c0a5b7c11</Id>
+  <Version>0.1.0.0</Version>
+  <ProviderName>ContractIQ</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="ContractIQ review"/>
+  <Description DefaultValue="See the review comments on this draft, insert the playbook's suggested wording and add comments from the selected text."/>
+  <IconUrl DefaultValue="https://YOUR-HOST/addin/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://YOUR-HOST/addin/icon-64.png"/>
+  <SupportUrl DefaultValue="https://YOUR-HOST/"/>
+  <AppDomains><AppDomain>https://YOUR-HOST</AppDomain></AppDomains>
+  <Hosts><Host Name="Document"/></Hosts>
+  <DefaultSettings><SourceLocation DefaultValue="https://YOUR-HOST/addin/taskpane.html"/></DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>

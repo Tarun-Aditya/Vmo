@@ -111,3 +111,11 @@ def test_security_headers_and_retention(client, seeded, monkeypatch):
         assert [r[0] for r in s.execute(text("SELECT user_email FROM audit_log"))] == ["new@x"]
         s.execute(text("DELETE FROM audit_log"))
         s.commit()
+
+
+def test_metrics_request_id_and_addin_files(client, seeded):
+    m = client.get("/api/ops/metrics").text
+    assert "contractiq_contracts " in m and "contractiq_alerts_open " in m and "# TYPE contractiq_pipeline_last_run_age_seconds gauge" in m
+    assert len(client.get("/health").headers["x-request-id"]) >= 8 and client.get("/health", headers={"x-request-id": "abc123"}).headers["x-request-id"] == "abc123"
+    assert client.get("/addin/manifest.xml").status_code == 200 and "TaskPaneApp" in client.get("/addin/manifest.xml").text
+    assert client.get("/addin/taskpane.js").status_code == 200
