@@ -137,7 +137,7 @@ def dry_run(md: str, status: str = "draft") -> dict:
         s.rollback()
     header, clauses = parse_document(md, lambda h, t: kcc.classify(h, t, cfg["kcc"]))
     meta = pipeline.infer_metadata(md, header, clauses, {})
-    vals = kcc.extract_metrics(clauses, cfg["metrics"])
+    vals = kcc.extract_metrics(clauses, cfg["metrics"], cfg["kcc"])
     res = kcc.evaluate_rules(meta["type"], status, clauses, vals, cfg["metrics"], cfg["rules"], False)
     rules = {r["key"]: r for r in cfg["rules"]}
     for r in res:

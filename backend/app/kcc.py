@@ -113,22 +113,22 @@ def _m(key, name, kcc, pattern, kind, unit, desc):
 
 def default_metrics() -> list[dict]:
     return [
-        _m("payment_terms_days", "Payment terms", "payment", r"within (\d+) days", "number", "days", "Days to pay undisputed invoices"),
-        _m("liability_cap_multiple", "Liability cap multiple", "liability_cap", r"([\d.]+) times", "number", "x annual fees", "Cap on liability as a multiple of annual fees"),
-        _m("tfc_notice_days", "Termination for convenience notice", "termination_for_convenience", r"(\d+) days' written notice", "number", "days", "Notice the Customer must give to terminate for convenience"),
-        _m("renewal_notice_days", "Non-renewal notice period", "renewal", r"at least (\d+) days", "number", "days", "Notice needed to stop an auto-renewal"),
-        _m("insurance_cover_usd", "Insurance cover per claim", "insurance", r"USD ([\d,]+)", "money", "USD", "Minimum professional indemnity cover per claim"),
-        _m("warranty_days", "Warranty period", "warranties", r"(\d+) days after acceptance", "number", "days", "Free-of-charge correction period after acceptance"),
-        _m("confidentiality_years", "Confidentiality survival", "confidentiality", r"for (\d+) years? after", "number", "years", "Years confidentiality survives the agreement"),
-        _m("sla_availability_pct", "Service availability", "sla", r"([\d.]+)% availability", "number", "%", "Monthly availability commitment"),
+        _m("payment_terms_days", "Payment terms", "payment", r"(?:within|net)\s+(\d+)(?:\s+calendar)?(?:\s+days)?", "number", "days", "Days to pay undisputed invoices"),
+        _m("liability_cap_multiple", "Liability cap multiple", "liability_cap", r"([\d.]+)\s*(?:times|x)\b", "number", "x annual fees", "Cap on liability as a multiple of annual fees"),
+        _m("tfc_notice_days", "Termination for convenience notice", "termination_for_convenience", r"(\d+) days['’]? (?:prior )?(?:written )?notice", "number", "days", "Notice the Customer must give to terminate for convenience"),
+        _m("renewal_notice_days", "Non-renewal notice period", "renewal", r"(?:at least|not less than|no later than)\s+(\d+)\s+days", "number", "days", "Notice needed to stop an auto-renewal"),
+        _m("insurance_cover_usd", "Insurance cover per claim", "insurance", r"USD\s*([\d,]{5,})", "money", "USD", "Minimum professional indemnity cover per claim"),
+        _m("warranty_days", "Warranty period", "warranties", r"(\d+)\s*days?\s+(?:after|from|following)\s+(?:acceptance|delivery|completion|go-live)|warranty period of (\d+) days", "number", "days", "Free-of-charge correction period after acceptance"),
+        _m("confidentiality_years", "Confidentiality survival", "confidentiality", r"(?:for|period of|survive[sd]? for|continue[sd]? for)\s+(?:a period of\s+)?(\d+)\s+years?", "number", "years", "Years confidentiality survives the agreement"),
+        _m("sla_availability_pct", "Service availability", "sla", r"([\d.]+)\s*%\s*(?:availability|uptime|monthly)|availability[^.]{0,60}?([\d.]+)\s*%", "number", "%", "Monthly availability commitment"),
         _m("incident_notice_hours", "Security incident notice", "security", r"within (\d+) (hours|days)", "number", "hours", "Time to notify a security incident"),
         _m("breach_notice_hours", "Personal data breach notice", "breach_notification", r"within (\d+) (hours|days)", "number", "hours", "Time to notify a personal data breach"),
         _m("cure_period_days", "Cure period for breach", "termination_for_cause", r"within (\d+) days", "number", "days", "Days to remedy a material breach"),
         _m("key_personnel_replacement_days", "Key personnel replacement", "key_personnel", r"within (\d+) days", "number", "days", "Days to provide an equivalent replacement"),
         _m("acceptance_days", "Acceptance testing window", "acceptance", r"not less than (\d+) business days", "number", "business days", "Customer testing period"),
         _m("audit_notice_days", "Audit notice", "audit_rights", r"(\d+) days' notice", "number", "days", "Notice needed before an audit"),
-        _m("force_majeure_termination_days", "Force majeure termination trigger", "force_majeure", r"more than (\d+) days", "number", "days", "Days of force majeure before termination"),
-        _m("governing_law_text", "Governing law", "governing_law", r"laws of ([A-Za-z ]+?)\.", "text", "", "Jurisdiction whose law governs"),
+        _m("force_majeure_termination_days", "Force majeure termination trigger", "force_majeure", r"(?:more than|exceed[s]?|longer than|in excess of)\s+(\d+)\s+days", "number", "days", "Days of force majeure before termination"),
+        _m("governing_law_text", "Governing law", "governing_law", r"laws? of (?:the )?(?:State of |Commonwealth of )?(England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2})(?:,|\.| without| and | excluding| \(|;)", "text", "", "Jurisdiction whose law governs"),
     ]
 
 
@@ -202,6 +202,16 @@ def _insert_missing(s, table: str, cols: list[str], rows: list[dict]) -> int:
     return n
 
 
+def refresh_builtins(s) -> int:
+    """Bring the built-in metric patterns up to date with the code (seed / upgrade). Rules and metrics added by admins are never touched."""
+    n = 0
+    for m in default_metrics():
+        r = s.execute(text("UPDATE metrics SET pattern=:p, kind=:k, unit=:u, kcc_key=:kk WHERE key=:key AND builtin AND (pattern IS DISTINCT FROM :p OR kcc_key IS DISTINCT FROM :kk)"),
+                      {"p": m["pattern"], "k": m["kind"], "u": m["unit"], "kk": m["kcc_key"], "key": m["key"]})
+        n += r.rowcount
+    return n
+
+
 def ensure_defaults(s) -> dict:
     """Insert any missing builtin config rows (never overwrites admin edits) and rebuild the matrix view."""
     out = {
@@ -257,7 +267,7 @@ def _norm(t: str) -> str:
 def classify(heading: str, body: str, kcc: list[dict]) -> str:
     """Map a clause to a KCC key: exact heading alias, then alias contained in the heading,
     then the best keyword score over the body. 'other' if nothing matches."""
-    h = _norm(re.sub(r"^\d+[\.\)]\s*", "", heading))
+    h = _norm(re.sub(r"^(?:article|section|clause)\s+[ivxlc\d]+\s*[-–—.:]*\s*|^\d+(?:\.\d+)*[\.\)]?\s*|^[-–—]+\s*", "", heading.replace("--", "–"), flags=re.I))
     for k in kcc:
         if h in {_norm(a) for a in (k["heading_aliases"] or [])} or h == _norm(k["name"]):
             return k["key"]
@@ -282,22 +292,36 @@ def _safe_re(p: str) -> bool:
 
 
 # ------------------------------------------------------------------ metric extraction
-def extract_metrics(clauses: list[dict], metrics: list[dict]) -> list[dict]:
-    """clauses: {id?, clause_type, text, page}. Returns [{metric_key, value_num, value_text, clause_id, page, confidence}]."""
+def extract_metrics(clauses: list[dict], metrics: list[dict], kcc_cfg: list[dict] | None = None) -> list[dict]:
+    """clauses: {id?, clause_type, text, page}. Returns [{metric_key, value_num, value_text, clause_id, page, confidence}].
+    A metric is read from the clauses of its KCC type; when the document has no such clause (real contracts merge or rename them) the pattern is tried
+    on the sentences of the whole document that carry one of that KCC clause's keywords."""
+    from app import textutil as tu
+
     by_type: dict[str, list[dict]] = {}
     for c in clauses:
         by_type.setdefault(c["clause_type"], []).append(c)
+    kw = {k["key"]: [w for w in (k.get("keywords") or []) if w and _safe_re(w)] for k in (kcc_cfg or [])}
     out = []
     for m in metrics:
-        pool = by_type.get(m["kcc_key"]) if m["kcc_key"] else clauses
-        if not pool or not _safe_re(m["pattern"]):
+        if not _safe_re(m["pattern"]):
             continue
-        for c in pool:
-            mt = re.search(m["pattern"], c["text"], re.I)
+        pool = by_type.get(m["kcc_key"]) if m["kcc_key"] else clauses
+        sentence_mode = False
+        if not pool and m["kcc_key"] and kw.get(m["kcc_key"]):
+            pool, sentence_mode = clauses, True
+        for c in pool or []:
+            text_ = tu.normalize(c["text"])
+            if sentence_mode:
+                sents = [x for x in re.split(r"(?<=[.;])\s+", text_) if any(re.search(w, x, re.I) for w in kw[m["kcc_key"]])]
+                text_ = " ".join(sents)
+            mt = re.search(m["pattern"], text_, re.I)
             if not mt:
                 continue
-            g = mt.group(1)
-            row = dict(metric_key=m["key"], value_num=None, value_text=None, clause_id=c.get("id"), page=c.get("page"), confidence=0.92)
+            g = next((x for x in mt.groups() if x and re.search(r"\d|\w", x)), None)
+            if g is None:
+                continue
+            row = dict(metric_key=m["key"], value_num=None, value_text=None, clause_id=c.get("id"), page=c.get("page"), confidence=0.85 if sentence_mode else 0.92)
             if m["kind"] == "text":
                 row["value_text"] = g.strip()
             else:
@@ -305,7 +329,8 @@ def extract_metrics(clauses: list[dict], metrics: list[dict]) -> list[dict]:
                     v = float(g.replace(",", "")) * float(m.get("scale") or 1)
                 except ValueError:
                     continue
-                if mt.lastindex and mt.lastindex >= 2 and (mt.group(2) or "").lower().startswith("day") and (m.get("unit") or "") == "hours":
+                unit_g = mt.group(2) if mt.lastindex and mt.lastindex >= 2 else None
+                if unit_g and unit_g.lower().startswith("day") and (m.get("unit") or "") == "hours":
                     v *= 24
                 row["value_num"] = v
             out.append(row)

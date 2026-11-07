@@ -168,3 +168,18 @@ def call_tool(
 
 def prompt(name: str) -> str:
     return (Path(__file__).parent / "prompts" / f"{name}.md").read_text()
+
+
+def complete(purpose: str, model: str, system: str, user: str, max_tokens: int = 6000, timeout: int = 600) -> str:
+    """Plain text generation (used to write the pilot corpus). Subscription (CLI) or API."""
+    if provider() == "claude_code":
+        cmd = ["claude", "-p", "--output-format", "text", "--model", model, "--tools", "", "--no-session-persistence", "--setting-sources", "", "--disable-slash-commands", "--system-prompt", system]
+        t0 = time.time()
+        with _cli_slots:
+            r = subprocess.run(cmd, input=user, capture_output=True, text=True, timeout=timeout, cwd=tempfile.gettempdir(), env=cli_env())
+        if r.returncode != 0 or not r.stdout.strip():
+            raise RuntimeError(f"claude CLI failed: {(r.stderr or r.stdout)[:300]}")
+        _log(purpose, "text", model, len(user) // 4, len(r.stdout) // 4, int((time.time() - t0) * 1000))
+        return r.stdout.strip()
+    resp = create(purpose, model=model, max_tokens=max_tokens, system=system, messages=[{"role": "user", "content": user}])
+    return "".join(b.text for b in resp.content if b.type == "text").strip()

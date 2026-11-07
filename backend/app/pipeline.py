@@ -18,7 +18,7 @@ from pathlib import Path
 
 from sqlalchemy import text
 
-from app import deviations, embeddings, extraction, kcc, llm, obligations
+from app import deviations, docstruct, embeddings, extraction, kcc, llm, meta_rules, obligations
 from app.config import data_path
 from app.db import SessionLocal
 from app.docgen.generate import render_template
@@ -26,7 +26,7 @@ from app.docgen.library import TEMPLATES
 from app.models import Clause, ClauseDeviation, Contract, FieldExtraction, Template, TemplateClause
 from app.parsing import parse_document
 
-SUPPORTED = {".md", ".txt"}
+SUPPORTED = {".md", ".txt", ".docx", ".pdf", ".html", ".htm"}
 OVERRIDABLE = {"expiry_date", "notice_period_days", "auto_renew", "annual_value", "total_value", "payment_terms_days",
                "liability_cap_multiple", "liability_cap_text", "termination_for_convenience", "governing_law"}
 DATE_FIELDS = {"effective_date", "expiry_date", "customer_signed_date", "supplier_signed_date"}
@@ -51,8 +51,12 @@ def _coerce(field: str, v):
     return date.fromisoformat(v) if field in DATE_FIELDS else v
 
 
-def infer_metadata(md: str, header: dict, clauses: list[dict], sidecar: dict) -> dict:
-    """Vendor / type / title come from the document itself; category, owner, status from an optional sidecar."""
+def infer_metadata(md: str, header: dict, clauses: list[dict], sidecar: dict, folder_hint: str = "") -> dict:
+    """Vendor / type / title / parent come from the document itself (rules for real contracts); category, owner, status from an optional sidecar or the folder."""
+    if not header.get("Parties") and not header.get("Document Type"):
+        m = meta_rules.infer(md, header, clauses, sidecar, folder_hint)
+        return dict(title=m["title"], vendor=m["vendor"], type=m["type"], category=m["category"], owner=m["owner"], status=m["status"],
+                    parent_title=sidecar.get("parent_title"), parent_ref=m["parent_ref"], template_key=TEMPLATE_KEY[m["type"]])
     title = next((ln[2:].strip() for ln in md.splitlines() if ln.startswith("# ")), "Untitled document")
     parties = header.get("Parties", "")
     m = re.search(r'and (.+?) \(the "Supplier"\)', parties)
@@ -74,7 +78,7 @@ def infer_metadata(md: str, header: dict, clauses: list[dict], sidecar: dict) ->
             parent = mm.group(1)
     return dict(title=title, vendor=vendor, type=doc_type, category=sidecar.get("category") or "Uncategorised",
                 owner=sidecar.get("owner") or "Unassigned", status=sidecar.get("status") or "active",
-                parent_title=parent, template_key=TEMPLATE_KEY[doc_type])
+                parent_title=parent, parent_ref=None, template_key=TEMPLATE_KEY[doc_type])
 
 
 # ------------------------------------------------------------------ templates
@@ -109,7 +113,7 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
     s.execute(text("DELETE FROM check_results WHERE contract_id=:c"), {"c": cid})
     s.execute(text("DELETE FROM clause_deviations WHERE contract_id=:c"), {"c": cid})
     s.execute(text("DELETE FROM redlines WHERE contract_id=:c"), {"c": cid})
-    vals = kcc.extract_metrics(clauses_db, cfg["metrics"])
+    vals = kcc.extract_metrics(clauses_db, cfg["metrics"], cfg["kcc"])
     for v in vals:
         s.execute(text("INSERT INTO extracted_values (contract_id, metric_key, value_num, value_text, clause_id, page, confidence) "
                        "VALUES (:c,:k,:n,:t,:cl,:p,:cf)"),
@@ -139,12 +143,12 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     existing = s.query(Contract).filter(Contract.source_path == rel).first()
     if existing and existing.content_hash == chash:
         return {"action": "unchanged", "contract_id": existing.id, "path": rel}
-    md = raw.decode("utf-8", errors="replace")
+    md = docstruct.load_document(path)
     sc = path.with_suffix(".meta.json")
     sidecar = json.loads(sc.read_text()) if sc.exists() else {}
     classify = lambda h, t: kcc.classify(h, t, cfg["kcc"])  # noqa: E731
     header, clauses = parse_document(md, classify)
-    meta = infer_metadata(md, header, clauses, sidecar)
+    meta = infer_metadata(md, header, clauses, sidecar, rel)
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
     val = {f: _coerce(f, d["value"]) for f, d in fields.items()}
     tid = cfg["templates"].get(meta["template_key"])
@@ -184,21 +188,16 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         s.add(FieldExtraction(contract_id=contract.id, field=f, value=None if d["value"] is None else str(d["value"]),
                               confidence=d["confidence"], source_clause_id=by_type.get(d["clause_type"]), source_page=d["page"]))
     stats = derive(s, contract, db_clauses, cfg, meta["template_key"], redline_mode if redline_mode != "auto" else "auto")
-    return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "parent_title": meta["parent_title"],
+    return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "parent_title": meta["parent_title"] or meta.get("parent_ref"),
             "extractor": mode, **stats}
 
 
-def link_parents(s, pending: dict[int, str | None]) -> int:
-    """Resolve parent_id from titles (works whatever order the files arrived in)."""
+def link_parents(s, pending: dict) -> int:
+    """Resolve parent_id from what each document says about its parent (an exact title, or type + date + number), then from the usual
+    hierarchy for the same vendor. Works whatever order the files arrived in."""
     n = 0
-    for cid, title in pending.items():
-        row = s.execute(text("SELECT type, vendor FROM contracts WHERE id=:i"), {"i": cid}).first()
-        pid = None
-        if title:
-            pid = s.execute(text("SELECT id FROM contracts WHERE title=:t AND id<>:i"), {"t": title, "i": cid}).scalar()
-        if pid is None and row and row[0] in ("NDA", "Amendment"):
-            ids = [r[0] for r in s.execute(text("SELECT id FROM contracts WHERE vendor=:v AND type='MSA' AND id<>:i"), {"v": row[1], "i": cid})]
-            pid = ids[0] if len(ids) == 1 else None
+    for cid, ref in pending.items():
+        pid = meta_rules.resolve_parent(s, cid, ref)
         if pid:
             s.execute(text("UPDATE contracts SET parent_id=:p WHERE id=:i"), {"p": pid, "i": cid})
             n += 1
@@ -216,7 +215,8 @@ def scan(root: Path, folders: list[str] | None = None) -> list[Path]:
     """Supported files under the inbox; with `folders`, only those sub-folders (a pipeline's watch list)."""
     bases = [root / f for f in folders] if folders else [root]
     return sorted(p for b in bases if b.exists() for p in b.rglob("*")
-                  if p.is_file() and p.suffix.lower() in SUPPORTED and not p.name.endswith(".meta.json"))
+                  if p.is_file() and p.suffix.lower() in SUPPORTED and not p.name.endswith(".meta.json")
+                  and not any(part.startswith(("_", ".")) for part in p.relative_to(root).parts))
 
 
 def watched_files(s, key: str, folders: list[str]) -> list[Path]:

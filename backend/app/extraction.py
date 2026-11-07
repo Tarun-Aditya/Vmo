@@ -216,5 +216,9 @@ def extract(
             return llm_extract(md, header, clauses, doc_type), "llm"
         except Exception as e:          # limit reached / network: never lose the document, fall back to the offline extractor
             llm.note_failure(e)
-            return heuristic_extract(header, clauses, doc_type), "heuristic-fallback"
-    return heuristic_extract(header, clauses, doc_type), "heuristic"
+            from app import extract_rules
+
+            return extract_rules.extract(md, header, clauses, doc_type), "heuristic-fallback"
+    from app import extract_rules
+
+    return extract_rules.extract(md, header, clauses, doc_type), "heuristic"

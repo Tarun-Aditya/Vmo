@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     readonly_database_url: str = "postgresql+psycopg://vmo_readonly:vmo_readonly@localhost:5432/vmo"
     anthropic_api_key: str = ""
     model_extract: str = "claude-sonnet-5-5"
+    customer_names: str = "Arcadia"   # comma-separated: how our own company is named in contracts
     llm_provider: str = "auto"  # auto | api | claude_code | offline
     model_ask: str = "claude-sonnet-5-5"
     model_redline: str = "claude-sonnet-5-5"
