@@ -6,7 +6,7 @@ import DocEditor from "../components/DocEditor";
 import { Btn, Field, inputCls } from "../forms";
 import { api } from "../lib";
 
-type Shared = { title: string; vendor: string; type: string; md: string; level: "view" | "comment" | "edit"; version: number };
+type Shared = { title: string; vendor: string; type: string; md: string; level: "view" | "comment" | "edit"; version: number; redline?: { clause_type: string; heading: string; status: string; severity: string; deviation: string; suggested_text: string }[] };
 
 /** A draft opened through a share link: no account needed. The link's level decides whether the guest can only read, comment, or edit. */
 export default function SharedDoc() {
@@ -34,6 +34,11 @@ export default function SharedDoc() {
         <div className="lg:col-span-3"><DocEditor value={md} onChange={setMd} readOnly={d.level !== "edit"} title={d.title} status={`Version ${d.version}`} height="75vh" /></div>
         <Comments docId={`shared-${token}`} canAct={d.level !== "view"} endpoints={{ list: `/api/shared/${token}`, add: `/api/shared/${token}/threads`, reply: (id) => `/api/shared/${token}/threads/${id}/comments`, guestName: name }} />
       </div>
+      {!!d.redline?.length && (
+        <section className="rounded border border-slate-200 p-3 dark:border-slate-700" aria-label="Playbook findings"><h2 className="mb-2 text-sm font-semibold">Playbook findings ({d.redline.length})</h2>
+          <ul className="space-y-2 text-sm">{d.redline.map((i) => (
+            <li key={i.clause_type}><span className="mr-2 rounded bg-slate-200 px-1.5 text-xs font-bold uppercase dark:bg-slate-700">{i.severity}</span><b>{i.heading}</b> — {i.deviation}
+              {i.suggested_text && <div className="mt-1 rounded bg-emerald-50 p-2 text-xs text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"><u>Suggested:</u> {i.suggested_text}</div>}</li>))}</ul></section>)}
     </div>
   );
 }

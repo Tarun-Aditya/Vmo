@@ -140,3 +140,23 @@ def test_scheduler_due_logic_follows_frequency_and_pause(seeded):
             s.execute(text("UPDATE pipeline_config SET enabled=:a, interval_minutes=:b, last_run_at=:c, next_run_at=:d WHERE key='contracts'"),
                       dict(a=saved[0], b=saved[1], c=saved[2], d=saved[3]))
             s.commit()
+
+
+def test_files_are_identified_by_content_hash_not_by_name_and_every_run_is_audited(tmp_inbox):
+    f = tmp_inbox / "msa.md"
+    f.write_text(MSA.format(days=20))
+    first = pipeline.run_pipeline("manual")
+    cid = rows("SELECT id FROM contracts WHERE source_path='pytest/msa.md'")[0]["id"]
+    ev = rows("SELECT action, content_hash, size_bytes, reason FROM pipeline_events WHERE run_id=:r", r=first["run_id"])[0]
+    assert ev["action"] == "new" and len(ev["content_hash"]) == 64 and ev["size_bytes"] > 0
+    f.rename(tmp_inbox / "renamed_msa.md")                                       # same bytes, new name: nothing is re-extracted
+    moved = pipeline.run_pipeline("manual")
+    assert (moved["new_docs"], moved["updated"]) == (0, 0)
+    e = rows("SELECT action, content_hash, reason FROM pipeline_events WHERE run_id=:r", r=moved["run_id"])[0]
+    assert e["action"] == "moved" and e["content_hash"] == ev["content_hash"] and "renamed from pytest/msa.md" in e["reason"]
+    assert rows("SELECT source_path FROM contracts WHERE id=:c", c=cid)[0]["source_path"] == "pytest/renamed_msa.md"
+    (tmp_inbox / "copy_of_msa.md").write_text(MSA.format(days=20))               # an identical copy is skipped, not ingested twice
+    dup = pipeline.run_pipeline("manual")
+    assert dup["new_docs"] == 0 and rows("SELECT count(*) AS n FROM contracts WHERE content_hash=:h", h=ev["content_hash"])[0]["n"] == 1
+    skipped = {r["path"]: r for r in rows("SELECT path, action, reason FROM pipeline_events WHERE run_id=:r", r=dup["run_id"])}
+    assert all(v["action"] == "unchanged" for v in skipped.values()) and any("duplicate of" in (v["reason"] or "") for v in skipped.values())

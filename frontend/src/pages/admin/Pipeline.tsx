@@ -7,7 +7,7 @@ import { Card, Loading, Td, Th } from "../../ui";
 
 type Cfg = Status & { inbox: string; inbox_files: number };
 type Run = { id: number; pipeline: string; started_at: string; finished_at: string | null; trigger: string; status: string; scanned: number; new_docs: number; updated: number; unchanged: number; failed: number; message: string | null };
-type Ev = { id: number; path: string; contract_id: number | null; action: string; detail: string; created_at: string };
+type Ev = { id: number; path: string; contract_id: number | null; action: string; detail: string; content_hash: string | null; size_bytes: number | null; reason: string | null; created_at: string };
 
 const FREQ: [number, string][] = [[15, "Every 15 minutes"], [30, "Every 30 minutes"], [60, "Every hour"], [120, "Every 2 hours (default)"], [360, "Every 6 hours"], [720, "Every 12 hours"], [1440, "Daily"]];
 const inDays = (n: number) => { const d = new Date(Date.now() + n * 864e5); return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }); };
@@ -124,11 +124,12 @@ export default function Pipeline() {
                   <tr><td colSpan={10} className="bg-slate-50 p-3 dark:bg-slate-900/50">
                     {r.message && <p className="mb-2 text-xs text-slate-500">{r.message}</p>}
                     <ul className="max-h-60 space-y-0.5 overflow-auto text-xs">
-                      {events.data?.filter((e) => e.action !== "unchanged").map((e) => (
-                        <li key={e.id} className="flex gap-2"><span className={`w-16 shrink-0 font-semibold uppercase ${e.action === "failed" ? "text-red-600" : e.action === "new" ? "text-emerald-700" : "text-sky-700"}`}>{e.action}</span>
-                          <span className="font-mono text-slate-500">{e.path}</span><span>{e.contract_id ? <Link className="text-indigo-600 hover:underline" to={`/contracts/${e.contract_id}`}>{e.detail}</Link> : e.detail}</span></li>))}
-                      {events.data && events.data.every((e) => e.action === "unchanged") && <li className="text-slate-500">All {events.data.length} files were unchanged — nothing to process.</li>}
-                    </ul></td></tr>)}
+                      {events.data?.map((e) => (
+                        <li key={e.id} className="flex flex-wrap gap-2"><span className={`w-16 shrink-0 font-semibold uppercase ${e.action === "failed" ? "text-red-600" : e.action === "new" ? "text-emerald-700" : e.action === "unchanged" ? "text-slate-400" : "text-sky-700"}`}>{e.action === "unchanged" ? "skipped" : e.action}</span>
+                          <span className="font-mono text-slate-500">{e.path}</span>
+                          {e.content_hash && <span className="font-mono text-slate-400" title={`sha256 ${e.content_hash}`}>#{e.content_hash.slice(0, 10)}</span>}
+                          <span>{e.contract_id && e.action !== "unchanged" ? <Link className="text-indigo-600 hover:underline" to={`/contracts/${e.contract_id}`}>{e.detail}</Link> : e.detail}</span>{e.reason && e.action !== "unchanged" && <span className="text-slate-400">· {e.reason}</span>}</li>))}
+                      </ul></td></tr>)}
               </Fragment>))}
           </tbody></table>
       </Card>

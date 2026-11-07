@@ -243,7 +243,9 @@ def _link(token: str, need: str) -> dict:
 def shared_open(token: str):
     ln = _link(token, "view")
     d = _doc(ln["contract_id"])
-    return {"title": d["title"], "vendor": d["vendor"], "type": d["type"], "md": d["body_md"], "level": ln["level"], "threads": threads_of(ln["contract_id"]), "version": _version(ln["contract_id"])}
+    return {"title": d["title"], "vendor": d["vendor"], "type": d["type"], "md": d["body_md"], "level": ln["level"], "threads": threads_of(ln["contract_id"]), "version": _version(ln["contract_id"]),
+            "redline": [{k: i.get(k) for k in ("clause_type", "heading", "status", "severity", "deviation", "standard_position", "suggested_text", "draft_text")}
+                        for i in ((rows("SELECT items FROM redlines WHERE contract_id=:c", c=ln["contract_id"]) or [{"items": []}])[0]["items"] or [])]}
 
 
 class GuestThread(ThreadIn):

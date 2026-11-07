@@ -62,6 +62,8 @@ def test_share_links_levels_expiry_and_revocation(client, draft):
     client.post(f"/api/documents/{draft}/share", json={"level": "edit"})
     assert view["token"].startswith("shr_") and view["path"] == f"/shared/{view['token']}"
     assert client.get(f"/api/shared/{view['token']}").json()["md"] == md
+    red = client.get(f"/api/shared/{view['token']}").json()["redline"]          # a view-only guest also sees the playbook findings
+    assert isinstance(red, list) and all({"clause_type", "severity", "deviation"} <= set(i) for i in red)
     assert client.post(f"/api/shared/{view['token']}/threads", json={"body": "hi", "name": "Vera"}).status_code == 403          # view only
     t = client.post(f"/api/shared/{com['token']}/threads", json={"body": "Please review clause 4", "name": "Vera (Vendor)", "anchor_text": md[:30]}).json()
     assert t["created_by"] == "Vera (Vendor) (guest)" and t["source"] == "guest"

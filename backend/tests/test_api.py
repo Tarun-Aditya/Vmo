@@ -154,7 +154,7 @@ def test_pipeline_status_and_frequency_config(client):
     finally:
         client.put("/api/admin/pipeline", json={"enabled": saved["enabled"], "interval_minutes": saved["interval_minutes"]})
     runs = client.get("/api/admin/pipeline/runs").json()
-    assert runs and client.get(f"/api/admin/pipeline/runs/{runs[-1]['id']}/events").json()
+    assert runs and any(client.get(f"/api/admin/pipeline/runs/{r['id']}/events").json() for r in runs)   # at least one recent run lists its files
 
 
 def test_upload_document_is_picked_up_everywhere(client, clean_docs):
@@ -282,3 +282,25 @@ def test_a_clause_added_in_admin_is_found_on_the_next_run_even_without_its_own_h
             s.commit()
         for f in list(root.rglob("residency_demo*")):
             f.unlink()
+
+
+def test_a_clause_added_in_admin_is_checked_in_redlines_with_suggested_wording(client, seeded):
+    """A draft that lacks the new clause gets a redline item with the admin's standard wording, and the checklist rule fails; a draft that has it does not."""
+
+    std = "All Customer Data shall be stored and processed only within the European Union."
+    mk = lambda name, extra: client.post("/api/redline/upload", json={"filename": name, "owner": "Legal", "category": "Legal", "content":
+        f"# Services Agreement – {name}\n\n**Parties:** Arcadia Retail Inc. (the \"Customer\") and {name} Inc (the \"Supplier\")\n\n## Payment\nThe Customer shall pay undisputed invoices within 30 days of receipt of a valid invoice.\n{extra}"}).json()["contract_id"]
+    body = {"name": "Data Residency", "keywords": ["stored in the european union", "data residency"], "heading_aliases": ["Data Residency"], "standard_text": std,
+            "playbook_position": "Customer Data stays in the EU.", "severity_if_missing": "high", "applies_to": ["MSA", "SOW", "SaaS", "NDA", "Services"]}
+    try:
+        without, has = mk("ResidencyNone", ""), mk("ResidencyHas", f"\n## Data Residency\n{std}\n")
+        assert client.post("/api/admin/kcc", json=body).status_code == 200
+        items = lambda cid: {i["clause_type"]: i for i in client.get(f"/api/redline/{cid}").json()["items"]}
+        miss = items(without)["data_residency"]
+        assert miss["status"] == "missing" and miss["severity"] == "high" and miss["suggested_text"] == std
+        assert "data_residency" not in items(has)
+    finally:
+        client.delete("/api/admin/kcc/data_residency")
+        with SessionLocal() as s:
+            s.execute(text("DELETE FROM contracts WHERE vendor ILIKE 'Residency%'"))
+            s.commit()

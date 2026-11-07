@@ -159,6 +159,8 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
         scope = settings.redline_llm_scope
         use = mode if (scope == "all" or (scope == "drafts" and contract.status == "draft")) else "heuristic"
         items = deviations.compare_document(clauses_db, template_key, use)
+        items += deviations.compare_custom(clauses_db, cfg["kcc"], contract.type)       # clauses added in Admin
+        items.sort(key=lambda i: -deviations.SEV_ORDER.index(i["severity"]))
         for it in items:
             tcid = cfg["tclause"].get((template_key, it["clause_type"]))
             if tcid:
@@ -172,9 +174,18 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     raw = path.read_bytes()
     chash = hashlib.sha256(raw).hexdigest()
     rel = str(path.relative_to(root))
+    base = {"hash": chash, "size": len(raw)}
     existing = s.query(Contract).filter(Contract.source_path == rel).first()
     if existing and existing.content_hash == chash:
-        return {"action": "unchanged", "contract_id": existing.id, "path": rel}
+        return {"action": "unchanged", "contract_id": existing.id, "path": rel, "reason": "same content hash as the last run", **base}
+    twin = None if existing or path.with_suffix(".meta.json").exists() else s.query(Contract).filter(Contract.content_hash == chash).first()
+    if twin and (root / (twin.source_path or "")).with_suffix(".meta.json").exists():
+        twin = None             # a sidecar can make identical text a different record (e.g. the executed copy of a draft)
+    if twin:                     # the same bytes under another name: identity is the hash, not the file name
+        if not (root / (twin.source_path or "")).exists():
+            old, twin.source_path = twin.source_path, rel
+            return {"action": "moved", "contract_id": twin.id, "path": rel, "reason": f"same content hash; moved/renamed from {old}", **base}
+        return {"action": "unchanged", "contract_id": twin.id, "path": rel, "reason": f"duplicate of {twin.source_path} (same content hash)", **base}
     md = docstruct.load_document(path)
     sc = path.with_suffix(".meta.json")
     sidecar = json.loads(sc.read_text()) if sc.exists() else {}
@@ -229,7 +240,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         s.add(FieldExtraction(contract_id=contract.id, field=f, value=None if d["value"] is None else str(d["value"]), corrected=bool(d.get("corrected")),
                               confidence=d["confidence"], source_clause_id=by_type.get(d["clause_type"]), source_page=d["page"]))
     stats = derive(s, contract, db_clauses, cfg, meta["template_key"], redline_mode if redline_mode != "auto" else "auto")
-    return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "parent_title": meta["parent_title"] or meta.get("parent_ref"),
+    return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "reason": "new content hash" if action == "new" else "content hash changed", **base, "parent_title": meta["parent_title"] or meta.get("parent_ref"),
             "extractor": mode, **stats}
 
 
@@ -320,18 +331,18 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
                     if r["action"] in ("new", "updated"):
                         with lk:
                             pending[r["contract_id"]] = r.get("parent_title")
-                    s.execute(text("INSERT INTO pipeline_events (run_id, path, contract_id, action, detail) VALUES (:r,:p,:c,:a,:d)"),
-                              {"r": run_id, "p": r["path"], "c": r["contract_id"], "a": r["action"],
+                    s.execute(text("INSERT INTO pipeline_events (run_id, path, contract_id, action, detail, content_hash, size_bytes, reason) VALUES (:r,:p,:c,:a,:d,:h,:z,:w)"),
+                              {"r": run_id, "p": r["path"], "c": r["contract_id"], "a": r["action"], "h": r["hash"], "z": r["size"], "w": r["reason"],
                                "d": (f"{r.get('title', '')} · {r.get('values', 0)} values, {r.get('checks', 0)} checks, "
-                                     f"{r.get('deviations', 0)} deviations") if r["action"] != "unchanged" else "content unchanged"})
+                                     f"{r.get('deviations', 0)} deviations") if r["action"] in ("new", "updated") else r["reason"]})
                     s.commit()
                 with lk:
-                    counts[{"new": "new_docs", "updated": "updated", "unchanged": "unchanged"}[r["action"]]] += 1
+                    counts[{"new": "new_docs", "updated": "updated", "unchanged": "unchanged", "moved": "unchanged"}[r["action"]]] += 1
             except Exception as e:  # one bad document must not stop the run
                 with lk:
                     counts["failed"] += 1
                 with SessionLocal() as s:
-                    s.execute(text("INSERT INTO pipeline_events (run_id, path, action, detail) VALUES (:r,:p,'failed',:d)"),
+                    s.execute(text("INSERT INTO pipeline_events (run_id, path, action, detail, reason) VALUES (:r,:p,'failed',:d,'will be retried on the next run')"),
                               {"r": run_id, "p": str(f.name), "d": f"{type(e).__name__}: {e}"[:300]})
                     s.commit()
 

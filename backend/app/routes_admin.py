@@ -136,7 +136,7 @@ def pipeline_runs():
 
 @router.get("/admin/pipeline/runs/{rid}/events")
 def pipeline_events(rid: int):
-    return rows("SELECT id, path, contract_id, action, detail, created_at FROM pipeline_events WHERE run_id=:r ORDER BY id", r=rid)
+    return rows("SELECT id, path, contract_id, action, detail, content_hash, size_bytes, reason, created_at FROM pipeline_events WHERE run_id=:r ORDER BY id", r=rid)
 
 
 class UploadIn(BaseModel):

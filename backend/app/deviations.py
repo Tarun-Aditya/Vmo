@@ -195,3 +195,25 @@ def compare_document(clauses: list[dict], template_type: str, mode: str = "auto"
         )
     items.sort(key=lambda i: -SEV_ORDER.index(i["severity"]))
     return items
+
+
+def compare_custom(clauses: list[dict], kcc_cfg: list[dict], doc_type: str) -> list[dict]:
+    """Redline items for clauses an admin added to the library (they have no template page): missing -> insert the standard wording,
+    present but worded very differently -> flag it with the standard wording as the suggestion."""
+    import difflib
+
+    by = {c["clause_type"]: c for c in clauses}
+    items = []
+    for k in kcc_cfg:
+        std = (k.get("standard_text") or "").strip()
+        if k.get("builtin") or not k.get("enabled", True) or not std or (k.get("applies_to") and doc_type not in k["applies_to"]):
+            continue
+        found = by.get(k["key"])
+        base = dict(clause_type=k["key"], heading=k["name"], standard_text=std, standard_position=k.get("playbook_position") or "", suggested_text=std)
+        if not found:
+            items.append({**base, "status": "missing", "draft_text": "", "deviation": f"The {k['name']} clause is missing.",
+                          "severity": k.get("severity_if_missing") or "medium", "diff": [["ins", std]], "page": None})
+        elif difflib.SequenceMatcher(None, norm(found["text"]), norm(std)).ratio() < 0.5:
+            items.append({**base, "status": "changed", "draft_text": found["text"], "deviation": f"{k['name']} is worded differently from the standard position.",
+                          "severity": "medium", "diff": word_diff(found["text"], std), "page": found["page"]})
+    return items
