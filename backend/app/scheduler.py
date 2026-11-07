@@ -49,6 +49,11 @@ async def scheduler_loop() -> None:
     while True:
         await asyncio.sleep(TICK_SECONDS)
         try:
+            from app.connectors import service as connectors
+
+            for cid in await asyncio.to_thread(connectors.due):
+                res = await asyncio.to_thread(connectors.sync, cid, "schedule")
+                log.info("connector %s synced: %s", cid, res)
             for k in due_keys():
                 with SessionLocal() as s:
                     mode = s.execute(text("SELECT trigger_mode FROM pipeline_config WHERE key=:k"), {"k": k}).scalar()

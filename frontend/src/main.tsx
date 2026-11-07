@@ -19,6 +19,7 @@ import Obligations from "./pages/Obligations";
 import Spend from "./pages/Spend";
 import Risk from "./pages/Risk";
 import RiskWeights from "./pages/admin/RiskWeights";
+import Connectors from "./pages/admin/Connectors";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Pipeline from "./pages/admin/Pipeline";
 import Kcc from "./pages/admin/Kcc";
@@ -55,6 +56,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="values" element={<Values />} />
               <Route path="checklist" element={<Checklist />} />
               <Route path="risk" element={<RiskWeights />} />
+              <Route path="connectors" element={<Connectors />} />
               <Route path="usage" element={<Usage />} />
             </Route>
           </Route>

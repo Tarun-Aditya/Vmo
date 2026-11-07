@@ -174,7 +174,6 @@ def _words(n: int) -> str:
 # ------------------------------------------------------------------ labels (ground truth from the spec)
 def labels(seed: date) -> dict:
     out = {"seed_date": seed.isoformat(), "contracts": {}, "drafts": {}}
-    sb = spec_by_key()
     for sp in DOCS:
         d = dates(sp, seed)
         cn, sn = signers(sp)

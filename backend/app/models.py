@@ -46,6 +46,7 @@ class Contract(Base):
     template_id: Mapped[int | None] = mapped_column(ForeignKey("templates.id"))
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("contracts.id"))
     status: Mapped[str] = mapped_column(Text, default="active")
+    source_url: Mapped[str | None] = mapped_column(Text)
     effective_date: Mapped[date | None] = mapped_column(Date)
     expiry_date: Mapped[date | None] = mapped_column(Date)
     notice_period_days: Mapped[int | None] = mapped_column(Integer)

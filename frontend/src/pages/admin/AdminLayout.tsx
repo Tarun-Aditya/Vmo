@@ -2,6 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const TABS: [string, string, string][] = [
   ["/admin", "Pipeline", "Folder watch, schedule, run history"],
+  ["/admin/connectors", "Connectors", "Google Drive, OneDrive, SharePoint"],
   ["/admin/clauses", "Key clause library", "What clauses to identify"],
   ["/admin/values", "Values & limits", "What numbers to extract"],
   ["/admin/checklist", "Redline checklist", "Rules to run before signing"],

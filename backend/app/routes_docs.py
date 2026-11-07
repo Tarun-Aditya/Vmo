@@ -5,10 +5,11 @@ import base64
 import re
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import ingest_text, pipeline
+from app import docx_export, ingest_text, pipeline
 from app.db import SessionLocal
 
 router = APIRouter(prefix="/api")
@@ -204,3 +205,35 @@ def redline_upload(u: RedlineUpload):
         root = pipeline.inbox_path(s)
         cid = s.execute(text("SELECT id FROM contracts WHERE source_path=:p"), {"p": str(p.relative_to(root))}).scalar()
     return {"contract_id": cid, "saved_as": p.name, "run": res}
+
+
+# ------------------------------------------------------------------ Word export
+DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
+
+def _fname(title: str, suffix: str = "") -> str:
+    import re
+
+    return re.sub(r"[^A-Za-z0-9._ -]+", "", title)[:80].strip().replace(" ", "_") + suffix + ".docx"
+
+
+@router.get("/documents/{cid}/export.docx")
+def export_docx(cid: int):
+    d = _doc(cid)
+    try:
+        data = docx_export.md_to_docx(d["body_md"])
+    except RuntimeError as e:
+        raise HTTPException(501, str(e))
+    return Response(data, media_type=DOCX, headers={"Content-Disposition": f'attachment; filename="{_fname(d["title"])}"'})
+
+
+@router.get("/redline/{cid}/export.docx")
+def export_redline_docx(cid: int):
+    """The document with every deviation as a tracked change (accepted ones inserted, rejected ones left out)."""
+    d = _doc(cid)
+    red = one("SELECT items FROM redlines WHERE contract_id=:i", i=cid)
+    try:
+        data, stats = docx_export.redline_docx(d["body_md"], (red or {}).get("items") or [], review_get(cid)["decisions"])
+    except RuntimeError as e:
+        raise HTTPException(501, str(e))
+    return Response(data, media_type=DOCX, headers={"Content-Disposition": f'attachment; filename="{_fname(d["title"], "_redline")}"', "X-Tracked-Changes": str(stats["changes"] + stats["inserted_clauses"])})

@@ -104,7 +104,7 @@ def _config() -> tuple[list[dict], list[dict]]:
     """(clause words, metrics) from the live admin configuration."""
     with SessionLocal() as s:
         k = [dict(r) for r in s.execute(text("SELECT key, name, keywords, heading_aliases FROM kcc_library WHERE enabled AND in_matrix")).mappings()]
-        m = [dict(r) for r in s.execute(text("SELECT key, name, kind, unit FROM metrics WHERE enabled")).mappings()]
+        m = [dict(r) for r in s.execute(text("SELECT key, name, kind, unit FROM metrics WHERE enabled ORDER BY key")).mappings()]
         r = [dict(x) for x in s.execute(text("SELECT key, name FROM checklist_rules WHERE enabled")).mappings()]
     return k, m, r
 
@@ -227,9 +227,11 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         def plural(ws):  # "payment terms" also matches "payment term"
             return r"\s+".join(re.escape(w.rstrip("s")) + "s?" for w in ws)
 
-        if re.search(r"\b" + plural(re.findall(r"[a-z]+", m["name"].lower())) + r"\b", q) or (len(words) >= 2 and re.search(r"\b" + plural(words[:2]) + r"\b", q)):
-            hit_metrics.append(m)
-            want_cols.append("mv:" + m["key"])
+        mt_ = re.search(r"\b" + plural(re.findall(r"[a-z]+", m["name"].lower())) + r"\b", q) or (len(words) >= 2 and re.search(r"\b" + plural(words[:2]) + r"\b", q))
+        if mt_:
+            hit_metrics.append((mt_.start(), m))
+    hit_metrics = [m for _, m in sorted(hit_metrics, key=lambda x: x[0])]        # columns follow the order of the question
+    want_cols.extend("mv:" + m["key"] for m in hit_metrics)
     cmp_ = re.search(rf"({LT}|{GT})\s*{NUM}", q)
     if cmp_ and hit_metrics:
         op_word, val, suf = cmp_.group(1), cmp_.group(2), cmp_.group(3)

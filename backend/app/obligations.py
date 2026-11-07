@@ -29,31 +29,27 @@ def _anniversary(eff: date | None, today: date) -> date | None:
     return d if d >= today else d.replace(year=d.year + 1)
 
 
-# metric -> (kind, party, title template, frequency, unit)
-METRIC_OBLIGATIONS = {
-    "sla_availability_pct": ("sla", "Supplier", "Keep service availability at or above {v:g}%", "monthly", "%"),
-    "incident_notice_hours": ("notice", "Supplier", "Notify security incidents within {v:g} hours", "event", "hours"),
-    "breach_notice_hours": ("notice", "Supplier", "Notify a personal-data breach within {v:g} hours", "event", "hours"),
-    "payment_terms_days": ("payment", "Customer", "Pay undisputed invoices within {v:g} days", "event", "days"),
-    "acceptance_days": ("acceptance", "Customer", "Accept or reject deliverables within {v:g} business days", "event", "business days"),
-    "key_personnel_replacement_days": ("personnel", "Supplier", "Give {v:g} days' notice before replacing key personnel", "event", "days"),
-    "cure_period_days": ("cure", "Both", "Remedy a material breach within {v:g} days of notice", "event", "days"),
-    "audit_notice_days": ("audit", "Customer", "Give {v:g} days' notice before an audit", "event", "days"),
-    "insurance_cover_usd": ("insurance", "Supplier", "Maintain insurance of at least ${v:,.0f} per claim and provide evidence annually", "annual", "USD"),
-    "warranty_days": ("warranty", "Supplier", "Fix defects during the {v:g}-day warranty period", "event", "days"),
-}
+def default_rules() -> list[dict]:
+    from app.config_items import OBLIGATION_RULES
+
+    return [dict(key=k, name=n, metric_key=m, kind=kd, party=p, title_template=t, frequency=f, unit=u, annual=a) for k, n, m, kd, p, t, f, u, a in OBLIGATION_RULES]
 
 
-def rule_obligations(c: dict, clauses: list[dict], vals: list[dict], today: date) -> list[dict]:
+def load_rules(s) -> list[dict]:
+    rows = [dict(r) for r in s.execute(text("SELECT * FROM obligation_rules WHERE enabled ORDER BY sort_order, key")).mappings()]
+    return rows or default_rules()
+
+
+def rule_obligations(c: dict, clauses: list[dict], vals: list[dict], today: date, rules: list[dict] | None = None) -> list[dict]:
     out: list[dict] = []
     by = {v["metric_key"]: v for v in vals if v.get("value_num") is not None}
-    for mk, (kind, party, title, freq, unit) in METRIC_OBLIGATIONS.items():
-        v = by.get(mk)
+    for r in rules or default_rules():            # one obligation per rule whose metric the contract states (rules are configurable in Admin)
+        v = by.get(r["metric_key"])
         if not v:
             continue
-        due = _anniversary(c.get("effective_date"), today) if freq == "annual" else None
-        out.append(dict(key=f"metric:{mk}", kind=kind, party=party, title=title.format(v=float(v["value_num"])), due_date=due, frequency=freq,
-                        target_value=v["value_num"], target_unit=unit, metric_key=mk, page=v.get("page"), clause_type=None, detail=None))
+        due = _anniversary(c.get("effective_date"), today) if (r.get("annual") or r["frequency"] == "annual") else None
+        out.append(dict(key=f"metric:{r['metric_key']}", kind=r["kind"], party=r["party"], title=r["title_template"].format(v=float(v["value_num"])), due_date=due, frequency=r["frequency"],
+                        target_value=v["value_num"], target_unit=r.get("unit"), metric_key=r["metric_key"], page=v.get("page"), clause_type=None, detail=None))
     for cl in clauses:                       # dated milestones in the deliverables clause
         for n, desc, when in re.findall(r"Milestone (\d+): (.+?) by (\d{1,2} [A-Za-z]+ \d{4})", cl["text"]):
             d = _date(when)
@@ -125,7 +121,7 @@ def derive(s, contract, clauses: list[dict], vals: list[dict], today: date | Non
         return 0
     c = dict(title=contract.title, type=contract.type, effective_date=contract.effective_date, expiry_date=contract.expiry_date,
              notice_period_days=contract.notice_period_days, auto_renew=contract.auto_renew)
-    items = rule_obligations(c, clauses, vals, today)
+    items = rule_obligations(c, clauses, vals, today, load_rules(s))
     if use_llm and llm.available():
         try:
             items += llm_obligations(c, clauses)

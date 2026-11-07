@@ -344,8 +344,9 @@ def build_draft(spec: dict) -> tuple[str, dict]:
 
 def _clean(d: Path) -> None:
     d.mkdir(parents=True, exist_ok=True)
-    for f in list(d.glob("*.md")) + list(d.glob("*.meta.json")):
-        f.unlink()
+    for f in d.glob("*"):             # a corpus switch must not leave the other corpus' files (docx / pdf / md) behind
+        if f.is_file():
+            f.unlink()
 
 
 def generate(root: Path, seed: date) -> dict:

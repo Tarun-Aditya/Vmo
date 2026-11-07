@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     readonly_database_url: str = "postgresql+psycopg://vmo_readonly:vmo_readonly@localhost:5432/vmo"
     anthropic_api_key: str = ""
     model_extract: str = "claude-sonnet-5-5"
+    redline_llm_scope: str = "drafts"   # which documents Claude redlines against the standard: drafts | all | none (the rest use the pattern library)
     customer_names: str = "Arcadia"   # comma-separated: how our own company is named in contracts
     llm_provider: str = "auto"  # auto | api | claude_code | offline
     model_ask: str = "claude-sonnet-5-5"

@@ -225,6 +225,9 @@ def ensure_defaults(s) -> dict:
     s.execute(text("INSERT INTO pipeline_config (id, key, name, folders) VALUES (1, 'contracts', 'Executed contracts', 'contracts,uploads') ON CONFLICT DO NOTHING"))
     s.execute(text("INSERT INTO pipeline_config (id, key, name, folders, trigger_mode, interval_minutes) VALUES (2, 'drafts', 'Draft review (redline)', 'drafts,generated', 'on_change', 15) ON CONFLICT DO NOTHING"))
     s.execute(text("INSERT INTO pipeline_config (id, key, name, folders, trigger_mode, interval_minutes) VALUES (3, 'feeds', 'Operational feeds', 'feeds', 'on_change', 60) ON CONFLICT DO NOTHING"))
+    from app import config_items
+
+    config_items.ensure_defaults(s)
     rebuild_key_clauses_view(s)
     return out
 
@@ -304,7 +307,7 @@ def extract_metrics(clauses: list[dict], metrics: list[dict], kcc_cfg: list[dict
     kw = {k["key"]: [w for w in (k.get("keywords") or []) if w and _safe_re(w)] for k in (kcc_cfg or [])}
     names = {k["key"]: k["name"] for k in (kcc_cfg or [])}
     for m in metrics:       # the words of the metric's own and its clause's name (stems) also mark a sentence as relevant: 'availability' ~ 'available'
-        stems = {w[:6] for w in re.findall(r"[a-z]{5,}", f"{m['name']} {names.get(m['kcc_key'], '')}".lower())}
+        stems = {w[:6] for w in re.findall(r"[a-z]{5,}", f"{m.get('name', '')} {names.get(m.get('kcc_key'), '')}".lower())}
         if m["kcc_key"] and stems:
             kw.setdefault(m["kcc_key"], [])
             kw[m["kcc_key"]] = list(dict.fromkeys(kw[m["kcc_key"]] + [rf"\b{x}\w*" for x in stems]))

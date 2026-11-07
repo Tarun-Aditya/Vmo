@@ -70,23 +70,33 @@ def obligation_patch(oid: int, b: ObligationPatch):
 
 
 # ------------------------------------------------------------------ SLA
-def _credit(shortfall: float, metric: str) -> float:
-    """Typical service-credit tiers (share of the monthly fee). The clause's own tiers are not extracted, so this is an estimate."""
-    if metric != "sla_availability_pct":
+def _credit(shortfall: float, better: str | None, tiers: list) -> float:
+    """Service-credit tiers (share of the monthly fee) come from Admin -> Thresholds; the clause's own tiers are not extracted, so this is an estimate.
+    Only metrics where higher is better (availability) carry credits."""
+    if better == "lower":
         return 0.0
-    return 0.05 if shortfall < 0.5 else 0.10 if shortfall < 1.0 else 0.20
+    for limit, share in tiers:
+        if limit is None or shortfall < float(limit):
+            return float(share)
+    return 0.0
 
 
 @router.get("/sla")
 def sla(vendor: str | None = None):
+    from app import config_items
+
+    with SessionLocal() as s_:
+        tiers = config_items.get(s_, "sla", "credit_tiers", [[0.5, 0.05], [1.0, 0.10], [None, 0.20]])
+    meta = {m["key"]: m for m in rows("SELECT key, name, unit, better FROM metrics")}
     pts = rows("""SELECT s.contract_id, s.title, s.vendor, s.metric_key, s.period, s.actual, s.target, s.breach, s.shortfall, s.incidents, t.annual_value
                   FROM v_sla s JOIN v_effective_terms t ON t.contract_id = s.contract_id WHERE (CAST(:v AS text) IS NULL OR s.vendor = :v) ORDER BY s.contract_id, s.metric_key, s.period""", v=vendor)
     series: dict[tuple, dict] = {}
     for p in pts:
         k = (p["contract_id"], p["metric_key"])
         e = series.setdefault(k, {"contract_id": p["contract_id"], "title": p["title"], "vendor": p["vendor"], "metric_key": p["metric_key"], "target": float(p["target"]) if p["target"] is not None else None,
-                                  "unit": "%" if p["metric_key"] == "sla_availability_pct" else "hours", "points": [], "breaches": 0, "credit_usd": 0.0})
-        credit = _credit(float(p["shortfall"] or 0), p["metric_key"]) * float(p["annual_value"] or 0) / 12 if p["breach"] else 0.0
+                                  "unit": meta.get(p["metric_key"], {}).get("unit") or "", "metric": meta.get(p["metric_key"], {}).get("name", p["metric_key"]), "better": meta.get(p["metric_key"], {}).get("better"),
+                                  "points": [], "breaches": 0, "credit_usd": 0.0})
+        credit = _credit(float(p["shortfall"] or 0), meta.get(p["metric_key"], {}).get("better"), tiers) * float(p["annual_value"] or 0) / 12 if p["breach"] else 0.0
         e["points"].append({"period": p["period"], "actual": float(p["actual"]), "breach": bool(p["breach"]), "incidents": p["incidents"], "credit_usd": round(credit)})
         e["breaches"] += int(bool(p["breach"]))
         e["credit_usd"] += credit
@@ -108,8 +118,8 @@ class Measurement(BaseModel):
 
 @router.post("/sla/measurements")
 def sla_add(m: Measurement):
-    if m.metric_key not in ("sla_availability_pct", "incident_notice_hours"):
-        raise HTTPException(422, "metric_key must be sla_availability_pct or incident_notice_hours")
+    if not rows("SELECT 1 FROM metrics WHERE key=:k AND sla", k=m.metric_key):
+        raise HTTPException(422, "that metric is not a measurable SLA metric (see Admin -> Values & limits)")
     with SessionLocal() as s:
         s.execute(text("""INSERT INTO sla_measurements (contract_id, metric_key, period, actual, incidents, note, source) VALUES (:c,:k,:p,:a,:i,:n,'manual')
                           ON CONFLICT (contract_id, metric_key, period) DO UPDATE SET actual=:a, incidents=:i, note=:n, source='manual'"""),
@@ -184,8 +194,12 @@ def risk_vendors():
     data = rows("""SELECT s.vendor, s.score, s.tier, s.components, (SELECT count(*) FROM contracts c WHERE c.vendor = s.vendor AND c.status <> 'draft') AS documents,
                           (SELECT COALESCE(sum(annual_value),0) FROM v_effective_terms t WHERE t.vendor = s.vendor AND t.status <> 'draft') AS annual_value
                    FROM vendor_scores s ORDER BY s.score DESC""")
+    from app import config_items
+
+    with SessionLocal() as s_:
+        g = config_items.group(s_, "risk")
     return {"vendors": data, "weights": rows("SELECT key, label, description, weight, enabled FROM risk_weights ORDER BY sort_order"),
-            "tiers": [{"min": 50, "tier": "critical"}, {"min": 30, "tier": "high"}, {"min": 15, "tier": "medium"}, {"min": 0, "tier": "low"}]}
+            "tiers": [{"min": g.get("tier_critical", 50), "tier": "critical"}, {"min": g.get("tier_high", 30), "tier": "high"}, {"min": g.get("tier_medium", 15), "tier": "medium"}, {"min": 0, "tier": "low"}]}
 
 
 @router.get("/risk/vendors/{vendor}")
@@ -223,9 +237,6 @@ def risk_recompute():
 
 
 # ------------------------------------------------------------------ benchmarks
-BENCH = ["payment_terms_days", "liability_cap_multiple", "sla_availability_pct", "insurance_cover_usd", "warranty_days", "tfc_notice_days", "renewal_notice_days", "incident_notice_hours", "confidentiality_years", "acceptance_days"]
-
-
 def _q(vals: list[float], p: float) -> float:
     vals = sorted(vals)
     k = (len(vals) - 1) * p
@@ -236,11 +247,9 @@ def _q(vals: list[float], p: float) -> float:
 @router.get("/benchmarks")
 def benchmarks():
     out = []
-    mets = {m["key"]: m for m in rows("SELECT key, name, unit FROM metrics")}
+    mets = {m["key"]: m for m in rows("SELECT key, name, unit, kind FROM metrics WHERE enabled ORDER BY key")}
     pol = rows("SELECT metric_key, name, operator, threshold, severity FROM checklist_rules WHERE rule_type='metric_threshold' AND enabled")
-    for key in BENCH:
-        if key not in mets:
-            continue
+    for key in [k for k, m in mets.items() if m["kind"] in ("number", "money")]:           # every numeric metric the admin has defined
         if key == "payment_terms_days":      # the effective value: amendments already applied
             vals = rows("""SELECT contract_id, title, vendor, type, payment_terms_days::float AS value FROM v_effective_terms WHERE status <> 'draft' AND payment_terms_days IS NOT NULL ORDER BY 5, vendor""")
         else:

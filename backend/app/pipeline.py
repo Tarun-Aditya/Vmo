@@ -126,7 +126,11 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
                    "cl": r["clause_id"], "p": r["page"], "x": r["excerpt"]})
     items = []
     if contract.type != "Amendment":
-        items = deviations.compare_document(clauses_db, template_key, mode)
+        from app.config import settings
+
+        scope = settings.redline_llm_scope
+        use = mode if (scope == "all" or (scope == "drafts" and contract.status == "draft")) else "heuristic"
+        items = deviations.compare_document(clauses_db, template_key, use)
         for it in items:
             tcid = cfg["tclause"].get((template_key, it["clause_type"]))
             if tcid:
@@ -151,11 +155,15 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     meta = infer_metadata(md, header, clauses, sidecar, rel)
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
     val = {f: _coerce(f, d["value"]) for f, d in fields.items()}
+    if meta["type"] in ("DPA", "NDA"):          # a DPA is not 'covered by a DPA'; an NDA processes no personal data: same result in every engine
+        val["has_dpa"] = False
+        if meta["type"] == "NDA":
+            val["processes_personal_data"] = False
     tid = cfg["templates"].get(meta["template_key"])
     attrs = dict(
         title=meta["title"], vendor=meta["vendor"], category=meta["category"], type=meta["type"], template_id=tid,
         status=meta["status"], owner=meta["owner"], body_md=md, currency="USD", source_path=rel, content_hash=chash,
-        ingested_at=datetime.now(timezone.utc), origin=sidecar.get("origin", "inbox"),
+        ingested_at=datetime.now(timezone.utc), origin=sidecar.get("origin", "inbox"), source_url=sidecar.get("source_url"),
         overrides=sorted(set(val) & OVERRIDABLE) if meta["type"] == "Amendment" else [],
         effective_date=val.get("effective_date"), expiry_date=val.get("expiry_date"), notice_period_days=val.get("notice_period_days"),
         auto_renew=bool(val.get("auto_renew")), annual_value=val.get("annual_value"), total_value=val.get("total_value"),

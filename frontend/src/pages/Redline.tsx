@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { mdToHtml } from "../components/mdhtml";
 import { Btn, inputCls } from "../forms";
-import { api, when } from "../lib";
+import { API, api, when } from "../lib";
 import { Card, Loading, Sev, SeverityChip, sevStripe } from "../ui";
 
 type RStatus = "pending" | "in_review" | "changes_requested" | "approved";
@@ -190,6 +190,7 @@ export default function Redline() {
               <button role="tab" aria-selected={tab === "checklist"} onClick={() => setTab("checklist")} className={`rounded-t px-3 py-1.5 text-sm font-medium ${tab === "checklist" ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>Pre-signature checklist ({r.checklist_summary.fail} failing)</button>
               <span className="ml-auto flex items-center gap-3 text-sm">
                 {r.status === "draft" && <Link className="font-medium text-indigo-600 hover:underline" to={`/documents/${r.id}/edit`}>Edit in document editor</Link>}
+                <a className="text-indigo-600 hover:underline" href={`${API}/api/redline/${r.id}/export.docx`} download>⬇ Download with tracked changes (.docx)</a>
                 <Link className="text-indigo-600 hover:underline" to={`/ask?doc=${r.id}`}>Ask about it</Link>
               </span>
             </div>

@@ -268,6 +268,8 @@ class MetricIn(BaseModel):
     unit: str | None = None
     scale: float = 1
     enabled: bool = True
+    better: str | None = None          # 'higher' | 'lower': which way is good (benchmarks, SLA breach direction)
+    sla: bool = False                  # measured monthly from the monitoring feed (SLA tracking)
 
 
 @router.get("/admin/metrics")
@@ -288,8 +290,8 @@ def metric_create(m: MetricIn):
         raise HTTPException(422, "the pattern is not a valid regular expression")
     if rows("SELECT 1 FROM metrics WHERE key=:k", k=key):
         raise HTTPException(409, "a metric with that key exists")
-    run_sql("INSERT INTO metrics (key,name,description,kcc_key,pattern,kind,unit,scale,enabled,builtin) VALUES (:k,:n,:d,:c,:p,:kind,:u,:s,:e,false)",
-            k=key, n=m.name, d=m.description, c=m.kcc_key or None, p=m.pattern, kind=m.kind, u=m.unit, s=m.scale, e=m.enabled)
+    run_sql("INSERT INTO metrics (key,name,description,kcc_key,pattern,kind,unit,scale,enabled,builtin,better,sla) VALUES (:k,:n,:d,:c,:p,:kind,:u,:s,:e,false,:b,:sl)",
+            k=key, n=m.name, d=m.description, c=m.kcc_key or None, p=m.pattern, kind=m.kind, u=m.unit, s=m.scale, e=m.enabled, b=m.better or None, sl=m.sla)
     return {"key": key, **_reprocess()}
 
 
@@ -297,8 +299,8 @@ def metric_create(m: MetricIn):
 def metric_update(key: str, m: MetricIn):
     if not _ok(m.pattern):
         raise HTTPException(422, "the pattern is not a valid regular expression")
-    run_sql("UPDATE metrics SET name=:n, description=:d, kcc_key=:c, pattern=:p, kind=:kind, unit=:u, scale=:s, enabled=:e WHERE key=:k",
-            k=key, n=m.name, d=m.description, c=m.kcc_key or None, p=m.pattern, kind=m.kind, u=m.unit, s=m.scale, e=m.enabled)
+    run_sql("UPDATE metrics SET name=:n, description=:d, kcc_key=:c, pattern=:p, kind=:kind, unit=:u, scale=:s, enabled=:e, better=:b, sla=:sl WHERE key=:k",
+            k=key, n=m.name, d=m.description, c=m.kcc_key or None, p=m.pattern, kind=m.kind, u=m.unit, s=m.scale, e=m.enabled, b=m.better or None, sl=m.sla)
     return {"key": key, **_reprocess()}
 
 
@@ -471,3 +473,93 @@ def gen_create(g: GenIn):
         return generator.create(g.template, g.params, g.md)
     except (ValueError, KeyError) as e:
         raise HTTPException(422, str(e))
+
+
+# ------------------------------------------------------------------ thresholds (config_items) and obligation rules
+@router.get("/admin/config")
+def config_get():
+    out: dict[str, list] = {}
+    for r in rows("SELECT grp, key, label, description, value, kind FROM config_items ORDER BY grp, sort_order, key"):
+        out.setdefault(r["grp"], []).append(r)
+    return {"groups": out, "titles": {"spend": "Spend checks", "risk": "Vendor risk: tiers and saturation", "risk_points": "Vendor risk: points per finding", "sla": "SLA"}}
+
+
+class ConfigIn(BaseModel):
+    value: float | int | list | str | bool | None
+
+
+@router.put("/admin/config/{grp}/{key}")
+def config_put(grp: str, key: str, b: ConfigIn):
+    import json
+
+    r = rows("SELECT kind FROM config_items WHERE grp=:g AND key=:k", g=grp, k=key)
+    if not r:
+        raise HTTPException(404, "unknown setting")
+    if r[0]["kind"] == "number" and not isinstance(b.value, (int, float)):
+        raise HTTPException(422, "this setting is a number")
+    if r[0]["kind"] == "json" and not isinstance(b.value, list):
+        raise HTTPException(422, "this setting is a list")
+    run_sql("UPDATE config_items SET value=CAST(:v AS jsonb) WHERE grp=:g AND key=:k", v=json.dumps(b.value), g=grp, k=key)
+    from app import feeds
+
+    return {"saved": True, **feeds.recompute()}
+
+
+class ObligationRuleIn(BaseModel):
+    key: str | None = None
+    name: str
+    metric_key: str | None = None
+    kind: str
+    party: str = "Supplier"
+    title_template: str
+    frequency: str = "event"
+    unit: str | None = None
+    annual: bool = False
+    enabled: bool = True
+
+
+@router.get("/admin/obligation-rules")
+def obl_rules():
+    return {"rules": rows("""SELECT r.*, (SELECT count(*) FROM obligations o WHERE o.key = 'metric:' || r.metric_key) AS obligations FROM obligation_rules r ORDER BY sort_order, key"""),
+            "metrics": rows("SELECT key, name, unit FROM metrics WHERE enabled ORDER BY name")}
+
+
+def _check_obl_rule(b: ObligationRuleIn) -> None:
+    if b.party not in ("Supplier", "Customer", "Both") or b.frequency not in ("once", "monthly", "quarterly", "annual", "event"):
+        raise HTTPException(422, "party must be Supplier, Customer or Both; frequency once, monthly, quarterly, annual or event")
+    try:
+        b.title_template.format(v=1.0)
+    except (KeyError, IndexError, ValueError):
+        raise HTTPException(422, "the title may use only {v}, e.g. 'Pay within {v:g} days'")
+    if b.metric_key and not rows("SELECT 1 FROM metrics WHERE key=:k", k=b.metric_key):
+        raise HTTPException(422, "unknown metric")
+
+
+@router.post("/admin/obligation-rules")
+def obl_rule_create(b: ObligationRuleIn):
+    _check_obl_rule(b)
+    key = b.key or re.sub(r"[^a-z0-9]+", "_", b.name.lower()).strip("_")
+    if rows("SELECT 1 FROM obligation_rules WHERE key=:k", k=key):
+        raise HTTPException(409, "a rule with that key exists")
+    run_sql("INSERT INTO obligation_rules (key,name,metric_key,kind,party,title_template,frequency,unit,annual,enabled,builtin,sort_order) VALUES (:k,:n,:m,:kd,:p,:t,:f,:u,:a,:e,false,999)",
+            k=key, n=b.name, m=b.metric_key, kd=b.kind, p=b.party, t=b.title_template, f=b.frequency, u=b.unit, a=b.annual, e=b.enabled)
+    return {"key": key, **_reprocess()}
+
+
+@router.put("/admin/obligation-rules/{key}")
+def obl_rule_update(key: str, b: ObligationRuleIn):
+    _check_obl_rule(b)
+    run_sql("UPDATE obligation_rules SET name=:n, metric_key=:m, kind=:kd, party=:p, title_template=:t, frequency=:f, unit=:u, annual=:a, enabled=:e WHERE key=:k",
+            k=key, n=b.name, m=b.metric_key, kd=b.kind, p=b.party, t=b.title_template, f=b.frequency, u=b.unit, a=b.annual, e=b.enabled)
+    return {"key": key, **_reprocess()}
+
+
+@router.delete("/admin/obligation-rules/{key}")
+def obl_rule_delete(key: str):
+    r = rows("SELECT builtin FROM obligation_rules WHERE key=:k", k=key)
+    if not r:
+        raise HTTPException(404, "not found")
+    if r[0]["builtin"]:
+        raise HTTPException(409, "built-in rules can be disabled, not deleted")
+    run_sql("DELETE FROM obligation_rules WHERE key=:k", k=key)
+    return {"deleted": key, **_reprocess()}

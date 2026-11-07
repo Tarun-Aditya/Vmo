@@ -54,28 +54,28 @@ def main() -> int:
     tot = {k: [0, 0] for k in tot}
     per_field: dict[str, list[int]] = {f: [0, 0] for f in FIELDS}
     misses, missing_docs = [], []
-    for key, l in docs.items():
+    for key, lab_ in docs.items():
         r = rows.get(key)
         if not r:
             missing_docs.append(key)
             continue
         for f in FIELDS:
-            if f in ("customer_signatory", "supplier_signatory") and l.get("meta", {}).get("status") == "draft":
+            if f in ("customer_signatory", "supplier_signatory") and lab_.get("meta", {}).get("status") == "draft":
                 pass
-            if l.get("meta", {}).get("type") == "Amendment" and f not in ("effective_date", "expiry_date", "payment_terms_days"):
+            if lab_.get("meta", {}).get("type") == "Amendment" and f not in ("effective_date", "expiry_date", "payment_terms_days"):
                 continue
-            if f == "payment_terms_days" and l["meta"]["type"] in ("NDA", "DPA"):
+            if f == "payment_terms_days" and lab_["meta"]["type"] in ("NDA", "DPA"):
                 continue
-            if l.get(f) is None and f in ("termination_for_convenience", "processes_personal_data", "has_dpa", "governing_law", "payment_terms_days", "liability_cap_multiple", "liability_cap_text"):
+            if lab_.get(f) is None and f in ("termination_for_convenience", "processes_personal_data", "has_dpa", "governing_law", "payment_terms_days", "liability_cap_multiple", "liability_cap_text"):
                 continue                                  # the spec says nothing about it for this document: not scored
-            ok = same(f, r.get(f), l.get(f))
+            ok = same(f, r.get(f), lab_.get(f))
             per_field[f][0] += ok
             per_field[f][1] += 1
             tot["fields"][0] += ok
             tot["fields"][1] += 1
             if not ok:
-                misses.append((key, f, r.get(f), l.get(f)))
-        m = l["meta"]
+                misses.append((key, f, r.get(f), lab_.get(f)))
+        m = lab_["meta"]
         for name, got, want in (("type", r["type"], m["type"]), ("vendor", r["vendor"], m["vendor"]), ("status", r["status"], m["status"]),
                                 ("parent", bool(r["parent_id"]), bool(m["parent"]))):
             ok = str(got).lower() == str(want).lower() if name != "vendor" else str(got).lower().rstrip(".") == str(want).lower()
@@ -83,14 +83,14 @@ def main() -> int:
             tot["meta"][1] += 1
             if not ok:
                 misses.append((key, f"meta.{name}", got, want))
-        for k, want in l["values"].items():
+        for k, want in lab_["values"].items():
             got = vals.get(key, {}).get(k)
             ok = got is not None and abs(got - float(want)) <= 0.01 * max(float(want), 1)
             tot["values"][0] += ok
             tot["values"][1] += 1
             if not ok:
                 misses.append((key, f"value.{k}", got, want))
-        for ms in l["milestones"]:
+        for ms in lab_["milestones"]:
             ok = ms["date"] in obl.get(key, set())
             tot["milestones"][0] += ok
             tot["milestones"][1] += 1

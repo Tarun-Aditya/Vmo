@@ -7,12 +7,14 @@ from datetime import date
 
 from sqlalchemy import text
 
-INTEREST_PER_MONTH = 0.01          # the standard MSA caps late-payment interest at 1% per month
-RUN_RATE_TOLERANCE = 1.10          # an invoice more than 10% above the contract's usual invoice is flagged
 
 
 def compute_exceptions(s, today: date | None = None) -> int:
+    from app import config_items
+
     today = today or date.today()
+    cfg = {**{k: v for g, k, _, _, v, _ in config_items.ITEMS if g == "spend"}, **config_items.group(s, "spend")}
+    INTEREST_PER_MONTH, RUN_RATE_TOLERANCE = float(cfg["interest_per_month"]), float(cfg["run_rate_tolerance"])
     s.execute(text("DELETE FROM spend_exceptions"))
     contracts = {r["contract_id"]: dict(r) for r in s.execute(text(
         "SELECT contract_id, title, vendor, effective_date, expiry_date, fully_executed, planned_value FROM v_contract_spend "
@@ -56,13 +58,13 @@ def compute_exceptions(s, today: date | None = None) -> int:
         if i["due_date"]:
             paid = i["paid_date"] or today
             late = (paid - i["due_date"]).days
-            if late > 5:                  # five days' grace
-                add(i["id"], i["contract_id"], i["vendor"], "late_payment", "medium" if late > 30 else "low", amt * INTEREST_PER_MONTH * late / 30,
+            if late > float(cfg["late_grace_days"]):
+                add(i["id"], i["contract_id"], i["vendor"], "late_payment", "medium" if late > float(cfg["late_medium_days"]) else "low", amt * INTEREST_PER_MONTH * late / 30,
                     f"{label} was {'paid' if i['paid_date'] else 'still unpaid'} {late} days after the due date; interest exposure at 1% a month.")
     for cid, c in contracts.items():          # the contract's total billing against its planned value
         billed = float(s.execute(text("SELECT COALESCE(sum(amount),0) FROM invoices WHERE contract_id=:c"), {"c": cid}).scalar())
         plan = float(c["planned_value"] or 0)
-        if plan and billed > plan * 1.001:
+        if plan and billed > plan * (1 + float(cfg["over_value_tolerance"])):
             add(None, cid, c["vendor"], "over_contract_value", "high", billed - plan,
                 f"${billed:,.0f} has been billed against {c['title']}, ${billed - plan:,.0f} ({billed / plan - 1:.0%}) more than its planned value of ${plan:,.0f}.")
     return n
