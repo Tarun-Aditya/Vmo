@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
@@ -160,6 +160,21 @@ app.include_router(vmo_router)
 _addin = Path(__file__).resolve().parents[2] / "addin"
 if _addin.exists():                       # the Word task pane (needs HTTPS in production: put the API behind your TLS proxy)
     app.mount("/addin", StaticFiles(directory=_addin), name="addin")
+
+
+@app.websocket("/ws/documents/{cid}")
+async def doc_socket(ws: WebSocket, cid: int, access_token: str = "", name: str = "Guest"):
+    """Presence and live pushes for one document. With sign-in on, the access token (session, API token or OIDC) is required."""
+    from app import collab
+
+    who = name[:40]
+    if auth.mode() == "on":
+        u = await run_in_threadpool(auth.identify, access_token)
+        if not u:
+            await ws.close(code=4401)
+            return
+        who = u.get("name") or u["email"]
+    await collab.room(ws, cid, who)
 
 
 @app.get("/api/ops/metrics", response_class=PlainTextResponse)

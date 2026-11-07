@@ -126,15 +126,15 @@ def test_contract_pulls_from_all_three_systems_match_the_erp_records(client, see
     try:
         by = {c["name"]: c for c in r["connectors"]}
         assert all(by[n]["status"] == "ok" and by[n]["new"] >= 2 for n in ("Coupa contracts (simulated)", "SAP contracts (simulated)", "Ariba contracts (simulated)")), by
-        want = {c["vendor"]: c for c in erp_contracts.erp_contracts()}
+        want = {(c["vendor"], c["kind"]): c for c in erp_contracts.erp_contracts()}
         with SessionLocal() as s:
-            got = {row["vendor"]: dict(row) for row in s.execute(text("SELECT vendor, type, effective_date, expiry_date, auto_renew, payment_terms_days, governing_law, source_url, origin FROM contracts WHERE origin LIKE 'connector:%contracts%'")).mappings()}
+            got = {(row["vendor"], row["type"]): dict(row) for row in s.execute(text("SELECT vendor, type, effective_date, expiry_date, auto_renew, payment_terms_days, governing_law, source_url, origin FROM contracts WHERE origin LIKE 'connector:%contracts%'")).mappings()}
         assert set(want) <= set(got)                                                                       # every contract the systems hold arrived
         for v, w in want.items():
             g = got[v]
             assert g["effective_date"] == w["start"] and g["expiry_date"] == w["end"], (v, g["effective_date"], w["start"])        # the document says what the ERP record says
             assert bool(g["auto_renew"]) == w["auto_renew"] and g["source_url"].startswith(live) and "/contracts/" in g["source_url"]
-        assert got["Brightwave Logistics Ltd"]["governing_law"] == "New York" and got["Pinecrest Facilities Services LLC"]["governing_law"] == "Texas"
+        assert got[("Brightwave Logistics Ltd", "SaaS")]["governing_law"] == "New York" and got[("Pinecrest Facilities Services LLC", "MSA")]["governing_law"] == "Texas"
         assert client.post("/api/connectors/demo-erp").json()["connectors"][2]["new"] == 0                 # idempotent
     finally:
         with SessionLocal() as s:

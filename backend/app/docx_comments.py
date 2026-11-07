@@ -42,7 +42,7 @@ def add_comments(docx: bytes, threads: list[dict]) -> tuple[bytes, int]:
         if idx is None:
             continue
         for c in t["comments"]:
-            body = ("[Resolved] " if t["status"] == "resolved" else "") + c["body"]
+            body = ("[Resolved] " if t["status"] == "resolved" else "") + c["body"] + (f"\n[Suggestion {t['suggestion'].get('state', '')}: {t['suggestion']['original'][:200]} → {t['suggestion']['proposed'][:200]}]" if t.get("suggestion") and c is t["comments"][0] else "")
             ps = "".join(f'<w:p><w:r><w:t xml:space="preserve">{escape(line)}</w:t></w:r></w:p>' for line in body.split("\n") if line.strip()) or "<w:p/>"
             initials = "".join(w[0] for w in re.findall(r"[A-Za-z]+", c["author"])[:2]).upper() or "C"
             entries.append(f'<w:comment w:id="{cid}" w:author="{escape(c["author"])}" w:date="{now}" w:initials="{initials}">{ps}</w:comment>')

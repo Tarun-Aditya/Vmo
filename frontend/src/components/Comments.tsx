@@ -5,7 +5,7 @@ import { api, when } from "../lib";
 import { Card } from "../ui";
 
 export type Cm = { id: number; author: string; body: string; created_at: string };
-export type Th = { id: number; status: "open" | "resolved"; source: "user" | "ai" | "guest"; severity: string | null; anchor_text: string | null; clause_type: string | null; created_by: string; assignee: string | null; due_date: string | null; resolved_by: string | null; comments: Cm[] };
+export type Th = { suggestion?: { original: string; proposed: string; state: "open" | "accepted" | "rejected" } | null; id: number; status: "open" | "resolved"; source: "user" | "ai" | "guest"; severity: string | null; anchor_text: string | null; clause_type: string | null; created_by: string; assignee: string | null; due_date: string | null; resolved_by: string | null; comments: Cm[] };
 type Api = { list: string; add: string; reply: (id: number) => string; patch?: (id: number) => string; guestName?: string };
 
 /** Word / Google-Docs style comment threads: add on the selected text, reply, assign, resolve, reopen. Used signed-in (editor) and by guests (shared link). */
@@ -22,6 +22,7 @@ export default function Comments({ docId, endpoints, canAct = true, onFocus }: {
   const add = useMutation({ mutationFn: () => api(endpoints.add, { method: "POST", body: JSON.stringify({ body, anchor_text: window.getSelection()?.toString().trim().slice(0, 300) || null, assignee: assignee || null, ...g }) }), onSuccess: () => { setBody(""); setAssignee(""); refresh(); } });
   const send = useMutation({ mutationFn: (id: number) => api(endpoints.reply(id), { method: "POST", body: JSON.stringify({ body: reply[id], ...g }) }), onSuccess: (_r, id) => { setReply((r) => ({ ...r, [id]: "" })); refresh(); } });
   const patch = useMutation({ mutationFn: (v: { id: number; status: string }) => api(endpoints.patch!(v.id), { method: "PUT", body: JSON.stringify({ status: v.status }) }), onSuccess: refresh });
+  const decide = useMutation({ mutationFn: (v: { id: number; what: "accept" | "reject" }) => api(`/api/threads/${v.id}/${v.what}`, { method: "POST" }), onSuccess: () => { refresh(); qc.invalidateQueries({ queryKey: ["doc-content"] }); } });
   const ai = useMutation({ mutationFn: () => api(`/api/documents/${docId}/threads/from-redline`, { method: "POST" }), onSuccess: refresh });
   const all = q.data?.threads ?? [];
   const list = all.filter((t) => show === "all" || t.status === show);
@@ -50,6 +51,13 @@ export default function Comments({ docId, endpoints, canAct = true, onFocus }: {
               {t.assignee && <span>→ {t.assignee}{t.due_date ? ` · due ${t.due_date}` : ""}</span>}
               {t.status === "resolved" && <span className="font-medium text-emerald-700">✓ resolved by {t.resolved_by}</span>}
             </div>
+            {t.suggestion && (
+              <div className="mb-1 rounded border border-slate-200 p-1.5 text-xs dark:border-slate-600" aria-label="Suggested change">
+                <del className="block text-red-700 dark:text-red-300">{t.suggestion.original}</del><ins className="block text-emerald-700 no-underline dark:text-emerald-300">{t.suggestion.proposed}</ins>
+                {t.suggestion.state === "open" && canAct && endpoints.patch ? <div className="mt-1 flex gap-2"><Btn onClick={() => decide.mutate({ id: t.id, what: "accept" })} disabled={decide.isPending}>Accept</Btn><Btn kind="ghost" onClick={() => decide.mutate({ id: t.id, what: "reject" })}>Reject</Btn></div>
+                  : <span className="font-medium text-slate-500">{t.suggestion.state}</span>}
+                {decide.error && <div role="alert" className="text-red-600">{String(decide.error).replace("Error: ", "")}</div>}
+              </div>)}
             {t.comments.map((c) => <div key={c.id} className="mb-1 min-w-0 break-words"><b>{c.author}</b> <span className="text-xs text-slate-500">{when(c.created_at)}</span><p className="whitespace-pre-wrap">{c.body}</p></div>)}
             {canAct && t.status === "open" && (
               <div className="mt-1 flex gap-1"><input className={`${inputCls} min-w-0 flex-1`} aria-label={`Reply to thread ${t.id}`} placeholder="Reply…" value={reply[t.id] ?? ""} onChange={(e) => setReply((r) => ({ ...r, [t.id]: e.target.value }))} onKeyDown={(e) => e.key === "Enter" && reply[t.id]?.trim() && send.mutate(t.id)} />

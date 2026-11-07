@@ -4,7 +4,7 @@ from __future__ import annotations
 import base64
 import re
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import text
@@ -53,15 +53,20 @@ def doc_version(cid: int, v: int):
 class SaveIn(BaseModel):
     md: str
     note: str | None = None
+    base_version: int | None = None          # the version the editor started from: a save from an out-of-date version is refused instead of overwriting a colleague
 
 
-def save_document(cid: int, md: str, note: str | None, trigger: str = "edit") -> dict:
+def save_document(cid: int, md: str, note: str | None, trigger: str = "edit", base_version: int | None = None, by: str | None = None) -> dict:
     d = _doc(cid)
     if d["status"] != "draft":
         raise HTTPException(409, "only drafts can be edited; an executed contract is changed by amendment")
     if not md.strip():
         raise HTTPException(422, "the document is empty")
     md = md.rstrip() + "\n"
+    if base_version is not None:
+        cur = one("SELECT COALESCE(max(version), 1) AS v FROM document_versions WHERE contract_id=:i", i=cid)["v"]
+        if cur != base_version:
+            raise HTTPException(409, f"conflict: version {cur} was saved while you were editing version {base_version}. Copy your changes, reload the latest version, and apply them again.")
     with SessionLocal() as s:
         root = pipeline.inbox_path(s)
         path = root / d["source_path"]
@@ -76,12 +81,17 @@ def save_document(cid: int, md: str, note: str | None, trigger: str = "edit") ->
     res = pipeline.run_pipeline(trigger, only=[path])
     if res.get("status") == "busy":
         raise HTTPException(409, "the pipeline is busy; try again in a moment")
+    from app import collab
+
+    collab.notify(cid, {"type": "version", "version": last + 1, "by": by or "someone", "note": note})
     return {"saved": True, "version": last + 1, "run": res}
 
 
 @router.put("/documents/{cid}/content")
-def doc_save(cid: int, b: SaveIn):
-    return save_document(cid, b.md, b.note)
+def doc_save(cid: int, b: SaveIn, request: Request):
+    from app.routes_auth import me
+
+    return save_document(cid, b.md, b.note, base_version=b.base_version, by=me(request)["name"] or me(request)["email"])
 
 
 # ------------------------------------------------------------------ review queue

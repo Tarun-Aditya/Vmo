@@ -45,7 +45,8 @@ def test_open_by_default(client, seeded):
     assert client.get("/api/contracts").status_code == 200
 
 
-def test_everything_needs_a_login_and_first_admin_bootstrap(secured):
+def test_everything_needs_a_login_and_first_admin_bootstrap(secured, monkeypatch):
+    monkeypatch.setenv("SIMULATORS", "0")                  # in demo mode the built-in identity provider is advertised as SSO
     c = secured
     assert c.get("/health").status_code == 200 and c.get("/api/auth/config").json() == {"auth_required": True, "min_password": 10, "needs_bootstrap": True, "oidc": False, "roles": ["viewer", "reviewer", "admin"]}
     assert c.get("/api/contracts").status_code == 401

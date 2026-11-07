@@ -81,21 +81,28 @@ class ThreadIn(BaseModel):
     clause_type: str | None = None
 
 
-def create_thread(cid: int, b: ThreadIn, author: str, source: str = "user", ai_key: str | None = None, severity: str | None = None) -> dict:
+def _push(cid: int, what: str = "threads") -> None:
+    from app import collab
+
+    collab.notify(cid, {"type": what})
+
+
+def create_thread(cid: int, b: ThreadIn, author: str, source: str = "user", ai_key: str | None = None, severity: str | None = None, suggestion: dict | None = None) -> dict:
     d = _doc(cid)
     if not b.body.strip():
         raise HTTPException(422, "a comment needs text")
     s0, e0 = _locate(d["body_md"] or "", b.anchor_text or "", b.anchor_start)
     with SessionLocal() as s:
-        tid = s.execute(text("""INSERT INTO comment_threads (contract_id, version, anchor_text, anchor_start, anchor_end, clause_type, source, severity, created_by, assignee, due_date, ai_key)
-                                VALUES (:c,:v,:q,:s,:e,:ct,:src,:sev,:by,:a,CAST(:d AS date),:k) ON CONFLICT (contract_id, ai_key) DO NOTHING RETURNING id"""),
+        tid = s.execute(text("""INSERT INTO comment_threads (contract_id, version, anchor_text, anchor_start, anchor_end, clause_type, source, severity, created_by, assignee, due_date, ai_key, suggestion)
+                                VALUES (:c,:v,:q,:s,:e,:ct,:src,:sev,:by,:a,CAST(:d AS date),:k,CAST(:sg AS jsonb)) ON CONFLICT (contract_id, ai_key) DO NOTHING RETURNING id"""),
                         {"c": cid, "v": _version(cid), "q": b.anchor_text, "s": s0, "e": e0, "ct": b.clause_type, "src": source, "sev": severity, "by": author, "a": b.assignee or None,
-                         "d": b.due_date or None, "k": ai_key}).scalar()
+                         "d": b.due_date or None, "k": ai_key, "sg": json.dumps(suggestion) if suggestion else None}).scalar()
         if tid:
             s.execute(text("INSERT INTO comments (thread_id, author, body) VALUES (:t,:a,:b)"), {"t": tid, "a": author, "b": b.body.strip()})
         s.commit()
     if not tid:
         return {}
+    _push(cid)
     who = [w for w in {*_mentions(b.body), *([b.assignee] if b.assignee else [])} if w != author]
     if who:
         _notify(cid, tid, who, f"{author} commented on {d['title']}", b.body, "new")
@@ -128,6 +135,7 @@ def reply(tid: int, b: ReplyIn, request: Request):
     with SessionLocal() as s:
         s.execute(text("INSERT INTO comments (thread_id, author, body) VALUES (:t,:a,:b)"), {"t": tid, "a": author, "b": b.body.strip()})
         s.commit()
+    _push(t["contract_id"])
     who = [w for w in {*_mentions(b.body), t["created_by"], t.get("assignee") or ""} if w and w != author and "@" in w or w in _mentions(b.body)]
     if who:
         _notify(t["contract_id"], tid, who, f"{author} replied on {_doc(t['contract_id'])['title']}", b.body, f"reply{len(t['comments'])}")
@@ -152,6 +160,7 @@ def update_thread(tid: int, b: ThreadPatch, request: Request):
         if b.assignee is not None or b.due_date is not None:
             s.execute(text("UPDATE comment_threads SET assignee=COALESCE(NULLIF(:a,''), assignee), due_date=COALESCE(CAST(NULLIF(:d,'') AS date), due_date) WHERE id=:i"), {"a": b.assignee, "d": b.due_date, "i": tid})
         s.commit()
+    _push(t["contract_id"])
     if b.status == "resolved" and t["created_by"] != who and "@" in t["created_by"]:
         _notify(t["contract_id"], tid, [t["created_by"]], f"{who} resolved a thread on {_doc(t['contract_id'])['title']}", t["comments"][0]["body"] if t["comments"] else "", "resolved")
     if b.assignee and b.assignee != who:
@@ -298,3 +307,58 @@ def import_comments(cid: int, b: ImportIn, request: Request):
         key = "docx:" + hashlib.sha1(f"{c['author']}|{c['anchor_text']}|{c['body']}".encode()).hexdigest()[:20]
         made += bool(create_thread(cid, ThreadIn(body=c["body"] or "(empty comment)", anchor_text=c["anchor_text"] or None), f"{c['author']} (Word)", "user", key))
     return {"found": len(found), "imported": made}
+
+
+# ------------------------------------------------------------------ suggestions (suggesting mode): a proposed replacement of some text, accepted or rejected like in Google Docs
+class SuggestIn(BaseModel):
+    original: str
+    proposed: str
+    note: str | None = None
+
+
+@router.post("/documents/{cid}/suggestions")
+def suggest(cid: int, b: SuggestIn, request: Request):
+    d = _doc(cid)
+    if d["status"] != "draft":
+        raise HTTPException(409, "suggestions are for drafts")
+    if not b.original.strip() or b.original == b.proposed:
+        raise HTTPException(422, "select the text to change and give the proposed wording")
+    if (d["body_md"] or "").count(b.original) != 1:
+        raise HTTPException(422, "the selected text must appear exactly once in the document: select a little more of the sentence")
+    body = f"Suggested change: replace “{b.original[:120]}” with “{b.proposed[:120]}”" + (f"\n\n{b.note}" if b.note else "")
+    return create_thread(cid, ThreadIn(body=body, anchor_text=b.original), me(request)["email"], "user", None, None, {"original": b.original, "proposed": b.proposed, "state": "open"})
+
+
+@router.post("/threads/{tid}/accept")
+def accept_suggestion(tid: int, request: Request):
+    """Apply the suggestion to the document as a new version (refused if the text has changed since) and resolve the thread."""
+    from app.routes_docs import save_document
+
+    t = thread_view(tid)
+    sg = t.get("suggestion")
+    if not sg or sg.get("state") != "open":
+        raise HTTPException(409, "this is not an open suggestion")
+    d = _doc(t["contract_id"])
+    if (d["body_md"] or "").count(sg["original"]) != 1:
+        raise HTTPException(409, "the text this suggestion was made on has changed or is no longer unique: reject it and suggest again")
+    who = me(request)
+    save_document(t["contract_id"], d["body_md"].replace(sg["original"], sg["proposed"], 1), f"Accepted suggestion by {t['created_by']}", trigger="suggestion", by=who["email"])
+    with SessionLocal() as s:
+        s.execute(text("UPDATE comment_threads SET status='resolved', resolved_by=:w, resolved_at=now(), suggestion = suggestion || '{\"state\": \"accepted\"}'::jsonb WHERE id=:i"), {"w": who["email"], "i": tid})
+        s.execute(text("INSERT INTO comments (thread_id, author, body) VALUES (:t,:a,'Accepted: the document was updated.')"), {"t": tid, "a": who["email"]})
+        s.commit()
+    _push(t["contract_id"])
+    return thread_view(tid)
+
+
+@router.post("/threads/{tid}/reject")
+def reject_suggestion(tid: int, request: Request):
+    t = thread_view(tid)
+    if not t.get("suggestion") or t["suggestion"].get("state") != "open":
+        raise HTTPException(409, "this is not an open suggestion")
+    who = me(request)["email"]
+    with SessionLocal() as s:
+        s.execute(text("UPDATE comment_threads SET status='resolved', resolved_by=:w, resolved_at=now(), suggestion = suggestion || '{\"state\": \"rejected\"}'::jsonb WHERE id=:i"), {"w": who, "i": tid})
+        s.commit()
+    _push(t["contract_id"])
+    return thread_view(tid)

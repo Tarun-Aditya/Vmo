@@ -7,6 +7,7 @@ import ShareDialog from "../components/ShareDialog";
 import SignaturePanel from "../components/SignaturePanel";
 import { Btn, inputCls } from "../forms";
 import { api, authUrl, when } from "../lib";
+import { useCollab } from "../components/useCollab";
 import { Card, Loading, Sev, SeverityChip } from "../ui";
 
 type Content = { id: number; title: string; vendor: string; type: string; status: string; md: string; editable: boolean; version: number; versions: { version: number; note: string | null; created_at: string; chars: number }[] };
@@ -22,13 +23,24 @@ export default function DocumentEditor() {
   const [note, setNote] = useState("");
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [saved, setSaved] = useState<string>("");
+  const [mode, setMode] = useState<"editing" | "suggesting">("editing");
+  const [picked, setPicked] = useState("");
+  const [proposed, setProposed] = useState("");
+  const collab = useCollab(String(id), q.data?.version);
   const loaded = useRef<string>("");
   const check = useMutation({ mutationFn: (t: string) => api<Analysis>("/api/generator/analyze", { method: "POST", body: JSON.stringify({ template: "x", md: t }) }), onSuccess: setAnalysis });
   useEffect(() => { if (q.data && q.data.md !== loaded.current) { loaded.current = q.data.md; setMd(q.data.md); check.mutate(q.data.md); } }, [q.data?.md]);
   const save = useMutation({
-    mutationFn: () => api<{ version: number }>(`/api/documents/${id}/content`, { method: "PUT", body: JSON.stringify({ md, note: note || null }) }),
+    mutationFn: () => api<{ version: number }>(`/api/documents/${id}/content`, { method: "PUT", body: JSON.stringify({ md, note: note || null, base_version: q.data?.version }) }),
     onSuccess: (r) => { setSaved(`Saved as version ${r.version}`); setNote(""); qc.invalidateQueries(); },
   });
+  const suggest = useMutation({ mutationFn: () => api(`/api/documents/${id}/suggestions`, { method: "POST", body: JSON.stringify({ original: picked, proposed }) }), onSuccess: () => { setPicked(""); setProposed(""); qc.invalidateQueries({ queryKey: ["threads"] }); } });
+  useEffect(() => {
+    if (mode !== "suggesting") return;
+    const f = () => { const t = window.getSelection()?.toString().trim() ?? ""; if (t.length > 2) setPicked(t); };
+    document.addEventListener("selectionchange", f);
+    return () => document.removeEventListener("selectionchange", f);
+  }, [mode]);
   if (!q.data || md === null) return <Loading q={q} />;
   const d = q.data;
   const dirty = md !== d.md;
@@ -41,11 +53,31 @@ export default function DocumentEditor() {
         <span className={`rounded px-1.5 text-xs font-semibold ${d.editable ? "bg-amber-100 text-amber-900" : "bg-slate-200 text-slate-700"}`}>{d.editable ? "DRAFT" : "EXECUTED · read only"}</span>
         <span className="ml-auto flex gap-3 text-sm"><a className="text-indigo-600 hover:underline" href={authUrl(`/api/documents/${d.id}/export.docx`)} download>⬇ Download .docx</a><Link className="text-indigo-600 hover:underline" to={`/redline/${d.id}`}>Review redline</Link><Link className="text-indigo-600 hover:underline" to={`/contracts/${d.id}`}>Open details</Link></span>
       </div>
+      {d.editable && (
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <div role="group" aria-label="Editing mode" className="inline-flex overflow-hidden rounded border border-slate-300 dark:border-slate-600">
+            {(["editing", "suggesting"] as const).map((m) => <button key={m} aria-pressed={mode === m} onClick={() => { setMode(m); collab.setEditing(m === "editing"); }} className={`px-3 py-1 capitalize ${mode === m ? "bg-indigo-600 text-white" : "bg-white dark:bg-slate-800"}`}>{m}</button>)}
+          </div>
+          <span className="text-xs text-slate-500">{mode === "suggesting" ? "Select text in the document, type the replacement: it goes to the others as a suggestion to accept or reject." : "Your changes are saved as a new version."}</span>
+          <span className="ml-auto flex items-center gap-1" aria-label="People in this document">{collab.users.map((u) => <span key={u.name} title={u.editing ? "editing" : "viewing"} className={`rounded-full px-2 py-0.5 text-xs ${u.name === collab.name ? "bg-indigo-100 text-indigo-900" : "bg-emerald-100 text-emerald-900"}`}>{u.name}{u.editing ? " ✎" : ""}</span>)}</span>
+        </div>)}
+      {collab.newer && (
+        <div role="status" className="flex items-center gap-3 rounded border border-amber-400 bg-amber-50 p-2 text-sm text-amber-900">
+          {collab.newer.by} saved version {collab.newer.version}. {dirty ? "You have unsaved changes: copy them before loading the latest." : ""}
+          <Btn kind="ghost" onClick={() => { collab.dismiss(); qc.invalidateQueries({ queryKey: ["doc-content", id] }); }}>Load latest</Btn>
+        </div>)}
       <div className="grid gap-4 lg:grid-cols-4">
         <div className="lg:col-span-3">
-          <DocEditor value={md} onChange={setMd} readOnly={!d.editable} title={d.title} status={dirty ? "Unsaved changes" : saved || `Version ${d.version}`} height="75vh" />
+          <DocEditor value={md} onChange={setMd} readOnly={!d.editable || mode === "suggesting"} title={d.title} status={dirty ? "Unsaved changes" : saved || `Version ${d.version}`} height="75vh" />
         </div>
         <div className="space-y-3">
+          {mode === "suggesting" && d.editable && (
+            <Card title="Suggest a change">
+              <p className="mb-1 text-xs text-slate-500">Selected text</p>
+              <blockquote className="mb-2 max-h-24 overflow-auto border-l-4 border-amber-400 bg-amber-50 px-2 text-sm italic dark:bg-slate-900" aria-label="Selected text">{picked || "Select text in the document…"}</blockquote>
+              <textarea className={`${inputCls} h-20`} aria-label="Proposed wording" placeholder="Replace it with…" value={proposed} onChange={(e) => setProposed(e.target.value)} />
+              <div className="mt-2 flex items-center gap-2"><Btn onClick={() => suggest.mutate()} disabled={!picked || !proposed.trim() || suggest.isPending}>Suggest</Btn>{suggest.error && <span role="alert" className="text-xs text-red-600">{String(suggest.error).replace("Error: ", "")}</span>}</div>
+            </Card>)}
           <Comments docId={String(d.id)} endpoints={{ list: `/api/documents/${d.id}/threads`, add: `/api/documents/${d.id}/threads`, reply: (t) => `/api/threads/${t}/comments`, patch: (t) => `/api/threads/${t}` }} />
           {d.editable && <ShareDialog docId={String(d.id)} />}
           {d.editable && <SignaturePanel docId={String(d.id)} />}
