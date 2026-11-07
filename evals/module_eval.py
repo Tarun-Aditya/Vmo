@@ -62,7 +62,6 @@ def check(kind, want, res):
 
 
 def cases():
-    meta = G("/api/meta")
     obl = G("/api/obligations")["rows"]
     sla = G("/api/sla")
     sp, ex, inv = G("/api/spend/summary"), G("/api/spend/exceptions"), G("/api/invoices")

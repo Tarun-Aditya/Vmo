@@ -8,7 +8,6 @@ from datetime import date
 from sqlalchemy import text
 
 
-
 def compute_exceptions(s, today: date | None = None) -> int:
     from app import config_items
 

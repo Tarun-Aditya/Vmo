@@ -3,9 +3,10 @@
 import json
 import sys
 
+from sqlalchemy import text
+
 from app.config import data_path
 from app.db import SessionLocal
-from sqlalchemy import text
 
 SEV = ["low", "medium", "high", "critical"]
 

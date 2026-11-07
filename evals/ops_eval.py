@@ -4,7 +4,6 @@ import json
 import re
 import sys
 from collections import Counter
-from datetime import date
 
 from app import opsdocs
 from app.config import data_path

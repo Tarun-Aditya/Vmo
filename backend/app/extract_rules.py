@@ -215,7 +215,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             put("termination_for_convenience", False, 0.92, tc)
         elif re.search(r"(?:may|can|shall be entitled to)\s+terminate[^.]{0,120}(?:for convenience|without cause|for any reason)|for convenience[^.]{0,60}(?:upon|on|by giving|with)[^.]{0,30}\d+\s*days", ttxt, re.I):
             put("termination_for_convenience", True, 0.9, tc)
-        elif (hits := __import__("app.kcc", fromlist=["x"]).sentence_hits("termination_for_convenience", d.flat)):
+        elif __import__("app.kcc", fromlist=["x"]).sentence_hits("termination_for_convenience", d.flat):
             put("termination_for_convenience", True, 0.7, tc)           # a sentence that gives a party the right to terminate without cause / for convenience / on notice (shared with the clause detector)
         else:
             put("termination_for_convenience", None, 0.4, tc)

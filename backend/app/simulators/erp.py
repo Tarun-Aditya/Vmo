@@ -5,7 +5,6 @@ Enabled with SIMULATORS=1. Demo credentials: Coupa client demo-client / demo-sec
 from __future__ import annotations
 
 import hashlib
-import hmac
 import secrets
 from datetime import date, datetime, timedelta, timezone
 

@@ -4,10 +4,11 @@ import json
 import sys
 from collections import defaultdict
 
+from sqlalchemy import text
+
 from app.config import data_path
 from app.db import SessionLocal
 from app.docgen.generate import KEY_FIELDS
-from sqlalchemy import text
 
 MONEY = {"annual_value", "total_value"}
 THRESHOLD = 0.90

@@ -9,7 +9,6 @@ from app.db import SessionLocal
 @pytest.fixture()
 def setup(client, seeded):
     cid = next(d["id"] for d in client.get("/api/contracts?status=draft").json() if client.get(f"/api/redline/{d['id']}").json().get("items"))
-    clean = lambda: [s.execute(text(q), {"c": cid}) for s in [SessionLocal()] for q in ("DELETE FROM approvals WHERE contract_id=:c", "DELETE FROM comment_threads WHERE contract_id=:c", "DELETE FROM contract_reviews WHERE contract_id=:c")] and None  # noqa: E731
     with SessionLocal() as s:
         s.execute(text("DELETE FROM approval_rules"))
         for q in ("DELETE FROM approvals WHERE contract_id=:c", "DELETE FROM comment_threads WHERE contract_id=:c", "DELETE FROM contract_reviews WHERE contract_id=:c"):

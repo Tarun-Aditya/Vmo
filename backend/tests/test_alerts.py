@@ -55,7 +55,7 @@ def test_ack_resolve_and_unread(client, clean):
     r = client.put(f"/api/alerts/{a['id']}", json={"status": "acknowledged", "by": "priya"}).json()
     assert r["status"] == "acknowledged" and r["acknowledged_by"] == "priya"
     assert client.get("/api/alerts/summary").json()["open"] >= 0
-    assert client.get(f"/api/alerts?status=acknowledged").json()["items"][0]["id"] == a["id"]
+    assert client.get("/api/alerts?status=acknowledged").json()["items"][0]["id"] == a["id"]
     assert client.put("/api/alerts/999999", json={"status": "resolved"}).status_code == 404
     assert client.put(f"/api/alerts/{a['id']}", json={"status": "nope"}).status_code == 422
     client.post("/api/alerts/read-all")

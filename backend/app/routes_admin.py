@@ -436,8 +436,9 @@ class BriefIn(BaseModel):
 @router.post("/generator/brief")
 def gen_brief(b: BriefIn):
     """Read deal details given as text or an uploaded file and return the form values found."""
-    from app import brief, ingest_text
     import base64
+
+    from app import brief, ingest_text
 
     try:
         txt = b.text if b.text else ingest_text.extract_text(b.filename or "brief.txt", base64.b64decode(b.content_b64 or ""))

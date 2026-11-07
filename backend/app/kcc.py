@@ -458,7 +458,6 @@ def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: 
     for key, rx in PRESENCE.items():
         if key in have_types or (enabled is not None and key not in enabled):
             continue
-        cre = re.compile(rx, re.I)
         for text_, page, head in pools:
             hit = sentence_hits(key, text_)
             if hit:

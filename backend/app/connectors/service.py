@@ -14,8 +14,8 @@ from app.connectors import crypto
 from app.connectors.base import SUPPORTED_EXT, Connector, ConnectorError, RemoteFile
 from app.connectors.gdrive import GoogleDrive
 from app.connectors.mailbox import Mailbox
-from app.connectors.rest import RestFeed
 from app.connectors.msgraph import MicrosoftGraph
+from app.connectors.rest import RestFeed
 from app.db import SessionLocal
 
 TYPES = {"gdrive": "Google Drive", "onedrive": "OneDrive", "sharepoint": "SharePoint", "imap": "Mailbox (IMAP)", "coupa": "Coupa", "sap": "SAP S/4HANA", "ariba": "SAP Ariba", "rest": "Generic REST (JSON)"}

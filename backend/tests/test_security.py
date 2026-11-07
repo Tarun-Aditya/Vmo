@@ -1,6 +1,5 @@
 """Security controls: password policy, lockout, MFA with recovery codes, SCIM provisioning, headers, retention."""
 import base64
-import time
 
 import pytest
 from sqlalchemy import text

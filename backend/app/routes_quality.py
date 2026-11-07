@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import csv
 import io
-import json
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import Response

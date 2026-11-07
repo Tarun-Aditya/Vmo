@@ -2,12 +2,12 @@
 import sys
 from pathlib import Path
 
-import yaml
-
 import pilot_gt
+import yaml
 
 sys.modules["ground_truth"] = pilot_gt          # ask_eval.check() reads expectations from `ground_truth`
 import ask_eval  # noqa: E402
+
 from app import ask  # noqa: E402
 
 

@@ -1,5 +1,4 @@
 """Suggesting mode (propose / accept / reject), conflict protection on save, and the live channel (presence and pushes)."""
-import re
 
 import pytest
 from sqlalchemy import text

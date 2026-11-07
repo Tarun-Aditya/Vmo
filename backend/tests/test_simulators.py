@@ -1,5 +1,4 @@
 """The built-in ERP and e-signature simulators, used end to end through the REAL connector and DocuSign client code over HTTP."""
-import re
 import socket
 import threading
 import time
@@ -117,7 +116,6 @@ def test_simulated_docusign_send_sign_webhook_and_execute(client, seeded, live, 
 def test_contract_pulls_from_all_three_systems_match_the_erp_records(client, seeded, live, monkeypatch):
     """Coupa, SAP and Ariba each hold contract documents; the real connectors pull them; the pipeline reads each document; what it reads must equal what the ERP record says."""
     import shutil
-    from datetime import date
 
     from app.simulators import erp_contracts
 

@@ -3,9 +3,9 @@
 import sys
 from pathlib import Path
 
+import ground_truth as gt
 import yaml
 
-import ground_truth as gt
 from app import ask
 
 PASS_MARK = 15

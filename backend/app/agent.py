@@ -28,7 +28,17 @@ def _history_prompt(question: str, history: list[dict]) -> str:
 
 
 async def _main(q: "queue.Queue", question: str, scope: list[int] | None, history: list[dict]) -> None:
-    from claude_agent_sdk import (AssistantMessage, ClaudeAgentOptions, ClaudeSDKClient, ResultMessage, StreamEvent, TextBlock, ToolUseBlock, create_sdk_mcp_server, tool)
+    from claude_agent_sdk import (
+        AssistantMessage,
+        ClaudeAgentOptions,
+        ClaudeSDKClient,
+        ResultMessage,
+        StreamEvent,
+        TextBlock,
+        ToolUseBlock,
+        create_sdk_mcp_server,
+        tool,
+    )
 
     calls: list[dict] = []
     notes: list[str] = []

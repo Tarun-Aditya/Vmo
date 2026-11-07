@@ -1,15 +1,15 @@
 import asyncio
 import logging
 import os
-from pathlib import Path
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request, WebSocket
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
-from starlette.concurrency import run_in_threadpool
-from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
+from starlette.concurrency import run_in_threadpool
 
 from app import auth, kcc, scheduler
 from app.db import SessionLocal, engine
@@ -18,13 +18,13 @@ from app.routes_admin import router as admin_router
 from app.routes_alerts import router as alerts_router
 from app.routes_approvals import router as approvals_router
 from app.routes_auth import router as auth_router
+from app.routes_chat import router as chat_router
+from app.routes_comments import router as comments_router
+from app.routes_connectors import router as connectors_router
+from app.routes_docs import router as docs_router
 from app.routes_quality import router as quality_router
 from app.routes_scim import router as scim_router
 from app.routes_signatures import router as signatures_router
-from app.routes_comments import router as comments_router
-from app.routes_chat import router as chat_router
-from app.routes_connectors import router as connectors_router
-from app.routes_docs import router as docs_router
 from app.routes_vmo import router as vmo_router
 
 log = logging.getLogger("app")
@@ -146,7 +146,6 @@ if os.environ.get('SIMULATORS', '0') == '1':        # stand-ins for ERP and e-si
     app.include_router(sim_erp)
     app.include_router(sim_esign)
     from app.simulators import cloud as sim_cloud
-
     from app.simulators import mail as sim_mail
     from app.simulators import sso as sim_sso
 

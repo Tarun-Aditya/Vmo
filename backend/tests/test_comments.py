@@ -59,7 +59,7 @@ def test_share_links_levels_expiry_and_revocation(client, draft):
     md = client.get(f"/api/documents/{draft}/content").json()["md"]
     view = client.post(f"/api/documents/{draft}/share", json={"level": "view", "label": "for legal"}).json()
     com = client.post(f"/api/documents/{draft}/share", json={"level": "comment"}).json()
-    edit = client.post(f"/api/documents/{draft}/share", json={"level": "edit"}).json()
+    client.post(f"/api/documents/{draft}/share", json={"level": "edit"})
     assert view["token"].startswith("shr_") and view["path"] == f"/shared/{view['token']}"
     assert client.get(f"/api/shared/{view['token']}").json()["md"] == md
     assert client.post(f"/api/shared/{view['token']}/threads", json={"body": "hi", "name": "Vera"}).status_code == 403          # view only

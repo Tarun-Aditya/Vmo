@@ -261,8 +261,9 @@ def sla_breach_vendors():
     for r in _feed("sla_measurements.csv"):
         if r["metric_key"] == "sla_availability_pct" and r["note"].startswith("Breach") and _d(r["period"]) >= seed - timedelta(days=183):
             out.add(r["contract_title"])
-    from app.db import SessionLocal
     from sqlalchemy import text
+
+    from app.db import SessionLocal
 
     with SessionLocal() as s_:        # titles -> vendor names (the feed has the contract title, the question asks for vendors)
         v = {r[0]: r[1] for r in s_.execute(text("SELECT title, vendor FROM contracts"))}

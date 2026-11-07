@@ -31,7 +31,7 @@ def _body(kind: str, vendor: str, eff: date, months: int, pay: int, cap: float |
              f"## 1. Term\n\nThis Agreement commences on {eff:%d %B %Y} and continues for {months} months until {end:%d %B %Y}"
              + (f", and then renews automatically for successive 12-month periods unless either party gives not less than {renew_notice} days' written notice of non-renewal before the end of the then-current term.\n" if renew_notice else ".\n")]
     if kind != "NDA":
-        parts += [f"## 2. Fees and Payment\n\n" + (f"The annual fees are USD {annual:,}. " if annual else "") + f"The Customer shall pay undisputed invoices within {pay} days of receipt of a valid invoice.\n"]
+        parts += ["## 2. Fees and Payment\n\n" + (f"The annual fees are USD {annual:,}. " if annual else "") + f"The Customer shall pay undisputed invoices within {pay} days of receipt of a valid invoice.\n"]
     if kind == "NDA":
         parts += ["## 2. Confidentiality\n\nEach party shall keep the other's Confidential Information confidential, use it only for the purpose of this Agreement, and these obligations survive for 3 years after this Agreement ends.\n"]
     else:
