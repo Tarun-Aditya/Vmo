@@ -1,0 +1,899 @@
+{
+  "seed_date": "2026-11-07",
+  "contracts": {
+    "accentia_msa": {
+      "effective_date": "2025-12-12",
+      "expiry_date": "2028-01-01",
+      "notice_period_days": 90,
+      "auto_renew": true,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": 1.0,
+      "termination_for_convenience": true,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2025-12-09",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2025-12-10",
+      "fully_executed": true,
+      "liability_cap_text": "1 times annual fees",
+      "deviations": [
+        {
+          "clause_type": "renewal",
+          "variant": "auto",
+          "severity": "medium",
+          "summary": "Auto-renews for 12-month periods; the Customer must give notice to exit"
+        },
+        {
+          "clause_type": "audit_rights",
+          "variant": "every3",
+          "severity": "low",
+          "summary": "Audit allowed only once every three years"
+        }
+      ]
+    },
+    "accentia_sow1": {
+      "effective_date": "2026-02-03",
+      "expiry_date": "2027-02-03",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 4800000,
+      "total_value": 9600000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-01-31",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2026-02-01",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": [
+        {
+          "clause_type": "acceptance",
+          "variant": "deemed",
+          "severity": "medium",
+          "summary": "Deliverables deemed accepted after 3 days of silence"
+        },
+        {
+          "clause_type": "key_personnel",
+          "variant": "free",
+          "severity": "medium",
+          "summary": "Supplier may replace key personnel at any time without notice"
+        }
+      ]
+    },
+    "accentia_sow2": {
+      "effective_date": "2026-07-30",
+      "expiry_date": "2027-12-12",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 11500000,
+      "total_value": 23000000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-07-27",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2026-07-28",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": []
+    },
+    "accentia_sow3": {
+      "effective_date": "2025-12-03",
+      "expiry_date": "2026-12-03",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 2400000,
+      "total_value": 2400000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2025-11-30",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2025-12-01",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": [
+        {
+          "clause_type": "sla",
+          "variant": "weak",
+          "severity": "high",
+          "summary": "Availability lowered to 99.0% and no service credits"
+        }
+      ]
+    },
+    "accentia_amd1": {
+      "effective_date": "2026-09-08",
+      "expiry_date": "2028-10-07",
+      "payment_terms_days": 30,
+      "liability_cap_multiple": 2.0,
+      "liability_cap_text": "2 times annual fees",
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-09-05",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2026-09-06",
+      "fully_executed": true,
+      "deviations": []
+    },
+    "accentia_wo1": {
+      "effective_date": "2026-09-08",
+      "expiry_date": "2027-11-22",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": 1200000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-09-05",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2026-09-06",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "accentia_wo2": {
+      "effective_date": "2026-10-18",
+      "expiry_date": "2027-12-02",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": 750000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-10-15",
+      "supplier_signatory": null,
+      "supplier_signed_date": null,
+      "fully_executed": false,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "accentia_nda": {
+      "effective_date": "2025-12-02",
+      "expiry_date": "2027-12-12",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": null,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Dana Whitfield",
+      "customer_signed_date": "2025-11-29",
+      "supplier_signatory": "Laura Stephens",
+      "supplier_signed_date": "2025-11-30",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": [
+        {
+          "clause_type": "confidentiality",
+          "variant": "short",
+          "severity": "medium",
+          "summary": "Confidentiality survives only 1 year (standard: 3 years)"
+        }
+      ]
+    },
+    "delmont_msa": {
+      "effective_date": "2025-10-03",
+      "expiry_date": "2028-01-31",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": false,
+      "governing_law": "England and Wales",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2025-09-30",
+      "supplier_signatory": "Richard Hale",
+      "supplier_signed_date": "2025-10-01",
+      "fully_executed": true,
+      "liability_cap_text": "Unlimited",
+      "deviations": [
+        {
+          "clause_type": "liability_cap",
+          "variant": "unlimited",
+          "severity": "critical",
+          "summary": "Liability is unlimited, including indirect and consequential loss"
+        },
+        {
+          "clause_type": "termination_for_convenience",
+          "variant": "none",
+          "severity": "high",
+          "summary": "No right to terminate for convenience"
+        },
+        {
+          "clause_type": "governing_law",
+          "variant": "england",
+          "severity": "medium",
+          "summary": "Governed by English law (standard: New York law)"
+        },
+        {
+          "clause_type": "indemnity",
+          "variant": "one_way",
+          "severity": "high",
+          "summary": "Indemnity runs from the Customer to the Supplier"
+        },
+        {
+          "clause_type": "insurance",
+          "variant": "low",
+          "severity": "medium",
+          "summary": "Insurance cover only USD 500,000 (standard: USD 5,000,000)"
+        },
+        {
+          "clause_type": "warranties",
+          "variant": "short",
+          "severity": "medium",
+          "summary": "Warranty period cut to 30 days (standard: 90)"
+        }
+      ]
+    },
+    "delmont_sow1": {
+      "effective_date": "2026-01-08",
+      "expiry_date": "2027-01-08",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 7200000,
+      "total_value": 14400000,
+      "payment_terms_days": 30,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-01-05",
+      "supplier_signatory": "Richard Hale",
+      "supplier_signed_date": "2026-01-06",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": [
+        {
+          "clause_type": "payment",
+          "variant": "net30",
+          "severity": "low",
+          "summary": "Payment terms shortened to 30 days (within fallback)"
+        },
+        {
+          "clause_type": "order_of_precedence",
+          "variant": "sow_prevails",
+          "severity": "high",
+          "summary": "The SOW overrides the MSA in a conflict"
+        }
+      ]
+    },
+    "delmont_sow2": {
+      "effective_date": "2026-10-08",
+      "expiry_date": "2027-12-12",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 1800000,
+      "total_value": 3600000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-10-05",
+      "supplier_signatory": "Richard Hale",
+      "supplier_signed_date": "2026-10-06",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": []
+    },
+    "delmont_amd1": {
+      "effective_date": "2026-09-23",
+      "expiry_date": "2029-01-15",
+      "payment_terms_days": 60,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-09-20",
+      "supplier_signatory": "Richard Hale",
+      "supplier_signed_date": "2026-09-21",
+      "fully_executed": true,
+      "deviations": []
+    },
+    "delmont_wo1": {
+      "effective_date": "2026-10-13",
+      "expiry_date": "2027-11-12",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": 600000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-10-10",
+      "supplier_signatory": "Richard Hale",
+      "supplier_signed_date": "2026-10-11",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "delmont_nda": {
+      "effective_date": "2024-11-19",
+      "expiry_date": "2026-11-19",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": null,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Dana Whitfield",
+      "customer_signed_date": "2024-11-16",
+      "supplier_signatory": "Richard Hale",
+      "supplier_signed_date": "2024-11-17",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "taraka_msa": {
+      "effective_date": "2026-03-02",
+      "expiry_date": "2029-04-25",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": 30,
+      "liability_cap_multiple": 1.0,
+      "termination_for_convenience": true,
+      "governing_law": "India",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-02-27",
+      "supplier_signatory": "Venkatesh Iyer",
+      "supplier_signed_date": "2026-02-28",
+      "fully_executed": true,
+      "liability_cap_text": "1 times annual fees",
+      "deviations": [
+        {
+          "clause_type": "governing_law",
+          "variant": "india",
+          "severity": "medium",
+          "summary": "Governed by Indian law (standard: New York law)"
+        },
+        {
+          "clause_type": "payment",
+          "variant": "net30",
+          "severity": "low",
+          "summary": "Payment terms shortened to 30 days (within fallback)"
+        }
+      ]
+    },
+    "taraka_sow1": {
+      "effective_date": "2026-03-12",
+      "expiry_date": "2028-01-01",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 6000000,
+      "total_value": 12000000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-03-09",
+      "supplier_signatory": "Venkatesh Iyer",
+      "supplier_signed_date": "2026-03-10",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": []
+    },
+    "taraka_sow2": {
+      "effective_date": "2026-07-10",
+      "expiry_date": "2027-12-22",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 2200000,
+      "total_value": 4400000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-07-07",
+      "supplier_signatory": "Venkatesh Iyer",
+      "supplier_signed_date": "2026-07-08",
+      "fully_executed": true,
+      "liability_cap_text": "Governed by MSA",
+      "deviations": []
+    },
+    "taraka_wo1": {
+      "effective_date": "2026-09-23",
+      "expiry_date": "2027-12-02",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": 480000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": null,
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-09-20",
+      "supplier_signatory": "Venkatesh Iyer",
+      "supplier_signed_date": "2026-09-21",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "taraka_nda": {
+      "effective_date": "2026-02-20",
+      "expiry_date": "2027-12-17",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": null,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Dana Whitfield",
+      "customer_signed_date": "2026-02-17",
+      "supplier_signatory": "Venkatesh Iyer",
+      "supplier_signed_date": "2026-02-18",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "nginova": {
+      "effective_date": "2026-04-21",
+      "expiry_date": "2028-04-10",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": 540000,
+      "total_value": 1620000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": 2.0,
+      "termination_for_convenience": true,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-04-18",
+      "supplier_signatory": "Chris Dalton",
+      "supplier_signed_date": "2026-04-19",
+      "fully_executed": true,
+      "liability_cap_text": "2 times annual fees",
+      "deviations": [
+        {
+          "clause_type": "sla",
+          "variant": "lower",
+          "severity": "low",
+          "summary": "Availability commitment lowered to 99.5%"
+        },
+        {
+          "clause_type": "liability_cap",
+          "variant": "x2",
+          "severity": "low",
+          "summary": "Liability cap raised to 2x annual fees (within fallback)"
+        }
+      ]
+    },
+    "cirrus": {
+      "effective_date": "2025-12-24",
+      "expiry_date": "2026-12-24",
+      "notice_period_days": 30,
+      "auto_renew": true,
+      "annual_value": 420000,
+      "total_value": 420000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": 1.0,
+      "termination_for_convenience": true,
+      "governing_law": "New York",
+      "processes_personal_data": true,
+      "has_dpa": true,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2025-12-21",
+      "supplier_signatory": "Emily Carter",
+      "supplier_signed_date": "2025-12-22",
+      "fully_executed": true,
+      "liability_cap_text": "1 times annual fees",
+      "deviations": [
+        {
+          "clause_type": "renewal",
+          "variant": "auto",
+          "severity": "medium",
+          "summary": "Auto-renews for 12-month periods; the Customer must give notice to exit"
+        },
+        {
+          "clause_type": "sla",
+          "variant": "lower",
+          "severity": "low",
+          "summary": "Availability commitment lowered to 99.5%"
+        }
+      ]
+    },
+    "ledgerline": {
+      "effective_date": "2026-01-21",
+      "expiry_date": "2027-01-21",
+      "notice_period_days": 30,
+      "auto_renew": true,
+      "annual_value": 650000,
+      "total_value": 1300000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": 2.0,
+      "termination_for_convenience": false,
+      "governing_law": "New York",
+      "processes_personal_data": true,
+      "has_dpa": true,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-01-18",
+      "supplier_signatory": "Farhan Qureshi",
+      "supplier_signed_date": "2026-01-19",
+      "fully_executed": true,
+      "liability_cap_text": "2 times annual fees",
+      "deviations": [
+        {
+          "clause_type": "termination_for_convenience",
+          "variant": "none",
+          "severity": "high",
+          "summary": "No right to terminate for convenience"
+        },
+        {
+          "clause_type": "liability_cap",
+          "variant": "x2",
+          "severity": "low",
+          "summary": "Liability cap raised to 2x annual fees (within fallback)"
+        },
+        {
+          "clause_type": "renewal",
+          "variant": "auto",
+          "severity": "medium",
+          "summary": "Auto-renews for 12-month periods; the Customer must give notice to exit"
+        }
+      ]
+    },
+    "pulsehr": {
+      "effective_date": "2026-10-23",
+      "expiry_date": "2027-11-22",
+      "notice_period_days": 60,
+      "auto_renew": true,
+      "annual_value": 340000,
+      "total_value": 340000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": "New York",
+      "processes_personal_data": true,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2026-10-20",
+      "supplier_signatory": "Lakshmi Rao",
+      "supplier_signed_date": "2026-10-21",
+      "fully_executed": true,
+      "liability_cap_text": "Unlimited",
+      "deviations": [
+        {
+          "clause_type": "liability_cap",
+          "variant": "unlimited",
+          "severity": "critical",
+          "summary": "Liability is unlimited, including indirect and consequential loss"
+        },
+        {
+          "clause_type": "renewal",
+          "variant": "auto",
+          "severity": "medium",
+          "summary": "Auto-renews for 12-month periods; the Customer must give notice to exit"
+        }
+      ]
+    },
+    "adspark": {
+      "effective_date": "2025-11-28",
+      "expiry_date": "2026-11-28",
+      "notice_period_days": 30,
+      "auto_renew": true,
+      "annual_value": 220000,
+      "total_value": 220000,
+      "payment_terms_days": 45,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": true,
+      "governing_law": "Singapore",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Michael Brennan",
+      "customer_signed_date": "2025-11-25",
+      "supplier_signatory": "Tanvi Joshi",
+      "supplier_signed_date": "2025-11-26",
+      "fully_executed": true,
+      "liability_cap_text": "Unlimited",
+      "deviations": [
+        {
+          "clause_type": "liability_cap",
+          "variant": "unlimited",
+          "severity": "critical",
+          "summary": "Liability is unlimited, including indirect and consequential loss"
+        },
+        {
+          "clause_type": "renewal",
+          "variant": "auto",
+          "severity": "medium",
+          "summary": "Auto-renews for 12-month periods; the Customer must give notice to exit"
+        },
+        {
+          "clause_type": "ip_ownership",
+          "variant": "supplier",
+          "severity": "high",
+          "summary": "Supplier owns deliverables; Customer gets a limited licence"
+        },
+        {
+          "clause_type": "governing_law",
+          "variant": "singapore",
+          "severity": "medium",
+          "summary": "Governed by Singapore law (standard: New York law)"
+        }
+      ]
+    },
+    "skyguard_nda": {
+      "effective_date": "2025-12-05",
+      "expiry_date": "2026-12-05",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": null,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": "England and Wales",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Dana Whitfield",
+      "customer_signed_date": "2025-12-02",
+      "supplier_signatory": "Imran Sheikh",
+      "supplier_signed_date": "2025-12-03",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": [
+        {
+          "clause_type": "governing_law",
+          "variant": "england",
+          "severity": "medium",
+          "summary": "Governed by English law (standard: New York law)"
+        }
+      ]
+    },
+    "cirrus_dpa": {
+      "effective_date": "2025-12-24",
+      "expiry_date": "2029-01-15",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": null,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Dana Whitfield",
+      "customer_signed_date": "2025-12-21",
+      "supplier_signatory": "Emily Carter",
+      "supplier_signed_date": "2025-12-22",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": []
+    },
+    "ledgerline_dpa": {
+      "effective_date": "2026-01-21",
+      "expiry_date": "2029-01-15",
+      "notice_period_days": null,
+      "auto_renew": false,
+      "annual_value": null,
+      "total_value": null,
+      "payment_terms_days": null,
+      "liability_cap_multiple": null,
+      "termination_for_convenience": null,
+      "governing_law": "New York",
+      "processes_personal_data": false,
+      "has_dpa": false,
+      "customer_signatory": "Dana Whitfield",
+      "customer_signed_date": "2026-01-18",
+      "supplier_signatory": "Farhan Qureshi",
+      "supplier_signed_date": "2026-01-19",
+      "fully_executed": true,
+      "liability_cap_text": null,
+      "deviations": [
+        {
+          "clause_type": "breach_notification",
+          "variant": "h72",
+          "severity": "medium",
+          "summary": "Breach notice within 72 hours (standard: 48 hours)"
+        }
+      ]
+    }
+  },
+  "drafts": {
+    "orbitline_msa": {
+      "deviations": [
+        {
+          "clause_type": "liability_cap",
+          "kind": "changed",
+          "variant": "unlimited",
+          "severity": "critical",
+          "summary": "Liability is unlimited, including indirect and consequential loss"
+        },
+        {
+          "clause_type": "indemnity",
+          "kind": "changed",
+          "variant": "one_way",
+          "severity": "high",
+          "summary": "Indemnity runs from the Customer to the Supplier"
+        },
+        {
+          "clause_type": "payment",
+          "kind": "changed",
+          "variant": "net15",
+          "severity": "high",
+          "summary": "Payment terms shortened to 15 days (below fallback)"
+        },
+        {
+          "clause_type": "termination_for_convenience",
+          "kind": "changed",
+          "variant": "none",
+          "severity": "high",
+          "summary": "No right to terminate for convenience"
+        },
+        {
+          "clause_type": "governing_law",
+          "kind": "changed",
+          "variant": "england",
+          "severity": "medium",
+          "summary": "Governed by English law (standard: New York law)"
+        }
+      ]
+    },
+    "quanta_saas": {
+      "deviations": [
+        {
+          "clause_type": "sla",
+          "kind": "changed",
+          "variant": "weak",
+          "severity": "high",
+          "summary": "Availability lowered to 99.0% and no service credits"
+        },
+        {
+          "clause_type": "security",
+          "kind": "changed",
+          "variant": "slow",
+          "severity": "medium",
+          "summary": "Incident notice within 7 days (standard: 48 hours)"
+        },
+        {
+          "clause_type": "data_protection",
+          "kind": "changed",
+          "variant": "weak",
+          "severity": "critical",
+          "summary": "Supplier may process personal data at its own discretion"
+        },
+        {
+          "clause_type": "liability_cap",
+          "kind": "changed",
+          "variant": "x05",
+          "severity": "high",
+          "summary": "Liability cap lowered to 0.5x annual fees"
+        },
+        {
+          "clause_type": "renewal",
+          "kind": "changed",
+          "variant": "auto",
+          "severity": "medium",
+          "summary": "Auto-renews for 12-month periods; the Customer must give notice to exit"
+        },
+        {
+          "clause_type": "data_return",
+          "kind": "missing",
+          "severity": "high",
+          "summary": "Return of Data clause is missing"
+        }
+      ]
+    },
+    "orbital_nda": {
+      "deviations": [
+        {
+          "clause_type": "confidentiality",
+          "kind": "changed",
+          "variant": "short",
+          "severity": "medium",
+          "summary": "Confidentiality survives only 1 year (standard: 3 years)"
+        },
+        {
+          "clause_type": "governing_law",
+          "kind": "changed",
+          "variant": "singapore",
+          "severity": "medium",
+          "summary": "Governed by Singapore law (standard: New York law)"
+        },
+        {
+          "clause_type": "non_solicit",
+          "kind": "missing",
+          "severity": "low",
+          "summary": "Non-Solicitation clause is missing"
+        }
+      ]
+    },
+    "vaultline_dpa": {
+      "deviations": [
+        {
+          "clause_type": "subprocessors",
+          "kind": "changed",
+          "variant": "general",
+          "severity": "high",
+          "summary": "Sub-processors may be appointed at the Supplier's discretion"
+        },
+        {
+          "clause_type": "breach_notification",
+          "kind": "changed",
+          "variant": "slow5",
+          "severity": "high",
+          "summary": "Breach notice within 5 days (standard: 48 hours)"
+        },
+        {
+          "clause_type": "cross_border",
+          "kind": "changed",
+          "variant": "any",
+          "severity": "critical",
+          "summary": "Personal data may be transferred to any country"
+        },
+        {
+          "clause_type": "audit_rights",
+          "kind": "changed",
+          "variant": "none",
+          "severity": "medium",
+          "summary": "No audit right"
+        }
+      ]
+    },
+    "brightpath_sow": {
+      "deviations": []
+    }
+  }
+}

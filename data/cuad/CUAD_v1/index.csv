@@ -1,0 +1,511 @@
+filename,agreement_type,split
+CybergyHoldingsInc_20140520_10-Q_EX-10.27_8605784_EX-10.27_Affiliate Agreement.pdf,Affiliate_Agreements,test
+EuromediaHoldingsCorp_20070215_10SB12G_EX-10.B(01)_525118_EX-10.B(01)_Content License Agreement.pdf,License_Agreements,test
+FulucaiProductionsLtd_20131223_10-Q_EX-10.9_8368347_EX-10.9_Content License Agreement.pdf,License_Agreements,train
+GopageCorp_20140221_10-K_EX-10.1_8432966_EX-10.1_Content License Agreement.pdf,License_Agreements,train
+IdeanomicsInc_20160330_10-K_EX-10.26_9512211_EX-10.26_Content License Agreement.pdf,License_Agreements,test
+DeltathreeInc_19991102_S-1A_EX-10.19_6227850_EX-10.19_Co-Branding Agreement_ Service Agreement.pdf,Co_Branding,test
+EdietsComInc_20001030_10QSB_EX-10.4_2606646_EX-10.4_Co-Branding Agreement.pdf,Co_Branding,train
+IntegrityMediaInc_20010329_10-K405_EX-10.17_2373875_EX-10.17_Co-Branding Agreement.pdf,Co_Branding,train
+MusclepharmCorp_20170208_10-KA_EX-10.38_9893581_EX-10.38_Co-Branding Agreement.pdf,Co_Branding,train
+TomOnlineInc_20060501_20-F_EX-4.46_749700_EX-4.46_Co-Branding Agreement.pdf,Co_Branding,train
+ConformisInc_20191101_10-Q_EX-10.6_11861402_EX-10.6_Development Agreement.pdf,Development,train
+EtonPharmaceuticalsInc_20191114_10-Q_EX-10.1_11893941_EX-10.1_Development Agreement.pdf,Development,train
+FuelcellEnergyInc_20191106_8-K_EX-10.1_11868007_EX-10.1_Development Agreement.pdf,Development,test
+ReedsInc_20191113_10-Q_EX-10.4_11888303_EX-10.4_Development Agreement.pdf,Development,train
+FuseMedicalInc_20190321_10-K_EX-10.43_11575454_EX-10.43_Distributor Agreement.pdf,Distributor,train
+GentechHoldingsInc_20190808_1-A_EX1A-6 MAT CTRCT_11776814_EX1A-6 MAT CTRCT_Distributor Agreement.pdf,Distributor,train
+ImineCorp_20180725_S-1_EX-10.5_11275970_EX-10.5_Distributor Agreement.pdf,Distributor,test
+InnerscopeHearingTechnologiesInc_20181109_8-K_EX-10.6_11419704_EX-10.6_Distributor Agreement.pdf,Distributor,train
+WaterNowInc_20191120_10-Q_EX-10.12_11900227_EX-10.12_Distributor Agreement.pdf,Distributor,test
+GridironBionutrientsInc_20171206_8-K_EX-10.2_10972556_EX-10.2_Endorsement Agreement.pdf,Endorsement,train
+EcoScienceSolutionsInc_20171117_8-K_EX-10.1_10956472_EX-10.1_Endorsement Agreement.pdf,Endorsement,test
+NakedBrandGroupInc_20150731_POS AM (on S-1)_EX-10.75_9196027_EX-10.75_Endorsement Agreement.pdf,Endorsement,train
+RgcResourcesInc_20151216_8-K_EX-10.3_9372751_EX-10.3_Franchise Agreement.pdf,Franchise,train
+SimplicityEsportsGamingCompany_20181130_8-K_EX-10.1_11444071_EX-10.1_Franchise Agreement.pdf,Franchise,train
+Freecook_20180605_S-1_EX-10.3_11233807_EX-10.3_Hosting Agreement.pdf,Hosting,test
+PareteumCorp_20081001_8-K_EX-99.1_2654808_EX-99.1_Hosting Agreement.pdf,Hosting,test
+VitalibisInc_20180316_8-K_EX-10.2_11100168_EX-10.2_Hosting Agreement.pdf,Hosting,train
+QuantumGroupIncFl_20090120_8-K_EX-99.2_3672910_EX-99.2_Hosting Agreement.pdf,Hosting,test
+CerenceInc_20191002_8-K_EX-10.4_11827494_EX-10.4_Intellectual Property Agreement.pdf,IP,train
+GarrettMotionInc_20181001_8-K_EX-2.4_11364532_EX-2.4_Intellectual Property Agreement.pdf,IP,test
+RareElementResourcesLtd_20171019_SC 13D_EX-99.4_10897534_EX-99.4_Intellectual Property Agreement.pdf,IP,train
+ArtaraTherapeuticsInc_20200110_8-K_EX-10.5_11943350_EX-10.5_License Agreement.pdf,License_Agreements,train
+GpaqAcquisitionHoldingsInc_20200123_S-4A_EX-10.6_11951677_EX-10.6_License Agreement.pdf,License_Agreements,test
+CytodynInc_20200109_10-Q_EX-10.5_11941634_EX-10.5_License Agreement.pdf,License_Agreements,test
+VirtuosoSurgicalInc_20191227_1-A_EX1A-6 MAT CTRCT_11933379_EX1A-6 MAT CTRCT_License Agreement.pdf,License_Agreements,test
+AtnInternationalInc_20191108_10-Q_EX-10.1_11878541_EX-10.1_Maintenance Agreement.pdf,Maintenance,test
+BloomEnergyCorp_20180321_DRSA (on S-1)_EX-10_11240356_EX-10_Maintenance Agreement.pdf,Maintenance,train
+HerImports_20161018_8-KA_EX-10.14_9765707_EX-10.14_Maintenance Agreement.pdf,Maintenance,test
+InmodeLtd_20190729_F-1A_EX-10.9_11743243_EX-10.9_Manufacturing Agreement.pdf,Manufacturing,test
+NeuroboPharmaceuticalsInc_20190903_S-4_EX-10.36_11802165_EX-10.36_Manufacturing Agreement_ Supply Agreement.pdf,Manufacturing,test
+KitovPharmaLtd_20190326_20-F_EX-4.15_11584449_EX-4.15_Manufacturing Agreement.pdf,Manufacturing,train
+UpjohnInc_20200121_10-12G_EX-2.6_11948692_EX-2.6_Manufacturing Agreement_ Supply Agreement.pdf,Manufacturing,train
+CcRealEstateIncomeFundadv_20181205_POS 8C_EX-99.(H)(3)_11447739_EX-99.(H)(3)_Marketing Agreement.pdf,Marketing,train
+EmmisCommunicationsCorp_20191125_8-K_EX-10.6_11906433_EX-10.6_Marketing Agreement.pdf,Marketing,test
+TodosMedicalLtd_20190328_20-F_EX-4.10_11587157_EX-4.10_Marketing Agreement_ Reseller Agreement.pdf,Marketing,train
+VertexEnergyInc_20200113_8-K_EX-10.1_11943624_EX-10.1_Marketing Agreement.pdf,Marketing,test
+XpresspaGroupInc_20190401_10-K_EX-10.28_11599457_EX-10.28_Marketing Agreement.pdf,Marketing,train
+FerroglobePlc_20150624_F-4A_EX-10.20_9154746_EX-10.20_Outsourcing Agreement.pdf,Outsourcing,train
+ImperialGardenResortInc_20161028_DRS (on F-1)_EX-10.13_9963189_EX-10.13_Outsourcing Agreement.pdf,Outsourcing,train
+ParatekPharmaceuticalsInc_20170505_10-KA_EX-10.29_10323872_EX-10.29_Outsourcing Agreement.pdf,Outsourcing,train
+PhotronicsInc_20171219_10-QA_EX-10.28_10982650_EX-10.28_Outsourcing Agreement.pdf,Outsourcing,train
+ExactSciencesCorp_20180822_8-K_EX-10.1_11331629_EX-10.1_Promotion Agreement.pdf,Promotion,train
+DovaPharmaceuticalsInc_20181108_10-Q_EX-10.2_11414857_EX-10.2_Promotion Agreement.pdf,Promotion,test
+VnueInc_20150914_8-K_EX-10.1_9259571_EX-10.1_Promotion Agreement.pdf,Promotion,train
+SigaTechnologiesInc_20190603_8-K_EX-10.1_11695818_EX-10.1_Promotion Agreement.pdf,Promotion,test
+BravatekSolutionsInc_20170418_8-K_EX-10.1_10205739_EX-10.1_Reseller Agreement.pdf,Reseller,train
+HealthcareIntegratedTechnologiesInc_20190812_8-K_EX-10.1_11776966_EX-10.1_Reseller Agreement.pdf,Reseller,train
+EhaveInc_20190515_20-F_EX-4.44_11678816_EX-4.44_License Agreement_ Reseller Agreement.pdf,Reseller,train
+SalesforcecomInc_20171122_10-Q_EX-10.1_10961535_EX-10.1_Reseller Agreement.pdf,Reseller,train
+IpassInc_20181203_8-K_EX-99.1_11445874_EX-99.1_Reseller Agreement.pdf,Reseller,test
+GpaqAcquisitionHoldingsInc_20200123_S-4A_EX-10.8_11951679_EX-10.8_Service Agreement.pdf,Service,train
+IntegrityFunds_20200121_485BPOS_EX-99.E UNDR CONTR_11948727_EX-99.E UNDR CONTR_Service Agreement.pdf,Service,test
+ReynoldsConsumerProductsInc_20200121_S-1A_EX-10.22_11948918_EX-10.22_Service Agreement.pdf,Service,train
+VerizonAbsLlc_20200123_8-K_EX-10.4_11952335_EX-10.4_Service Agreement.pdf,Service,train
+ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement.pdf,Sponsorship,train
+AlliedEsportsEntertainmentInc_20190815_8-K_EX-10.34_11788308_EX-10.34_Sponsorship Agreement.pdf,Sponsorship,train
+EcoScienceSolutionsInc_20180406_8-K_EX-10.1_11135398_EX-10.1_Sponsorship Agreement.pdf,Sponsorship,train
+AgapeAtpCorp_20191202_10-KA_EX-10.1_11911128_EX-10.1_Supply Agreement.pdf,Supply,train
+FreezeTagInc_20180411_8-K_EX-10.1_11139603_EX-10.1_Sponsorship Agreement.pdf,Sponsorship,train
+LohaCompanyltd_20191209_F-1_EX-10.16_11917878_EX-10.16_Supply Agreement.pdf,Supply,train
+ReynoldsConsumerProductsInc_20191115_S-1_EX-10.18_11896469_EX-10.18_Supply Agreement.pdf,Supply,train
+WestPharmaceuticalServicesInc_20200116_8-K_EX-10.1_11947529_EX-10.1_Supply Agreement.pdf,Supply,train
+HertzGroupRealtyTrustInc_20190920_S-11A_EX-10.8_11816941_EX-10.8_Trademark License Agreement.pdf,License_Agreements,train
+ArconicRolledProductsCorp_20191217_10-12B_EX-2.7_11923804_EX-2.7_Trademark License Agreement.pdf,License_Agreements,train
+MorganStanleyDirectLendingFund_20191119_10-12GA_EX-10.5_11898508_EX-10.5_Trademark License Agreement.pdf,License_Agreements,test
+NmfSlfIInc_20200115_10-12GA_EX-10.5_11946987_EX-10.5_Trademark License Agreement.pdf,License_Agreements,test
+PalmerSquareCapitalBdcInc_20200116_10-12GA_EX-10.6_11949289_EX-10.6_Trademark License Agreement.pdf,License_Agreements,test
+PenntexMidstreamPartnersLp_20150416_S-1A_EX-10.4_9042833_EX-10.4_Transportation Agreement.pdf,Transportation,train
+TcPipelinesLp_20160226_10-K_EX-99.12_9454048_EX-99.12_Transportation Agreement.pdf,Transportation,train
+RangeResourcesLouisianaInc_20150417_8-K_EX-10.5_9045501_EX-10.5_Transportation Agreement.pdf,Transportation,train
+ZtoExpressCaymanInc_20160930_F-1_EX-10.10_9752871_EX-10.10_Transportation Agreement.pdf,Transportation,train
+AudibleInc_20001113_10-Q_EX-10.32_2599586_EX-10.32_Co-Branding Agreement_ Marketing Agreement_ Investment Distribution Agreement.pdf,Marketing,train
+2ThemartComInc_19990826_10-12G_EX-10.10_6700288_EX-10.10_Co-Branding Agreement_ Agency Agreement.pdf,Co_Branding,train
+EmbarkComInc_19991008_S-1A_EX-10.10_6487661_EX-10.10_Co-Branding Agreement.pdf,Co_Branding,test
+HealthcentralCom_19991108_S-1A_EX-10.27_6623292_EX-10.27_Co-Branding Agreement.pdf,Co_Branding,test
+ImpresseCorp_20000322_S-1A_EX-10.11_5199234_EX-10.11_Co-Branding Agreement.pdf,Co_Branding,train
+EbixInc_20010515_10-Q_EX-10.3_4049767_EX-10.3_Co-Branding Agreement.pdf,Co_Branding,train
+InvendaCorp_20000828_S-1A_EX-10.2_2588206_EX-10.2_Co-Branding Agreement.pdf,Co_Branding,test
+MphaseTechnologiesInc_20030911_10-K_EX-10.15_1560667_EX-10.15_Co-Branding Agreement.pdf,Co_Branding,train
+LeadersonlineInc_20000427_S-1A_EX-10.8_4991089_EX-10.8_Co-Branding Agreement.pdf,Co_Branding,train
+NeoformaInc_19991202_S-1A_EX-10.26_5224521_EX-10.26_Co-Branding Agreement.pdf,Co_Branding,train
+PaperexchangeComInc_20000322_S-1A_EX-10.4_5202103_EX-10.4_Co-Branding Agreement.pdf,Co_Branding,train
+RaeSystemsInc_20001114_10-Q_EX-10.57_2631790_EX-10.57_Co-Branding Agreement.pdf,Co_Branding,train
+RandWorldwideInc_20010402_8-KA_EX-10.2_2102464_EX-10.2_Co-Branding Agreement.pdf,Co_Branding,train
+TheglobeComInc_19990503_S-1A_EX-10.20_5416126_EX-10.20_Co-Branding Agreement.pdf,Co_Branding,train
+StampscomInc_20001114_10-Q_EX-10.47_2631630_EX-10.47_Co-Branding Agreement.pdf,Co_Branding,test
+CreditcardscomInc_20070810_S-1_EX-10.33_362297_EX-10.33_Affiliate Agreement.pdf,Affiliate_Agreements,train
+DigitalCinemaDestinationsCorp_20111220_S-1_EX-10.10_7346719_EX-10.10_Affiliate Agreement.pdf,Affiliate_Agreements,train
+LinkPlusCorp_20050802_8-K_EX-10_3240252_EX-10_Affiliate Agreement.pdf,Affiliate_Agreements,train
+SouthernStarEnergyInc_20051202_SB-2A_EX-9_801890_EX-9_Affiliate Agreement.pdf,Affiliate_Agreements,train
+SteelVaultCorp_20081224_10-K_EX-10.16_3074935_EX-10.16_Affiliate Agreement.pdf,Affiliate_Agreements,test
+UnionDentalHoldingsInc_20050204_8-KA_EX-10_3345577_EX-10_Affiliate Agreement.pdf,Affiliate_Agreements,train
+TubeMediaCorp_20060310_8-K_EX-10.1_513921_EX-10.1_Affiliate Agreement.pdf,Affiliate_Agreements,test
+UsioInc_20040428_SB-2_EX-10.11_1723988_EX-10.11_Affiliate Agreement 2.pdf,Affiliate_Agreements,test
+BizzingoInc_20120322_8-K_EX-10.17_7504499_EX-10.17_Endorsement Agreement.pdf,Endorsement,train
+BerkshireHillsBancorpInc_20120809_10-Q_EX-10.16_7708169_EX-10.16_Endorsement Agreement.pdf,Endorsement,train
+GridironBionutrientsInc_20171206_8-K_EX-10.1_10972555_EX-10.1_Endorsement Agreement.pdf,Endorsement,test
+LegacyEducationAllianceInc_20141110_8-K_EX-10.9_8828866_EX-10.9_Endorsement Agreement.pdf,Endorsement,train
+LifewayFoodsInc_20160316_10-K_EX-10.24_9489766_EX-10.24_Endorsement Agreement.pdf,Endorsement,train
+PerformanceSportsBrandsInc_20110909_S-1_EX-10.10_7220214_EX-10.10_Endorsement Agreement.pdf,Endorsement,train
+PharmagenInc_20120803_8-KA_EX-10.1_7693204_EX-10.1_Endorsement Agreement.pdf,Endorsement,train
+PrudentialBancorpInc_20170606_8-K_EX-10.4_10474434_EX-10.4_Endorsement Agreement.pdf,Endorsement,test
+ThriventVariableInsuranceAccountB_20190701_N-6_EX-99.D(IV)_11720968_EX-99.D(IV)_Endorsement Agreement.pdf,Endorsement,train
+ArcaUsTreasuryFund_20200207_N-2_EX-99.K5_11971930_EX-99.K5_Development Agreement.pdf,Development,train
+AimmuneTherapeuticsInc_20200205_8-K_EX-10.3_11967170_EX-10.3_Development Agreement.pdf,Development,train
+CnsPharmaceuticalsInc_20200326_8-K_EX-10.1_12079626_EX-10.1_Development Agreement.pdf,Development,train
+ClickstreamCorp_20200330_1-A_EX1A-6 MAT CTRCT_12089935_EX1A-6 MAT CTRCT_Development Agreement.pdf,Development,train
+CoherusBiosciencesInc_20200227_10-K_EX-10.29_12021376_EX-10.29_Development Agreement.pdf,Development,train
+ElPolloLocoHoldingsInc_20200306_10-K_EX-10.16_12041700_EX-10.16_Development Agreement.pdf,Development,train
+EmeraldHealthBioceuticalsInc_20200218_1-A_EX1A-6 MAT CTRCT_11987205_EX1A-6 MAT CTRCT_Development Agreement.pdf,Development,test
+HarpoonTherapeuticsInc_20200312_10-K_EX-10.18_12051356_EX-10.18_Development Agreement.PDF,,train
+IbioInc_20200313_8-K_EX-10.1_12052678_EX-10.1_Development Agreement.pdf,Development,train
+HfEnterprisesInc_20191223_S-1_EX-10.22_11931299_EX-10.22_Development Agreement.pdf,Development,test
+LegacyEducationAllianceInc_20200330_10-K_EX-10.18_12090678_EX-10.18_Development Agreement.pdf,Development,train
+LiquidmetalTechnologiesInc_20200205_8-K_EX-10.1_11968198_EX-10.1_Development Agreement.pdf,Development,train
+NlsPharmaceuticsLtd_20200228_F-1_EX-10.14_12029046_EX-10.14_Development Agreement.pdf,Development,test
+PhasebioPharmaceuticalsInc_20200330_10-K_EX-10.21_12086810_EX-10.21_Development Agreement.pdf,Development,train
+RevolutionMedicinesInc_20200117_S-1_EX-10.1_11948417_EX-10.1_Development Agreement.pdf,Development,train
+RitterPharmaceuticalsInc_20200313_S-4A_EX-10.54_12055220_EX-10.54_Development Agreement.pdf,Development,train
+VgrabCommunicationsInc_20200129_10-K_EX-10.33_11958828_EX-10.33_Development Agreement.pdf,Development,test
+ChinaRealEstateInformationCorp_20090929_F-1_EX-10.32_4771615_EX-10.32_Content License Agreement.pdf,License_Agreements,train
+AlliedEsportsEntertainmentInc_20190815_8-K_EX-10.19_11788293_EX-10.19_Content License Agreement.pdf,License_Agreements,train
+DataCallTechnologies_20060918_SB-2A_EX-10.9_944510_EX-10.9_Content License Agreement.pdf,License_Agreements,test
+GlobalTechnologiesGroupInc_20050928_10KSB_EX-10.9_4148808_EX-10.9_Content License Agreement.pdf,License_Agreements,train
+IdeanomicsInc_20151124_8-K_EX-10.2_9354744_EX-10.2_Content License Agreement.pdf,License_Agreements,train
+MidwestEnergyEmissionsCorp_20080604_8-K_EX-10.2_3093976_EX-10.2_Content License Agreement.pdf,License_Agreements,train
+PacificapEntertainmentHoldingsInc_20051115_8-KA_EX-1.01_4300894_EX-1.01_Content License Agreement.pdf,License_Agreements,train
+PhoenixNewMediaLtd_20110421_F-1_EX-10.17_6958322_EX-10.17_Content License Agreement.pdf,License_Agreements,test
+RemarkHoldingsInc_20081114_10-Q_EX-10.24_2895649_EX-10.24_Content License Agreement.pdf,License_Agreements,train
+WatchitMediaInc_20061201_8-K_EX-10.1_4148672_EX-10.1_Content License Agreement.pdf,License_Agreements,train
+XinhuaSportsEntertainmentLtd_20070221_F-1_EX-99.4_645553_EX-99.4_Content License Agreement.pdf,License_Agreements,train
+WebmdHealthCorp_20050908_S-1A_EX-10.7_1027007_EX-10.7_Content License Agreement.pdf,License_Agreements,train
+ScansourceInc_20190509_10-Q_EX-10.2_11661422_EX-10.2_Distributor Agreement.pdf,Distributor,train
+ScansourceInc_20190822_10-K_EX-10.39_11793959_EX-10.39_Distributor Agreement.pdf,Distributor,train
+PrecheckHealthServicesInc_20200320_8-K_EX-99.2_12070169_EX-99.2_Distributor Agreement.pdf,Distributor,train
+SmartRxSystemsInc_20180914_1-A_EX1A-6 MAT CTRCT_11351705_EX1A-6 MAT CTRCT_Distributor Agreement.pdf,Distributor,train
+StaarSurgicalCompany_20180801_10-Q_EX-10.37_11289449_EX-10.37_Distributor Agreement.pdf,Distributor,train
+ZogenixInc_20190509_10-Q_EX-10.2_11663313_EX-10.2_Distributor Agreement.pdf,Distributor,train
+ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement.pdf,IP,train
+GluMobileInc_20070319_S-1A_EX-10.09_436630_EX-10.09_Content License Agreement1.pdf,License_Agreements,train
+GluMobileInc_20070319_S-1A_EX-10.09_436630_EX-10.09_Content License Agreement2.pdf,License_Agreements,test
+GluMobileInc_20070319_S-1A_EX-10.09_436630_EX-10.09_Content License Agreement3.pdf,License_Agreements,train
+GluMobileInc_20070319_S-1A_EX-10.09_436630_EX-10.09_Content License Agreement4.pdf,License_Agreements,test
+LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement1.pdf,License_Agreements,train
+LejuHoldingsLtd_20140121_DRS (on F-1)_EX-10.26_8473102_EX-10.26_Content License Agreement2.pdf,License_Agreements,train
+PapaJohnsInternationalInc_20190617_8-K_EX-10.1_11707365_EX-10.1_Endorsement Agreement.pdf,Endorsement,test
+PfHospitalityGroupInc_20150923_10-12G_EX-10.1_9266710_EX-10.1_Franchise Agreement3.pdf,Franchise,train
+PfHospitalityGroupInc_20150923_10-12G_EX-10.1_9266710_EX-10.1_Franchise Agreement1.pdf,Franchise,train
+PlayboyEnterprisesInc_20090220_10-QA_EX-10.2_4091580_EX-10.2_Content License Agreement_ Marketing Agreement_ Sales-Purchase Agreement1.pdf,License_Agreements,train
+PlayboyEnterprisesInc_20090220_10-QA_EX-10.2_4091580_EX-10.2_Content License Agreement_ Marketing Agreement_ Sales-Purchase Agreement2.pdf,License_Agreements,train
+ScansourceInc_20190822_10-K_EX-10.38_11793958_EX-10.38_Distributor Agreement1.pdf,Distributor,test
+ScansourceInc_20190822_10-K_EX-10.38_11793958_EX-10.38_Distributor Agreement2.pdf,Distributor,train
+PelicanDeliversInc_20200211_S-1_EX-10.3_11975895_EX-10.3_Development Agreement2.pdf,Development,train
+PelicanDeliversInc_20200211_S-1_EX-10.3_11975895_EX-10.3_Development Agreement1.pdf,Development,train
+BellringBrandsInc_20190920_S-1_EX-10.12_11817081_EX-10.12_Manufacturing Agreement1.pdf,Manufacturing,train
+BellringBrandsInc_20190920_S-1_EX-10.12_11817081_EX-10.12_Manufacturing Agreement2.pdf,Manufacturing,test
+BellringBrandsInc_20190920_S-1_EX-10.12_11817081_EX-10.12_Manufacturing Agreement4.pdf,Manufacturing,train
+BellringBrandsInc_20190920_S-1_EX-10.12_11817081_EX-10.12_Manufacturing Agreement3.pdf,Manufacturing,test
+SLINGERBAGINC_05_27_2020-EX-10.7-CONSULTING AGREEMENT.PDF,Consulting Agreements,train
+"KIROMICBIOPHARMA,INC_05_11_2020-EX-10.23-CONSULTING AGREEMENT.PDF",Consulting Agreements,test
+SPHERE3DCORP_06_24_2020-EX-10.12-CONSULTING AGREEMENT.PDF,Consulting Agreements,train
+GLOBALTECHNOLOGIESLTD_06_08_2020-EX-10.16-CONSULTING AGREEMENT.PDF,Consulting Agreements,train
+EMERALDHEALTHTHERAPEUTICSINC_06_10_2020-EX-4.5-CONSULTING AGREEMENT - DR. GAETANO MORELLO N.D. INC..PDF,Consulting Agreements,train
+"MEDALISTDIVERSIFIEDREIT,INC_05_18_2020-EX-10.1-CONSULTING AGREEMENT.PDF",Consulting Agreements,train
+"DRIVENDELIVERIES,INC_05_22_2020-EX-10.4-CONSULTING AGREEMENT.PDF",Consulting Agreements,test
+"ADUROBIOTECH,INC_06_02_2020-EX-10.7-CONSULTING AGREEMENT.PDF",Consulting Agreements,train
+PANDIONTHERAPEUTICSHOLDCOLLC_05_22_2020-EX-10.17-CONSULTING AGREEMENT.PDF,Consulting Agreements,train
+"CORALGOLDRESOURCES,LTD_05_28_2020-EX-4.1-CONSULTING AGREEMENT.PDF",Consulting Agreements,train
+MRSFIELDSORIGINALCOOKIESINC_01_29_1998-EX-10-FRANCHISE AGREEMENT.PDF,Franchise,train
+"ADUROBIOTECH,INC_06_02_2020-EX-10.7-CONSULTING AGREEMENT(1).PDF",Consulting Agreements,test
+CENTRACKINTERNATIONALINC_10_29_1999-EX-10.3-WEB SITE HOSTING AGREEMENT.PDF,Hosting,train
+WEBHELPCOMINC_03_22_2000-EX-10.8-HOSTING AGREEMENT.PDF,Hosting,test
+BANGIINC_05_25_2005-EX-10-Premium Managed Hosting Agreement.PDF,Hosting,test
+DYNTEKINC_07_30_1999-EX-10-ONLINE HOSTING AGREEMENT.PDF,Hosting,train
+REGANHOLDINGCORP_03_31_2008-EX-10-LICENSE AND HOSTING AGREEMENT.PDF,Hosting,train
+BUFFALOWILDWINGSINC_06_05_1998-EX-10.3-FRANCHISE AGREEMENT.PDF,Franchise,train
+BONTONSTORESINC_04_20_2018-EX-99.3-AGENCY AGREEMENT.PDF,Agency Agreements,test
+"ATHENSBANCSHARESCORP_11_02_2009-EX-1.2-AGENCY AGREEMENT , 2009.PDF",Agency Agreements,test
+"XACCT Technologies, Inc.SUPPORT AND MAINTENANCE AGREEMENT.PDF",Maintenance,train
+WELLSFARGOMORTGAGEBACKEDSECURITIES2006-6TRUST_05_11_2006-EX-10.3-Yield Maintenance Agreement.PDF,Maintenance,train
+NETZEEINC_11_14_2002-EX-10.3-MAINTENANCE AGREEMENT.PDF,Maintenance,train
+IMAGEWARESYSTEMSINC_12_20_1999-EX-10.22-MAINTENANCE AGREEMENT.PDF,Maintenance,train
+ABILITYINC_06_15_2020-EX-4.25-SERVICES AGREEMENT.PDF,Service,test
+AULAMERICANUNITTRUST_04_24_2020-EX-99.8.77-SERVICING AGREEMENT.PDF,Service,train
+CUROGROUPHOLDINGSCORP_05_04_2020-EX-10.3-SERVICING AGREEMENT.PDF,Service,train
+BLACKSTONEGSOLONG-SHORTCREDITINCOMEFUND_05_11_2020-EX-99.(K)(1)-SERVICE AGREEMENT.PDF,Service,train
+"OAKTREECAPITALGROUP,LLC_03_02_2020-EX-10.8-Services Agreement.PDF",Service,train
+"PAXMEDICA,INC_07_02_2020-EX-10.12-Master Service Agreement.PDF",Service,train
+MERITLIFEINSURANCECO_06_19_2020-EX-10.(XIV)-MASTER SERVICES AGREEMENT.PDF,Service,test
+PFSFUNDS_06_26_2020-EX-99.H OTH MAT CONT-SERVICES AGREEMENT.PDF,Service,test
+SCOUTCAMINC_05_12_2020-EX-10.22-SERVICES AGREEMENT.PDF,Service,train
+TALCOTTRESOLUTIONLIFEINSURANCECO-SEPARATEACCOUNTTWELVE_04_30_2020-EX-99.8(L)-SERVICE AGREEMENT.PDF,Service,test
+TRANSMONTAIGNEPARTNERSLLC_03_13_2020-EX-10.9-SERVICES AGREEMENT.PDF,Service,train
+WPPPLC_04_30_2020-EX-4.28-SERVICE AGREEMENT.PDF,Service,train
+BICYCLETHERAPEUTICSPLC_03_10_2020-EX-10.11-SERVICE AGREEMENT.PDF,Service,train
+NYLIACVARIABLEANNUITYSEPARATEACCOUNTIII_04_10_2020-EX-99.8.KK-SERVICE AGREEMENT.PDF,Service,test
+RISEEDUCATIONCAYMANLTD_04_17_2020-EX-4.23-SERVICE AGREEMENT.PDF,Service,train
+OPERALTD_04_30_2020-EX-4.14-SERVICE AGREEMENT.PDF,Service,train
+"SOLUTIONSVENDINGINTERNATIONAL,INC_03_31_2020-EX1A-1 UNDR AGMT-SERVICES AGREEMENT.PDF",Service,train
+"THERAVANCEBIOPHARMA,INC_05_08_2020-EX-10.2-SERVICE AGREEMENT.PDF",Service,train
+DOMINIADVISORTRUST_02_18_2005-EX-99.(H)(2)-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+"CANOPETROLEUM,INC_12_13_2007-EX-10.1-Sponsorship Agreement.PDF",Sponsorship,test
+"HALITRON,INC_03_01_2005-EX-10.15-SPONSORSHIP AND DEVELOPMENT AGREEMENT.PDF",Sponsorship,train
+GAINSCOINC_01_21_2010-EX-10.41-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+"IPAYMENT,INC_05_14_2007-EX-10.1-SPONSORSHIP AGREEMENT.PDF",Sponsorship,train
+LOOKSMARTLTD_07_20_2012-EX-99.(D)(I)-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+STAMPSCOMINC_06_24_1999-EX-10.18-SPONSORSHIP AGREEMENT.PDF,Sponsorship,test
+VIOLINMEMORYINC_12_12_2012-EX-10.14-SPONSORSHIP AGREEMENT.PDF,Sponsorship,test
+XYBERNAUTCORP_07_12_2002-EX-4-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+"CURAEGISTECHNOLOGIES,INC_05_26_2010-EX-1-CORPORATE SPONSORSHIP AGREEMENT.PDF",Sponsorship,train
+DRKOOPCOMINC_04_21_1999-EX-10.28-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+GSVINC_05_15_1998-EX-10-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+IVILLAGEINC_03_17_1999-EX-10.16-SPONSORSHIP AGREEMENT.PDF,Sponsorship,test
+LOGANSROADHOUSEINC_03_27_1998-EX-10.17-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+MERCATAINC_03_09_2000-EX-10.21-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+HYDRONTECHNOLOGIESINC_03_31_1997-EX-10.47-SPONSORSHIP AGREEMENT.PDF,Sponsorship,test
+N2KINC_10_16_1997-EX-10.16-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+"XLITECHNOLOGIES,INC_12_11_2015-EX-10.1-Sponsorship Agreement.PDF",Sponsorship,train
+VITAMINSHOPPECOMINC_09_13_1999-EX-10.26-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+ASPIRITYHOLDINGSLLC_05_07_2012-EX-10.6-OUTSOURCING AGREEMENT.PDF,Outsourcing,test
+BNLFINANCIALCORP_03_30_2007-EX-10.8-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+CCAINDUSTRIESINC_04_14_2014-EX-10.1-OUTSOURCING AGREEMENT.PDF,Outsourcing,test
+ELANDIAINTERNATIONALINC_04_25_2007-EX-10.21-Outsourcing Agreement.PDF,Outsourcing,test
+NICELTD_06_26_2003-EX-4.5-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+SYKESHEALTHPLANSERVICESINC_04_24_1998-EX-10.14-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+TRICITYBANKSHARESCORP_05_15_1998-EX-10-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+OFGBANCORP_03_28_2007-EX-10.23-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+DRAGONSYSTEMSINC_01_08_1999-EX-10.17-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+HUBEIMINKANGPHARMACEUTICALLTD_09_19_2006-EX-10.1-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+MANUFACTURERSSERVICESLTD_06_05_2000-EX-10.14-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+NEXSTARFINANCEHOLDINGSINC_03_27_2002-EX-10.26-OUTSOURCING AGREEMENT.PDF,Outsourcing,train
+"OASYSMOBILE,INC_07_05_2001-EX-10.17-OUTSOURCING AGREEMENT.PDF",Outsourcing,train
+"UNITEDNATIONALBANCORP_03_03_1999-EX-99-Outsourcing Agreement with the BISYS Group, Inc..PDF",Outsourcing,train
+ASIANDRAGONGROUPINC_08_11_2005-EX-10.5-Reseller Agreement.PDF,Reseller,test
+LOYALTYPOINTINC_11_16_2004-EX-10.2-RESELLER AGREEMENT.PDF,Reseller,train
+MTITECHNOLOGYCORP_11_16_2004-EX-10.102-Reseller Agreement Premier Addendum.PDF,Reseller,train
+"OMINTO,INC_03_29_2004-EX-10-RESELLER AGREEMENT.PDF",Reseller,train
+AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement2.pdf,Maintenance,train
+AzulSa_20170303_F-1A_EX-10.3_9943903_EX-10.3_Maintenance Agreement1.pdf,Maintenance,test
+CardlyticsInc_20180112_S-1_EX-10.16_11002987_EX-10.16_Maintenance Agreement2.pdf,Maintenance,train
+CardlyticsInc_20180112_S-1_EX-10.16_11002987_EX-10.16_Maintenance Agreement3.pdf,Maintenance,train
+CardlyticsInc_20180112_S-1_EX-10.16_11002987_EX-10.16_Maintenance Agreement4.pdf,Maintenance,test
+CardlyticsInc_20180112_S-1_EX-10.16_11002987_EX-10.16_Maintenance Agreement1.pdf,Maintenance,train
+OLDAPIWIND-DOWNLTD_01_08_2016-EX-1.3-AGENCY AGREEMENT1.pdf,Agency Agreements,test
+OLDAPIWIND-DOWNLTD_01_08_2016-EX-1.3-AGENCY AGREEMENT2.pdf,Agency Agreements,train
+MEDIWOUNDLTD_01_15_2014-EX-10.6-SUPPLY AGREEMENT.PDF,Supply,train
+SEASPINEHOLDINGSCORP_10_10_2018-EX-10.1-SUPPLY AGREEMENT.PDF,Supply,train
+PROFOUNDMEDICALCORP_08_29_2019-EX-4.5-SUPPLY AGREEMENT.PDF,Supply,train
+"GRIDIRONBIONUTRIENTS,INC_02_05_2020-EX-10.3-SUPPLY AGREEMENT.PDF",Supply,train
+"BELLICUMPHARMACEUTICALS,INC_05_07_2019-EX-10.1-Supply Agreement.PDF",Supply,train
+FLOTEKINDUSTRIESINCCN_05_09_2019-EX-10.1-SUPPLY AGREEMENT.PDF,Supply,train
+GRANTIERRAENERGYINC_05_07_2012-EX-10.6-TRANSPORTATION CONTRACT.PDF,Transportation,train
+ATMOSENERGYCORP_11_22_2002-EX-10.17-TRANSPORTATION SERVICE AGREEMENT.PDF,Transportation,train
+DYNAMEXINC_06_06_1996-EX-10.4-TRANSPORTATION SERVICES AGREEMENT.PDF,Transportation,test
+MPLXLP_06_17_2015-EX-10.1-TRANSPORTATION SERVICES AGREEMENT.PDF,Transportation,train
+CHAPARRALRESOURCESINC_03_30_2000-EX-10.66-TRANSPORTATION CONTRACT.PDF,Transportation,train
+KENTUCKYUTILITIESCO_03_25_2003-EX-10.65-TRANSPORTATION AGREEMENT.PDF,Transportation,train
+MACROGENICSINC_08_02_2013-EX-10-COLLABORATION AGREEMENT.PDF,Collaboration,train
+CHINARECYCLINGENERGYCORP_11_14_2013-EX-10.6-Cooperation Agreement.PDF,Collaboration,train
+IDREAMSKYTECHNOLOGYLTD_07_03_2014-EX-10.39-Cooperation Agreement on Mobile Game Business.PDF,Collaboration,test
+TUNIUCORP_03_06_2014-EX-10-COOPERATION AGREEMENT.PDF,Collaboration,train
+SENMIAOTECHNOLOGYLTD_02_19_2019-EX-10.5-Collaboration Agreement.PDF,Collaboration,test
+"BERKELEYLIGHTS,INC_06_26_2020-EX-10.12-COLLABORATION AGREEMENT.PDF",Collaboration,train
+PREMIERBIOMEDICALINC_05_14_2020-EX-10.2-INTELLECTUAL PROPERTY AGREEMENT.PDF,IP,train
+"MIDDLEBROOKPHARMACEUTICALS,INC_03_18_2010-EX-10.1-PROMOTION AGREEMENT.PDF",Promotion,train
+"ASHWORTHINC_01_29_1999-EX-10.(D)-PROMOTION AGREEMENT AND NANTZ COMMUNICATIONS, INC..PDF",Promotion,train
+ON4COMMUNICATIONSINC_07_02_2009-EX-10.1-PROMOTION AGREEMENT.PDF,Promotion,train
+"WHITESMOKE,INC_11_08_2011-EX-10.26-PROMOTION AND DISTRIBUTION AGREEMENT.PDF",Promotion,train
+GOCALLINC_03_30_2000-EX-10.7-Promotion Agreement.PDF,Promotion,test
+QBIOMEDINC_04_08_2020-EX-99.1-JOINT FILING AGREEMENT.PDF,Joint Venture _ Filing,train
+ACCELERATEDTECHNOLOGIESHOLDINGCORP_04_24_2003-EX-10.13-JOINT VENTURE AGREEMENT.PDF,Joint Venture,test
+"MFAFINANCIAL,INC_07_06_2020-EX-99.D-JOINT FILING AGREEMENT.PDF",Joint Venture _ Filing,train
+"TALLGRASSENERGY,LP_02_20_2020-EX-99.26-JOINT FILING AGREEMENT.PDF",Joint Venture _ Filing,train
+"GALERATHERAPEUTICS,INC_02_14_2020-EX-99.A-JOINT FILING AGREEMENT.PDF",Joint Venture,train
+CHIPMOSTECHNOLOGIESBERMUDALTD_04_18_2016-EX-4.72-Strategic Alliance Agreement.PDF,Strategic Alliance,test
+"SIBANNAC,INC_12_04_2017-EX-2.1-Strategic Alliance Agreement.PDF",Strategic Alliance,train
+PLAYAHOTELS&RESORTSNV_03_14_2017-EX-10.22-STRATEGIC ALLIANCE AGREEMENT (Hyatt Ziva Cancun).PDF,,train
+ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT.PDF,Collaboration,train
+XENCORINC_10_25_2013-EX-10.24-COLLABORATION AGREEMENT (3).PDF,Collaboration,test
+IMMUNOMEDICSINC_08_07_2019-EX-10.1-PROMOTION AGREEMENT.PDF,Promotion,test
+IGENEBIOTECHNOLOGYINC_05_13_2003-EX-1-JOINT VENTURE AGREEMENT.PDF,Joint Venture _ Filing,train
+RMRGROUPINC_01_22_2020-EX-99.1-JOINT FILING AGREEMENT.PDF,Joint Venture _ Filing,train
+"MJBIOTECH,INC_12_06_2018-EX-99.01-JOINT VENTURE AGREEMENT.PDF",Joint Venture _ Filing,train
+"ONEMAINHOLDINGS,INC_02_20_2020-EX-99.D-JOINT FILING AGREEMENT.PDF",Joint Venture _ Filing,train
+"MACY'S,INC_05_11_2020-EX-99.4-JOINT FILING AGREEMENT.PDF",,test
+BLACKROCKMUNIHOLDINGSINVESTMENTQUALITYFUND_04_07_2020-EX-99.01-JOINT FILING AGREEMENT.PDF,Joint Venture _ Filing,test
+NELNETINC_04_08_2020-EX-1-JOINT FILING AGREEMENT.PDF,Joint Venture _ Filing,train
+"VIRGINGALACTICHOLDINGS,INC_04_08_2020-EX-99.1-JOINT FILING STATEMENT.PDF",Joint Venture _ Filing,train
+"PRECIGEN,INC_01_22_2020-EX-99.1-JOINT FILING AGREEMENT.PDF",Joint Venture _ Filing,train
+"SPRINGBANKPHARMACEUTICALS,INC_04_08_2020-EX-99.A-JOINT FILING AGREEMENT.PDF",Joint Venture _ Filing,test
+ATENTOSA_07_06_2020-EX-99.1-JOINT FILING AGREEMENT.PDF,Joint Venture _ Filing,test
+CYBERIANOUTPOSTINC_07_09_1998-EX-10.13-PROMOTION AGREEMENT.PDF,Promotion,test
+KINGPHARMACEUTICALSINC_08_09_2006-EX-10.1-PROMOTION AGREEMENT.PDF,Promotion,train
+"KNOWLABS,INC_08_15_2005-EX-10-INTELLECTUAL PROPERTY AGREEMENT.PDF",IP,test
+INGEVITYCORP_05_16_2016-EX-10.5-INTELLECTUAL PROPERTY AGREEMENT.PDF,IP,train
+"BABCOCK_WILCOXENTERPRISES,INC_08_04_2015-EX-10.17-INTELLECTUAL PROPERTY AGREEMENT between THE BABCOCK _ WILCOX COMPANY and BABCOCK _ WILCOX ENTERPRISES, INC..PDF",IP,train
+PcquoteComInc_19990721_S-1A_EX-10.11_6377149_EX-10.11_Co-Branding Agreement2.pdf,Co_Branding,train
+PcquoteComInc_19990721_S-1A_EX-10.11_6377149_EX-10.11_Co-Branding Agreement3.pdf,Co_Branding,train
+PcquoteComInc_19990721_S-1A_EX-10.11_6377149_EX-10.11_Co-Branding Agreement1.pdf,Co_Branding,test
+SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement2.pdf,Franchise,train
+SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement3.pdf,Franchise,train
+SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement1.pdf,Franchise,test
+SoupmanInc_20150814_8-K_EX-10.1_9230148_EX-10.1_Franchise Agreement4.pdf,Franchise,train
+FEDERATEDGOVERNMENTINCOMESECURITIESINC_04_28_2020-EX-99.SERV AGREE-SERVICES AGREEMENT.PDF,Service,train
+FEDERATEDGOVERNMENTINCOMESECURITIESINC_04_28_2020-EX-99.SERV AGREE-SERVICES AGREEMENT_SECONDAMENDMENT.pdf,Service,train
+FEDERATEDGOVERNMENTINCOMESECURITIESINC_04_28_2020-EX-99.SERV AGREE-SERVICES AGREEMENT_POWEROF.pdf,Service,train
+FEDERATEDGOVERNMENTINCOMESECURITIESINC_04_28_2020-EX-99.SERV AGREE-SERVICES AGREEMENT_AMENDMENT.pdf,Service,train
+WESTERN COPPER - NON-COMPETITION AGREEMENT.PDF,Non_Compete_Non_Solicit,train
+"INNOVIVA,INC_08_07_2014-EX-10.1-COLLABORATION AGREEMENT.PDF",Collaboration,train
+"FOUNDATIONMEDICINE,INC_02_02_2015-EX-10.2-Collaboration Agreement.PDF",Collaboration,test
+"NOVOINTEGRATEDSCIENCES,INC_12_23_2019-EX-10.1-JOINT VENTURE AGREEMENT.PDF",Joint Venture,train
+"TRANSPHORM,INC_02_14_2020-EX-10.12(1)-JOINT VENTURE AGREEMENT.PDF",Joint Venture,train
+VALENCETECHNOLOGYINC_02_14_2003-EX-10-JOINT VENTURE CONTRACT.PDF,Joint Venture,train
+"VIVINT SOLAR, INC. - NON-COMPETITION AGREEMENT.PDF",Non_Compete_Non_Solicit,train
+Quaker Chemical Corporation - NON COMPETITION AND NON SOLICITATION AGREEMENT.PDF,Non_Compete_Non_Solicit,test
+MOELIS&CO_03_24_2014-EX-10.19-STRATEGIC ALLIANCE AGREEMENT.PDF,,test
+ENERGOUSCORP_03_16_2017-EX-10.24-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,test
+"BORROWMONEYCOM,INC_06_11_2020-EX-10.1-JOINT VENTURE AGREEMENT.PDF",Joint Venture,train
+"VEONEER,INC_02_21_2020-EX-10.11-JOINT VENTURE AGREEMENT.PDF",Joint Venture,train
+"KIROMICBIOPHARMA,INC_04_08_2020-EX-10.28-JOINT VENTURE AGREEMENT.PDF",Joint Venture,train
+IMPCOTECHNOLOGIESINC_04_15_2003-EX-10.65-JOINT VENTURE AGREEMENT.PDF,Joint Venture,train
+GULFSOUTHMEDICALSUPPLYINC_12_24_1997-EX-4-AFFILIATE AGREEMENT.PDF,Affiliate Agreement,test
+AFSALABANCORPINC_08_01_1996-EX-1.1-AGENCY AGREEMENT.PDF,Agency Agreements,test
+ALAMOGORDOFINANCIALCORP_12_16_1999-EX-1-AGENCY AGREEMENT.PDF,Agency Agreements,train
+ALCOSTORESINC_12_14_2005-EX-10.26-AGENCY AGREEMENT.PDF,Agency Agreements,test
+ALLIANCEBANCORPINCOFPENNSYLVANIA_10_18_2006-EX-1.2-AGENCY AGREEMENT.PDF,Agency Agreements,train
+AMERICANPHYSICIANSCAPITALINC_03_31_2003-EX-10.26-AGENCY AGREEMENT.PDF,Agency Agreements,test
+BANUESTRAFINANCIALCORP_09_08_2006-EX-10.16-AGENCY AGREEMENT.PDF,Agency Agreements,train
+BIOPURECORP_06_30_1999-EX-10.13-AGENCY AGREEMENT.PDF,Agency Agreements,test
+"BLUEHILLSBANCORP,INC_05_20_2014-EX-1.1-AGENCY AGREEMENT.PDF",Agency Agreements,test
+"BLUEROCKRESIDENTIALGROWTHREIT,INC_06_01_2016-EX-1.1-AGENCY AGREEMENT.PDF",Agency Agreements,test
+AURASYSTEMSINC_06_16_2010-EX-10.25-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement.PDF,Strategic Alliance,train
+ADAPTIMMUNETHERAPEUTICSPLC_04_06_2017-EX-10.11-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,test
+"COOLTECHNOLOGIES,INC_10_25_2017-EX-10.71-Strategic Alliance Agreement.PDF",Strategic Alliance,train
+"DUOSTECHNOLOGIESGROUP,INC_04_21_2009-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+ENTRUSTINC_07_24_1998-EX-10.5-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+"FTENETWORKS,INC_02_18_2016-EX-99.4-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,test
+"GIGGLESN_HUGS,INC_06_23_2016-EX-10.2-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+GOLDRESOURCECORP_12_11_2008-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+ICORECONNECTINC_10_13_2010-EX-7.1-Strategic Alliance Agreement.PDF,Strategic Alliance,train
+"INTELLIGENTHIGHWAYSOLUTIONS,INC_01_18_2018-EX-10.1-Strategic Alliance Agreement.PDF",Strategic Alliance,train
+INTRICONCORP_03_10_2009-EX-10.22-Strategic Alliance Agreement.PDF,Strategic Alliance,train
+"IOVANCEBIOTHERAPEUTICS,INC_08_03_2017-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,test
+LIGHTBRIDGECORP_11_23_2015-EX-10.26-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+MANAKOASERVICESCORP_11_21_2007-EX-7.5-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+ORBSATCORP_08_17_2007-EX-7.3-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,test
+PHLVARIABLEINSURANCECOCT_08_17_2009-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,test
+"PHREESIA,INC_05_28_2019-EX-10.18-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,test
+REWALKROBOTICSLTD_07_10_2014-EX-10.2-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+KALLOINC_11_03_2011-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.PDF',Strategic Alliance,test
+"ROCKYMOUNTAINCHOCOLATEFACTORY,INC_12_23_2019-EX-10.2-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+"SUCAMPOPHARMACEUTICALS,INC_11_04_2015-EX-10.2-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+"TURNKEYCAPITAL,INC_07_20_2017-EX-1.1-Strategic Alliance Agreement.PDF",Strategic Alliance,test
+USASYNTHETICFUELCORP_10_21_2010-EX-10.10-STRATEGIC ALLIANCE AGREEMENT.PDF,Strategic Alliance,train
+"WASTE2ENERGYHOLDINGS,INC_06_03_2010-EX-10.2-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+"VIRTUALSCOPICS,INC_11_12_2010-EX-10.1-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+"XLITECHNOLOGIES,INC_12_02_2015-EX-10.02-STRATEGIC ALLIANCE AGREEMENT.PDF",Strategic Alliance,train
+ANIXABIOSCIENCESINC_06_09_2020-EX-10.1-COLLABORATION AGREEMENT.PDF,Collaboration,train
+BIOCEPTINC_08_19_2013-EX-10-COLLABORATION AGREEMENT.PDF,Collaboration,train
+"CARDAX,INC_08_19_2014-EX-10.1-COLLABORATION AGREEMENT.PDF",Collaboration,train
+CHEETAHMOBILEINC_04_22_2014-EX-10.43-Cooperation Agreement.PDF,Collaboration,train
+"ELFBEAUTY,INC_07_02_2020-EX-10.1-COOPERATION AGREEMENT.PDF",Collaboration,train
+FIBROGENINC_10_01_2014-EX-10.11-COLLABORATION AGREEMENT.PDF,Collaboration,test
+"HC2HOLDINGS,INC_05_14_2020-EX-10.1-COOPERATION AGREEMENT.PDF",Collaboration,train
+HPILHOLDING_01_07_2015-EX-99.1-COOPERATION AGREEMENT.PDF,Collaboration,train
+LEJUHOLDINGSLTD_03_12_2014-EX-10.34-INTERNET CHANNEL COOPERATION AGREEMENT.PDF,Collaboration,train
+"MEETGROUP,INC_06_29_2017-EX-10.1-COOPERATION AGREEMENT.PDF",Collaboration,train
+QIWI_06_16_2017-EX-99.(D)(2)-COOPERATION AGREEMENT.PDF,Collaboration,test
+"SPIENERGYCO,LTD_07_10_2014-EX-10-Cooperation Agreement of 50MWp Photovoltaic Grid-connected Power Generation Project in Yangqiao of~1.PDF",Collaboration,train
+"SPOKHOLDINGS,INC_06_19_2020-EX-10.1-COOPERATION AGREEMENT.PDF",Collaboration,train
+STWRESOURCESHOLDINGCORP_08_06_2014-EX-10.1-COOPERATION AGREEMENT.PDF,Collaboration,train
+URSCORPNEW_03_17_2014-EX-99-COOPERATION AGREEMENT.PDF,Collaboration,train
+"CERES,INC_01_25_2012-EX-10.20-Collaboration Agreement.PDF",Collaboration,test
+"FIDELITYNATIONALINFORMATIONSERVICES,INC_08_05_2009-EX-10.3-INTELLECTUAL PROPERTY AGREEMENT.PDF",IP,train
+"ARMSTRONGFLOORING,INC_01_07_2019-EX-10.2-INTELLECTUAL PROPERTY AGREEMENT.PDF",IP,test
+"GSITECHNOLOGYINC_11_16_2009-EX-10.2-INTELLECTUAL PROPERTY AGREEMENT between SONY ELECTRONICS INC. and GSI TECHNOLOGY, INC..PDF",IP,test
+"HERTZGLOBALHOLDINGS,INC_07_07_2016-EX-10.4-INTELLECTUAL PROPERTY AGREEMENT.PDF",IP,train
+JINGWEIINTERNATIONALLTD_10_04_2007-EX-10.7-INTELLECTUAL PROPERTY AGREEMENT.PDF,IP,train
+MSCIINC_02_28_2008-EX-10.10-.PDF,IP,train
+"OTISWORLDWIDECORP_04_03_2020-EX-10.4-INTELLECTUAL PROPERTY AGREEMENT by and among UNITED TECHNOLOGIES CORPORATION, OTIS WORLDWIDE CORPORATION and CARRIER ~1.PDF",IP,train
+VERSOTECHNOLOGIESINC_12_28_2007-EX-99.3-INTELLECTUAL PROPERTY AGREEMENT.PDF,IP,train
+ZEBRATECHNOLOGIESCORP_04_16_2014-EX-10.1-INTELLECTUAL PROPERTY AGREEMENT.PDF,IP,train
+AIRSPANNETWORKSINC_04_11_2000-EX-10.5-Distributor Agreement.PDF,Distributor,train
+ACCURAYINC_09_01_2010-EX-10.31-DISTRIBUTOR AGREEMENT.PDF,Distributor,test
+BLACKBOXSTOCKSINC_08_05_2014-EX-10.1-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+ENTERTAINMENTGAMINGASIAINC_02_15_2005-EX-10.5-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+"ETELOS,INC_03_09_2004-EX-10.8-DISTRIBUTOR AGREEMENT.PDF",Distributor,train
+EUROPEANMICROHOLDINGSINC_03_06_1998-EX-10.6-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+HYPERIONSOFTWARECORP_09_28_1994-EX-10.47-EXCLUSIVE DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+"LEGACYTECHNOLOGYHOLDINGS,INC_12_09_2005-EX-10.2-DISTRIBUTOR AGREEMENT.PDF",Distributor,train
+LUCIDINC_04_15_2011-EX-10.9-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+LIMEENERGYCO_09_09_1999-EX-10-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+NEOMEDIATECHNOLOGIESINC_12_15_2005-EX-16.1-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+NANOPHASETECHNOLOGIESCORP_11_01_2005-EX-99.1-DISTRIBUTOR AGREEMENT.PDF,Distributor,train
+"OPTIMIZEDTRANSPORTATIONMANAGEMENT,INC_07_26_2000-EX-6.6-DISTRIBUTOR AGREEMENT.PDF",Distributor,test
+"VISIUMTECHNOLOGIES,INC_10_20_2004-EX-10.20-DISTRIBUTOR AGREEMENT.PDF",Distributor,train
+ENERGYXXILTD_05_08_2015-EX-10.13-Transportation AGREEMENT.PDF,Transportation,test
+ENTERPRISEPRODUCTSPARTNERSLP_07_08_1998-EX-10.3-TRANSPORTATION CONTRACT.PDF,Transportation,train
+MARTINMIDSTREAMPARTNERSLP_01_23_2004-EX-10.3-TRANSPORTATION SERVICES AGREEMENT.PDF,Transportation,train
+ADAMSGOLFINC_03_21_2005-EX-10.17-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+AMBASSADOREYEWEARGROUPINC_11_17_1997-EX-10.28-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+HOLIDAYRVSUPERSTORESINC_04_15_2002-EX-10.13-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+"MARSHALLHOLDINGSINTERNATIONAL,INC_04_14_2004-EX-10.15-ENDORSEMENT AGREEMENT.PDF",Endorsement Agreement,train
+MOVADOGROUPINC_04_30_2003-EX-10.28-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+MOSSIMOINC_04_14_2000-EX-10.14-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+SPORTHALEYINC_09_29_1997-EX-10.2-10-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+TEARDROPGOLFCO_10_23_1996-EX-10.12-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+WARNINGMANAGEMENTSERVICESINC_12_10_1999-EX-10-ENDORSEMENT AGREEMENT.PDF,Endorsement Agreement,train
+"Array BioPharma Inc. - LICENSE, DEVELOPMENT AND COMMERCIALIZATION AGREEMENT.PDF",Development,train
+Microgenics Corporation - Collaborative Development and Commercialization Agreement.PDF,Development,train
+WARNERCHILCOTTPLC_12_31_2003-EX-4.36-DEVELOPMENT AGREEMENT.PDF,Development,train
+TRUENORTHENERGYCORP_02_08_2007-EX-10.1-DEVELOPMENT AGREEMENT.PDF,Development,train
+AIRTECHINTERNATIONALGROUPINC_05_08_2000-EX-10.4-FRANCHISE AGREEMENT.PDF,Franchise,train
+"HOSPITALITYINVESTORSTRUST,INC_04_07_2014-EX-10.26-FRANCHISE AGREEMENT.PDF",Franchise,train
+INTERNATIONALFASTFOODCORP_04_04_1997-EX-99-FRANCHISE AGREEMENT.PDF,Franchise,train
+"GOOSEHEADINSURANCE,INC_04_02_2018-EX-10.6-Franchise Agreement.PDF",Franchise,train
+JOINTCORP_09_19_2014-EX-10.15-FRANCHISE AGREEMENT.PDF,Franchise,test
+AMERICASSHOPPINGMALLINC_12_10_1999-EX-10.2-SITE DEVELOPMENT AND HOSTING AGREEMENT.PDF,Hosting,train
+BLUEFLYINC_03_27_2002-EX-10.27-e-business Hosting Agreement.PDF,Hosting,train
+BEYONDCOMCORP_08_03_2000-EX-10.2-CO-HOSTING AGREEMENT.PDF,Hosting,train
+BNCMORTGAGEINC_05_17_1999-EX-10.4-LICENSING AND WEB SITE HOSTING AGREEMENT.PDF,Hosting,train
+BOLIVARMININGCORP_05_23_2003-EX-2.1-VISP WEB SITE BUILDING AND HOSTING AGREEMENT.PDF,Hosting,train
+CORIOINC_07_20_2000-EX-10.5-LICENSE AND HOSTING AGREEMENT.PDF,Hosting,test
+CHANGEPOINTCORP_03_08_2000-EX-10.6-LICENSE AND HOSTING AGREEMENT.PDF,Hosting,train
+GALACTICOMMTECHNOLOGIESINC_11_07_1997-EX-10.46-WEB HOSTING AGREEMENT.PDF,Hosting,train
+INKTOMICORP_06_08_1998-EX-10.14-SOFTWARE HOSTING AGREEMENT.PDF,Hosting,train
+"ADMA BioManufacturing, LLC -  Amendment #3 to Manufacturing Agreement .PDF",Manufacturing,train
+"Antares Pharma, Inc. - Manufacturing Agreement.PDF",Manufacturing,train
+Apollo Endosurgery - Manufacturing and Supply Agreement.PDF,Manufacturing,train
+Cerus Corporation - FIRST AMEND TO SUPPLY AND MANUFACTURING AGREEMENT.PDF,Manufacturing,train
+"Columbia Laboratories, (Bermuda) Ltd. - AMEND NO. 2 TO MANUFACTURING AND SUPPLY AGREEMENT.PDF",Manufacturing,train
+ELECTRAMECCANICA VEHICLES CORP. - Manufacturing Agreement .PDF,Manufacturing,train
+"Magenta Therapeutics, Inc. - Master Development and Manufacturing Agreement.PDF",Manufacturing,test
+"Sonos, Inc. - Manufacturing Agreement .PDF",Manufacturing,train
+"VAPOTHERM, INC. - Manufacturing and Supply Agreement.PDF",Manufacturing,train
+"ON2TECHNOLOGIES,INC_11_17_2006-EX-10.3-SUPPORT AND MAINTENANCE AGREEMENT.PDF",Maintenance,test
+PRIMEENERGYRESOURCESCORP_04_02_2007-EX-10.28-COMPLETION AND LIQUIDITY MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SECURIANFUNDSTRUST_05_01_2012-EX-99.28.H.9-NET INVESTMENT INCOME MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SANDRIDGEENERGYINC_08_06_2009-EX-10.6-OPERATIONS AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SEPARATEACCOUNTIIOFAGL_05_02_2011-EX-99.(J)(4)-UNCONDITIONAL CAPITAL MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SLOVAKWIRELESSFINANCECOBV_03_28_2001-EX-4.(B)(II).3-Maintenance and support contract for SICAP(R) modules.PDF,Maintenance,train
+SFGFINANCIALCORP_05_12_2009-EX-10.1-SOFTWARE LICENSE AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SPARKLINGSPRINGWATERHOLDINGSLTD_07_03_2002-EX-10.13-SOFTWARE LICENSE AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SMITHELECTRICVEHICLESCORP_04_04_2012-EX-10.26-FLEET MAINTENANCE AGREEMENT.PDF,Maintenance,test
+"SPIENERGYCO,LTD_03_09_2011-EX-99.5-OPERATIONS AND MAINTENANCE AGREEMENT.PDF",Maintenance,test
+STARTECGLOBALCOMMUNICATIONSCORP_11_16_1998-EX-10.30-CONSTRUCTION AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SUNTRONCORP_05_17_2006-EX-10.22-MAINTENANCE AGREEMENT.PDF,Maintenance,train
+SUMMAFOURINC_06_19_1998-EX-10.3-SOFTWARE LICENSE AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+TELEGLOBEINTERNATIONALHOLDINGSLTD_03_29_2004-EX-10.10-CONSTRUCTION AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+TELKOMSALTD_01_30_2003-EX-10-LICENCE AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+TRIZETTOGROUPINC_08_18_1999-EX-10.17-TECHNICAL INFRASTRUCTURE MAINTENANCE AGREEMENT.PDF,Maintenance,train
+UAGHINC_04_14_2004-EX-10.18-MAINTENANCE AGREEMENT.PDF,Maintenance,train
+VARIABLESEPARATEACCOUNT_04_30_2014-EX-13.C-UNCONDITIONAL CAPITAL MAINTENANCE AGREEMENT.PDF,Maintenance,train
+VERTEXENERGYINC_08_14_2014-EX-10.24-OPERATION AND MAINTENANCE AGREEMENT.PDF,Maintenance,test
+VERTICALNETINC_04_01_2002-EX-10.19-MAINTENANCE AND SUPPORT AGREEMENT.PDF,Maintenance,test
+ZONDWINDSYSTEMPARTNERSLTDSERIES85-B_04_03_2006-EX-10-MANAGEMENT AND MAINTENANCE AGREEMENT.PDF,Maintenance,train
+"GWG HOLDINGS, INC. - ORDERLY MARKETING AGREEMENT.PDF",Marketing,train
+"HEMISPHERX - Sales, Marketing, Distribution, and Supply Agreement.PDF",Supply,test
+Monsanto Company - SECOND A&R EXCLUSIVE AGENCY AND MARKETING AGREEMENT .PDF,,train
+LECLANCHÉ S.A. - JOINT DEVELOPMENT AND MARKETING AGREEMENT.PDF,,train
+"Loop Industries, Inc. - Marketing Agreement.PDF",Marketing,train
+NUVEEN - REMARKETING AGREEMENT.PDF,Marketing,test
+"MetLife, Inc. - Remarketing Agreement.PDF",Marketing,train
+"PACIRA PHARMACEUTICALS, INC. - A&R STRATEGIC LICENSING, DISTRIBUTION AND MARKETING AGREEMENT .PDF",,train
+Principal Life Insurance Company - Broker Dealer Marketing and Servicing Agreement .PDF,Marketing,test
+"Reinsurance Group of America, Incorporated - A&R REMARKETING  AGREEMENT.PDF",,train
+"SightLife Surgical, Inc. - STRATEGIC SALES & MARKETING AGREEMENT.PDF",,train
+"Zounds Hearing, Inc. - MANUFACTURING DESIGN MARKETING AGREEMENT.PDF",Marketing,test
+NATIONALPROCESSINGINC_07_18_1996-EX-10.4-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+PACIFICSYSTEMSCONTROLTECHNOLOGYINC_08_24_2000-EX-10.53-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+PROLONGINTERNATIONALCORP_03_23_1998-EX-10.16-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+NETGROCERINC_07_31_1998-EX-10.15-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+SONUSCORP_03_12_1997-EX-10.11-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+RUBIOSRESTAURANTSINC_03_31_2008-EX-10.75-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+TICKETSCOMINC_06_22_1999-EX-10.22-SPONSORSHIP AGREEMENT.PDF,Sponsorship,train
+"VNUE,INC_07_10_2015-EX-10.1-SPONSORSHIP AGREEMENT.PDF",Sponsorship,train
+"ADIANUTRITION,INC_04_01_2005-EX-10.D2-RESELLER AGREEMENT.PDF",Reseller,test
+DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT.PDF,Reseller,test
+WORLDWIDESTRATEGIESINC_11_02_2005-EX-10-RESELLER AGREEMENT.PDF,Reseller,test
+"BELLRINGBRANDS,INC_02_07_2020-EX-10.18-MASTER SUPPLY AGREEMENT.PDF",Supply,test
+BIOFRONTERAAG_04_29_2019-EX-4.17-SUPPLY AGREEMENT.PDF,Supply,test
+FUSIONPHARMACEUTICALSINC_06_05_2020-EX-10.17-Supply Agreement - FUSION.PDF,Supply,test
+"INTERSECTENT,INC_05_11_2020-EX-10.1-SUPPLY AGREEMENT.PDF",Supply,train
+ULTRAGENYXPHARMACEUTICALINC_12_23_2013-EX-10.9-SUPPLY AGREEMENT.PDF,Supply,train
+"VAXCYTE,INC_05_22_2020-EX-10.19-SUPPLY AGREEMENT.PDF",Supply,train
+VERICELCORP_08_06_2019-EX-10.10-SUPPLY AGREEMENT.PDF,Supply,train
+HEALTHGATEDATACORP_11_24_1999-EX-10.1-HOSTING AND MANAGEMENT AGREEMENT - Escrow Agreement.pdf,Hosting,train
+BIOAMBERINC_04_10_2013-EX-10.34-DEVELOPMENT AGREEMENT - First Amendment.pdf,Development,train
+HEALTHGATEDATACORP_11_24_1999-EX-10.1-HOSTING AND MANAGEMENT AGREEMENT (1).pdf,Hosting,train
+BIOAMBERINC_04_10_2013-EX-10.34-DEVELOPMENT AGREEMENT (1).pdf,Development,test
+"NETGEAR,INC_04_21_2003-EX-10.16-AMENDMENT TO THE DISTRIBUTOR AGREEMENT BETWEEN INGRAM MICRO AND NETGEAR-.pdf",Distributor,test
+"NETGEAR,INC_04_21_2003-EX-10.16-DISTRIBUTOR AGREEMENT.pdf",Distributor,test
+"NETGEAR,INC_04_21_2003-EX-10.16- AMENDMENT #2 TO THE DISTRIBUTION AGREEMENT.pdf",Distributor,train
+NEONSYSTEMSINC_03_01_1999-EX-10.5-DISTRIBUTOR AGREEMENT_Amendment.pdf,Distributor,train
+NEONSYSTEMSINC_03_01_1999-EX-10.5-DISTRIBUTOR AGREEMENT_New.pdf,Distributor,train
+WOMENSGOLFUNLIMITEDINC_03_29_2000-EX-10.13-ENDORSEMENT AGREEMENT.PDF,Endorsement,train
+WOMENSGOLFUNLIMITEDINC_03_29_2000-EX-10.13-ENDORSEMENT AGREEMENT - Intellectual Property Rights                 Confidentiality and Non-Use Obligations Agreement.pdf,Endorsement,train
+"KUBIENT,INC_07_02_2020-EX-10.14-MASTER SERVICES AGREEMENT_Part2.pdf",Service,train
+"KUBIENT,INC_07_02_2020-EX-10.14-MASTER SERVICES AGREEMENT_Part1.pdf",Service,train

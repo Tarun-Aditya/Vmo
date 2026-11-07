@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>My security</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F2EE;color:#1B1F24;font-family:'Instrument Sans',system-ui,sans-serif;font-size:14px;line-height:1.45}
+*{box-sizing:border-box}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.rail{width:208px;flex:0 0 208px;background:#1B1F24;color:#C9CDD2;padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+.rail a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:#C9CDD2;text-decoration:none;min-height:44px}
+.rail a.on{background:#2A3038;color:#fff}
+.rail a:hover{background:#2A3038}
+.rail svg{width:18px;height:18px;flex:none}
+.main{flex:999 1 640px;min-width:0;padding:20px 32px 40px}
+.serif{font-family:'Newsreader',Georgia,serif}
+.card{background:#fff;border:1px solid #E4E0D8;border-radius:12px;padding:20px}
+.mute{color:#5E6670}
+.num{font-variant-numeric:tabular-nums}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 8px;border-radius:999px;font-size:12px;font-weight:600;line-height:20px}
+.chip svg{width:10px;height:10px}
+.crit{background:#FBE4E1;color:#8E1B10}.high{background:#FDE9D4;color:#8A3A05}.med{background:#F8EEC2;color:#6B5400}.low{background:#E8EBEF;color:#3A4350}.ok{background:#DCEFEA;color:#0A5247}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #D5D0C6;background:#fff;color:#1B1F24;font:inherit;font-weight:600;cursor:pointer}
+.btn.p{background:#0E6B5E;border-color:#0E6B5E;color:#fff}
+.lab{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#5E6670;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;padding:8px 10px;border-bottom:1px solid #D5D0C6;color:#5E6670;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:10px;border-bottom:1px solid #EEEAE2}
+.code{background:#1B1F24;color:#DDE3EA;border-radius:10px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;white-space:pre}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E4E0D8;margin-bottom:20px}.tabs a{padding:10px 14px;text-decoration:none;color:#5E6670;font-weight:600;border-bottom:3px solid transparent}.tabs a.on{color:#1B1F24;border-color:#0E6B5E}.sim{background:#EDE7F6;color:#4A2C86}
+.mx td,.mx th{padding:6px 4px;text-align:center;border-bottom:1px solid #EEEAE2}.sim{background:#EDE7F6;color:#4A2C86}
+.inp{border:1px solid #D5D0C6;border-radius:10px;padding:10px 12px;min-height:44px;background:#fff;display:flex;align-items:center}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E4E0D8;margin-bottom:20px}
+.tabs a{padding:10px 14px;text-decoration:none;color:#5E6670;font-weight:600;border-bottom:3px solid transparent}
+.tabs a.on{color:#1B1F24;border-color:#0E6B5E}
+.g{display:grid;gap:16px}.wrap{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.tog{display:inline-block;width:40px;height:22px;border-radius:11px;background:#0E6B5E;position:relative;vertical-align:middle}.tog:after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}.tog.off{background:#C9C4B8}.tog.off:after{right:auto;left:3px}
+.bar{height:10px;border-radius:5px;background:#0E6B5E}
+</style>
+</helmet>
+<div class="app"><nav class="rail" aria-label="Main"><div style="display:flex;align-items:center;gap:10px;padding:4px 12px 16px;color:#fff;font-weight:600;font-size:16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5FD3C0" stroke-width="2" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M9 13l2 2 4-4"/></svg>ContractIQ</div><a href="Main.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Portfolio</a><a href="Map.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="12" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7l8 4M8 17l8-4"/></svg>Portfolio map</a><a class="on" href="Contracts.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Contracts</a><a href="Vendors.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6"/><path d="M16 5a3 3 0 010 6M18 14c2 1 3 3 3 6"/></svg>Vendors</a><a href="Clauses.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg>Key clauses</a><a href="Ask.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Ask</a><a href="Review.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/></svg>Review</a><a href="Templates.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>Templates</a><a href="Obligations.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12l4 4 10-10"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>Obligations</a><a href="Spend.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Spend</a><a href="Risk.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l8 4v5c0 4-3 7-8 9-5-2-8-5-8-9V7z"/></svg>Risk</a><a href="Alerts.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4z"/><path d="M10 21h4"/></svg>Alerts</a><div style="flex:1"></div><a href="System.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>Admin</a><div style="margin:8px 12px 0;padding:10px 12px;border-radius:10px;background:#2A3038;font-size:12px;color:#C9CDD2"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#F2B544;margin-right:6px"></span><b style="color:#fff">Demo mode</b><br>No Claude. Simulated systems.</div></nav><main class="main"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:flex-end;margin-bottom:14px" class="mute"><span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0E6B5E;margin-right:6px"></span>Synced 4 min ago · next in 26 min</span><span class="chip sim">Demo · no Claude</span><button class="btn" style="min-height:36px">☾ Dark</button><span style="width:36px;height:36px;border-radius:50%;background:#DCEFEA;color:#0E6B5E;display:grid;place-items:center;font-weight:600">PN</span></div><header style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:20px"><div><h1 class="serif" style="margin:0 0 4px;font-size:34px;font-weight:400">My security</h1><span class="mute">Protect your account</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"></div></header><div class="wrap"><div style="flex:1 1 440px;min-width:0"><section class="card" style=""><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:12px"><h2 style="margin:0;font-size:18px">Two-factor authentication</h2></div><div style="margin-bottom:10px"><span class="chip ok"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 5l3 3 5-6" stroke="currentColor" stroke-width="2" fill="none"/></svg>On</span> <span class="mute">since 2 Nov</span></div><ol class="mute" style="padding-left:18px;line-height:1.9;margin:0 0 14px"><li>Scan the QR code with an authenticator app</li><li>Enter the 6-digit code it shows</li><li>Save your 8 recovery codes somewhere safe</li></ol><div style="display:flex;gap:16px;flex-wrap:wrap"><div style="width:120px;height:120px;border:1px solid #D5D0C6;border-radius:10px;display:grid;place-items:center" class="mute">QR</div><div style="flex:1 1 200px"><div style="flex:1 1 auto"><div class="lab" style="margin-bottom:4px">Confirmation code</div><div class="inp">123 456</div></div><div style="margin-top:10px"><button class="btn p">Confirm</button></div></div></div></section></div><div style="flex:1 1 360px;min-width:0"><section class="card" style=""><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:12px"><h2 style="margin:0;font-size:18px">Switch off</h2></div><div style="flex:1 1 auto"><div class="lab" style="margin-bottom:4px">Code to switch off</div><div class="inp">6-digit code</div></div><div style="margin-top:10px"><button class="btn">Switch off (needs a current code)</button></div></section></div></div></main></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":720}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

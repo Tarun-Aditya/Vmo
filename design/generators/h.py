@@ -1,0 +1,66 @@
+from lib import *
+import re, json
+tog=lambda on=True:'<span class="tog%s"></span>'%('' if on else ' off')
+sel=lambda t,w='1 1 160px': inp(t+' <span class="mute" style="margin-left:auto">▾</span>',w)
+# ---------- Ask: history, scope, reasoning
+p=ROOT+'Ask.dc.html'; s=open(p).read()
+if 'Conversation history' not in s:
+    m=re.search(r'<main class="main">(.*?)</main>',s,re.S); inner=m.group(1)
+    hist=('<aside aria-label="Conversation history" style="flex:0 0 280px;width:280px;display:flex;flex-direction:column;gap:12px">'+btn('+ New chat',True)+inp('Search conversations…')+'<div class="lab">Today</div>'+
+      ''.join(f'<div style="padding:10px 12px;border-radius:10px;{"background:#fff;border:1px solid #0E6B5E;" if i==0 else "border:1px solid transparent;"}font-size:13px"><b>{t}</b><div class="mute" style="font-size:12px">{w}</div></div>' for i,(t,w) in enumerate([('SaaS vendors with personal data and no DPA','11:42 · 5 steps'),('Which contracts renew in 60 days?','10:15 · 4 steps'),('Compare Helio and Northwind liability','09:02 · 6 steps')]))+
+      '<div class="lab" style="margin-top:6px">Earlier</div><div class="mute" style="font-size:13px;padding:0 12px">Top 5 vendors by value · Uncapped liability list · 3 more</div></aside>')
+    scope=('<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px;padding:12px 14px;background:#fff;border:1px solid #E4E0D8;border-radius:12px"><span class="lab">Question scope</span>'+sel('Scope: whole portfolio','0 1 230px')+inp('Search documents…','1 1 220px')+'<span class="chip low">Northwind MSA ✕</span><span class="chip low">Helio SaaS ✕</span><span style="margin-left:auto;display:flex;gap:8px;align-items:center" class="mute">'+tog()+' Show model reasoning</span></div>')
+    s=s.replace(m.group(0),'<main class="main"><div style="display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start">'+hist+'<div style="flex:1 1 640px;min-width:0">'+scope+inner+'</div></div></main>',1)
+    s=re.sub(r'"height":\d+\}','"height":1250}',s,count=1)
+    open(p,'w').write(s)
+# ---------- Dialogs board
+def dlg(title,body,foot,w=460):
+    return f'<div style="width:{w}px;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.25);padding:24px;display:flex;flex-direction:column;gap:14px"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:20px">{title}</h2><span class="mute" style="font-size:20px">✕</span></div>{body}<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">{foot}</div></div>'
+F=lambda l,v: fld(l,v,'1 1 auto')
+dlgs=[
+dlg('Share this draft',F('Link label (e.g. Vendor legal)','Helio legal')+'<div>'+lab('Link access')+'<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip low">View</span><span class="chip ok">Comment</span><span class="chip low">Edit</span></div></div>'+F('Expires in days','14')+'<div style="background:#F4F2EE;border-radius:10px;padding:10px 12px;font-size:13px"><b>shr_9Xk2…</b> copy it now; it is not shown again.</div><div class="lab">Active links</div>'+tbl(['Label','Access','Uses',''],[('Helio legal','Comment','3','Revoke'),('Finance','View','1','Revoke')]),btn('Close')+btn('Create link',True)),
+dlg('Send for signature',F('Signature provider','ContractIQ (click to sign) or DocuSign')+'<div class="lab">Signers, in order</div>'+tbl(['#','Name','E-mail'],[('1','Meera Joshi','meera@arcadia.example'),('2','Vera Kapoor','vera@helio.example')])+'<div class="mute" style="font-size:13px">A certificate is attached when the last signer finishes. The signed copy is read by the pipeline as an executed contract.</div>',btn('Cancel')+btn('Send',True)),
+dlg('Approval decision',F('Decision comment','Approved subject to Finance sign-off.')+'<div class="mute" style="font-size:13px">Step 2 of 3 · Finance · reminder after 3 days</div>',btn('Request changes')+btn('Reject')+btn('Approve',True)),
+dlg('Correct a field',F('Field','Governing law')+F('Value found','Delaware (confidence 58%)')+F('Correct value','England and Wales')+'<div class="mute" style="font-size:13px">Corrections are kept when the document is read again and count towards the quality report.</div>',btn('Cancel')+btn('Save correction',True)),
+dlg('Version note',F('What changed? (optional)','Cap set at 2x; payment 45 days')+'<div class="mute" style="font-size:13px">Saves version 5. Earlier versions stay in the history.</div>',btn('Cancel')+btn('Save version',True)),
+dlg('Suggest a change',F('Selected text','Neither party is liable for indirect loss.')+F('Replace it with…','Neither party is liable for indirect or consequential loss.')+'<div class="mute" style="font-size:13px">Shown to the owner as a suggestion they can accept or reject.</div>',btn('Cancel')+btn('Send suggestion',True)),
+dlg('Comment thread',F('New comment','Can Legal propose a 2x cap?')+F('Assign to (e-mail)','asha@arcadia.example')+'<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip ok">All</span><span class="chip low">Open</span><span class="chip low">Assigned to me</span><span class="chip low">Resolved</span></div><div style="border-left:3px solid #0E6B5E;padding:6px 12px;background:#F4F2EE"><b>Rahul</b> Clause 12.1 is uncapped.<br><b>Asha</b> Drafting now. '+chip('ok','Resolve')+'</div>'+F('Reply…','Thanks, will review by Friday.'),btn('Cancel')+btn('Post',True)),
+dlg('Reset access',F('User','Asha Rao')+'<div class="mute" style="font-size:13px">Clears the lockout and switches off their two-factor so they can set it up again. This is written to the audit log.</div>',btn('Cancel')+btn('Reset',True)),
+]
+body='<div style="background:rgba(27,31,36,.55);min-height:100vh;padding:40px"><h1 class="serif" style="color:#fff;font-weight:400;margin:0 0 6px">Dialogs and panels</h1><p style="color:#E4E0D8;margin:0 0 24px">Used across Contract detail, Review, Editor and Admin. Shown here side by side.</p><div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">'+''.join(dlgs)+'</div></div>'
+page('Dialogs','Dialogs and panels','',body,1750,bare=True)
+# ---------- States board
+def st(title,icon,msg,act,tone=''):
+    return f'<div class="card" style="flex:1 1 300px;min-width:280px;text-align:center;padding:28px 20px"><div style="width:52px;height:52px;border-radius:50%;background:{tone or "#E8EBEF"};display:grid;place-items:center;margin:0 auto 12px;font-size:22px">{icon}</div><b style="font-size:16px">{title}</b><div class="mute" style="margin:6px 0 14px;font-size:13px">{msg}</div>{act}</div>'
+skel=lambda w:f'<div style="height:14px;border-radius:7px;background:linear-gradient(90deg,#ECE8DF,#F6F3EC,#ECE8DF);width:{w}%;margin:10px 0"></div>'
+body=head('States','Empty, loading, error, offline fallback and permission screens used across the app')+\
+'<div class="wrap">'+st('No contracts yet','▢','Connect a source or upload documents. The first run reads them in about a minute.',btn('Go to Data inputs',True,True))+\
+st('Reading documents…','…','3 of 12 files done. You can leave this page; the sync indicator shows progress.','<div style="height:8px;background:#ECE8DF;border-radius:4px"><div style="width:25%;height:8px;background:#0E6B5E;border-radius:4px"></div></div>')+\
+st('Couldn\'t answer that','!','The database query failed once and the retry did too. Your question is saved.',btn('Try again',True,True)+' '+btn('Show details',False,True),'#FBE4E1')+\
+st('You can\'t open this','⛔','Your role (Viewer) doesn\'t include Admin. Ask an administrator for access.',btn('Back to Portfolio',False,True),'#FDE9D4')+\
+st('This link is not valid any more','⏱','It may have expired or been revoked. Ask the sender for a new one.','', '#FDE9D4')+\
+st('Claude is paused','⏸','The usage limit was reached. Everything keeps working on the offline engine until it resets.',btn('Switch to Demo mode',False,True),'#F8EEC2')+'</div>'+\
+card('Loading a table',skel(90)+skel(75)+skel(82)+skel(60),'','margin-top:20px')+\
+card('No results after filtering',  '<div class="mute" style="text-align:center;padding:12px">No contracts match "Vendor: Helio, Status: Expired". '+btn('Clear filters',False,True)+'</div>','','margin-top:20px')+\
+card('Signed out for inactivity','<div class="mute" style="text-align:center;padding:12px">For your security you were signed out after 30 minutes. Your unsent comment is saved. '+btn('Sign in again',True,True)+'</div>','','margin-top:20px')
+page('States','States','',body,1250,bare=False)
+# ---------- Dark theme sample (portfolio home) – reuse helpers with dark overrides
+dk='''<style>
+.dk{background:#14171B;color:#E8EAED}.dk .card{background:#1D2228;border-color:#2C333B;color:#E8EAED}.dk .mute,.dk .lab{color:#A3ABB5}
+.dk .btn{background:#262C33;border-color:#3A424B;color:#E8EAED}.dk .btn.p{background:#2FA391;border-color:#2FA391;color:#0B1B18}
+.dk table th{color:#A3ABB5;border-color:#3A424B}.dk td{border-color:#2C333B}
+.dk .crit{background:#4A1D19;color:#FFB4AB}.dk .high{background:#4A2A10;color:#FFC794}.dk .med{background:#453A0A;color:#F4DD7A}.dk .low{background:#2E353D;color:#C9CED6}.dk .ok{background:#12372F;color:#8EE0CF}
+.dk .rail{background:#0E1114}.dk .inp{background:#1D2228;border-color:#3A424B;color:#E8EAED}
+</style>'''
+bd=head('Portfolio','Dark theme: same layout, same tokens, ground and ink swapped',btn('☀ Light')+btn('Export',False))+kpis(kpi('Contracts','32','27 executed'),kpi('Annual value','₹ 48.2 cr',''),kpi('Expiring in 90 days','8','₹ 11.9 cr','warn'),kpi('Uncapped liability','3','','crit'))+card('Decision queue',tbl(['Contract','Last day to act','Value',''],[('Northwind MSA',chip('crit','Passed 6 days ago'),'₹ 2.1 cr',btn('Negotiate exit',True,True)),('Helio SaaS',chip('crit','12 Nov'),'₹ 1.6 cr',btn('Send notice',True,True)),('Pinecrest SOW 2',chip('high','1 Jan'),'₹ 0.9 cr',btn('Review',False,True))]))
+dark=f'<div class="dk" style="min-height:100vh"><div class="app">{nav("Main").replace("Demo mode","Demo mode")}<main class="main">{topbar()}{bd}</main></div></div>'
+page('Dark','Dark theme','',dk+dark,900,bare=True)
+# ---------- Mobile (390 wide frames)
+def ph(inner): return f'<div style="width:390px;height:844px;background:#F4F2EE;border-radius:34px;border:8px solid #1B1F24;overflow:hidden;position:relative;display:flex;flex-direction:column;flex:none"><div style="padding:14px 18px 8px;display:flex;justify-content:space-between;align-items:center;background:#fff;border-bottom:1px solid #E4E0D8"><b style="color:#0E6B5E">ContractIQ</b><span class="chip sim">Demo</span></div><div style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:12px">{inner}</div><div style="display:flex;justify-content:space-around;background:#fff;border-top:1px solid #E4E0D8;padding:10px 0;font-size:11px" class="mute"><span><b style="color:#0E6B5E">Home</b></span><span>Contracts</span><span>Ask</span><span>Alerts</span><span>More</span></div></div>'
+c=lambda t,i:f'<div class="card" style="padding:14px"><b>{t}</b>{i}</div>'
+p1=ph('<div class="lab">Tue 10 Nov</div><div class="serif" style="font-size:24px;line-height:1.2">4 notice deadlines in the next 30 days. <span style="color:#0E6B5E">₹ 6.4 cr</span> renews unless you act.</div>'+c('Northwind MSA',f'<div class="mute" style="font-size:13px">{chip("crit","Notice passed 6 days ago")}</div><div style="margin-top:8px">'+btn('Negotiate exit',True,True)+'</div>')+c('Helio SaaS',f'<div class="mute" style="font-size:13px">{chip("crit","Last day 12 Nov")}</div><div style="margin-top:8px">'+btn('Send notice',True,True)+'</div>')+c('3 hierarchy problems','<div class="mute" style="font-size:13px">Open the portfolio map</div>'))
+p2=ph('<div class="mute" style="font-size:13px">Contracts › Northwind</div><div class="serif" style="font-size:22px">Master Services Agreement</div><div>'+chip('crit','Uncapped')+' '+chip('crit','Notice passed')+'</div>'+c('Liability cap','<div>Uncapped · 94%</div><div class="mute" style="font-size:13px">cl. 12.1, page 4 ›</div>')+c('Payment terms','<div>45 days · Amendment 1</div>')+c('Hierarchy','<div class="mute" style="font-size:13px">MSA › SOW 1, SOW 2 › Amendment 1</div>'))
+p3=ph('<div class="serif" style="font-size:22px">Ask</div><div style="align-self:flex-end;background:#1B1F24;color:#fff;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:13px">SaaS vendors with personal data and no DPA?</div>'+c('Working it out','<div class="mute" style="font-size:13px">1 Understand · 2 Plan · 3 Query · 4 Evidence · 5 Cross-check ✓</div>')+c('2 vendors, ₹ 1.9 cr','<table style="font-size:12px"><tr><td>Cobalt</td><td>₹ 1.2 cr</td></tr><tr><td>Lumen</td><td>₹ 0.7 cr</td></tr></table>')+'<div style="margin-top:auto;border:1px solid #D5D0C6;border-radius:12px;padding:10px 12px;background:#fff" class="mute">Ask a follow-up…</div>')
+body=f'<div style="padding:32px 40px;background:#E9E7E1;min-height:100vh"><h1 class="serif" style="margin:0 0 6px;font-weight:400">Phone layouts</h1><p class="mute" style="margin:0 0 24px">390 px wide. The sidebar becomes a bottom bar; tables become cards; every action stays a 44 px target.</p><div style="display:flex;gap:32px;flex-wrap:wrap">{p1}{p2}{p3}</div></div>'
+page('Mobile','Phone layouts','',body,980,bare=True)
+json.dump(BOARDS,open('boards_h.json','w'))

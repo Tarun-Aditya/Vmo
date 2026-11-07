@@ -50,7 +50,11 @@ def main() -> int:
     miss: list[dict] = []
     if "--vmo" in sys.argv:       # the CUAD agreement types closest to a VMO's world: services, maintenance, outsourcing, hosting, consulting, supply, transport
         want_dirs = ("service", "maintenance", "outsourcing", "hosting", "consulting", "supply", "transportation", "agency")
-        vmo = {f.stem for f in (root / "full_contract_pdf").rglob("*") if f.is_file() and any(w in f.parent.name.lower() for w in want_dirs)}
+        idx = root / "index.csv"       # bundled with the repo, so the PDF folder is not needed
+        if idx.exists():
+            vmo = {Path(r["filename"]).stem for r in csv.DictReader(open(idx)) if any(w in r["agreement_type"].lower() for w in want_dirs)}
+        else:
+            vmo = {f.stem for f in (root / "full_contract_pdf").rglob("*") if f.is_file() and any(w in f.parent.name.lower() for w in want_dirs)}
         keep = {r["Filename"] for r in csv.DictReader(open(root / "master_clauses.csv", encoding="utf-8-sig")) if Path(r["Filename"]).stem in vmo and (keep is None or r["Filename"] in keep)}
     rows = list(csv.DictReader(open(root / "master_clauses.csv", encoding="utf-8-sig")))
     random.Random(seed).shuffle(rows)

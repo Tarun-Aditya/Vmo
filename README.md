@@ -1,157 +1,205 @@
-# ContractIQ — vendor contract intelligence for VMOs (POC)
+# ContractIQ
 
-Live-demo POC for **Arcadia Retail Inc.**'s Vendor Management Office, over an enterprise **IT-services portfolio in USD**:
-a global systems integrator, a Big-4-style consultancy, an offshore IT services major, a web-infrastructure software
-vendor and SaaS suppliers (all **fictional lookalikes** — no real company names). 32 documents: 6 standard templates,
-27 executed contracts (MSA → SOW → Work Order, amendments, NDAs, DPAs, SaaS) and 5 vendor drafts. See `CLAUDE.md` for scope.
+**Vendor contract intelligence for Vendor Management Offices (VMOs).**
+Load your vendor contracts and drafts; ContractIQ reads them, keeps one unified dataset, and tells you what needs action:
+which renewals have a notice deadline coming, where liability is uncapped, which drafts deviate from your playbook, what you
+billed against what you signed, and the answer to any question about the portfolio, with the evidence to check it.
 
-## Two corpora
-* **Pilot corpus (recommended for evaluation)** — `make seed-pilot`: 36 realistic fictional contracts (MSAs, SOWs, work orders, amendments, NDAs, DPAs, SaaS, drafts) written
-  in eight drafting styles and delivered as **PDF, Word and Markdown**, with signature tables in several layouts, short-form and unnumbered headings, number words and mixed
-  date formats, no sidecar metadata. Source: `corpus/pilot/*.md` (date tokens), spec: `backend/app/docgen/pilot_spec.py`. Ground truth is computed from the spec
-  (`data/labels_pilot.json`), never from the document text. `evals/pilot_eval.py` scores extraction; `evals/pilot_ask_eval.py` scores Ask.
-* **Synthetic corpus** — `make seed` (the default below): 32 generated documents; deterministic, used by `make test` and `scripts/demo_walkthrough.js`.
+> **Status: proof of concept.** It runs end to end on a fictional corpus and on public real-world contracts, with simulated
+> ERP, e-signature, cloud-drive and mailbox systems. It has not been used on a customer's real contracts or connected to
+> real tenants. See [Known limits](#known-limits). The fictional customer is **Arcadia Retail**; every vendor, person and
+> document in the demo data is fictional.
 
-Nothing in the product is tied to either: vendors, categories, obligations, SLA metrics, spend rules and risk points all come from the loaded documents and from
-configuration (Admin → Values, Obligation rules, Thresholds, Risk scoring). Feed CSVs (invoices, SLA, obligation status) are generated *from the loaded contracts*.
+## What it does
 
-## Run it
+| Area | What you get |
+|---|---|
+| **Portfolio** | KPI tiles, a decision queue sorted by the *last day to act* (expiry minus notice period), 30/60/90-day buckets with value at stake, expiries by month, vendor operations. |
+| **Contracts and hierarchy** | Repository with filters. Contract detail shows the text beside extracted fields (click a field to see its source passage, page and confidence), parent/child links (MSA → SOW → Work Order, amendments), and **effective terms** after amendments, with where each value comes from. |
+| **Key clauses** | Matrix of every document × every key clause, with a citation for each tick and boxed gaps where the template requires a clause. The clause library is configurable in Admin. |
+| **Ask** | Plain-English questions over the whole portfolio or chosen documents. Structured questions become read-only SQL; clause questions use semantic search; every answer shows its steps, SQL, result table and cited clauses. Conversation history, follow-ups, stop. |
+| **Review and redline** | Vendor drafts are compared with the standard template and playbook. A review queue (status, assignee, due date), Word-style tracked changes, margin comments, accept/reject per change, apply accepted changes as a new version, export to `.docx` with real tracked changes. **Redlining is only for drafts**: executed contracts are read-only (change them by amendment). |
+| **Online editor** | Word/Docs-style editing with Editing / Suggesting / Viewing, presence, comment threads (assign, resolve), version history, and guest **share links** (view / comment / edit) with an expiry. |
+| **Approvals and e-signature** | Configurable approval routing with reminders; internal click-to-sign or a DocuSign-compatible flow; signed copies re-enter the pipeline as executed contracts. |
+| **Templates** | Standard templates clause by clause, coverage matrix, and a deviation heatmap of executed contracts against each template. |
+| **Obligations and SLAs** | Dated duties, SLA targets, notice periods, per-month actuals against the contract, breaches and estimated credits. |
+| **Spend vs contract** | Invoices matched to contracts: off-contract, before/after term, duplicates, above rate, over planned value. Utilisation by contract. |
+| **Vendor risk** | Explainable 0 to 100 scorecards (weights set in Admin) and portfolio benchmarks for terms such as liability cap and governing law. |
+| **Alerts** | Rules over live data, an in-app centre, and delivery to e-mail, Slack, Teams or any webhook. |
+| **Admin** | Pipelines, key-clause library, values and limits, checklist rules, thresholds, risk weights, obligation rules, connectors, alert channels, approval rules, users and audit log, quality and corrections, AI usage and cost. |
+
+Everything shown is derived from the loaded documents plus Admin configuration. Nothing is tied to a vendor or a document.
+
+## Quick start
+
+Requirements: Docker with Compose, or Python 3.12 + Node 20 + Postgres 16 with pgvector.
+
 ```bash
-cp .env.example .env          # add ANTHROPIC_API_KEY for the live Claude path (optional, see below)
-make dev                      # db + api + web  ->  http://localhost:5173  (api: :8000/health)
-make seed                     # synthetic corpus into the inbox folder and run the pipeline (idempotent)
-make seed-pilot               # the 36-document pilot corpus (PDF / Word / Markdown) instead
-python -m app.seed --pilot    # same, outside Docker (set DATABASE_URL, DATA_DIR)
-make eval                     # extraction, redline and Ask evals
-make test                     # pytest
+cp .env.example .env     # ANTHROPIC_API_KEY is optional, see "Demo and Live"
+make dev                 # db + api + web   ->  http://localhost:5173   (API health: http://localhost:8000/health)
+make seed-pilot          # load the 36-document pilot corpus (PDF, Word, Markdown) and run the pipeline
 ```
-Dates in the documents are relative to the seed run, so **re-run `make seed` on the day of the demo** (and before each
-walkthrough run: it creates a draft and edits admin settings, then restores them).
 
-## How the data flows (one unified dataset)
-```
-data/inbox/**.md  ──►  pipeline  ──►  contracts · clauses · fields · values · checks · redlines  ──►  every screen + Ask
- (folder watch)        parse → classify clauses (KCC library) → extract fields (Claude / offline) → embed
-                       → extract values & limits → compare to template → run the redline checklist
-```
-* **Folder pipelines** — anything dropped into `data/inbox/` (Markdown or text) is picked up and processed; vendor, type and
-  parent are read from the document. A file is re-processed only when its content changes. There are two pipelines, each with
-  its **own trigger** (Admin → Pipeline): *Executed contracts* (`contracts/`, `uploads/`; default **periodic, every 2 hours**) and
-  *Draft review* (`drafts/`, `generated/`; default **dynamic: runs as soon as a new or changed file appears**). A trigger is
-  periodic (any frequency), dynamic (on new/changed files, checked every 20 s) or manual, plus Run now. The seed uses the same path.
-* **Admin** (⚙) configures what the platform identifies, extracts and checks — every change re-runs over all documents:
-  * **Key clause library** — which clauses to identify (heading aliases + keywords), what the standard says, whether each shows
-    in the matrix. Add any number; a new clause becomes a column in Key clauses and in Ask. *Preview matches* before saving.
-  * **Values & limits** — the numbers to extract from a clause (regex → number/text): payment days, liability cap multiple,
-    insurance cover, notice periods, uptime, governing law…
-  * **Redline checklist** — rules run on a contract before signing: clause required / absent, value vs threshold, forbidden
-    wording; severity, where it applies, suggested replacement wording.
-  * **Pipeline** — frequency, run now, add a document, run history with per-document events.
-* **Review queue (Redline)** — drafts from the drafts folder (or uploaded: `.docx`, `.md`, `.txt`) are redlined automatically and
-  wait in a queue (To review / In review / Changes requested / Approved). Each opens as a **Word-style page with the redline as
-  tracked changes** and margin comments: accept or reject each change, **apply accepted changes as a new version**, approve or
-  request changes with a note. The checklist (rules live in Admin) sits on its own tab.
-* **Online editor** — any draft opens in a Word/Docs-style editor (toolbar, page sheet, highlighted `[placeholders]`, word
-  count) with a live checklist and **version history**; saving writes the file back and re-runs the pipeline. Executed
-  contracts are read-only (change them by amendment).
-* **New contract** — pick a template (MSA/SOW/Work Order/NDA/SaaS/DPA), or **paste/upload the deal details** (an email, term
-  sheet, `key: value` lines, JSON, CSV, `.docx`) and the form is filled from them (Claude when a key is set, otherwise a
-  rule-based reader). Choose which clauses go in (the template's, plus any of the 39 in the clause library), edit in the online
-  editor with the live checklist, create: it is dropped into the folder, extracted, and appears everywhere.
-* **Templates** — every template clause by clause with its deviation heatmap, and a coverage matrix of which clauses each
-  template contains; "Create a contract from this template" jumps into New contract.
-* **Chat** — Ask is a chat window: the **thinking trail streams live** (understood the question → SQL → composed the answer; with
-  Claude also its reasoning text), then the answer is written out and the tables appear; **Stop** cancels. Follow-ups stay in
-  the same conversation (Claude gets the earlier turns as context; the offline planner answers each question on its own).
-  **Conversation history** on the left: reopen any past chat with its answers, tables and thinking, search, rename, delete.
-  Re-seeding resets history (document ids change).
-* **VMO depth** (what a vendor-management office runs on, beyond the contract text):
-  * **Obligations & SLAs** — what each party must do, per contract: dated milestones, SLA targets, notice periods, payment, acceptance,
-    insurance and audit duties, renewal-notice deadlines (rules over the extracted text; with Claude, extra duties such as reporting or
-    certificates are added, tagged "found by Claude"). Status is tracked (open / overdue / done / waived; mark done in the UI). Monthly SLA
-    actuals from monitoring feeds are charted against the contract target, with breaches and *estimated* service credits.
-  * **Spend vs contract** — invoices (AP/ERP export) matched to contracts and checked: no contract on file, billed against an unsigned
-    contract, before/after the term, duplicates, above the usual invoice, over the planned value, late payment (interest exposure).
-    Contract utilisation shows billed vs planned vs share of term elapsed.
-  * **Vendor risk scorecards** — 0–100 per vendor from five explainable components (contract terms, renewal exposure, performance,
-    spend compliance, concentration), weights set in Admin → Risk scoring, every driver listed. **Term benchmarks** show each term across
-    the portfolio against the median and our policy.
-  * **Operational feeds** — a third pipeline loads CSVs from `data/feeds/` (`invoices*.csv`, `sla*.csv`, `obligation_status*.csv`) on its own
-    trigger (default: when a file changes), or via upload in the UI. `make seed` writes believable fictional feeds with planted problems
-    (unsigned work order billed, a hosting vendor with only a draft MSA, a duplicate invoice, SLA misses...). Replace them with real exports.
-* **Ask** — *analytical* questions over the whole portfolio, or questions about **specific documents** chosen (search +
-  select) in the panel on the right. Answers are tables; the SQL and steps are under a collapsed **Thinking** section.
+`make seed` loads the older 32-document synthetic corpus instead (deterministic; the test suite uses it). Dates inside the
+documents are relative to the seed run, so re-seed on the day of a demo.
 
-### LLM engine: Claude subscription, API key, or offline
-`LLM_PROVIDER=auto` (default) picks, in order: **`api`** (`ANTHROPIC_API_KEY` set) → **`claude_code`** (the `claude` CLI is installed and
-logged in: everything runs on your **Claude subscription**, no key; run the API on the host, `pip install -e ".[claude-code]"`) →
-**`offline`**. To move from the subscription to a key later, just set `ANTHROPIC_API_KEY` (or `LLM_PROVIDER=api`); nothing else changes.
-If Claude is unavailable (e.g. the subscription's 5-hour limit), calls fall back to the offline engine and the header says so.
+Without Docker: set `DATABASE_URL` and `DATA_DIR`, run `alembic upgrade head`, then `python -m app.seed --pilot`, then
+`uvicorn app.main:app` in `backend/` and `npm run dev` in `frontend/`.
 
-| | Claude (`api` / `claude_code`) | Offline engine |
+Other targets: `make eval`, `make test`, `make lint`, `make docs`, `make migrate`, `make down`.
+
+## Demo and Live
+
+One switch in the header controls the whole application and is saved on the server.
+
+| | **Demo mode** (on) | **Live mode** (off) |
 |---|---|---|
-| Extraction | Claude, forced JSON schema (cached on disk, so re-seeding is free) | regex extractor |
-| Redline / deviations | Claude judges each changed clause vs the playbook | word diff + pattern library |
-| Brief → new-contract form | Claude fills the schema | rule-based reader |
-| Checklist, values, clause identification | rule engine (no LLM) | same |
-| Ask | Claude tool-use loop (`run_sql`, `search_clauses`, `get_contract`), streamed live: reasoning, SQL steps, answer | scripted plans + rule-based planner |
-| Embeddings | `sentence-transformers` if installed, else hashed bag-of-words | hashed bag-of-words |
+| Extraction, redline, clause tagging, Ask | Offline rule engine and cached results. **No Claude anywhere.** | Claude (API key, or the logged-in `claude` CLI on a subscription) |
+| External systems | Built-in labelled simulators | Simulators until real tenants are configured |
+| Good for | Fast, repeatable, works without internet | Real accuracy on real wording |
 
-Measured with Claude on the subscription (`make seed && make eval`): extraction **437/442 (98.9%)**, redline recall **18/18** (severity agreement
-14/18: Claude grades severity differently from the planted labels), Ask **26/27** (the miss is clause *retrieval* ranking with the hashed embeddings).
-Offline: 442/442, 18/18, 27/27. `make test` seeds offline first (the tests assert the deterministic offline data). Free-form (non-cached)
-questions need **Demo mode off** to go live; with it on, preloaded questions are served from the cache that the seed generated with Claude.
+Stored documents keep the data of the engine that read them. After switching to Live, press **Admin → Pipeline → Re-extract all**
+to read everything with Claude; people's manual field corrections are kept.
 
-The header badge shows the engine in use. Offline eval scores prove the plumbing and data, not Claude's quality; the Claude scores above do.
+`LLM_PROVIDER=auto` picks `api` if a key is set, else `claude_code` if the CLI is available, else `offline`. If Claude hits a
+limit, calls fall back to the offline engine and the header says so. The offline engine is a demo and fallback, not the
+product's accuracy target.
 
-## Connectors, alerts, access (Admin)
-* **Connectors** (Admin → Connectors): Google Drive (service-account key or OAuth refresh token), OneDrive and SharePoint (Microsoft Graph, app registration with
-  `Files.Read.All`/`Sites.Read.All`). New and changed PDF / Word / Markdown / text files are copied into the inbox on a schedule (or *Sync now*), processed like any dropped file,
-  and each contract keeps a link to the original. Secrets are encrypted (`SECRET_KEY` or `data/.secret_key`) and never shown again. Tested against local Drive/Graph stand-ins
-  (auth flows, paging, redirects, Google-native export, changed/removed files); **not yet exercised against a live Google or Microsoft tenant**.
-* **Alerts** (bell, `/alerts`; rules and channels in Admin → Alerts): 11 rules over the live data (renewal notice passed / due, expiring 30 / 90 days, obligation overdue / due,
-  SLA breach, serious spend exception, vendor risk tier, draft waiting for review, connector failure). Each event is raised once; deliver to e-mail (SMTP), Slack, Teams or any webhook, with a
-  minimum severity per channel. Review assignments (assignee, due date) live on the Redline screen.
-* **Access** (Admin → Users & audit): `AUTH_MODE=off` (default, demo) is open; `AUTH_MODE=on` requires sign-in (first start creates the administrator), roles **viewer < reviewer < admin**,
-  API tokens (`Authorization: Bearer ciq_…`, never outranking their owner), optional **OpenID Connect** (`OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_ROLES_CLAIM`; RS256/ES256 tokens verified against the issuer's JWKS),
-  and an audit log of every change, sign-in and refusal. This is application-level access control; SSO provisioning (SCIM), MFA and per-tenant isolation are not built.
-* **Word**: every draft / document exports to `.docx`; the redline exports with real tracked changes (`w:ins` / `w:del`) that Word shows as accept / reject.
+## How documents flow through the system
 
-## Demo without any ERP or DocuSign account (simulators)
-Start the API with `SIMULATORS=1 PUBLIC_API_URL=http://localhost:8000` (the default in `.env.example` for demos). The app then contains stand-ins that speak the same APIs the real connectors use:
-* **ERP** — Admin → Connectors → **Connect demo ERP**. Registers a simulated Coupa (OAuth client credentials, JSON, paging) and a simulated SAP S/4HANA (API key, OData v2, `/Date()/` values) and syncs them; the real
-  connector code runs over HTTP. The invoices are generated from *your loaded contracts* (this month's fee per active SOW / SaaS, a resend, an over-run, a vendor with no contract, an unsigned contract), so Spend and Alerts
-  change in front of the audience (e.g. 51 → 68 invoices, 12 → 20 exceptions on the pilot corpus). Demo credentials: Coupa `demo-client` / `demo-secret`, SAP key `demo-sap-key`.
-* **E-signature** — open a draft in the editor → Signatures → provider *DocuSign* → Send. The DocuSign-compatible simulator returns the signing links (a real service e-mails them); open each in a browser, sign in order,
-  and the simulator calls our Connect-style webhook; the draft gets a signature block, the signatories are extracted, and *Mark executed* turns it into an executed contract.
-The simulators are clearly labelled, are not the vendors' services, and a real account is used the moment `DOCUSIGN_*` / a real connector is configured (`SIMULATORS=0` in production).
+```
+folder / connector / upload / mailbox
+        │  identify the file by SHA-256 of its content (not its name)
+        ▼
+  parse → split into clauses → tag key clauses (heading, keyword, sentence, optionally Claude)
+        → extract fields (Claude or rules) → embed → derive values and limits
+        → compare with template → run the checklist → obligations, risk, spend, alerts
+        ▼
+ one database  →  every screen and the Ask assistant
+```
+
+* **Incremental.** A run only touches the delta. A file whose size and modified time are unchanged is not even opened; a touched
+  file is hashed and skipped if identical; a renamed file is recognised by its hash and recorded as *moved*; an identical
+  copy is skipped as a duplicate; a changed hash updates the same record. Failed files are retried on the next run.
+* **Audited.** Every run lists each file with its hash, size, action and reason (Admin → Pipeline).
+* **Triggers.** Each pipeline runs on demand (**Run now**), on a schedule, or when files change.
+* **Admin changes re-derive, they do not re-read.** Saving a key clause, value, checklist rule or threshold re-classifies the stored
+  text and recomputes checks, deviations and redlines for every document. With Claude available, custom clauses are also tagged
+  by meaning in any wording; the quote must appear verbatim in the document, and answers are cached by content hash.
+* **Corrections stick.** A person's correction to a field survives re-extraction.
+
+## Integrations and simulators
+
+No sandboxes were available, so every external dependency has a stand-in that speaks the same API shape. The real connector
+and client code runs against it over HTTP. Simulators are mounted only when `SIMULATORS=1` and are always labelled **Simulated**.
+
+| System | Real code in the app | Stand-in used for the demo | Verified against a live tenant? |
+|---|---|---|---|
+| Coupa, SAP S/4HANA, SAP Ariba | OAuth / API-key connectors, paging, contracts and invoices | `/sim/coupa`, `/sim/sap`, `/sim/ariba` | No |
+| DocuSign | Envelope, signing links, HMAC webhook | DocuSign-compatible simulator | No |
+| Google Drive, OneDrive, SharePoint | Service account / Graph app, paging, change detection | Drive and Graph look-alikes | No |
+| Mailbox intake | IMAP connector | Local IMAP server with contract attachments | No |
+| Alerts | SMTP, Slack, Teams, webhook senders | Local sinks (`/sim/outbox`) | No |
+| SSO | OpenID Connect (authorization code, JWKS) | Local identity provider | No |
+
+Admin → Connectors has one-click "connect demo" buttons. Expect to debug permissions and consent on the first real connection.
+
+## Data included in this repository (so a clone is self-contained)
+
+| Path | What it is |
+|---|---|
+| `corpus/pilot/` and `backend/app/docgen/pilot_spec.py` | Source and spec of the 36 fictional pilot contracts |
+| `data/inbox/` | The seeded folders the pipeline reads: contracts and drafts (PDF, Word, Markdown) |
+| `data/feeds/` | Fixture invoices, SLA reports and acceptance certificates as **documents** (written for demos and tests; the product only reads files) |
+| `data/labels*.json`, `data/manifest*.json` | Ground truth used only by the evals |
+| `data/templates/` | The standard templates and playbook |
+| `data/.cache/` | Cached Claude results, so Demo mode and re-seeding are instant and offline |
+| `data/cuad/` | **CUAD v1**, 510 real public contracts as text with expert labels, plus our `index.csv` (agreement type and train/test split). CC BY 4.0, attributed in `data/cuad/README.md` |
+| `reports/` | Eval outputs and recorded walkthrough videos and screenshots |
+| `design/` | The full redesign: 39 boards and the generators that built them |
+
+Not stored: the CUAD PDFs (`make cuad-full` downloads them) and generated test scratch data (`data_test/`).
+
+One-command paths: `make showcase` (clone to running demo), `make cuad` (real-contract accuracy on the bundled text), `make eval`, `make test`, `make video` (records the end-to-end walkthrough into `reports/e2e/`).
+
+## Accuracy: what has and has not been measured
+
+* **Fictional pilot corpus** (36 documents, ground truth computed from the generating spec): extraction 98.9% offline, 98.2% with
+  Claude; Ask checked against the page APIs, 60/60 offline, 57 to 60 of 60 with Claude (misses were answer-format only).
+* **Public real contracts** (CUAD v1, 510 SEC-filed contracts with expert labels, 70/30 split by file-name hash; tuning used only
+  the training split). On the 133-contract hold-out the offline engine reaches, for example, governing law 77%, effective
+  date 76%, liability-cap clause F1 0.87, assignment F1 0.94; with Claude, on a 60-contract hold-out, governing law 98% and effective
+  date 94%. Termination for convenience is the weakest area (offline recall about 0.63, Claude about 0.70).
+  CUAD is not VMO-shaped (licences, distribution and similar), so read these as robustness on messy real text.
+* **Semantic clause search** with the local `fastembed` model (BAAI/bge-small-en-v1.5) retrieves the right clause far more often than the
+  hashed fallback (about 85% vs 40% on the retrieval eval).
+* **Not measured:** accuracy on a customer's real vendor MSAs. That is the first thing to do with a pilot customer.
+
+Reproduce: `python evals/pilot_eval.py`, `python evals/module_eval.py`, `python evals/retrieval_eval.py`, and for CUAD `make cuad`
+(or `python evals/cuad_eval.py data/cuad/CUAD_v1 --split test`; `LLM_PROVIDER=offline` for rules, unset for Claude). Result files are in `reports/`; `HANDOVER.md` has the full tables.
+
+## Security and operations
+
+* `AUTH_MODE=off` (default for demos) is open. `AUTH_MODE=on` requires sign-in; first start creates the administrator. Roles
+  viewer < reviewer < admin, API tokens, optional OIDC SSO, TOTP two-factor with recovery codes, lockout and password policy,
+  SCIM user provisioning, and an audit log of changes, sign-ins and refusals. Connector secrets are stored encrypted.
+* The Ask assistant's `run_sql` tool runs `SELECT` only, as a read-only Postgres role, with a statement timeout and an automatic
+  `LIMIT 200`; the role cannot read embeddings or pipeline tables.
+* Security headers, request ids, JSON logs, retention settings, metrics at `/api/ops/metrics`, `scripts/backup.sh`, a CI workflow.
+  Details: [`docs/SECURITY.md`](docs/SECURITY.md).
+* The scheduler runs inside the API process (one worker).
+
+## Configuration
+
+Set in `.env` (see `.env.example`):
+
+| Variable | Purpose |
+|---|---|
+| `LLM_PROVIDER`, `ANTHROPIC_API_KEY`, `MODEL_EXTRACT`, `MODEL_ASK`, `MODEL_REDLINE` | Engine and models |
+| `EMBEDDING_PROVIDER` | `auto`, `local` (fastembed) or `hash` |
+| `DATABASE_URL`, `READONLY_DATABASE_URL`, `DATA_DIR` | Database and data folder |
+| `AUTH_MODE`, `OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_ROLES_CLAIM`, `SECRET_KEY`, `CORS_ORIGINS` | Access and encryption |
+| `SIMULATORS`, `PUBLIC_API_URL`, `SIM_IMAP_PORT`, `SIM_SMTP_PORT` | Demo stand-ins (set `SIMULATORS=0` in production) |
+| `SCHEDULER_ENABLED` | Background pipeline scheduler (tests turn it off) |
 
 ## Tests
-`make test` (offline, synthetic corpus: 116 tests including connectors, alerts, access control, real PDF/Word ingestion). Outside Docker use a separate database and data folder
-for tests (`DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`) so they never touch a demo database.
-Pilot evals: `python evals/pilot_eval.py`, `python evals/pilot_ask_eval.py` (run with `LLM_PROVIDER=offline` or unset for Claude). Browser walkthrough over any corpus:
-`NODE_PATH=$(npm root -g) node scripts/demo_pilot.js out/ "Claude mode"`.
 
-## Demo script (~10 min)
-1. **Dashboard (1m)** — USD; contracts expiring in the next 30 / 60 / 90 days with $ at stake; AdSpark's notice deadline has passed.
-2. **Vendors (1m)** — Accentia / Delmont / Taraka / Nginova…: spend, next dates, risk flags; open Accentia: MSA → SOW → Work Order tree.
-3. **Contract detail (1m)** — signatures, terms & limits, checklist, effective terms ("payment 45→30, overridden by Amendment No. 1"); Work Order inherits its MSA's terms.
-4. **Key clauses (1m)** — every document × every key clause ✓/✗; hover for the citation; Work Order 2 is unsigned.
-5. **Ask — portfolio (2m)** — "How many contracts are expiring in the next quarter?" · "Which contracts have payment terms below 45 days?" · "Which contracts fail the checklist?"; open **Thinking**.
-6. **Ask — specific documents (1m)** — switch to *Selected documents*, search "delmont", tick the MSA: "Tell me about this contract", "What does the indemnity clause say?"; tick a draft: "Which checklist rules does it fail?".
-7. **Review queue (1.5m)** — a vendor draft as a Word-style page with tracked changes; accept/reject, request changes, checklist tab; upload a `.docx`/`.md` and watch it join the queue; apply accepted changes → new version.
-8. **New contract (1.5m)** — paste an email with the deal details → the SOW form fills itself (parent MSA picked) → add a clause from the library → the checklist flags 20-day payment → fix it in the editor → create → open it in the online editor, type, save v2.
-9. **Templates (0.5m)** — clause coverage across the 6 templates; "Create a contract from this template".
-10. **Admin (1.5m)** — each pipeline's trigger (periodic / dynamic / manual); add a key clause → new matrix column; tighten a threshold → everything re-checks.
+* `make test`: backend suite (167 tests) against the offline-seeded synthetic corpus.
+* Outside Docker, use a separate database and data folder so tests never touch demo data:
+  `DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`.
+* Browser walkthroughs: `scripts/demo_pilot.js` (any corpus) and `scripts/demo_walkthrough.js` (synthetic corpus).
 
-`NODE_PATH=$(npm root -g) node scripts/demo_walkthrough.js` walks every screen above and records a captioned video.
+## Repository layout
+
+```
+backend/app/         FastAPI app: pipeline, extraction, kcc (clause library), kcc_ai, deviations, ask*, routes_*,
+                     connectors/, simulators/, collab, mode (Demo/Live), llm, embeddings
+backend/alembic/     migrations (0001 to 0027; below 0005 cannot be downgraded)
+backend/tests/       pytest suite
+frontend/src/        React + Vite + TypeScript + Tailwind + TanStack Query
+evals/               extraction, redline, Ask, module, OCR, retrieval, CUAD and pilot evals
+corpus/pilot/        source text of the 36 fictional pilot documents
+data/                inbox, feeds, templates (generated files are git-ignored)
+addin/               Word task-pane add-in (untested inside Word)
+scripts/             seed, backup, demo walkthroughs
+docs/, HANDOVER.md   security notes; handover with measured results and limits
+CLAUDE.md            original scope and conventions
+```
+
+## Known limits
+
+1. Every external integration is verified only against simulators, never a live tenant.
+2. Accuracy on real customer vendor contracts has not been measured; offline extraction is weaker on messy real wording than on the fictional corpus.
+3. Claude-assisted clause tagging was tested with simulated Claude replies and not yet against real ones.
+4. Co-editing shares presence, comments, suggestions and versions; there is no character-level simultaneous typing (no CRDT).
+5. Not built: multi-tenancy, SOC 2 evidence, a penetration test. The Word add-in has not been tested in Word.
+6. The Docker image and CI workflow were written but not run in the build environment.
+7. OCR is tested on clean and noisy scans only; stamps, handwriting and low resolution will be worse.
+8. The redesign in the design review is not yet implemented in the front end.
 
 ## Notes
-- Severity values are `low | medium | high | critical`. "Uncapped" means a liability clause that states liability is unlimited.
-- Currency is USD throughout (documents, extraction, UI, Ask). Governing-law standard is New York.
-- Drafts are ordinary documents with status `draft`: excluded from portfolio numbers (dashboard, vendors, Ask) but visible in
-  the repository, key-clause matrix, Redline and scoped Ask.
-- Catalogue metadata (category, owner, parent links) comes from an optional `.meta.json` next to a document, else is inferred
-  from the document; `data/labels.json` is ground truth used only by the evals. Generated files under `data/` are git-ignored.
-- The read-only role `vmo_readonly` backs `run_sql`; it cannot read embeddings, pipeline tables, `llm_calls` or `ask_cache`.
-- Migrations 0003+ cannot be downgraded (recreate the database). The scheduler runs inside the API process (one worker).
+
+* Severity values: `low | medium | high | critical`. "Uncapped" means a liability clause that states liability is unlimited.
+* Currency is USD in the demo data. Drafts are documents with status `draft` and are excluded from portfolio numbers.
+* Catalogue metadata (category, owner, parent links) comes from an optional `.meta.json` next to a document, else is inferred.
+  `data/labels*.json` are ground truth used only by the evals.

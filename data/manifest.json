@@ -1,0 +1,379 @@
+{
+  "seed_date": "2026-11-07",
+  "customer": "Arcadia Retail Inc.",
+  "currency": "USD",
+  "templates": [
+    {
+      "key": "msa",
+      "name": "Master Services Agreement (Standard)",
+      "type": "MSA",
+      "file": "templates/template_msa.md"
+    },
+    {
+      "key": "sow",
+      "name": "Statement of Work (Standard)",
+      "type": "SOW",
+      "file": "templates/template_sow.md"
+    },
+    {
+      "key": "wo",
+      "name": "Work Order (Standard)",
+      "type": "WO",
+      "file": "templates/template_wo.md"
+    },
+    {
+      "key": "nda",
+      "name": "Non-Disclosure Agreement (Standard)",
+      "type": "NDA",
+      "file": "templates/template_nda.md"
+    },
+    {
+      "key": "saas",
+      "name": "SaaS Subscription Agreement (Standard)",
+      "type": "SaaS",
+      "file": "templates/template_saas.md"
+    },
+    {
+      "key": "dpa",
+      "name": "Data Processing Agreement (Standard)",
+      "type": "DPA",
+      "file": "templates/template_dpa.md"
+    }
+  ],
+  "contracts": [
+    {
+      "key": "accentia_msa",
+      "title": "Master Services Agreement \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "IT Services",
+      "type": "MSA",
+      "template": "MSA",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": null,
+      "file": "inbox/contracts/accentia_msa.md"
+    },
+    {
+      "key": "accentia_sow1",
+      "title": "SOW 1 \u2013 Application Managed Services \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "IT Services",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": "accentia_msa",
+      "file": "inbox/contracts/accentia_sow1.md"
+    },
+    {
+      "key": "accentia_sow2",
+      "title": "SOW 2 \u2013 AWS Cloud Migration and Platform Engineering \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "Cloud",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Sam Ortiz (Infrastructure)",
+      "parent": "accentia_msa",
+      "file": "inbox/contracts/accentia_sow2.md"
+    },
+    {
+      "key": "accentia_sow3",
+      "title": "SOW 3 \u2013 Service Desk Staff Augmentation \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "Staffing",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": "accentia_msa",
+      "file": "inbox/contracts/accentia_sow3.md"
+    },
+    {
+      "key": "accentia_amd1",
+      "title": "Amendment No. 1 to MSA \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "IT Services",
+      "type": "Amendment",
+      "template": "MSA",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": "accentia_msa",
+      "file": "inbox/contracts/accentia_amd1.md"
+    },
+    {
+      "key": "accentia_wo1",
+      "title": "Work Order 1 \u2013 Data Center Exit Wave 2 \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "Cloud",
+      "type": "Work Order",
+      "template": "WO",
+      "owner": "Sam Ortiz (Infrastructure)",
+      "parent": "accentia_sow2",
+      "file": "inbox/contracts/accentia_wo1.md"
+    },
+    {
+      "key": "accentia_wo2",
+      "title": "Work Order 2 \u2013 Endpoint Security Hardening \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "Security",
+      "type": "Work Order",
+      "template": "WO",
+      "owner": "Taylor Reed (Security)",
+      "parent": "accentia_sow2",
+      "file": "inbox/contracts/accentia_wo2.md"
+    },
+    {
+      "key": "accentia_nda",
+      "title": "NDA \u2013 Accentia Technology Services",
+      "vendor": "Accentia Technology Services Inc",
+      "category": "IT Services",
+      "type": "NDA",
+      "template": "NDA",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": "accentia_msa",
+      "file": "inbox/contracts/accentia_nda.md"
+    },
+    {
+      "key": "delmont_msa",
+      "title": "Master Services Agreement \u2013 Delmont Consulting",
+      "vendor": "Delmont Consulting LLP",
+      "category": "Consulting",
+      "type": "MSA",
+      "template": "MSA",
+      "owner": "Morgan Hayes (Finance Transformation)",
+      "parent": null,
+      "file": "inbox/contracts/delmont_msa.md"
+    },
+    {
+      "key": "delmont_sow1",
+      "title": "SOW 1 \u2013 SAP S/4HANA Transformation, Phase 1 \u2013 Delmont Consulting",
+      "vendor": "Delmont Consulting LLP",
+      "category": "ERP",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Morgan Hayes (Finance Transformation)",
+      "parent": "delmont_msa",
+      "file": "inbox/contracts/delmont_sow1.md"
+    },
+    {
+      "key": "delmont_sow2",
+      "title": "SOW 2 \u2013 Cybersecurity Posture Assessment and Roadmap \u2013 Delmont Consulting",
+      "vendor": "Delmont Consulting LLP",
+      "category": "Security",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Taylor Reed (Security)",
+      "parent": "delmont_msa",
+      "file": "inbox/contracts/delmont_sow2.md"
+    },
+    {
+      "key": "delmont_amd1",
+      "title": "Amendment No. 1 to MSA \u2013 Delmont Consulting",
+      "vendor": "Delmont Consulting LLP",
+      "category": "Consulting",
+      "type": "Amendment",
+      "template": "MSA",
+      "owner": "Morgan Hayes (Finance Transformation)",
+      "parent": "delmont_msa",
+      "file": "inbox/contracts/delmont_amd1.md"
+    },
+    {
+      "key": "delmont_wo1",
+      "title": "Work Order 1 \u2013 Incident Response Retainer \u2013 Delmont Consulting",
+      "vendor": "Delmont Consulting LLP",
+      "category": "Security",
+      "type": "Work Order",
+      "template": "WO",
+      "owner": "Taylor Reed (Security)",
+      "parent": "delmont_sow2",
+      "file": "inbox/contracts/delmont_wo1.md"
+    },
+    {
+      "key": "delmont_nda",
+      "title": "NDA \u2013 Delmont Consulting",
+      "vendor": "Delmont Consulting LLP",
+      "category": "Consulting",
+      "type": "NDA",
+      "template": "NDA",
+      "owner": "Morgan Hayes (Finance Transformation)",
+      "parent": "delmont_msa",
+      "file": "inbox/contracts/delmont_nda.md"
+    },
+    {
+      "key": "taraka_msa",
+      "title": "Master Services Agreement \u2013 Taraka Consultancy Services",
+      "vendor": "Taraka Consultancy Services Ltd",
+      "category": "IT Services",
+      "type": "MSA",
+      "template": "MSA",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": null,
+      "file": "inbox/contracts/taraka_msa.md"
+    },
+    {
+      "key": "taraka_sow1",
+      "title": "SOW 1 \u2013 Application Development and Maintenance (Offshore) \u2013 Taraka Consultancy Services",
+      "vendor": "Taraka Consultancy Services Ltd",
+      "category": "IT Services",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Jamie Cruz (Enterprise Apps)",
+      "parent": "taraka_msa",
+      "file": "inbox/contracts/taraka_sow1.md"
+    },
+    {
+      "key": "taraka_sow2",
+      "title": "SOW 2 \u2013 QA and Test Automation Centre of Excellence \u2013 Taraka Consultancy Services",
+      "vendor": "Taraka Consultancy Services Ltd",
+      "category": "IT Services",
+      "type": "SOW",
+      "template": "SOW",
+      "owner": "Jamie Cruz (Enterprise Apps)",
+      "parent": "taraka_msa",
+      "file": "inbox/contracts/taraka_sow2.md"
+    },
+    {
+      "key": "taraka_wo1",
+      "title": "Work Order 1 \u2013 Mainframe Modernization Assessment \u2013 Taraka Consultancy Services",
+      "vendor": "Taraka Consultancy Services Ltd",
+      "category": "IT Services",
+      "type": "Work Order",
+      "template": "WO",
+      "owner": "Jamie Cruz (Enterprise Apps)",
+      "parent": "taraka_sow1",
+      "file": "inbox/contracts/taraka_wo1.md"
+    },
+    {
+      "key": "taraka_nda",
+      "title": "NDA \u2013 Taraka Consultancy Services",
+      "vendor": "Taraka Consultancy Services Ltd",
+      "category": "IT Services",
+      "type": "NDA",
+      "template": "NDA",
+      "owner": "Jordan Blake (IT Procurement)",
+      "parent": "taraka_msa",
+      "file": "inbox/contracts/taraka_nda.md"
+    },
+    {
+      "key": "nginova",
+      "title": "Enterprise Subscription and Support Agreement \u2013 Nginova Systems",
+      "vendor": "Nginova Systems Inc",
+      "category": "Software",
+      "type": "SaaS",
+      "template": "SaaS",
+      "owner": "Sam Ortiz (Infrastructure)",
+      "parent": null,
+      "file": "inbox/contracts/nginova.md"
+    },
+    {
+      "key": "cirrus",
+      "title": "SaaS Subscription Agreement \u2013 Cirrus CRM",
+      "vendor": "Cirrus CRM Inc",
+      "category": "SaaS",
+      "type": "SaaS",
+      "template": "SaaS",
+      "owner": "Avery Patel (Customer Experience)",
+      "parent": null,
+      "file": "inbox/contracts/cirrus.md"
+    },
+    {
+      "key": "ledgerline",
+      "title": "SaaS Subscription Agreement \u2013 Ledgerline Finance Cloud",
+      "vendor": "Ledgerline Systems Inc",
+      "category": "SaaS",
+      "type": "SaaS",
+      "template": "SaaS",
+      "owner": "Morgan Hayes (Finance Transformation)",
+      "parent": null,
+      "file": "inbox/contracts/ledgerline.md"
+    },
+    {
+      "key": "pulsehr",
+      "title": "SaaS Subscription Agreement \u2013 PulseHR",
+      "vendor": "PulseHR Inc",
+      "category": "SaaS",
+      "type": "SaaS",
+      "template": "SaaS",
+      "owner": "Casey Lin (HR Technology)",
+      "parent": null,
+      "file": "inbox/contracts/pulsehr.md"
+    },
+    {
+      "key": "adspark",
+      "title": "SaaS Subscription Agreement \u2013 AdSpark Analytics",
+      "vendor": "AdSpark Analytics LLP",
+      "category": "Marketing",
+      "type": "SaaS",
+      "template": "SaaS",
+      "owner": "Riley Chen (Digital Marketing)",
+      "parent": null,
+      "file": "inbox/contracts/adspark.md"
+    },
+    {
+      "key": "skyguard_nda",
+      "title": "NDA \u2013 Skyguard Security",
+      "vendor": "Skyguard Security Solutions Inc",
+      "category": "Security",
+      "type": "NDA",
+      "template": "NDA",
+      "owner": "Taylor Reed (Security)",
+      "parent": null,
+      "file": "inbox/contracts/skyguard_nda.md"
+    },
+    {
+      "key": "cirrus_dpa",
+      "title": "Data Processing Agreement \u2013 Cirrus CRM",
+      "vendor": "Cirrus CRM Inc",
+      "category": "SaaS",
+      "type": "DPA",
+      "template": "DPA",
+      "owner": "Avery Patel (Customer Experience)",
+      "parent": "cirrus",
+      "file": "inbox/contracts/cirrus_dpa.md"
+    },
+    {
+      "key": "ledgerline_dpa",
+      "title": "Data Processing Agreement \u2013 Ledgerline Finance Cloud",
+      "vendor": "Ledgerline Systems Inc",
+      "category": "SaaS",
+      "type": "DPA",
+      "template": "DPA",
+      "owner": "Morgan Hayes (Finance Transformation)",
+      "parent": "ledgerline",
+      "file": "inbox/contracts/ledgerline_dpa.md"
+    }
+  ],
+  "drafts": [
+    {
+      "key": "orbitline_msa",
+      "title": "Draft MSA \u2013 Orbitline Cloud Hosting",
+      "vendor": "Orbitline Cloud Hosting Inc",
+      "template": "MSA",
+      "file": "inbox/drafts/orbitline_msa.md"
+    },
+    {
+      "key": "quanta_saas",
+      "title": "Draft SaaS Agreement \u2013 Quanta Billing Cloud",
+      "vendor": "Quanta Billing Technologies Inc",
+      "template": "SaaS",
+      "file": "inbox/drafts/quanta_saas.md"
+    },
+    {
+      "key": "orbital_nda",
+      "title": "Draft NDA \u2013 Orbital Security Labs",
+      "vendor": "Orbital Security Labs Inc",
+      "template": "NDA",
+      "file": "inbox/drafts/orbital_nda.md"
+    },
+    {
+      "key": "vaultline_dpa",
+      "title": "Draft DPA \u2013 Vaultline Data Services",
+      "vendor": "Vaultline Data Services Inc",
+      "template": "DPA",
+      "file": "inbox/drafts/vaultline_dpa.md"
+    },
+    {
+      "key": "brightpath_sow",
+      "title": "Draft SOW \u2013 Brightpath IT Staffing (clean control)",
+      "vendor": "Brightpath IT Staffing Inc",
+      "template": "SOW",
+      "file": "inbox/drafts/brightpath_sow.md"
+    }
+  ]
+}

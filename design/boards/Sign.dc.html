@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Signing page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F2EE;color:#1B1F24;font-family:'Instrument Sans',system-ui,sans-serif;font-size:14px;line-height:1.45}
+*{box-sizing:border-box}
+.app{display:flex;flex-wrap:wrap;min-height:100vh}
+.rail{width:208px;flex:0 0 208px;background:#1B1F24;color:#C9CDD2;padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+.rail a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:#C9CDD2;text-decoration:none;min-height:44px}
+.rail a.on{background:#2A3038;color:#fff}
+.rail a:hover{background:#2A3038}
+.rail svg{width:18px;height:18px;flex:none}
+.main{flex:999 1 640px;min-width:0;padding:20px 32px 40px}
+.serif{font-family:'Newsreader',Georgia,serif}
+.card{background:#fff;border:1px solid #E4E0D8;border-radius:12px;padding:20px}
+.mute{color:#5E6670}
+.num{font-variant-numeric:tabular-nums}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 8px;border-radius:999px;font-size:12px;font-weight:600;line-height:20px}
+.chip svg{width:10px;height:10px}
+.crit{background:#FBE4E1;color:#8E1B10}.high{background:#FDE9D4;color:#8A3A05}.med{background:#F8EEC2;color:#6B5400}.low{background:#E8EBEF;color:#3A4350}.ok{background:#DCEFEA;color:#0A5247}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #D5D0C6;background:#fff;color:#1B1F24;font:inherit;font-weight:600;cursor:pointer}
+.btn.p{background:#0E6B5E;border-color:#0E6B5E;color:#fff}
+.lab{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#5E6670;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;padding:8px 10px;border-bottom:1px solid #D5D0C6;color:#5E6670;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:10px;border-bottom:1px solid #EEEAE2}
+.code{background:#1B1F24;color:#DDE3EA;border-radius:10px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.6;overflow-x:auto;white-space:pre}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E4E0D8;margin-bottom:20px}.tabs a{padding:10px 14px;text-decoration:none;color:#5E6670;font-weight:600;border-bottom:3px solid transparent}.tabs a.on{color:#1B1F24;border-color:#0E6B5E}.sim{background:#EDE7F6;color:#4A2C86}
+.mx td,.mx th{padding:6px 4px;text-align:center;border-bottom:1px solid #EEEAE2}.sim{background:#EDE7F6;color:#4A2C86}
+.inp{border:1px solid #D5D0C6;border-radius:10px;padding:10px 12px;min-height:44px;background:#fff;display:flex;align-items:center}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid #E4E0D8;margin-bottom:20px}
+.tabs a{padding:10px 14px;text-decoration:none;color:#5E6670;font-weight:600;border-bottom:3px solid transparent}
+.tabs a.on{color:#1B1F24;border-color:#0E6B5E}
+.g{display:grid;gap:16px}.wrap{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.tog{display:inline-block;width:40px;height:22px;border-radius:11px;background:#0E6B5E;position:relative;vertical-align:middle}.tog:after{content:"";position:absolute;right:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}.tog.off{background:#C9C4B8}.tog.off:after{right:auto;left:3px}
+.bar{height:10px;border-radius:5px;background:#0E6B5E}
+</style>
+</helmet>
+<div style="background:#F4F2EE;min-height:100vh;display:grid;place-items:center;padding:24px"><div style="max-width:620px;width:100%"><div style="text-align:center;font-weight:600;color:#0E6B5E;margin-bottom:14px">ContractIQ</div>
+<section class="card" style="padding:28px"><div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:12px"><h2 style="margin:0;font-size:18px">Sign: Master Services Agreement, Helio Cloud</h2></div><div class='mute' style='margin-bottom:10px'>You are signing as <b style='color:#1B1F24'>Meera Joshi</b> for Arcadia Retail Ltd. Order: Arcadia first, then Helio Cloud.</div><div style='border:1px solid #E4E0D8;border-radius:10px;padding:16px;max-height:180px;overflow:hidden' class='serif'>Master Services Agreement … (scroll to read the full document before signing)</div><div style='margin:16px 0 4px' class='lab'>Type your full name to sign</div><div class='inp'>Meera Joshi</div><label style='display:flex;gap:10px;align-items:center;margin:14px 0;min-height:44px'><span style='width:22px;height:22px;border:2px solid #0E6B5E;border-radius:5px;background:#0E6B5E;color:#fff;display:grid;place-items:center'>✓</span>I agree that this is my electronic signature</label><div style='display:flex;gap:8px'><button class="btn p">Sign</button><button class="btn">Decline</button></div><div class='mute' style='font-size:12px;margin-top:10px'>A signing certificate with time, name and document fingerprint is attached when the last signer finishes.</div></section></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":760}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
