@@ -15,6 +15,7 @@ MONTH_RE = "(" + "|".join(list(MONTHS) + [m[:3] for m in MONTHS]) + ")"
 DATE_PATTERNS = [
     (re.compile(rf"\b(\d{{1,2}})(?:st|nd|rd|th)?\s+{MONTH_RE}\.?,?\s+(\d{{4}})\b", re.I), "dmy"),
     (re.compile(rf"\b{MONTH_RE}\.?\s+(\d{{1,2}})(?:st|nd|rd|th)?,?\s+(\d{{4}})\b", re.I), "mdy"),
+    (re.compile(rf"\b(\d{{1,2}})\s*(?:[a-z]\s*[a-z])?\s+day\s+of\s+{MONTH_RE}\.?,?\s+(\d{{4}})\b", re.I), "dmy"),
     (re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b"), "iso"),
     (re.compile(r"\b(\d{1,2})/(\d{1,2})/(\d{4})\b"), "us"),
 ]

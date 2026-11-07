@@ -276,14 +276,20 @@ def classify(heading: str, body: str, kcc: list[dict]) -> str:
             return k["key"]
     best, score = "other", 0
     for k in kcc:
-        if any(re.search(rf"\b{re.escape(_norm(a))}\b", h) for a in (k["heading_aliases"] or []) if len(a) > 4):
+        if any(re.search(rf"\b{re.escape(_norm(a))}\b", h) for a in (k["heading_aliases"] or []) if len(a) > 4) and _confirmed(k["key"], body):
             return k["key"]
     b = _norm(body)
     for k in kcc:
         sc = sum(1 for kw in (k["keywords"] or []) if kw and re.search(kw, b, re.I) if _safe_re(kw))
-        if sc > score:
+        if sc > score and _confirmed(k["key"], body):
             best, score = k["key"], sc
     return best
+
+
+def _confirmed(key: str, body: str) -> bool:
+    """A clause matched only loosely (alias inside a heading, or body keywords) is accepted for a key that has a precise sentence pattern only if the pattern really matches:
+    real contracts have table-of-contents lines, boilerplate and licences that merely mention 'termination' or 'insurance'. An exact heading match is always accepted."""
+    return True if key not in PRESENCE else bool(sentence_hits(key, body or ""))
 
 
 def _safe_re(p: str) -> bool:
@@ -425,14 +431,23 @@ __all__ = ["ensure_defaults", "load_kcc", "load_metrics", "load_rules", "classif
 
 # ------------------------------------------------------------------ sentence-level clause detection (real contracts bury clauses inside other sections, or have no usable headings)
 PRESENCE = {
-    "audit_rights": r"\b(?:audit|inspect)\w*\b[^.;]{0,100}\b(?:books|records|facilit\w+|premises|accounts)|\b(?:books|records|accounts)\b[^.;]{0,100}\b(?:audit|inspect)\w*|right to (?:audit|inspect)|access (?:to|during)[^.;]{0,80}\b(?:records|books|facilit\w+)",
-    "assignment": r"\b(?:may|shall|will|can)\s+not\s+(?:\w+\s+){0,4}?(?:assign|transfer)\w*\b|\bno\s+(?:party|assignment)[^.;]{0,60}\b(?:assign|transfer)|assign\w*[^.;]{0,100}without[^.;]{0,50}(?:prior )?(?:written )?consent|(?:prior )?(?:written )?consent[^.;]{0,60}to (?:any )?assign",
-    "termination_for_convenience": r"terminat\w+[^.;]{0,160}(?:for convenience|without cause|for any (?:reason|or no reason)|for no reason)|(?:for convenience|without cause)[^.;]{0,80}terminat\w+|(?:may|can|has the right to) terminate\b(?![^.;]*(?:breach|default|insolven|bankrupt|cause|failure))[^.;]{0,80}(?:upon|on|by giving|with|after) (?:not less than |at least )?(?:\w+ )?\(?\d+\)? ?(?:days|months)['’]? (?:prior )?(?:written )?notice",
-    "liability_cap": r"(?:in no event|under no circumstances|shall not)[^.;]{0,250}(?:liab\w+|damages)[^.;]{0,250}(?:exceed|in excess of|limited to|not be greater than)|(?:liab\w+|damages)[^.;]{0,120}(?:shall|will) not exceed|aggregate liability|liability (?:is|shall be) (?:limited|capped)",
+    "audit_rights": r"\b(?:examin\w+|review\w*)\b[^.;]{0,80}\b(?:books|records)\b|\b(?:books|records)\b[^.;]{0,100}\b(?:available (?:for|to)|examin\w+)|available for audit|\b(?:audit|inspect)\w*\b[^.;]{0,100}\b(?:books|records|facilit\w+|premises|accounts)|\b(?:books|records|accounts)\b[^.;]{0,100}\b(?:audit|inspect)\w*|right to (?:audit|inspect)|access (?:to|during)[^.;]{0,80}\b(?:records|books|facilit\w+)",
+    "assignment": r"\b(?:neither|no|none of the)\s+(?:party|parties)\b[^.;]{0,60}\b(?:may|shall|will|can)\b[^.;]{0,40}\b(?:assign|transfer|cede|delegate)\w*|\b(?:may|shall|will|can)\s+not\s+(?:\w+\s+){0,4}?(?:assign|transfer)\w*\b|\bno\s+(?:party|assignment)[^.;]{0,60}\b(?:assign|transfer)|assign\w*[^.;]{0,100}without[^.;]{0,50}(?:prior )?(?:written )?consent|(?:prior )?(?:written )?consent[^.;]{0,60}to (?:any )?assign",
+    "termination_for_convenience": r"\btermination for convenience\b|\bterminat\w*[^.;]{0,40}\bfor (?:its |their )?convenience\b|\bfor convenience\b[^.;]{0,40}\bterminat\w*|\b(?:may|can|shall have the right to|has the right to|have the right to|is entitled to|reserves the right to|may elect to)\s+(?:\w+\s+){0,3}?terminate\b[^.;]{0,200}?(?:without cause|for any reason|for no reason|at any time|(?:upon|on|with|by giving|after)[^.;]{0,40}\d+\)?\s*(?:calendar |business )?(?:days|months)|prior written notice)|\b(?:may|can|shall) be terminated[^.;]{0,200}?(?:without cause|for any reason|for no reason|at any time|(?:upon|on|with|by giving)[^.;]{0,40}\d+\)?\s*(?:calendar |business )?(?:days|months)|prior written notice)|\bcancell?able at any time",
+    "liability_cap": r"limitation[s]? (?:of|on) liability|\b(?:total|maximum|aggregate|entire) liability\b|(?:shall|will) not be liable[^.;]{0,120}(?:indirect|consequential|special|incidental|punitive|exemplary|lost profits)|(?:neither|no) party[^.;]{0,80}liab\w+[^.;]{0,160}(?:indirect|consequential|special|incidental|punitive|exemplary|lost profits)|(?:in no event|under no circumstances|shall not)[^.;]{0,250}(?:liab\w+|damages)[^.;]{0,250}(?:exceed|in excess of|limited to|not be greater than)|(?:liab\w+|damages)[^.;]{0,120}(?:shall|will) not exceed|aggregate liability|liability (?:is|shall be) (?:limited|capped)",
     "insurance": r"\b(?:maintain|carry|procure|keep)\b[^.;]{0,100}\binsurance\b|\binsurance (?:coverage|polic\w+|certificate)|certificates? of insurance|general liability insurance",
-    "ip_ownership": r"(?:shall|will) (?:be|remain) (?:the )?(?:sole |exclusive )?(?:property|owner)\w*|\b(?:owns?|retains?) all (?:right|title)|(?:hereby )?assigns?[^.;]{0,80}(?:right, title|intellectual property|work product|inventions)|work made for hire|ownership of[^.;]{0,60}(?:intellectual property|inventions|work product)",
+    "ip_ownership": r"\b(?:own\w*|title|rights?)\b[^.;]{0,80}\b(?:developed|created|conceived|invented|work product|deliverables|improvements|inventions)\b|\b(?:developed|created|conceived|invented)\b[^.;]{0,120}\b(?:shall|will) (?:be|remain|belong)\b[^.;]{0,50}(?:property|owned|belong|owner)|hereby assigns?[^.;]{0,80}(?:right, title|intellectual property|work product|inventions)|assigns?[^.;]{0,60}right, title and interest|work made for hire|(?:shall|will) (?:be|remain) the (?:sole |exclusive )?property of",
     "non_solicit": r"non-?solicit\w*|(?:shall|will|agrees?|covenants?) not[^.;]{0,80}\bsolicit\w*|\bsolicit\w*[^.;]{0,60}\b(?:employees|customers|personnel|clients)",
 }
+
+
+# sentences that look like a match but are not (a termination for breach / insolvency, or a survival clause), skipped for that key
+NEGATIVE = {"termination_for_convenience": r"\b(?:breach|default|insolven\w*|bankrupt\w*|failure to|fails? to|surviv\w+|for cause|material)\b(?![^.;]*(?:without cause|for convenience))|\bnotwithstanding any termination\b"}
+
+
+def sentence_hits(key: str, text_: str) -> list[str]:
+    cre, neg = re.compile(PRESENCE[key], re.I), re.compile(NEGATIVE[key], re.I) if key in NEGATIVE else None
+    return [s for s in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text_)) if cre.search(s) and not (neg and neg.search(s))]
 
 
 def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: set[str] | None = None) -> list[dict]:
@@ -445,7 +460,7 @@ def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: 
             continue
         cre = re.compile(rx, re.I)
         for text_, page, head in pools:
-            hit = [s for s in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text_)) if cre.search(s)]
+            hit = sentence_hits(key, text_)
             if hit:
                 out.append({"clause_type": key, "heading": f"{head[:60]} (found in text)", "text": " ".join(hit[:2])[:900], "page": page, "idx": 0})
                 break

@@ -69,21 +69,31 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
         out[field] = dict(value=value, confidence=conf if value is not None else min(conf, 0.5), clause_type=ctype if ctype in d.by else None, page=d.page_of(ctype))
 
     # ---- effective date
-    head = _first_para(d)
     eff = None
-    dm = re.search(r"([A-Za-z0-9,/ .\-]{6,30}?)\s*\(\s*(?:the\s+|this\s+)?[\"“”']?(?:Effective Date|Commencement Date|Start Date)[\"“”']?\s*\)", head, re.I)
-    if dm:
-        eff = tu.first_date(dm.group(1))
-    for rx in () if eff else (r"(?:effective (?:as of|on|date)|entered into (?:as of|on)|made (?:as of|on|and entered into on)|is dated|dated as of|as of|commenc\w+ on|starts? on)[:\s|*]*([^.;]{0,40})",
-               r"Effective Date[\s|:*]+([^\n|]{4,40})", r"Period[\s|:*]+([^\n|]{4,40}?)(?:\s+(?:to|through|until|–|-)\s+)"):
-        for m in re.finditer(rx, head, re.I):
-            eff = tu.first_date(m.group(1))
+    for head in (_first_para(d), re.sub(r"\s+", " ", d.flat[:3500])):         # real contracts start with exhibit numbers, redaction notices, tables of contents
+        dm = re.search(r"([A-Za-z0-9,/ .\-]{6,40}?)\s*[\(\[]\s*(?:the\s+|this\s+|hereinafter\s+)?[\"“”']?(?:Effective Date|Commencement Date|Start Date)[\"“”']?\s*[\)\]]", head, re.I)
+        if dm:
+            eff = tu.first_date(dm.group(1))
+        for rx in () if eff else (r"(?:effective (?:as of|on|date)|entered into (?:as of|on|this)|made (?:and entered into )?(?:as of|on|this|effective)|is dated|dated (?:as of|this|effective)|as of|commenc\w+ on|starts? on)(?: this)?[:\s|*]*([^.;]{0,40})",
+                   r"Effective Date[\s|:*]+([^\n|]{4,40})", r"Period[\s|:*]+([^\n|]{4,40}?)(?:\s+(?:to|through|until|–|-)\s+)"):
+            for m in re.finditer(rx, head, re.I):
+                eff = tu.first_date(m.group(1))
+                if eff:
+                    break
             if eff:
                 break
         if eff:
             break
+        if head is not None and len(head) < 400:
+            eff = tu.first_date(head)
+            if eff:
+                break
+    if not eff:     # the first sentence of the form 'This ... Agreement ... <date>' (not a redaction notice or a date elsewhere)
+        for s_ in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", d.flat[:4000])):
+            if re.search(r"\b(?:this|the)\b[^.]{0,100}\bagreement\b", s_, re.I) and (eff := tu.first_date(s_)):
+                break
     if not eff:
-        eff = tu.first_date(head)
+        eff = tu.first_date(re.sub(r"\s+", " ", d.flat[:3500]))
     put("effective_date", _iso(eff), 0.95 if eff else 0.3)
 
     # ---- expiry
@@ -205,21 +215,27 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             put("termination_for_convenience", False, 0.92, tc)
         elif re.search(r"(?:may|can|shall be entitled to)\s+terminate[^.]{0,120}(?:for convenience|without cause|for any reason)|for convenience[^.]{0,60}(?:upon|on|by giving|with)[^.]{0,30}\d+\s*days", ttxt, re.I):
             put("termination_for_convenience", True, 0.9, tc)
-        elif any(re.search(r"\b(?:may|can|has the right to|shall have the right to)\s+terminate\b[^.;]{0,80}\b(?:upon|on|by giving|with|after)\s+(?:not less than |at least |no less than )?(?:\w+\s+)?\(?\d+\)?\s*(?:calendar |business )?(?:days|months)['’]?\s+(?:prior )?(?:written )?notice", s_, re.I)
-                 and not re.search(r"breach|default|insolven|bankrupt|cause|failure|fail to|non-?payment|material", s_, re.I) for s_ in re.split(r"(?<=[.;])\s+", d.flat)):
-            put("termination_for_convenience", True, 0.75, tc)          # 'either party may terminate on 90 days' written notice', with no breach / cause language in the sentence
+        elif (hits := __import__("app.kcc", fromlist=["x"]).sentence_hits("termination_for_convenience", d.flat)):
+            put("termination_for_convenience", True, 0.7, tc)           # a sentence that gives a party the right to terminate without cause / for convenience / on notice (shared with the clause detector)
         else:
             put("termination_for_convenience", None, 0.4, tc)
     # ---- governing law
     if not amend:
-        m, gc = d.search(r"(?:governed by|construed in accordance with|subject to)[^.]{0,50}?laws? of (?:the )?(?:State of |Commonwealth of |Republic of )?((?:England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2}))(?:,|\.| without| and | excluding| including| applicable| for| \(|;)", ("governing_law",), flags=0)
-        if not m:     # real contracts: longer wording between 'governed by' and the jurisdiction, 'internal laws', or only 'the laws of the State of X'
-            m, gc = d.search(r"(?:governed|construed|interpreted|enforced)[^.]{0,200}?(?:internal )?laws? (?:of|in) (?:the )?(?:State of |Commonwealth of |Province of |Republic of )?((?:England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2}))(?:,|\.| without| and | excluding| including| applicable| for| \(|;| applied| regardless| as )", ("governing_law",), flags=0) or (None, None)
-        if not m:
-            m2 = re.search(r"laws? of (?:the )?(?:State|Commonwealth|Province) of ([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)", d.flat)
-            m, gc = (m2, None) if m2 else (None, None)
-        v = m.group(1).strip() if m else None
-        put("governing_law", v, 0.93 if v else 0.4, gc)
+        gl = _governing_law(d.flat)
+        if gl:
+            put("governing_law", gl, 0.9, None)
+        else:
+            m, gc = d.search(r"(?:governed by|construed in accordance with|subject to)[^.]{0,50}?laws? of (?:the )?(?:State of |Commonwealth of |Republic of )?((?:England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2}))(?:,|\.| without| and | excluding| including| applicable| for| \(|;)", ("governing_law",), flags=0)
+            if not m:     # real contracts: longer wording between 'governed by' and the jurisdiction, 'internal laws', or only 'the laws of the State of X'
+                m, gc = d.search(r"(?:governed|construed|interpreted|enforced)[^.]{0,200}?(?:internal )?laws? (?:of|in) (?:the )?(?:State of |Commonwealth of |Province of |Republic of )?((?:England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2}))(?:,|\.| without| and | excluding| including| applicable| for| \(|;| applied| regardless| as )", ("governing_law",), flags=0) or (None, None)
+            if not m:
+                m2 = re.search(r"laws? of (?:the )?(?:State|Commonwealth|Province) of ([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)", d.flat)
+                m, gc = (m2, None) if m2 else (None, None)
+            if not m:     # countries and regions: 'laws of England', 'the laws of the People's Republic of China', 'laws of Hong Kong'
+                m2 = re.search(r"(?:governed|construed|interpreted)[^.]{0,200}?laws? of (?:the )?((?:People[’']s Republic of China|Republic of [A-Z][a-z]+|England(?: and Wales)?|Hong Kong|Singapore|Japan|Germany|France|Switzerland|India|Australia|Canada|Ireland|Scotland|Netherlands|Israel|Ontario|British Columbia|Quebec|Belgium|Sweden|Italy|Spain|Brazil|Mexico|China|Korea|United Kingdom|Cayman Islands|Bermuda)\b)", d.flat)
+                m, gc = (m2, None) if m2 else (None, None)
+            v = m.group(1).strip() if m else None
+            put("governing_law", v, 0.93 if v else 0.4, gc)
     # ---- personal data and DPA
     if not amend:
         scope = d.flat
@@ -342,3 +358,34 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
 
 
 COMPANY_RX = re.compile(r"[A-Z][\w&'\-]*(?:\s+(?:&\s+)?[A-Z][\w&'\-]*){0,5}?\s+(?:Inc\.?|LLC|LLP|Ltd\.?|Limited|Corp\.?|Corporation|Pte Ltd|GmbH|PLC|LP|Group|Co\.)")
+
+
+US_STATES = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+             "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota",
+             "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"]
+PLACES = ["England and Wales", "England", "Scotland", "Ireland", "Northern Ireland", "Hong Kong", "Singapore", "Japan", "Germany", "France", "Switzerland", "India", "Australia", "Canada", "Ontario", "British Columbia", "Quebec",
+          "Alberta", "Netherlands", "Israel", "Belgium", "Sweden", "Italy", "Spain", "Brazil", "Mexico", "China", "Korea", "United Kingdom", "Cayman Islands", "Bermuda", "Luxembourg", "Denmark", "Norway", "Finland", "Austria",
+          "New Zealand", "South Africa", "United Arab Emirates", "Taiwan", "Thailand", "Malaysia", "Philippines", "District of Columbia"]
+ALIASES = {"PRC": "People's Republic of China", "P.R.C.": "People's Republic of China", "UK": "United Kingdom", "U.K.": "United Kingdom"}
+
+
+def _governing_law(flat: str) -> str | None:
+    """The jurisdiction named in the sentence that says what law governs the agreement. Sentence first (a stray 'construed' elsewhere is not a governing-law clause), then the name in it:
+    'State of X', 'laws of the People's Republic of China', 'internal laws of New York', or a known state / country."""
+    sents = re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", flat))
+    pri = [s for s in sents if re.search(r"\bgovern\w*\b[^.;]{0,160}\blaws?\b|\blaws?\b[^.;]{0,120}\bgovern\w*|governing law|(?:construed|interpreted|enforced)[^.;]{0,80}(?:in accordance with|under|pursuant to)[^.;]{0,40}\blaws?\b|\bapplicable law:|choice of law|laws? of (?:the )?state of", s, re.I)]
+    for s in pri:
+        m = re.search(r"(?:State|Commonwealth|Province|Republic|Kingdom) of ([A-Z][A-Za-z]+(?: [A-Z][A-Za-z]+)?)", s)
+        if m and m.group(1).split(" and ")[0] in US_STATES + PLACES + [x.split()[0] for x in US_STATES if " " in x]:
+            return m.group(1)
+        low = s
+        for name in sorted(US_STATES + PLACES, key=len, reverse=True):
+            if re.search(rf"\b{re.escape(name)}\b", low):
+                return name
+        for a, full in ALIASES.items():
+            if re.search(rf"\b{re.escape(a)}\b", low):
+                return full
+        m = re.search(r"laws? of (?:the )?(People[’']s Republic of China)", s)
+        if m:
+            return "People's Republic of China"
+    return None

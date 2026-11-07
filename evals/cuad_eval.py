@@ -38,8 +38,20 @@ def main() -> int:
     n = int(sys.argv[sys.argv.index("--n") + 1]) if "--n" in sys.argv else 150
     seed = int(sys.argv[sys.argv.index("--seed") + 1]) if "--seed" in sys.argv else 1
     use_pdf = "--pdf" in sys.argv
+    split = sys.argv[sys.argv.index("--split") + 1] if "--split" in sys.argv else "all"      # train (70%) | test (30%, never tuned on) | all; fixed by a hash of the file name
+    dump = sys.argv[sys.argv.index("--dump") + 1] if "--dump" in sys.argv else None
+    import hashlib
+    import json
+    if split != "all":
+        rows0 = list(csv.DictReader(open(root / "master_clauses.csv", encoding="utf-8-sig")))
+        keep = {r["Filename"] for r in rows0 if (int(hashlib.md5(r["Filename"].encode()).hexdigest(), 16) % 10 < 7) == (split == "train")}
+    else:
+        keep = None
+    miss: list[dict] = []
     rows = list(csv.DictReader(open(root / "master_clauses.csv", encoding="utf-8-sig")))
     random.Random(seed).shuffle(rows)
+    if keep is not None:
+        rows = [r for r in rows if r["Filename"] in keep]
     with SessionLocal() as s:
         cfg = pipeline.load_config(s)
     classify = lambda h, t: kcc.classify(h, t, cfg["kcc"])  # noqa: E731
@@ -72,6 +84,8 @@ def main() -> int:
             got = key in types
             i = (0 if got else 2) if want else (1 if got else 3)
             pres[key][i] += 1
+            if dump and i in (1, 2):
+                miss.append({"file": name, "kind": "presence", "clause": key, "error": "FP" if i == 1 else "FN", "label": " | ".join((r.get(c) or "")[:300] for c in cols), "ours": next((c["text"][:300] for c in clauses if c["clause_type"] == key), "")})
         v = lambda k: (out.get(k) or {}).get("value")  # noqa: E731
         gl = (r.get("Governing Law-Answer") or "").strip()
         if gl:
@@ -81,6 +95,11 @@ def main() -> int:
         if ed:
             fld["effective_date"][1] += 1
             fld["effective_date"][0] += str(v("effective_date"))[:10] == ed.isoformat()
+        if dump:
+            if gl and not (v("governing_law") and gl.lower().split(",")[0] in str(v("governing_law")).lower()):
+                miss.append({"file": name, "kind": "field", "clause": "governing_law", "error": "FN", "label": gl, "ours": str(v("governing_law"))})
+            if ed and str(v("effective_date"))[:10] != ed.isoformat():
+                miss.append({"file": name, "kind": "field", "clause": "effective_date", "error": "FN", "label": ed.isoformat(), "ours": str(v("effective_date")), "head": md[:300]})
         want_t = (r.get("Termination For Convenience-Answer") or "").strip().lower() == "yes"
         got_t = v("termination_for_convenience") is True
         tfc[(0 if got_t else 2) if want_t else (1 if got_t else 3)] += 1
@@ -98,6 +117,8 @@ def main() -> int:
     print(f"\n  termination_for_convenience=True  precision {tp / max(tp + fp, 1):.2f}  recall {tp / max(tp + fn, 1):.2f}  (tp/fp/fn {tp}/{fp}/{fn})")
     for k, (a, b) in fld.items():
         print(f"  {k:28s} {a}/{b} = {100 * a / max(b, 1):.1f}%")
+    if dump:
+        Path(dump).write_text(json.dumps(miss))
     print(f"\nOVERALL crashes: {errors}/{done + errors}")
     return 0
 
