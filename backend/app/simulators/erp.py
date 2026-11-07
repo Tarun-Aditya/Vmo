@@ -19,8 +19,9 @@ COUPA_ID, COUPA_SECRET, SAP_KEY = "demo-client", "demo-secret", "demo-sap-key"
 _TOKENS: dict[str, float] = {}
 
 
-def demo_invoices(today: date | None = None) -> list[dict]:
-    """This month's invoices as an ERP would hold them, derived from the loaded contracts by rule."""
+def demo_invoices(today: date | None = None, system: str | None = None) -> list[dict]:
+    """This month's invoices as an ERP would hold them, derived from the loaded contracts by rule. `system` splits them like a real estate would: SaaS subscriptions sit in the
+    SAP system, services (SOWs, vendors without a contract) in Coupa, so connecting both never duplicates an invoice."""
     today = today or date.today()
     with SessionLocal() as s:
         cons = [{**dict(r), "annual_value": float(r["annual_value"] or 0)} for r in s.execute(text("""SELECT contract_id, title, vendor, type, annual_value, total_value, payment_terms_days, expiry_date, fully_executed
@@ -33,7 +34,7 @@ def demo_invoices(today: date | None = None) -> list[dict]:
         v = vendor or c["vendor"]
         no = no or f"{v[:3].upper()}-{d:%y%m}-S{(c or {'contract_id': 0})['contract_id']:03d}"
         key = f"{no}|{tag}"
-        out.append(dict(id=int(hashlib.sha1(key.encode()).hexdigest()[:7], 16), vendor=v, contract_title=title if title is not None else (c["title"] if c else ""), invoice_no=no, invoice_date=d,
+        out.append(dict(system="sap" if c and c["type"] == "SaaS" else "coupa", id=int(hashlib.sha1(key.encode()).hexdigest()[:7], 16), vendor=v, contract_title=title if title is not None else (c["title"] if c else ""), invoice_no=no, invoice_date=d,
                         due_date=d + timedelta(days=int((c or {}).get("payment_terms_days") or 45)), amount=round(float(amount), 2), description=desc, updated=datetime(d.year, d.month, d.day, 12, tzinfo=timezone.utc)))
 
     for c in cons:
@@ -49,7 +50,7 @@ def demo_invoices(today: date | None = None) -> list[dict]:
     unsigned = [c for c in cons if not c["fully_executed"]]
     if unsigned:
         inv(unsigned[0], unsigned[0]["annual_value"] / 12 * 0.5, "Mobilisation fee", no=f"{unsigned[0]['vendor'][:3].upper()}-{today:%y%m}-MOB", tag="unsigned")
-    return out
+    return [r for r in out if system in (None, r["system"])]
 
 
 def _ms(d: date) -> str:
@@ -71,7 +72,7 @@ def coupa_invoices(request: Request, limit: int = 50, offset: int = 0):
     tok = (request.headers.get("authorization") or "")[7:]
     if _TOKENS.get(tok, 0) < datetime.now().timestamp():
         raise HTTPException(401, "invalid_token")
-    rows = demo_invoices()[offset:offset + limit]
+    rows = demo_invoices(system="coupa")[offset:offset + limit]
     return [{"id": r["id"], "invoice-number": r["invoice_no"], "invoice-date": r["invoice_date"].isoformat(), "payment-due-date": r["due_date"].isoformat(), "paid-date": None,
              "total-with-taxes": f"{r['amount']:.2f}", "currency": {"code": "USD"}, "status": "approved", "supplier": {"name": r["vendor"]}, "contract": {"name": r["contract_title"]} if r["contract_title"] else None,
              "line-items": [{"description": r["description"]}], "updated-at": r["updated"].isoformat()} for r in rows]
@@ -84,4 +85,4 @@ def sap_invoices(apikey: str | None = Header(None, alias="APIKey")):
         raise HTTPException(401, "API key is missing or invalid")
     return {"d": {"results": [{"SupplierInvoice": str(r["id"]), "FiscalYear": str(r["invoice_date"].year), "InvoicingParty": r["vendor"], "SupplierInvoiceIDByInvcgParty": r["invoice_no"],
                                "DocumentDate": _ms(r["invoice_date"]), "PaymentDueDate": _ms(r["due_date"]), "InvoiceGrossAmount": f"{r['amount']:.2f}", "DocumentCurrency": "USD",
-                               "DocumentHeaderText": r["description"], "LastChangeDate": r["updated"].strftime("%Y%m%d")} for r in demo_invoices()]}}
+                               "DocumentHeaderText": r["description"], "LastChangeDate": r["updated"].strftime("%Y%m%d")} for r in demo_invoices(system="sap")]}}

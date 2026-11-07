@@ -84,3 +84,13 @@ Plan: build to files first (invoice / PO exports are already read), then a confi
 | 8 | Word add-in | Scaffold: manifest + task pane (comments, insert suggested wording, comment on selection) served at `/addin/`. **Not tested inside Word** |
 | 9 | Docker / CI / ops | Built: CI workflow, backup script, metrics, JSON logs. **Docker image and the CI workflow have not been run** (no Docker / GitHub runner here) |
 | 10 | Ask gaps, market table | Built: service credits queryable, answer-format rules for Claude. Market table re-checked: LinkSquares has a Word add-in with playbook redlining (our old "Authoring in Word: No" for contract-AI tools was wrong for it); most comparison material found is vendor-authored |
+
+## Demo simulators (ERP and e-signature)
+`SIMULATORS=1`: Coupa- and SAP-shaped invoice APIs generated from the loaded contracts (`app/simulators/erp.py`) and a DocuSign-compatible envelope API with a signing page and webhook (`app/simulators/esign.py`).
+Tested through the real connector and DocuSign client code over HTTP (`tests/test_simulators.py`). They prove the integration path and the demo story, **not** that a real Coupa / SAP / DocuSign tenant behaves identically:
+field names and auth are modelled on their public documentation and must still be checked against a customer's sandbox.
+
+## Real-contract benchmark (CUAD, 510 public contracts with expert labels)
+`python evals/cuad_eval.py <CUAD_v1 folder> --n 150 --seed 7`. Held-out results: offline rules governing law 72%, effective date 55%, termination-for-convenience recall 33%; **Claude (60 contracts): governing law 98%,
+effective date 96%, termination for convenience precision 0.76 / recall 0.81**. Clause detection (rules, both modes), held-out: audit rights recall 0.76, assignment 0.79, insurance 0.81, liability cap 0.52, termination for
+convenience precision 0.46. Use Claude mode for real customer contracts. CUAD is mostly licence / distribution agreements, not vendor MSAs.

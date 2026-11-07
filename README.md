@@ -117,6 +117,15 @@ The header badge shows the engine in use. Offline eval scores prove the plumbing
   and an audit log of every change, sign-in and refusal. This is application-level access control; SSO provisioning (SCIM), MFA and per-tenant isolation are not built.
 * **Word**: every draft / document exports to `.docx`; the redline exports with real tracked changes (`w:ins` / `w:del`) that Word shows as accept / reject.
 
+## Demo without any ERP or DocuSign account (simulators)
+Start the API with `SIMULATORS=1 PUBLIC_API_URL=http://localhost:8000` (the default in `.env.example` for demos). The app then contains stand-ins that speak the same APIs the real connectors use:
+* **ERP** — Admin → Connectors → **Connect demo ERP**. Registers a simulated Coupa (OAuth client credentials, JSON, paging) and a simulated SAP S/4HANA (API key, OData v2, `/Date()/` values) and syncs them; the real
+  connector code runs over HTTP. The invoices are generated from *your loaded contracts* (this month's fee per active SOW / SaaS, a resend, an over-run, a vendor with no contract, an unsigned contract), so Spend and Alerts
+  change in front of the audience (e.g. 51 → 68 invoices, 12 → 20 exceptions on the pilot corpus). Demo credentials: Coupa `demo-client` / `demo-secret`, SAP key `demo-sap-key`.
+* **E-signature** — open a draft in the editor → Signatures → provider *DocuSign* → Send. The DocuSign-compatible simulator returns the signing links (a real service e-mails them); open each in a browser, sign in order,
+  and the simulator calls our Connect-style webhook; the draft gets a signature block, the signatories are extracted, and *Mark executed* turns it into an executed contract.
+The simulators are clearly labelled, are not the vendors' services, and a real account is used the moment `DOCUSIGN_*` / a real connector is configured (`SIMULATORS=0` in production).
+
 ## Tests
 `make test` (offline, synthetic corpus: 116 tests including connectors, alerts, access control, real PDF/Word ingestion). Outside Docker use a separate database and data folder
 for tests (`DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`) so they never touch a demo database.
