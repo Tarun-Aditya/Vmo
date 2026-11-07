@@ -196,6 +196,28 @@ docs/, HANDOVER.md   security notes; handover with measured results and limits
 CLAUDE.md            original scope and conventions
 ```
 
+## Roadmap (future scope, not built)
+
+**VMO depth** (what a mature vendor-management office runs beyond contracts):
+1. Vendor performance reviews: quarterly business reviews with scores, actions and history per vendor.
+2. Compliance certificates: insurance, security and other certificates with their own expiry dates and reminders.
+3. Renewal and negotiation workflow: a recorded decision per renewal (renew, renegotiate, exit) with owner, deadline and outcome.
+4. Savings tracking: cost avoided or reduced through renegotiation, reported per vendor and per category.
+5. Vendor master data: duplicate vendors across business units, consolidation and tiering.
+6. Onboarding and due diligence: questionnaires, financial-health and risk checks before signature.
+7. Rate cards and resourcing for staffing and services vendors.
+8. Exit and transition plans for critical vendors.
+
+**Platform:** upload with OCR at scale, Word tracked-changes round trip from Word itself, character-level co-editing, ERP and procurement
+connectors verified against real tenants (Coupa, SAP, Ariba), multi-tenancy, SSO provisioning at scale, SOC 2 evidence, audit export.
+
+**Product:** port the redesign in `design/` to the front end, one headline demo path (renewals, portfolio map, Ask), and measured accuracy on a
+design partner's own redacted contracts.
+
+**Verticals:** a hospitality version (property-level hierarchy across many sites, hotel-specific clauses such as food safety, guest data and
+brand standards, rate cards per room-night or per kilo). It would use fictional data only and be built from public knowledge and customers'
+own contracts, never from any employer's confidential material. The first decision is who the first buyer is.
+
 ## Known limits
 
 1. Every external integration is verified only against simulators, never a live tenant.
