@@ -59,3 +59,14 @@ Swapping the Claude subscription for an API key: set `ANTHROPIC_API_KEY`; nothin
 2. Run the pipeline (Admin → Pipeline → Run now). Check Contracts for vendor / type / parent resolution; fix by adding a `.meta.json` sidecar if needed.
 3. Review Admin → Values & limits and Thresholds against the customer's policy; add obligation rules for their duty types.
 4. Load their AP / SLA exports as CSV; set alert channels; turn on `AUTH_MODE=on`.
+
+## Review collaboration (G1, built)
+Threaded comments anchored to selected text (add, reply, assign with due date, resolve, reopen, @mention through the alerts engine), AI playbook findings opened as threads (idempotent),
+approval blocked while threads are open (HTTP 409), and share links (view / comment / edit, expiry, revoke) that guests open without an account at `/shared/<token>`. Tests: `tests/test_comments.py`.
+Not yet built: comments exported into / imported from `.docx` (Word margin comments), live multi-cursor co-editing (guests and users save whole versions), authoring-side "suggesting" mode, e-mail delivery of comment notifications beyond the alert channels.
+
+## Ariba / Coupa / SAP: what is needed (checked 2026-11)
+* **SAP Ariba:** a registered application in the Ariba Developer Portal (requested by the customer's Ariba administrator) gives an application key + OAuth client; the portal's sandbox / "try out" calls work without production approval. Real data needs the customer's realm and approval.
+* **Coupa:** OAuth 2.0 client (client-credentials) created by the customer admin under Setup > OAuth2/OpenID Connect Clients; partner / demo instances are on coupacloud.com. I found no public free tier; sandbox access comes through a customer or Coupa's partner programme.
+* **SAP S/4HANA:** the SAP Business Accelerator Hub offers a free read-only sandbox API key for exploring APIs; a free S/4HANA Cloud trial exists but is limited (about 30 days, shared tenant, reduced features).
+Plan: build to files first (invoice / PO exports are already read), then a configurable REST connector with mock-server tests, then live tests with the pilot customer's sandbox credentials.

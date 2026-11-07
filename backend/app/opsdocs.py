@@ -16,7 +16,7 @@ from app.config import settings
 from app.db import SessionLocal
 from app.extract_rules import COMPANY_RX, customer_markers
 
-PARSER_VERSION = "4"        # bump when the readers change: parsed results are cached by content hash + this
+PARSER_VERSION = "6"        # bump when the readers change: parsed results are cached by content hash + this
 DOC_EXT = {".pdf", ".docx", ".md", ".txt"}
 AMT = r"(?:USD|US\$|\$)\s*([\d]{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)"
 DATE_RX = r"(?:\d{1,2}[ \-/][A-Za-z]{3,9}[ \-/,]*\d{4}|[A-Za-z]{3,9}\.? \d{1,2},? \d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4})"
@@ -76,11 +76,11 @@ def _vendor(t: str) -> str | None:
 
 
 def _reference(t: str) -> str | None:
-    for lab in (r"(?:agreement|contract|sow|statement of work|work order|reference|your ref(?:erence)?|re)\b[^:|\n]{0,20}",):
-        m = re.search(rf"(?:^|\n)\W*{lab}\s*[:|]\s*([^\n|]{{6,160}})", t, re.I)
-        if m:
-            return m.group(1).strip(" .|")
-    return None
+    """The agreement / SOW / work order a document refers to, from a labelled line ('Agreement: X', '| Reference | X |', or 'Agreement X' once a Word table has lost its separators)."""
+    m = re.search(r"(?:^|\n)[\s|]*(?:agreement|contract|sow|statement of work|work order|your ref(?:erence)?|our ref(?:erence)?|reference|re)\b[^:|\n]{0,20}?\s*[:|]\s*([^\n|]{6,160})", t, re.I)
+    if not m:
+        m = re.search(r"(?:^|\n)[\s|]*(?i:agreement|contract|your ref(?:erence)?|reference)\s+([A-Z][^\n|]{5,159})", t)
+    return m.group(1).strip(" .|") if m else None
 
 
 def parse_invoice(t: str) -> dict:
