@@ -1,6 +1,7 @@
 """Operational feeds: invoices (ERP / AP export), SLA measurements (monitoring / ITSM export) and obligation status updates.
-Real feeds are CSV files dropped in data/feeds/ and loaded by the 'feeds' pipeline. For the demo, `generate()` writes believable
-fictional feeds for the seeded contracts (with planted problems) so spend, SLA and risk screens have data."""
+Real feeds are the customer's own files dropped in data/feeds/ (or synced by a connector): CSV exports, or the documents themselves (invoices, monthly
+service-level reports, milestone acceptance certificates; PDF / Word / Markdown / scans), read by app.opsdocs and loaded by the 'feeds' pipeline.
+`generate_rows()` only exists to make fictional fixtures for demos and tests (see app.docgen.ops_fixtures, which writes them as documents): no screen reads its output directly."""
 from __future__ import annotations
 
 import csv
@@ -27,6 +28,35 @@ def feeds_dir() -> Path:
     return data_path() / "feeds"
 
 
+def feed_files() -> list[Path]:
+    """Everything the feeds pipeline reads: CSV exports and operational documents (invoices, service-level reports, acceptance certificates), in any sub-folder."""
+    from app.opsdocs import DOC_EXT
+
+    d = feeds_dir()
+    return sorted(f for f in d.rglob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXT | {".csv"})
+
+
+FEED_OF = {"invoice": "invoices", "sla_report": "sla", "acceptance": "obligation_status"}
+
+
+def _read_document(f: Path) -> tuple[str, list[dict]]:
+    """Parse one operational document, remembering the result by content hash (OCR and Claude are slow; the same file is not read twice)."""
+    import json
+
+    from app import llm, opsdocs
+
+    cache = data_path() / ".cache" / "opsdocs"
+    key = hashlib.sha256(f.read_bytes() + opsdocs.PARSER_VERSION.encode() + (b"llm" if llm.available() else b"rules")).hexdigest()
+    c = cache / f"{key}.json"
+    if c.exists():
+        kind, rows = json.loads(c.read_text())
+        return kind, rows
+    kind, rows = opsdocs.read(f)
+    cache.mkdir(parents=True, exist_ok=True)
+    c.write_text(json.dumps([kind, rows], default=str))
+    return kind, rows
+
+
 def _add_months(d: date, n: int) -> date:
     m0 = d.month - 1 + n
     y, m = d.year + m0 // 12, m0 % 12 + 1
@@ -38,8 +68,8 @@ def _add_months(d: date, n: int) -> date:
     return date(y, m, 28)
 
 
-# ------------------------------------------------------------------ demo feed generator
-def generate(today: date | None = None, seed: int = 11) -> dict:
+# ------------------------------------------------------------------ fixture generator (TEST / DEMO DATA ONLY: used to write fictional invoice and report *documents*)
+def generate_rows(today: date | None = None, seed: int = 11) -> tuple[list[dict], list[dict], list[dict]]:
     today = today or date.today()
     rnd = random.Random(seed)
     with SessionLocal() as s:
@@ -47,7 +77,7 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
             "SELECT t.contract_id, t.title, t.vendor, t.type, t.category, t.effective_date, t.expiry_date, t.annual_value, t.total_value, t.payment_terms_days "
             "FROM v_effective_terms t WHERE t.status <> 'draft' ORDER BY t.contract_id")).mappings()]
         sla_t = {(r[0], r[1]): float(r[2]) for r in s.execute(text("SELECT contract_id, metric_key, value_num FROM extracted_values WHERE metric_key IN ('sla_availability_pct','incident_notice_hours')"))}
-        ms = [dict(r) for r in s.execute(text("SELECT o.contract_id, c.title, o.key, o.due_date FROM obligations o JOIN contracts c ON c.id=o.contract_id WHERE o.kind='milestone' ORDER BY o.contract_id, o.due_date")).mappings()]
+        ms = [dict(r) for r in s.execute(text("SELECT o.contract_id, c.title, c.vendor, o.key, o.due_date FROM obligations o JOIN contracts c ON c.id=o.contract_id WHERE o.kind='milestone' ORDER BY o.contract_id, o.due_date")).mappings()]
     invoices, n = [], 0
 
     def inv(c, d, amt, desc, ps=None, pe=None, paid_extra=0, vendor=None, title=None, force_unpaid=False, no=None):
@@ -140,7 +170,7 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
                 continue
             miss = breach_plan.get(ix, {}).get(back)
             actual = round(tgt - miss, 2) if miss else round(min(100.0, tgt + rnd.uniform(0.02, 0.35)), 2)
-            sla.append(dict(contract_title=c["title"], metric_key="sla_availability_pct", period=ps, actual=actual, incidents=1 if actual < tgt else rnd.choice([0, 0, 0, 1]), note="Breach: service credit claim" if actual < tgt else ""))
+            sla.append(dict(contract_title=c["title"], vendor=c["vendor"], metric_key="sla_availability_pct", period=ps, actual=actual, incidents=1 if actual < tgt else rnd.choice([0, 0, 0, 1]), note="Breach: service credit claim" if actual < tgt else ""))
     inc_contracts = [c for c in cons if sla_t.get((c["contract_id"], "incident_notice_hours")) is not None]
     for ix, c in enumerate(inc_contracts):
         it = sla_t[(c["contract_id"], "incident_notice_hours")]
@@ -149,7 +179,7 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
             if ps < date(c["effective_date"].year, c["effective_date"].month, 1):
                 continue
             bad = ix == 1 and back == -2
-            sla.append(dict(contract_title=c["title"], metric_key="incident_notice_hours", period=ps, actual=round(it * 1.5) if bad else rnd.choice([6, 12, 20, 30]), incidents=1, note="Notified late" if bad else ""))
+            sla.append(dict(contract_title=c["title"], vendor=c["vendor"], metric_key="incident_notice_hours", period=ps, actual=round(it * 1.5) if bad else rnd.choice([6, 12, 20, 30]), incidents=1, note="Notified late" if bad else ""))
     # ---- obligation status: past milestones were delivered, except the latest one on two contracts
     status, over = [], set()
     past_by: dict[int, list] = {}
@@ -160,22 +190,15 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
         over.add((cid, past_by[cid][-1]["key"]))
     for m in ms:
         if m["due_date"] < today and (m["contract_id"], m["key"]) not in over:
-            status.append(dict(contract_title=m["title"], key=m["key"], status="done", completed_on=m["due_date"] + timedelta(days=rnd.randint(-4, 6)), note="Accepted by the business"))
-    d = feeds_dir()
-    d.mkdir(parents=True, exist_ok=True)
-    for old in d.glob("*.csv"):         # a seed starts from a clean feeds folder
-        old.unlink()
-    for name, cols, rows in (("invoices.csv", INVOICE_COLS, invoices), ("sla_measurements.csv", SLA_COLS, sla), ("obligation_status.csv", STATUS_COLS, status)):
-        with (d / name).open("w", newline="") as f:
-            w = csv.DictWriter(f, cols)
-            w.writeheader()
-            w.writerows(rows)
-    return {"invoices": len(invoices), "sla": len(sla), "status": len(status)}
+            status.append(dict(contract_title=m["title"], vendor=m["vendor"], key=m["key"], status="done", completed_on=m["due_date"] + timedelta(days=rnd.randint(-4, 6)), note="Accepted by the business"))
+    return invoices, sla, status
 
 
 # ------------------------------------------------------------------ loader
-def _d(v: str | None) -> date | None:
-    return date.fromisoformat(v) if v and v.strip() else None
+def _d(v) -> date | None:
+    if isinstance(v, date):
+        return v
+    return date.fromisoformat(v) if v and str(v).strip() else None
 
 
 class ContractIndex:
@@ -193,27 +216,46 @@ class ContractIndex:
         return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()
 
     def match(self, vendor: str | None, ref: str | None) -> int | None:
+        """Vendor first (titles such as 'Statement of Work No. 1' repeat across vendors), then the reference within that vendor's contracts."""
         ref = (ref or "").strip()
+        v = self._n(vendor) if vendor else ""
+        pool = [r for r in self.rows if v and (self._n(r["vendor"]) == v or self._n(r["vendor"]).split()[0] == v.split()[0])] or self.rows
         if ref:
-            if ref in self.exact:
-                return self.exact[ref]
             n = self._n(ref)
-            if n in self.norm:
-                return self.norm[n]
-            hits = [r["id"] for r in self.rows if n and (n in self._n(r["title"]) or self._n(r["title"]) in n) and (not vendor or self._n(vendor).split()[0] in self._n(r["vendor"]))]
-            if len(hits) == 1:
-                return hits[0]
-            return None
+            for key in (lambda r: r["title"] == ref, lambda r: self._n(r["title"]) == n):
+                hits = [r["id"] for r in pool if key(r)]
+                if len(hits) == 1:
+                    return hits[0]
+            hits = [r["id"] for r in pool if n and (n in self._n(r["title"]) or self._n(r["title"]) in n)]
+            return hits[0] if len(hits) == 1 else None
         if vendor:
-            vs = [r for r in self.rows if self._n(r["vendor"]) == self._n(vendor) and r["value"]]
+            vs = [r for r in pool if r["value"]]
             if len(vs) == 1:
                 return vs[0]["id"]
         return None
 
 
 def load_csv(name: str, content: str) -> dict:
-    """Load one feed (by file name) into the tables; idempotent. Returns counts."""
-    rows = list(csv.DictReader(io.StringIO(content)))
+    """Load one CSV feed (by file name) into the tables; idempotent. Returns counts."""
+    return apply_rows(name, list(csv.DictReader(io.StringIO(content))))
+
+
+def _milestone_key(s, cid: int | None, r: dict) -> str | None:
+    """The obligation an acceptance certificate refers to: same due date, else the milestone whose title shares the most words."""
+    if not cid:
+        return None
+    obs = [dict(x) for x in s.execute(text("SELECT key, title, due_date FROM obligations WHERE contract_id=:c AND kind='milestone'"), {"c": cid}).mappings()]
+    if r.get("due"):
+        same = [o for o in obs if o["due_date"] == _d(r["due"])]
+        if len(same) == 1:
+            return same[0]["key"]
+        obs = same or obs
+    words = set(re.findall(r"[a-z]{4,}", (r.get("milestone") or "").lower()))
+    best = max(obs, key=lambda o: len(words & set(re.findall(r"[a-z]{4,}", o["title"].lower()))), default=None)
+    return best["key"] if best and words & set(re.findall(r"[a-z]{4,}", best["title"].lower())) else None
+
+
+def apply_rows(name: str, rows: list[dict]) -> dict:
     cnt = dict(rows=len(rows), new=0, updated=0, skipped=0, unmatched=0)
     with SessionLocal() as s:
         ids = ContractIndex(s)
@@ -223,6 +265,10 @@ def load_csv(name: str, content: str) -> dict:
                     cid = ids.match(r.get("vendor"), r.get("contract_title"))
                     if r.get("contract_title") and not cid:
                         cnt["unmatched"] += 1
+                    if not r.get("vendor") or not r.get("amount"):
+                        cnt["skipped"] += 1
+                        continue
+                    r["external_id"] = r.get("external_id") or f"{r['vendor']}|{r.get('invoice_no')}|{r['amount']}"
                     ex = s.execute(text("SELECT 1 FROM invoices WHERE external_id=:e"), {"e": r["external_id"]}).first()
                     s.execute(text("""INSERT INTO invoices (external_id, vendor, contract_id, contract_ref, invoice_no, invoice_date, period_start, period_end, due_date, paid_date, amount, description, category)
                                       VALUES (:e,:v,:c,:ref,:no,:d,:ps,:pe,:due,:paid,:a,:desc,:cat)
@@ -243,6 +289,10 @@ def load_csv(name: str, content: str) -> dict:
                               {"c": cid, "k": r["metric_key"], "p": _d(r["period"]), "a": r["actual"], "i": int(r.get("incidents") or 0), "n": r.get("note") or None})
                 elif name.startswith("obligation"):
                     cid = ids.match(r.get("vendor"), r["contract_title"])
+                    r["key"] = r.get("key") or _milestone_key(s, cid, r)
+                    if not r["key"]:
+                        cnt["unmatched"] += 1
+                        continue
                     res = s.execute(text("UPDATE obligations SET status=:st, completed_on=:d, note=COALESCE(:n, note), updated_at=now() WHERE contract_id=:c AND key=:k AND (status <> :st OR completed_on IS DISTINCT FROM :d)"),
                                     {"st": r["status"], "d": _d(r.get("completed_on")), "n": r.get("note") or None, "c": cid, "k": r["key"]})
                     ex = None if res.rowcount else True
@@ -279,7 +329,7 @@ def run_feeds(trigger: str = "manual") -> dict:
     try:
         d = feeds_dir()
         d.mkdir(parents=True, exist_ok=True)
-        files = sorted(d.glob("*.csv"))
+        files = feed_files()
         with SessionLocal() as s:
             rid = s.execute(text("INSERT INTO pipeline_runs (trigger, pipeline) VALUES (:t,'feeds') RETURNING id"), {"t": trigger}).scalar()
             s.commit()
@@ -287,7 +337,11 @@ def run_feeds(trigger: str = "manual") -> dict:
         failed = 0
         for f in files:
             try:
-                c = load_csv(f.name, f.read_text())
+                if f.suffix.lower() == ".csv":
+                    c = load_csv(f.name, f.read_text())
+                else:
+                    kind, rows = _read_document(f)
+                    c = apply_rows(FEED_OF[kind], rows)
                 for k in tot:
                     tot[k] += c[k]
                 detail = f"{c['rows']} rows: {c['new']} new, {c['updated']} updated" + (f", {c['unmatched']} without a matching contract" if c["unmatched"] else "")
@@ -296,7 +350,7 @@ def run_feeds(trigger: str = "manual") -> dict:
                 failed += 1
                 detail, act = f"{type(e).__name__}: {e}"[:300], "failed"
             with SessionLocal() as s:
-                s.execute(text("INSERT INTO pipeline_events (run_id, path, action, detail) VALUES (:r,:p,:a,:d)"), {"r": rid, "p": f"feeds/{f.name}", "a": act, "d": detail})
+                s.execute(text("INSERT INTO pipeline_events (run_id, path, action, detail) VALUES (:r,:p,:a,:d)"), {"r": rid, "p": f"feeds/{f.relative_to(d)}", "a": act, "d": detail})
                 s.commit()
         res = recompute()
         with SessionLocal() as s:

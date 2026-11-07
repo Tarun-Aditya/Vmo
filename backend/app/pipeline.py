@@ -233,7 +233,7 @@ def watched_files(s, key: str, folders: list[str]) -> list[Path]:
         from app import feeds
 
         d = feeds.feeds_dir()
-        return sorted(d.glob("*.csv")) if d.exists() else []
+        return feeds.feed_files() if d.exists() else []
     return scan(inbox_path(s), folders)
 
 

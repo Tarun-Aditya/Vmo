@@ -1,0 +1,1611 @@
+{
+ "invoices": {
+  "invoice_001.md": {
+   "vendor": "Atlas Facilities Tech Inc",
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "invoice_no": "ATL-2512-001",
+   "invoice_date": "2025-11-26",
+   "due_date": "2025-12-26",
+   "paid_date": "2026-01-17",
+   "amount": 96000.0
+  },
+  "invoice_002.docx": {
+   "vendor": "Bluepeak Analytics Inc",
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "invoice_no": "BLU-2603-002",
+   "invoice_date": "2026-03-02",
+   "due_date": "2026-04-16",
+   "paid_date": "2026-04-18",
+   "amount": 540000.0
+  },
+  "invoice_003.pdf": {
+   "vendor": "CoreLedger Payments Pte Ltd",
+   "contract_title": "SaaS Subscription Agreement",
+   "invoice_no": "COR-2607-003",
+   "invoice_date": "2026-07-30",
+   "due_date": "2026-08-29",
+   "paid_date": "2026-08-30",
+   "amount": 195000.0
+  },
+  "invoice_004.md": {
+   "vendor": "CoreLedger Payments Pte Ltd",
+   "contract_title": "SaaS Subscription Agreement",
+   "invoice_no": "COR-2610-004",
+   "invoice_date": "2026-10-30",
+   "due_date": "2026-11-29",
+   "paid_date": null,
+   "amount": 195000.0
+  },
+  "invoice_005.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2511-005",
+   "invoice_date": "2025-11-27",
+   "due_date": "2026-01-11",
+   "paid_date": "2026-01-12",
+   "amount": 533333.33
+  },
+  "invoice_006.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2512-006",
+   "invoice_date": "2025-12-27",
+   "due_date": "2026-02-10",
+   "paid_date": "2026-02-12",
+   "amount": 533333.33
+  },
+  "invoice_007.md": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2601-007",
+   "invoice_date": "2026-01-27",
+   "due_date": "2026-03-13",
+   "paid_date": "2026-03-10",
+   "amount": 533333.33
+  },
+  "invoice_008.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2602-008",
+   "invoice_date": "2026-02-27",
+   "due_date": "2026-04-13",
+   "paid_date": "2026-04-09",
+   "amount": 533333.33
+  },
+  "invoice_009.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2603-009",
+   "invoice_date": "2026-03-27",
+   "due_date": "2026-05-11",
+   "paid_date": "2026-05-13",
+   "amount": 533333.33
+  },
+  "invoice_010.md": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2604-010",
+   "invoice_date": "2026-04-27",
+   "due_date": "2026-06-11",
+   "paid_date": "2026-06-12",
+   "amount": 533333.33
+  },
+  "invoice_011.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2605-011",
+   "invoice_date": "2026-05-27",
+   "due_date": "2026-07-11",
+   "paid_date": "2026-07-07",
+   "amount": 533333.33
+  },
+  "invoice_012.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2606-012",
+   "invoice_date": "2026-06-27",
+   "due_date": "2026-08-11",
+   "paid_date": "2026-08-06",
+   "amount": 533333.33
+  },
+  "invoice_013.md": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2607-013",
+   "invoice_date": "2026-07-27",
+   "due_date": "2026-09-10",
+   "paid_date": "2026-09-11",
+   "amount": 533333.33
+  },
+  "invoice_014.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2608-014",
+   "invoice_date": "2026-08-27",
+   "due_date": "2026-10-11",
+   "paid_date": "2026-10-09",
+   "amount": 773333.33
+  },
+  "invoice_015.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2609-015",
+   "invoice_date": "2026-09-27",
+   "due_date": "2026-11-11",
+   "paid_date": "2026-11-07",
+   "amount": 773333.33
+  },
+  "invoice_016.md": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2610-016",
+   "invoice_date": "2026-10-27",
+   "due_date": "2026-12-11",
+   "paid_date": null,
+   "amount": 533333.33
+  },
+  "invoice_017.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "invoice_no": "HEL-2605-017",
+   "invoice_date": "2026-05-25",
+   "due_date": "2026-07-09",
+   "paid_date": "2026-07-04",
+   "amount": 258333.33
+  },
+  "invoice_018.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "invoice_no": "HEL-2606-018",
+   "invoice_date": "2026-06-25",
+   "due_date": "2026-08-09",
+   "paid_date": "2026-08-11",
+   "amount": 258333.33
+  },
+  "invoice_019.md": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "invoice_no": "HEL-2607-019",
+   "invoice_date": "2026-07-25",
+   "due_date": "2026-09-08",
+   "paid_date": "2026-09-02",
+   "amount": 258333.33
+  },
+  "invoice_020.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "invoice_no": "HEL-2608-020",
+   "invoice_date": "2026-08-25",
+   "due_date": "2026-10-09",
+   "paid_date": "2026-10-09",
+   "amount": 258333.33
+  },
+  "invoice_021.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "invoice_no": "HEL-2609-021",
+   "invoice_date": "2026-09-25",
+   "due_date": "2026-11-09",
+   "paid_date": null,
+   "amount": 258333.33
+  },
+  "invoice_022.md": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "invoice_no": "HEL-2610-022",
+   "invoice_date": "2026-10-25",
+   "due_date": "2026-12-09",
+   "paid_date": null,
+   "amount": 258333.33
+  },
+  "invoice_023.docx": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Work Order No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2611-023",
+   "invoice_date": "2026-11-07",
+   "due_date": "2026-12-22",
+   "paid_date": null,
+   "amount": 126000.0
+  },
+  "invoice_024.pdf": {
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "invoice_no": "KES-2512-024",
+   "invoice_date": "2025-12-07",
+   "due_date": "2026-02-05",
+   "paid_date": "2026-02-01",
+   "amount": 210000.0
+  },
+  "invoice_025.md": {
+   "vendor": "Lumina Learning Systems Inc",
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "invoice_no": "LUM-2609-025",
+   "invoice_date": "2026-09-08",
+   "due_date": "2026-10-08",
+   "paid_date": "2026-10-02",
+   "amount": 68750.0
+  },
+  "invoice_026.docx": {
+   "vendor": "Meridian Cloud Services LLC",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "MER-2608-026",
+   "invoice_date": "2026-08-24",
+   "due_date": "2026-10-08",
+   "paid_date": "2026-10-10",
+   "amount": 75000.0
+  },
+  "invoice_027.pdf": {
+   "vendor": "Meridian Cloud Services LLC",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "MER-2609-027",
+   "invoice_date": "2026-09-24",
+   "due_date": "2026-11-08",
+   "paid_date": "2026-11-03",
+   "amount": 75000.0
+  },
+  "invoice_028.md": {
+   "vendor": "Meridian Cloud Services LLC",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "MER-2610-028",
+   "invoice_date": "2026-10-24",
+   "due_date": "2026-12-08",
+   "paid_date": null,
+   "amount": 75000.0
+  },
+  "invoice_029.docx": {
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "contract_title": "Statement of Work No.\u00a01 -- Cybersecurity Assessment and Remediation Services",
+   "invoice_no": "ORI-2608-029",
+   "invoice_date": "2026-08-14",
+   "due_date": "2026-09-13",
+   "paid_date": "2026-09-07",
+   "amount": 79166.67
+  },
+  "invoice_030.pdf": {
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "contract_title": "Statement of Work No.\u00a01 -- Cybersecurity Assessment and Remediation Services",
+   "invoice_no": "ORI-2609-030",
+   "invoice_date": "2026-09-14",
+   "due_date": "2026-10-14",
+   "paid_date": "2026-10-08",
+   "amount": 79166.67
+  },
+  "invoice_031.md": {
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "contract_title": "Statement of Work No.\u00a01 -- Cybersecurity Assessment and Remediation Services",
+   "invoice_no": "ORI-2610-031",
+   "invoice_date": "2026-10-14",
+   "due_date": "2026-11-13",
+   "paid_date": null,
+   "amount": 79166.67
+  },
+  "invoice_032.docx": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2602-032",
+   "invoice_date": "2026-02-25",
+   "due_date": "2026-03-27",
+   "paid_date": "2026-03-24",
+   "amount": 350000.0
+  },
+  "invoice_033.pdf": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2603-033",
+   "invoice_date": "2026-03-25",
+   "due_date": "2026-04-24",
+   "paid_date": "2026-04-18",
+   "amount": 350000.0
+  },
+  "invoice_034.md": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2604-034",
+   "invoice_date": "2026-04-25",
+   "due_date": "2026-05-25",
+   "paid_date": "2026-05-26",
+   "amount": 350000.0
+  },
+  "invoice_035.docx": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2605-035",
+   "invoice_date": "2026-05-25",
+   "due_date": "2026-06-24",
+   "paid_date": "2026-06-23",
+   "amount": 350000.0
+  },
+  "invoice_036.pdf": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2606-036",
+   "invoice_date": "2026-06-25",
+   "due_date": "2026-07-25",
+   "paid_date": "2026-07-26",
+   "amount": 350000.0
+  },
+  "invoice_037.md": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2607-037",
+   "invoice_date": "2026-07-25",
+   "due_date": "2026-08-24",
+   "paid_date": "2026-08-21",
+   "amount": 350000.0
+  },
+  "invoice_038.docx": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2608-038",
+   "invoice_date": "2026-08-25",
+   "due_date": "2026-09-24",
+   "paid_date": "2026-09-26",
+   "amount": 350000.0
+  },
+  "invoice_039.pdf": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2609-039",
+   "invoice_date": "2026-09-25",
+   "due_date": "2026-10-25",
+   "paid_date": "2026-10-22",
+   "amount": 350000.0
+  },
+  "invoice_040.md": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "TAT-2610-040",
+   "invoice_date": "2026-10-25",
+   "due_date": "2026-11-24",
+   "paid_date": null,
+   "amount": 350000.0
+  },
+  "invoice_041.docx": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No. 1 \u2013 QA Centre of Excellence and Test",
+   "invoice_no": "TAT-2609-041",
+   "invoice_date": "2026-09-13",
+   "due_date": "2026-10-13",
+   "paid_date": "2026-10-11",
+   "amount": 154166.67
+  },
+  "invoice_042.pdf": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Statement of Work No. 1 \u2013 QA Centre of Excellence and Test",
+   "invoice_no": "TAT-2610-042",
+   "invoice_date": "2026-10-13",
+   "due_date": "2026-11-12",
+   "paid_date": null,
+   "amount": 154166.67
+  },
+  "invoice_043.md": {
+   "vendor": "Tatva Infosystems Ltd",
+   "contract_title": "Work Order \u2013 Tatva Infosystems",
+   "invoice_no": "TAT-2610-043",
+   "invoice_date": "2026-10-16",
+   "due_date": "2026-11-15",
+   "paid_date": null,
+   "amount": 78000.0
+  },
+  "invoice_044.docx": {
+   "vendor": "Zenith Software Ltd",
+   "contract_title": "SaaS Subscription Agreement",
+   "invoice_no": "ZEN-2606-044",
+   "invoice_date": "2026-06-10",
+   "due_date": "2026-07-10",
+   "paid_date": "2026-07-05",
+   "amount": 360000.0
+  },
+  "invoice_045.pdf": {
+   "vendor": "Helix Digital Consulting Inc",
+   "contract_title": "Work Order No. 1 \u2013 Helix Digital Consulting",
+   "invoice_no": "HEL-2610-045",
+   "invoice_date": "2026-10-31",
+   "due_date": "2026-12-15",
+   "paid_date": null,
+   "amount": 126000.0
+  },
+  "invoice_046.md": {
+   "vendor": "Granite Network Integrators Inc",
+   "contract_title": "",
+   "invoice_no": "GRA-2608-001",
+   "invoice_date": "2026-08-28",
+   "due_date": "2026-10-12",
+   "paid_date": "2026-10-13",
+   "amount": 85000
+  },
+  "invoice_047.docx": {
+   "vendor": "Granite Network Integrators Inc",
+   "contract_title": "",
+   "invoice_no": "GRA-2609-002",
+   "invoice_date": "2026-09-28",
+   "due_date": "2026-11-12",
+   "paid_date": null,
+   "amount": 85000
+  },
+  "invoice_048.pdf": {
+   "vendor": "Granite Network Integrators Inc",
+   "contract_title": "",
+   "invoice_no": "GRA-2610-003",
+   "invoice_date": "2026-10-28",
+   "due_date": "2026-12-12",
+   "paid_date": null,
+   "amount": 85000
+  },
+  "invoice_049.md": {
+   "vendor": "Sable Legal Tech Inc",
+   "contract_title": "",
+   "invoice_no": "SAB-2609-014",
+   "invoice_date": "2026-09-18",
+   "due_date": "2026-11-02",
+   "paid_date": "2026-11-02",
+   "amount": 48000
+  },
+  "invoice_050.docx": {
+   "vendor": "Meridian Cloud Services LLC",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "MER-2608-026",
+   "invoice_date": "2026-08-24",
+   "due_date": "2026-10-08",
+   "paid_date": "2026-10-10",
+   "amount": 75000.0
+  },
+  "invoice_051.pdf": {
+   "vendor": "Atlas Facilities Tech Inc",
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "invoice_no": "ATL-2610-051",
+   "invoice_date": "2026-10-29",
+   "due_date": "2026-11-28",
+   "paid_date": null,
+   "amount": 9600.0
+  }
+ },
+ "sla": {
+  "sla_report_001.md": {
+   "contract_title": "Data Processing Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_002.docx": {
+   "contract_title": "Data Processing Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_003.pdf": {
+   "contract_title": "Data Processing Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_004.md": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_005.docx": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_006.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_007.md": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_008.docx": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_009.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_010.md": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_011.docx": {
+   "contract_title": "Master Services Agreement \u2013 Ironbridge Data Centers",
+   "vendor": "Ironbridge Data Centers Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_012.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.98,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_013.md": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_014.docx": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_015.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_016.md": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_017.docx": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_018.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_019.md": {
+   "contract_title": "Master Services Agreement \u2013 Meridian Cloud Services",
+   "vendor": "Meridian Cloud Services LLC",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_020.docx": {
+   "contract_title": "Master Services Agreement \u2013 Orion Cybersecurity Partners",
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_021.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Orion Cybersecurity Partners",
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_022.md": {
+   "contract_title": "Master Services Agreement \u2013 Orion Cybersecurity Partners",
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_023.docx": {
+   "contract_title": "Master Services Agreement \u2013 Tatva Infosystems",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_024.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Tatva Infosystems",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_025.md": {
+   "contract_title": "Master Services Agreement \u2013 Tatva Infosystems",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_026.docx": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_027.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_028.md": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_029.docx": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_030.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_031.md": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_032.docx": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_033.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_034.md": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.11,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_035.docx": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.35,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_036.pdf": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.09,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_037.md": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.35,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_038.docx": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.03,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_039.pdf": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.09,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_040.md": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.02,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_041.docx": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Kestrel Marketing Cloud Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.29,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_042.pdf": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Lumina Learning Systems Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.04,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_043.md": {
+   "contract_title": "SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT",
+   "vendor": "Lumina Learning Systems Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.09,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_044.docx": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "CoreLedger Payments Pte Ltd",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_045.pdf": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "CoreLedger Payments Pte Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_046.md": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "CoreLedger Payments Pte Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.84,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_047.docx": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "CoreLedger Payments Pte Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.96,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_048.pdf": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "Zenith Software Ltd",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_049.md": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "Zenith Software Ltd",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_050.docx": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "Zenith Software Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_051.pdf": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "Zenith Software Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_052.md": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "Zenith Software Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.93,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_053.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.8,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_054.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.59,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_055.md": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.68,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_056.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.66,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_057.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.38,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_058.md": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.78,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_059.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.63,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 108,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_060.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 Bluepeak Analytics",
+   "vendor": "Bluepeak Analytics Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.01,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_061.md": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.85,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_062.docx": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.75,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_063.pdf": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.77,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_064.md": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.53,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_065.docx": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.65,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_066.pdf": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.12,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_067.md": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.31,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_068.docx": {
+   "contract_title": "Software-as-a-Service Subscription Agreement",
+   "vendor": "Atlas Facilities Tech Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.65,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_069.pdf": {
+   "contract_title": "Statement of Work No. 1 \u2013 QA Centre of Excellence and Test",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.83,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_070.md": {
+   "contract_title": "Statement of Work No. 1 \u2013 QA Centre of Excellence and Test",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.56,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_071.docx": {
+   "contract_title": "Statement of Work No. 1 \u2013 QA Centre of Excellence and Test",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.7,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_072.pdf": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.26,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_073.md": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.25,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_074.docx": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.31,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_075.pdf": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.16,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_076.md": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.06,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_077.docx": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.1,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_078.pdf": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.1,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_079.md": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.12,
+     "incidents": 0
+    }
+   ]
+  }
+ },
+ "acceptance": {
+  "acceptance_001.md": {
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "vendor": "Helix Digital Consulting Inc",
+   "key": "milestone:2025-11-22",
+   "completed_on": "2025-11-26"
+  },
+  "acceptance_002.docx": {
+   "contract_title": "Statement of Work No. 1 \u2013 Helix Digital Consulting",
+   "vendor": "Helix Digital Consulting Inc",
+   "key": "milestone:2026-03-02",
+   "completed_on": "2026-02-27"
+  },
+  "acceptance_003.pdf": {
+   "contract_title": "Statement of Work No.\u00a01 -- Data Platform and Analytics Services",
+   "vendor": "Helix Digital Consulting Inc",
+   "key": "milestone:2026-05-21",
+   "completed_on": "2026-05-25"
+  },
+  "acceptance_004.md": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Meridian Cloud Services LLC",
+   "key": "milestone:2026-08-19",
+   "completed_on": "2026-08-23"
+  },
+  "acceptance_005.docx": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Meridian Cloud Services LLC",
+   "key": "milestone:2026-10-28",
+   "completed_on": "2026-10-24"
+  },
+  "acceptance_006.pdf": {
+   "contract_title": "Statement of Work No.\u00a01 -- Cybersecurity Assessment and Remediation Services",
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "key": "milestone:2026-08-09",
+   "completed_on": "2026-08-09"
+  },
+  "acceptance_007.md": {
+   "contract_title": "Statement of Work No.\u00a01 -- Cybersecurity Assessment and Remediation Services",
+   "vendor": "Orion Cybersecurity Partners LLP",
+   "key": "milestone:2026-10-18",
+   "completed_on": "2026-10-23"
+  },
+  "acceptance_008.docx": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "key": "milestone:2026-03-12",
+   "completed_on": "2026-03-09"
+  },
+  "acceptance_009.pdf": {
+   "contract_title": "Statement of Work No.\u00a01",
+   "vendor": "Tatva Infosystems Ltd",
+   "key": "milestone:2026-04-21",
+   "completed_on": "2026-04-24"
+  },
+  "acceptance_010.md": {
+   "contract_title": "Statement of Work No. 1 \u2013 QA Centre of Excellence and Test",
+   "vendor": "Tatva Infosystems Ltd",
+   "key": "milestone:2026-09-18",
+   "completed_on": "2026-09-14"
+  },
+  "acceptance_011.docx": {
+   "contract_title": "Statement of Work No. 1 \u2013 Vantage Telecom Services",
+   "vendor": "Vantage Telecom Services Inc",
+   "key": "milestone:2026-09-28",
+   "completed_on": "2026-09-27"
+  }
+ }
+}

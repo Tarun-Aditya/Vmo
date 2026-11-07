@@ -47,8 +47,9 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
     res = pipeline.run_pipeline("seed", extractor, log=lambda r: log(f"pipeline: {r}"))
     try:        # operational feeds: invoices, SLA measurements, obligation status -> spend exceptions, risk scores
         from app import feeds
+        from app.docgen import ops_fixtures
 
-        log(f"feeds generated: {feeds.generate(seed_date)}")
+        log(f"fixture documents written: {ops_fixtures.generate(seed_date)}")
         log(f"feeds loaded: {feeds.run_feeds('seed')}")
     except Exception as e:
         log(f"feeds failed: {type(e).__name__}: {e}")
