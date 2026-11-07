@@ -2,12 +2,12 @@
 # SOW 1 – Application Managed Services – Accentia Technology Services
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Accentia Technology Services Inc (the "Supplier")
-**Effective Date:** 2 February 2026
+**Effective Date:** 3 February 2026
 **Document Type:** SOW
 **Reference:** ARC-SOW-ACCENTIA_SOW1
 
 ## 1. Master Agreement Reference
-This SOW is issued under the Master Services Agreement dated 11 December 2025 between the parties (Master Services Agreement – Accentia Technology Services). Capitalised terms have the meaning given in that agreement.
+This SOW is issued under the Master Services Agreement dated 12 December 2025 between the parties (Master Services Agreement – Accentia Technology Services). Capitalised terms have the meaning given in that agreement.
 
 ## 2. Scope
 24x7 application managed services (L2/L3) for Arcadia's e-commerce, merchandising and ERP platforms.
@@ -15,10 +15,10 @@ This SOW is issued under the Master Services Agreement dated 11 December 2025 be
 <!-- page: 2 -->
 
 ## 3. Deliverables and Milestones
-Milestone 1: mobilisation and delivery plan by 16 February 2026. Milestone 2: core delivery by 3 May 2026. Milestone 3: handover and written acceptance by 1 August 2026.
+Milestone 1: mobilisation and delivery plan by 17 February 2026. Milestone 2: core delivery by 4 May 2026. Milestone 3: handover and written acceptance by 2 August 2026.
 
 ## 4. Term
-This SOW commences on 2 February 2026 and, unless terminated earlier in accordance with its terms, expires on 2 February 2027.
+This SOW commences on 3 February 2026 and, unless terminated earlier in accordance with its terms, expires on 3 February 2027.
 
 ## 5. Fees
 The annual fees under this SOW are USD 4,800,000 and the total contract value is USD 9,600,000, exclusive of applicable taxes.
@@ -59,4 +59,4 @@ Liability under this SOW is governed by the liability provisions of the MSA.
 <!-- page: 6 -->
 
 ## 15. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 30 January 2026. Signed for and on behalf of Accentia Technology Services Inc (the Supplier) by Laura Stephens, Managing Director, on 31 January 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 31 January 2026. Signed for and on behalf of Accentia Technology Services Inc (the Supplier) by Laura Stephens, Managing Director, on 1 February 2026.

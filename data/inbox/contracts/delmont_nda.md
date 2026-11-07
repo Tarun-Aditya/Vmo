@@ -2,12 +2,12 @@
 # NDA – Delmont Consulting
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Delmont Consulting LLP (the "Supplier")
-**Effective Date:** 18 November 2024
+**Effective Date:** 19 November 2024
 **Document Type:** NDA
 **Reference:** ARC-NDA-DELMONT_NDA
 
 ## 1. Term
-This NDA commences on 18 November 2024 and, unless terminated earlier in accordance with its terms, expires on 18 November 2026.
+This NDA commences on 19 November 2024 and, unless terminated earlier in accordance with its terms, expires on 19 November 2026.
 
 ## 2. Confidentiality
 Each party shall keep the other party's Confidential Information confidential, use it only for the purposes of this NDA, and continue to do so for 3 years after the NDA ends.
@@ -26,4 +26,4 @@ This NDA is governed by the laws of New York. The courts at New York County have
 <!-- page: 3 -->
 
 ## 6. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Dana Whitfield, General Counsel, on 15 November 2024. Signed for and on behalf of Delmont Consulting LLP (the Supplier) by Richard Hale, Partner, on 16 November 2024.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Dana Whitfield, General Counsel, on 16 November 2024. Signed for and on behalf of Delmont Consulting LLP (the Supplier) by Richard Hale, Partner, on 17 November 2024.

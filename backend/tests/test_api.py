@@ -4,6 +4,13 @@ from sqlalchemy import text
 ACC = "Accentia Technology Services Inc"
 
 
+def _long(client, cid):
+    import datetime as dt
+
+    d = dt.date.fromisoformat(client.get(f"/api/contracts/{cid}").json()["contract"]["effective_date"])
+    return f"{d.day} {d:%B %Y}"
+
+
 def by_title(client):
     return {r["title"]: r for r in client.get("/api/contracts").json()}
 
@@ -235,7 +242,7 @@ def test_new_contract_from_template_preview_edit_create(client, clean_docs):
     params = {"vendor": ACC, "parent_id": msa["id"], "scope": "Retail analytics platform build", "annual_fees": 1_800_000, "term_months": 12,
               "payment_terms_days": 20, "effective_date": "2026-12-01"}
     pre = client.post("/api/generator/preview", json={"template": "SOW", "params": params}).json()
-    assert "issued under the Master Services Agreement dated 11 December 2025" in pre["md"] and "USD 1,800,000" in pre["md"]
+    assert f"issued under the Master Services Agreement dated {_long(client, msa['id'])}" in pre["md"] and "USD 1,800,000" in pre["md"]
     fails = {c["rule_key"] for c in pre["analysis"]["checks"] if c["status"] == "fail"}
     assert fails == {"payment_terms_min", "payment_terms_target"}                    # 20 days breaks the payment policy
     fixed = pre["md"].replace("within 20 days", "within 45 days")                    # the user edits the text, re-checks

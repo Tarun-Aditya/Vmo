@@ -2,12 +2,12 @@
 # SaaS Subscription Agreement – PulseHR
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and PulseHR Inc (the "Supplier")
-**Effective Date:** 22 October 2026
+**Effective Date:** 23 October 2026
 **Document Type:** SaaS
 **Reference:** ARC-SaaS-PULSEHR
 
 ## 1. Term
-This Agreement commences on 22 October 2026 and, unless terminated earlier in accordance with its terms, expires on 21 November 2027.
+This Agreement commences on 23 October 2026 and, unless terminated earlier in accordance with its terms, expires on 22 November 2027.
 
 ## 2. Renewal
 This Agreement renews automatically for successive periods of 12 months unless either party gives at least 60 days' written notice of non-renewal before the end of the then-current term.
@@ -59,4 +59,4 @@ This Agreement is governed by the laws of New York. The courts at New York Count
 <!-- page: 6 -->
 
 ## 15. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 19 October 2026. Signed for and on behalf of PulseHR Inc (the Supplier) by Lakshmi Rao, Founder and CEO, on 20 October 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 20 October 2026. Signed for and on behalf of PulseHR Inc (the Supplier) by Lakshmi Rao, Founder and CEO, on 21 October 2026.

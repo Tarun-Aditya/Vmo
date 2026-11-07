@@ -118,7 +118,7 @@ def _num_of(title: str) -> int | None:
 
 def resolve_parent(s, cid: int, ref) -> int | None:
     row = s.execute(text("SELECT type, vendor, effective_date, status FROM contracts WHERE id=:i"), {"i": cid}).first()
-    if not row or row[3] == "draft":
+    if not row or (row[3] == "draft" and not ref):        # a draft is linked only when it names its parent
         return None
     typ, vendor, eff = row[0], row[1], row[2]
     if isinstance(ref, str) and ref:                       # an exact title (generated documents, sidecars)

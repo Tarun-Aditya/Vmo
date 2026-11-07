@@ -2,7 +2,7 @@
 # Data Processing Agreement – Cirrus CRM
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Cirrus CRM Inc (the "Supplier")
-**Effective Date:** 23 December 2025
+**Effective Date:** 24 December 2025
 **Document Type:** DPA
 **Reference:** ARC-DPA-CIRRUS_DPA
 
@@ -10,7 +10,7 @@
 This DPA supplements the SaaS Subscription Agreement – Cirrus CRM and applies to all personal data the Supplier processes on behalf of the Customer.
 
 ## 2. Term
-This DPA commences on 23 December 2025 and, unless terminated earlier in accordance with its terms, expires on 14 January 2029.
+This DPA commences on 24 December 2025 and, unless terminated earlier in accordance with its terms, expires on 15 January 2029.
 
 <!-- page: 2 -->
 
@@ -40,4 +40,4 @@ On termination or expiry, the Supplier shall return or securely delete all Custo
 This DPA is governed by the laws of New York. The courts at New York County have exclusive jurisdiction.
 
 ## 10. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Dana Whitfield, General Counsel, on 20 December 2025. Signed for and on behalf of Cirrus CRM Inc (the Supplier) by Emily Carter, VP Sales, on 21 December 2025.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Dana Whitfield, General Counsel, on 21 December 2025. Signed for and on behalf of Cirrus CRM Inc (the Supplier) by Emily Carter, VP Sales, on 22 December 2025.

@@ -2,12 +2,12 @@
 # Enterprise Subscription and Support Agreement – Nginova Systems
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Nginova Systems Inc (the "Supplier")
-**Effective Date:** 20 April 2026
+**Effective Date:** 21 April 2026
 **Document Type:** SaaS
 **Reference:** ARC-SaaS-NGINOVA
 
 ## 1. Term
-This Agreement commences on 20 April 2026 and, unless terminated earlier in accordance with its terms, expires on 9 April 2028.
+This Agreement commences on 21 April 2026 and, unless terminated earlier in accordance with its terms, expires on 10 April 2028.
 
 ## 2. Renewal
 This Agreement does not renew automatically. Any extension requires a written agreement signed by both parties.
@@ -59,4 +59,4 @@ This Agreement is governed by the laws of New York. The courts at New York Count
 <!-- page: 6 -->
 
 ## 15. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 17 April 2026. Signed for and on behalf of Nginova Systems Inc (the Supplier) by Chris Dalton, Chief Revenue Officer, on 18 April 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 18 April 2026. Signed for and on behalf of Nginova Systems Inc (the Supplier) by Chris Dalton, Chief Revenue Officer, on 19 April 2026.

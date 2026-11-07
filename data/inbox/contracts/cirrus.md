@@ -2,12 +2,12 @@
 # SaaS Subscription Agreement – Cirrus CRM
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Cirrus CRM Inc (the "Supplier")
-**Effective Date:** 23 December 2025
+**Effective Date:** 24 December 2025
 **Document Type:** SaaS
 **Reference:** ARC-SaaS-CIRRUS
 
 ## 1. Term
-This Agreement commences on 23 December 2025 and, unless terminated earlier in accordance with its terms, expires on 23 December 2026.
+This Agreement commences on 24 December 2025 and, unless terminated earlier in accordance with its terms, expires on 24 December 2026.
 
 ## 2. Renewal
 This Agreement renews automatically for successive periods of 12 months unless either party gives at least 30 days' written notice of non-renewal before the end of the then-current term.
@@ -21,7 +21,7 @@ The annual fees under this Agreement are USD 420,000 and the total contract valu
 The services involve the processing of personal data of the Customer's customers and loyalty members.
 
 ## 5. Data Processing Agreement
-The parties executed a Data Processing Agreement dated 6 January 2026 covering the personal data processed under this Agreement.
+The parties executed a Data Processing Agreement dated 7 January 2026 covering the personal data processed under this Agreement.
 
 <!-- page: 3 -->
 
@@ -62,4 +62,4 @@ Each party shall keep the other party's Confidential Information confidential, u
 This Agreement is governed by the laws of New York. The courts at New York County have exclusive jurisdiction.
 
 ## 16. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 20 December 2025. Signed for and on behalf of Cirrus CRM Inc (the Supplier) by Emily Carter, VP Sales, on 21 December 2025.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 21 December 2025. Signed for and on behalf of Cirrus CRM Inc (the Supplier) by Emily Carter, VP Sales, on 22 December 2025.

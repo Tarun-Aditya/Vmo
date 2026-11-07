@@ -2,12 +2,12 @@
 # Master Services Agreement – Accentia Technology Services
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Accentia Technology Services Inc (the "Supplier")
-**Effective Date:** 11 December 2025
+**Effective Date:** 12 December 2025
 **Document Type:** MSA
 **Reference:** ARC-MSA-ACCENTIA_MSA
 
 ## 1. Term
-This Agreement commences on 11 December 2025 and, unless terminated earlier in accordance with its terms, expires on 31 December 2027.
+This Agreement commences on 12 December 2025 and, unless terminated earlier in accordance with its terms, expires on 1 January 2028.
 
 ## 2. Renewal
 This Agreement renews automatically for successive periods of 12 months unless either party gives at least 90 days' written notice of non-renewal before the end of the then-current term.
@@ -81,4 +81,4 @@ This Agreement is governed by the laws of New York. The courts at New York Count
 <!-- page: 8 -->
 
 ## 21. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 8 December 2025. Signed for and on behalf of Accentia Technology Services Inc (the Supplier) by Laura Stephens, Managing Director, on 9 December 2025.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 9 December 2025. Signed for and on behalf of Accentia Technology Services Inc (the Supplier) by Laura Stephens, Managing Director, on 10 December 2025.

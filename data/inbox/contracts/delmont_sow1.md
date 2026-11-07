@@ -2,12 +2,12 @@
 # SOW 1 – SAP S/4HANA Transformation, Phase 1 – Delmont Consulting
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Delmont Consulting LLP (the "Supplier")
-**Effective Date:** 7 January 2026
+**Effective Date:** 8 January 2026
 **Document Type:** SOW
 **Reference:** ARC-SOW-DELMONT_SOW1
 
 ## 1. Master Agreement Reference
-This SOW is issued under the Master Services Agreement dated 2 October 2025 between the parties (Master Services Agreement – Delmont Consulting). Capitalised terms have the meaning given in that agreement.
+This SOW is issued under the Master Services Agreement dated 3 October 2025 between the parties (Master Services Agreement – Delmont Consulting). Capitalised terms have the meaning given in that agreement.
 
 ## 2. Scope
 Phase 1 of the SAP S/4HANA finance and supply-chain transformation: design, build and data migration.
@@ -15,10 +15,10 @@ Phase 1 of the SAP S/4HANA finance and supply-chain transformation: design, buil
 <!-- page: 2 -->
 
 ## 3. Deliverables and Milestones
-Milestone 1: mobilisation and delivery plan by 21 January 2026. Milestone 2: core delivery by 7 April 2026. Milestone 3: handover and written acceptance by 6 July 2026.
+Milestone 1: mobilisation and delivery plan by 22 January 2026. Milestone 2: core delivery by 8 April 2026. Milestone 3: handover and written acceptance by 7 July 2026.
 
 ## 4. Term
-This SOW commences on 7 January 2026 and, unless terminated earlier in accordance with its terms, expires on 7 January 2027.
+This SOW commences on 8 January 2026 and, unless terminated earlier in accordance with its terms, expires on 8 January 2027.
 
 ## 5. Fees
 The annual fees under this SOW are USD 7,200,000 and the total contract value is USD 14,400,000, exclusive of applicable taxes.
@@ -59,4 +59,4 @@ Liability under this SOW is governed by the liability provisions of the MSA.
 <!-- page: 6 -->
 
 ## 15. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 4 January 2026. Signed for and on behalf of Delmont Consulting LLP (the Supplier) by Richard Hale, Partner, on 5 January 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 5 January 2026. Signed for and on behalf of Delmont Consulting LLP (the Supplier) by Richard Hale, Partner, on 6 January 2026.

@@ -2,12 +2,12 @@
 # SaaS Subscription Agreement – Ledgerline Finance Cloud
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Ledgerline Systems Inc (the "Supplier")
-**Effective Date:** 20 January 2026
+**Effective Date:** 21 January 2026
 **Document Type:** SaaS
 **Reference:** ARC-SaaS-LEDGERLINE
 
 ## 1. Term
-This Agreement commences on 20 January 2026 and, unless terminated earlier in accordance with its terms, expires on 20 January 2027.
+This Agreement commences on 21 January 2026 and, unless terminated earlier in accordance with its terms, expires on 21 January 2027.
 
 ## 2. Renewal
 This Agreement renews automatically for successive periods of 12 months unless either party gives at least 30 days' written notice of non-renewal before the end of the then-current term.
@@ -21,7 +21,7 @@ The annual fees under this Agreement are USD 650,000 and the total contract valu
 The services involve the processing of personal data of the Customer's suppliers and employees.
 
 ## 5. Data Processing Agreement
-The parties executed a Data Processing Agreement dated 3 February 2026 covering the personal data processed under this Agreement.
+The parties executed a Data Processing Agreement dated 4 February 2026 covering the personal data processed under this Agreement.
 
 <!-- page: 3 -->
 
@@ -62,4 +62,4 @@ Each party shall keep the other party's Confidential Information confidential, u
 This Agreement is governed by the laws of New York. The courts at New York County have exclusive jurisdiction.
 
 ## 16. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 17 January 2026. Signed for and on behalf of Ledgerline Systems Inc (the Supplier) by Farhan Qureshi, Director, on 18 January 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 18 January 2026. Signed for and on behalf of Ledgerline Systems Inc (the Supplier) by Farhan Qureshi, Director, on 19 January 2026.

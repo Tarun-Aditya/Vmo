@@ -2,12 +2,12 @@
 # SaaS Subscription Agreement – AdSpark Analytics
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and AdSpark Analytics LLP (the "Supplier")
-**Effective Date:** 27 November 2025
+**Effective Date:** 28 November 2025
 **Document Type:** SaaS
 **Reference:** ARC-SaaS-ADSPARK
 
 ## 1. Term
-This Agreement commences on 27 November 2025 and, unless terminated earlier in accordance with its terms, expires on 27 November 2026.
+This Agreement commences on 28 November 2025 and, unless terminated earlier in accordance with its terms, expires on 28 November 2026.
 
 ## 2. Renewal
 This Agreement renews automatically for successive periods of 12 months unless either party gives at least 30 days' written notice of non-renewal before the end of the then-current term.
@@ -59,4 +59,4 @@ This Agreement is governed by the laws of Singapore. The courts at Singapore hav
 <!-- page: 6 -->
 
 ## 15. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 24 November 2025. Signed for and on behalf of AdSpark Analytics LLP (the Supplier) by Tanvi Joshi, Partner, on 25 November 2025.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 25 November 2025. Signed for and on behalf of AdSpark Analytics LLP (the Supplier) by Tanvi Joshi, Partner, on 26 November 2025.

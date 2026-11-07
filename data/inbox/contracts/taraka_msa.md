@@ -2,12 +2,12 @@
 # Master Services Agreement – Taraka Consultancy Services
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Taraka Consultancy Services Ltd (the "Supplier")
-**Effective Date:** 1 March 2026
+**Effective Date:** 2 March 2026
 **Document Type:** MSA
 **Reference:** ARC-MSA-TARAKA_MSA
 
 ## 1. Term
-This Agreement commences on 1 March 2026 and, unless terminated earlier in accordance with its terms, expires on 24 April 2029.
+This Agreement commences on 2 March 2026 and, unless terminated earlier in accordance with its terms, expires on 25 April 2029.
 
 ## 2. Renewal
 This Agreement does not renew automatically. Any extension requires a written agreement signed by both parties.
@@ -81,4 +81,4 @@ This Agreement is governed by the laws of India. The courts at Mumbai have exclu
 <!-- page: 8 -->
 
 ## 21. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 26 February 2026. Signed for and on behalf of Taraka Consultancy Services Ltd (the Supplier) by Venkatesh Iyer, VP Delivery, on 27 February 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 27 February 2026. Signed for and on behalf of Taraka Consultancy Services Ltd (the Supplier) by Venkatesh Iyer, VP Delivery, on 28 February 2026.

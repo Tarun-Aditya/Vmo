@@ -2,12 +2,12 @@
 # SOW 2 – QA and Test Automation Centre of Excellence – Taraka Consultancy Services
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Taraka Consultancy Services Ltd (the "Supplier")
-**Effective Date:** 9 July 2026
+**Effective Date:** 10 July 2026
 **Document Type:** SOW
 **Reference:** ARC-SOW-TARAKA_SOW2
 
 ## 1. Master Agreement Reference
-This SOW is issued under the Master Services Agreement dated 1 March 2026 between the parties (Master Services Agreement – Taraka Consultancy Services). Capitalised terms have the meaning given in that agreement.
+This SOW is issued under the Master Services Agreement dated 2 March 2026 between the parties (Master Services Agreement – Taraka Consultancy Services). Capitalised terms have the meaning given in that agreement.
 
 ## 2. Scope
 Test automation framework and managed QA for release trains across 14 applications.
@@ -15,10 +15,10 @@ Test automation framework and managed QA for release trains across 14 applicatio
 <!-- page: 2 -->
 
 ## 3. Deliverables and Milestones
-Milestone 1: mobilisation and delivery plan by 23 July 2026. Milestone 2: core delivery by 7 October 2026. Milestone 3: handover and written acceptance by 5 January 2027.
+Milestone 1: mobilisation and delivery plan by 24 July 2026. Milestone 2: core delivery by 8 October 2026. Milestone 3: handover and written acceptance by 6 January 2027.
 
 ## 4. Term
-This SOW commences on 9 July 2026 and, unless terminated earlier in accordance with its terms, expires on 21 December 2027.
+This SOW commences on 10 July 2026 and, unless terminated earlier in accordance with its terms, expires on 22 December 2027.
 
 ## 5. Fees
 The annual fees under this SOW are USD 2,200,000 and the total contract value is USD 4,400,000, exclusive of applicable taxes.
@@ -59,4 +59,4 @@ Liability under this SOW is governed by the liability provisions of the MSA.
 <!-- page: 6 -->
 
 ## 15. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 6 July 2026. Signed for and on behalf of Taraka Consultancy Services Ltd (the Supplier) by Venkatesh Iyer, VP Delivery, on 7 July 2026.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 7 July 2026. Signed for and on behalf of Taraka Consultancy Services Ltd (the Supplier) by Venkatesh Iyer, VP Delivery, on 8 July 2026.

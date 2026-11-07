@@ -187,7 +187,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
                     put("liability_cap_text", "Governed by MSA", 0.88, lc)
                 else:
                     put("liability_cap_multiple", None, 0.3, lc)
-        else:
+        elif not amend:
             put("liability_cap_multiple", None, 0.6)
             put("liability_cap_text", None, 0.6)
     # ---- termination for convenience

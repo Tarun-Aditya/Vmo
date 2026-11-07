@@ -2,12 +2,12 @@
 # Master Services Agreement – Delmont Consulting
 
 **Parties:** Arcadia Retail Inc. (the "Customer") and Delmont Consulting LLP (the "Supplier")
-**Effective Date:** 2 October 2025
+**Effective Date:** 3 October 2025
 **Document Type:** MSA
 **Reference:** ARC-MSA-DELMONT_MSA
 
 ## 1. Term
-This Agreement commences on 2 October 2025 and, unless terminated earlier in accordance with its terms, expires on 30 January 2028.
+This Agreement commences on 3 October 2025 and, unless terminated earlier in accordance with its terms, expires on 31 January 2028.
 
 ## 2. Renewal
 This Agreement does not renew automatically. Any extension requires a written agreement signed by both parties.
@@ -81,4 +81,4 @@ This Agreement is governed by the laws of England and Wales. The courts at Londo
 <!-- page: 8 -->
 
 ## 21. Execution
-Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 29 September 2025. Signed for and on behalf of Delmont Consulting LLP (the Supplier) by Richard Hale, Partner, on 30 September 2025.
+Signed for and on behalf of Arcadia Retail Inc. (the Customer) by Michael Brennan, Chief Procurement Officer, on 30 September 2025. Signed for and on behalf of Delmont Consulting LLP (the Supplier) by Richard Hale, Partner, on 1 October 2025.
