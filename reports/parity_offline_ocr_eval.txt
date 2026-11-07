@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "/home/user/Vmo/backend/../evals/ocr_eval.py", line 51, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/user/Vmo/backend/../evals/ocr_eval.py", line 41, in main
+    want, got = fields(t / "a.pdf", dtype), fields(t / "scan.pdf", dtype)
+                                            ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/Vmo/backend/../evals/ocr_eval.py", line 22, in fields
+    md = docstruct.load_document(path)
+  File "/home/user/Vmo/backend/app/docstruct.py", line 172, in load_document
+    text = pdf_to_text(path)
+  File "/home/user/Vmo/backend/app/docstruct.py", line 36, in pdf_to_text
+    return ocr_pdf(path)
+  File "/home/user/Vmo/backend/app/docstruct.py", line 50, in ocr_pdf
+    r = subprocess.run(["tesseract", str(img), "-", "--psm", "4"], capture_output=True, text=True, timeout=300)
+  File "/usr/local/lib/python3.13/subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/subprocess.py", line 1223, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/subprocess.py", line 2156, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/subprocess.py", line 1270, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['tesseract', '/tmp/tmpln6_zmt9/p-2.png', '-', '--psm', '4']' timed out after 300 seconds

@@ -26,10 +26,7 @@ v_renewals  -- active contracts with renewal maths. Columns: contract_id, title,
 v_document_terms  -- same columns as v_effective_terms but INCLUDING vendor drafts (status='draft'). Use it for questions about
   drafts or about specific selected documents.
 v_values  -- extracted terms & limits, one row per (document, metric): contract_id, title, vendor, type, status, metric_key,
-  metric, unit, value_num, value_text, page. metric_key values: payment_terms_days, liability_cap_multiple, tfc_notice_days,
-  renewal_notice_days, insurance_cover_usd, warranty_days, confidentiality_years, sla_availability_pct, incident_notice_hours,
-  breach_notice_hours, cure_period_days, key_personnel_replacement_days, acceptance_days, audit_notice_days,
-  force_majeure_termination_days, governing_law_text. USE THIS for any threshold question ("shorter than", "below", "at least",
+  metric, unit, value_num, value_text, page. metric_key values are the rows of the `metrics` table (key, name, unit; configured in Admin → Values & limits): SELECT key, name, unit FROM metrics to see them. USE THIS for any threshold question ("shorter than", "below", "at least",
   "more than") on those numbers, e.g. `WHERE metric_key='confidentiality_years' AND value_num < 3`.
 v_checks  -- pre-signature checklist results, one row per (document, rule): contract_id, title, vendor, type, status, rule_key, rule,
   result ('pass'|'fail'|'na'), severity (low|medium|high|critical), actual, expected, page. Use it for "which contracts fail ...".
@@ -44,10 +41,16 @@ v_contract_spend  -- per contract with a value: contract_id, title, vendor, type
 v_spend_exceptions  -- invoices/contracts that break a rule: exception_id, kind (no_contract | unsigned_contract | billed_before_effective | billed_after_expiry |
   duplicate | above_run_rate | over_contract_value | late_payment), severity, amount_at_risk, detail, vendor, contract_id, contract_title, invoice_no, invoice_date,
   invoice_amount. "Spend with vendors that have no contract on file" = SUM(invoice_amount) WHERE kind = 'no_contract'.
-v_sla  -- monthly SLA actuals vs the contract target: contract_id, title, vendor, metric_key (sla_availability_pct | incident_notice_hours), period (month start),
+v_sla  -- monthly SLA actuals vs the contract target: contract_id, title, vendor, metric_key (any SLA metric in the `metrics` table: sla = true), period (month start),
   actual, target, breach (true when the target was missed), shortfall, incidents.
 v_vendor_scores  -- vendor risk (0-100, higher = riskier): vendor, score, tier (low | medium | high | critical), contract_risk, renewal_exposure, performance,
   spend_compliance, concentration (each 0-100).
+v_alerts  -- the notification centre: alert_id, rule_key, title, body, severity (low|medium|high|critical), status ('open' | 'acknowledged' | 'resolved'), vendor, contract_id, created_at.
+v_reviews  -- the vendor-draft review queue (one row per draft): contract_id, title, vendor, type, review_status ('pending' | 'in_review' | 'changes_requested' | 'approved'),
+  assignee, due_date, reviewer, deviations (changes vs the standard template), checks_failed (checklist rules failed), days_waiting.
+v_deviations  -- where documents depart from their standard template, one row per (document, clause): contract_id, title, vendor, type, status, template, clause_type, severity, deviation_summary.
+Benchmarks (median / min / max of a term across the portfolio): aggregate v_values, e.g. percentile_cont(0.5) WITHIN GROUP (ORDER BY value_num) WHERE metric_key = '...' AND status <> 'draft'.
+Templates: `templates` (name, type) and `template_clauses` (the clauses of each standard template).
 contracts  -- raw rows incl. Amendment rows (type='Amendment', parent_id -> amended contract; the columns
   an amendment changes are listed in `overrides`). Raw values are NOT amendment-adjusted.
 template_clauses(id, template_id, clause_type, standard_text, playbook_position, fallback_text,

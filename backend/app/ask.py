@@ -268,10 +268,12 @@ def answer(question: str, demo_mode: bool = False, scope: list[int] | None = Non
     if llm.available() and not force_offline:
         res, source = ask_llm(question, scope=scope), "llm" if llm.provider() == "api" else "claude-subscription"
     else:
-        from app import ask_nl, ask_scripted
+        from app import ask_modules, ask_nl, ask_scripted
 
         res = None if scope else ask_scripted.answer(question)
         source = "scripted"
+        if not res:
+            res, source = ask_modules.answer(question, scope=scope), "offline-modules"
         if not res:
             res, source = ask_nl.answer(question, scope=scope), "offline-planner"
         if not res:
