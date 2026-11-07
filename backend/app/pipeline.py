@@ -180,6 +180,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     sidecar = json.loads(sc.read_text()) if sc.exists() else {}
     classify = lambda h, t: kcc.classify(h, t, cfg["kcc"])  # noqa: E731
     header, clauses = parse_document(md, classify)
+    clauses += kcc.detect_in_text(clauses, md, {c["clause_type"] for c in clauses}, {k["key"] for k in cfg["kcc"] if k.get("enabled", True)})
     meta = infer_metadata(md, header, clauses, sidecar, rel)
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
     corrections = {r[0]: r[1] for r in s.execute(text("SELECT field, corrected_value FROM field_corrections WHERE source_path=:p"), {"p": rel})}

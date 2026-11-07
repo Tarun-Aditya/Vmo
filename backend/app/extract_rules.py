@@ -205,11 +205,19 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             put("termination_for_convenience", False, 0.92, tc)
         elif re.search(r"(?:may|can|shall be entitled to)\s+terminate[^.]{0,120}(?:for convenience|without cause|for any reason)|for convenience[^.]{0,60}(?:upon|on|by giving|with)[^.]{0,30}\d+\s*days", ttxt, re.I):
             put("termination_for_convenience", True, 0.9, tc)
+        elif any(re.search(r"\b(?:may|can|has the right to|shall have the right to)\s+terminate\b[^.;]{0,80}\b(?:upon|on|by giving|with|after)\s+(?:not less than |at least |no less than )?(?:\w+\s+)?\(?\d+\)?\s*(?:calendar |business )?(?:days|months)['’]?\s+(?:prior )?(?:written )?notice", s_, re.I)
+                 and not re.search(r"breach|default|insolven|bankrupt|cause|failure|fail to|non-?payment|material", s_, re.I) for s_ in re.split(r"(?<=[.;])\s+", d.flat)):
+            put("termination_for_convenience", True, 0.75, tc)          # 'either party may terminate on 90 days' written notice', with no breach / cause language in the sentence
         else:
             put("termination_for_convenience", None, 0.4, tc)
     # ---- governing law
     if not amend:
         m, gc = d.search(r"(?:governed by|construed in accordance with|subject to)[^.]{0,50}?laws? of (?:the )?(?:State of |Commonwealth of |Republic of )?((?:England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2}))(?:,|\.| without| and | excluding| including| applicable| for| \(|;)", ("governing_law",), flags=0)
+        if not m:     # real contracts: longer wording between 'governed by' and the jurisdiction, 'internal laws', or only 'the laws of the State of X'
+            m, gc = d.search(r"(?:governed|construed|interpreted|enforced)[^.]{0,200}?(?:internal )?laws? (?:of|in) (?:the )?(?:State of |Commonwealth of |Province of |Republic of )?((?:England and Wales|Northern Ireland|[A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+){0,2}))(?:,|\.| without| and | excluding| including| applicable| for| \(|;| applied| regardless| as )", ("governing_law",), flags=0) or (None, None)
+        if not m:
+            m2 = re.search(r"laws? of (?:the )?(?:State|Commonwealth|Province) of ([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)?)", d.flat)
+            m, gc = (m2, None) if m2 else (None, None)
         v = m.group(1).strip() if m else None
         put("governing_law", v, 0.93 if v else 0.4, gc)
     # ---- personal data and DPA

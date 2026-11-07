@@ -421,3 +421,32 @@ def evaluate_rules(doc_type: str, status: str, clauses: list[dict], values: list
 
 
 __all__ = ["ensure_defaults", "load_kcc", "load_metrics", "load_rules", "classify", "extract_metrics", "evaluate_rules", "DOC_TYPES", "clause_text"]
+
+
+# ------------------------------------------------------------------ sentence-level clause detection (real contracts bury clauses inside other sections, or have no usable headings)
+PRESENCE = {
+    "audit_rights": r"\b(?:audit|inspect)\w*\b[^.;]{0,100}\b(?:books|records|facilit\w+|premises|accounts)|\b(?:books|records|accounts)\b[^.;]{0,100}\b(?:audit|inspect)\w*|right to (?:audit|inspect)|access (?:to|during)[^.;]{0,80}\b(?:records|books|facilit\w+)",
+    "assignment": r"\b(?:may|shall|will|can)\s+not\s+(?:\w+\s+){0,4}?(?:assign|transfer)\w*\b|\bno\s+(?:party|assignment)[^.;]{0,60}\b(?:assign|transfer)|assign\w*[^.;]{0,100}without[^.;]{0,50}(?:prior )?(?:written )?consent|(?:prior )?(?:written )?consent[^.;]{0,60}to (?:any )?assign",
+    "termination_for_convenience": r"terminat\w+[^.;]{0,160}(?:for convenience|without cause|for any (?:reason|or no reason)|for no reason)|(?:for convenience|without cause)[^.;]{0,80}terminat\w+|(?:may|can|has the right to) terminate\b(?![^.;]*(?:breach|default|insolven|bankrupt|cause|failure))[^.;]{0,80}(?:upon|on|by giving|with|after) (?:not less than |at least )?(?:\w+ )?\(?\d+\)? ?(?:days|months)['’]? (?:prior )?(?:written )?notice",
+    "liability_cap": r"(?:in no event|under no circumstances|shall not)[^.;]{0,250}(?:liab\w+|damages)[^.;]{0,250}(?:exceed|in excess of|limited to|not be greater than)|(?:liab\w+|damages)[^.;]{0,120}(?:shall|will) not exceed|aggregate liability|liability (?:is|shall be) (?:limited|capped)",
+    "insurance": r"\b(?:maintain|carry|procure|keep)\b[^.;]{0,100}\binsurance\b|\binsurance (?:coverage|polic\w+|certificate)|certificates? of insurance|general liability insurance",
+    "ip_ownership": r"(?:shall|will) (?:be|remain) (?:the )?(?:sole |exclusive )?(?:property|owner)\w*|\b(?:owns?|retains?) all (?:right|title)|(?:hereby )?assigns?[^.;]{0,80}(?:right, title|intellectual property|work product|inventions)|work made for hire|ownership of[^.;]{0,60}(?:intellectual property|inventions|work product)",
+    "non_solicit": r"non-?solicit\w*|(?:shall|will|agrees?|covenants?) not[^.;]{0,80}\bsolicit\w*|\bsolicit\w*[^.;]{0,60}\b(?:employees|customers|personnel|clients)",
+}
+
+
+def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: set[str] | None = None) -> list[dict]:
+    """Extra clause records for key clauses that no heading-based clause carries, found by sentence in the clause texts (or, when the document yielded no clauses, in its paragraphs).
+    Each record keeps the matching sentence(s) as its text and the page of the clause it came from, so the matrix, checklist and Ask can cite it."""
+    pools = [(c["text"], c.get("page", 1), c.get("heading") or "Text") for c in clauses] or [(p, 1, "Text") for p in re.split(r"\n\s*\n", md)]
+    out: list[dict] = []
+    for key, rx in PRESENCE.items():
+        if key in have_types or (enabled is not None and key not in enabled):
+            continue
+        cre = re.compile(rx, re.I)
+        for text_, page, head in pools:
+            hit = [s for s in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text_)) if cre.search(s)]
+            if hit:
+                out.append({"clause_type": key, "heading": f"{head[:60]} (found in text)", "text": " ".join(hit[:2])[:900], "page": page, "idx": 0})
+                break
+    return out
