@@ -22,6 +22,7 @@ import Risk from "./pages/Risk";
 import Alerts from "./pages/Alerts";
 import AlertSettings from "./pages/admin/AlertSettings";
 import Access from "./pages/admin/Access";
+import ApprovalRules from "./pages/admin/ApprovalRules";
 import Login from "./pages/Login";
 import SharedDoc from "./pages/Shared";
 import RiskWeights from "./pages/admin/RiskWeights";
@@ -84,6 +85,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="thresholds" element={<Thresholds />} />
               <Route path="obligations" element={<ObligationRules />} />
               <Route path="access" element={<Access />} />
+              <Route path="approvals" element={<ApprovalRules />} />
               <Route path="usage" element={<Usage />} />
             </Route>
           </Route>

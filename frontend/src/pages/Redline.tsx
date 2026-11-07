@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { mdToHtml } from "../components/mdhtml";
 import { Btn, inputCls } from "../forms";
+import ApprovalPanel from "../components/ApprovalPanel";
 import { api, authUrl, when } from "../lib";
 import { Card, Loading, Sev, SeverityChip, sevStripe } from "../ui";
 
@@ -188,6 +189,7 @@ export default function Redline() {
                 {r.review.updated_at && <span className="text-xs text-slate-500">updated {when(r.review.updated_at)}</span>}
               </div>
             </Card>
+            {r.status === "draft" && <ApprovalPanel docId={String(r.id)} />}
 
             <div className="flex items-center gap-2" role="tablist">
               <button role="tab" aria-selected={tab === "doc"} onClick={() => setTab("doc")} className={`rounded-t px-3 py-1.5 text-sm font-medium ${tab === "doc" ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>Document with tracked changes ({r.items.length})</button>

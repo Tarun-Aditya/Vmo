@@ -12,6 +12,7 @@ const TABS: [string, string, string][] = [
   ["/admin/obligations", "Obligation rules", "Which values become tracked duties"],
   ["/admin/thresholds", "Thresholds", "Spend checks, risk points, SLA credits"],
   ["/admin/risk", "Risk scoring", "Weights of the vendor risk score"],
+  ["/admin/approvals", "Approval rules", "Who must approve which drafts, in order"],
   ["/admin/access", "Users & audit", "Roles, API tokens, who changed what"],
   ["/admin/usage", "AI usage", "Calls, tokens, cost"],
 ];

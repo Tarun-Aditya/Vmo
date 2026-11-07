@@ -14,6 +14,7 @@ from app.db import SessionLocal, engine
 from app.routes import router
 from app.routes_admin import router as admin_router
 from app.routes_alerts import router as alerts_router
+from app.routes_approvals import router as approvals_router
 from app.routes_auth import router as auth_router
 from app.routes_comments import router as comments_router
 from app.routes_chat import router as chat_router
@@ -80,6 +81,7 @@ app.include_router(connectors_router)
 app.include_router(alerts_router)
 app.include_router(auth_router)
 app.include_router(comments_router)
+app.include_router(approvals_router)
 app.include_router(vmo_router)
 
 

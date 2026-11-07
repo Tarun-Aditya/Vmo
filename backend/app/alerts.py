@@ -28,6 +28,7 @@ DEFAULT_RULES = [
     ("spend_exception", "Serious spend exception", "An invoice or contract breaks a spend rule at or above this severity.", "spend_exception", "high", {"min_severity": "high"}, ["in_app", "email", "chat"]),
     ("vendor_risk_tier", "Vendor risk tier high or critical", "A vendor's risk score reached the 'high' or 'critical' tier.", "vendor_tier", "high", {"min_tier": "high"}, ["in_app", "chat"]),
     ("review_waiting", "Draft waiting for review", "A vendor draft has been in the review queue longer than this.", "review_waiting", "medium", {"days": 5}, ["in_app"]),
+    ("approval_waiting", "Approval step stalled", "An approver has not decided a step for longer than the rule's reminder period.", "approval_waiting", "medium", {}, ["in_app", "email"]),
     ("connector_error", "Connector sync failed", "A cloud-storage connector could not sync.", "connector_error", "high", {}, ["in_app", "email"]),
 ]
 
@@ -78,6 +79,13 @@ def _candidates(s, r: dict, today: date) -> list[dict]:
         for x in s.execute(text("""SELECT c.id, c.title, c.vendor, (CURRENT_DATE - c.ingested_at::date) AS days FROM contracts c LEFT JOIN contract_reviews v ON v.contract_id = c.id
                                    WHERE c.status='draft' AND COALESCE(v.status,'pending') IN ('pending','in_review') AND (CURRENT_DATE - c.ingested_at::date) >= :d"""), {"d": int(p.get("days", 5))}).mappings():
             out.append(dict(dedupe=f"{r['key']}:{x['id']}", title=f"Draft waiting {x['days']} days for review: {x['title']}", body=f"{x['vendor']}", contract_id=x["id"], vendor=x["vendor"], link=f"/redline/{x['id']}"))
+    elif kind == "approval_waiting":
+        for x in s.execute(text("""SELECT s.id, s.label, s.approvers, a.id AS aid, c.id AS cid, c.title, c.vendor, (CURRENT_DATE - s.activated_at::date) AS d, COALESCE(r.remind_after_days, 3) AS lim
+                                   FROM approval_steps s JOIN approvals a ON a.id=s.approval_id JOIN contracts c ON c.id=a.contract_id LEFT JOIN approval_rules r ON r.id=a.rule_id
+                                   WHERE a.status='pending' AND s.status='pending'""")).mappings():
+            if x["d"] >= x["lim"]:
+                out.append(dict(dedupe=f"{r['key']}:{x['id']}:{x['d'] // max(x['lim'], 1)}", title=f"Approval waiting {x['d']} days ({x['label']}): {x['title']}", body=f"Approvers: {', '.join(x['approvers'])}",
+                                contract_id=x["cid"], vendor=x["vendor"], link=f"/redline/{x['cid']}"))
     elif kind == "connector_error":
         for x in s.execute(text("SELECT id, name, last_message, last_sync_at FROM connectors WHERE last_status = 'error'")).mappings():
             out.append(dict(dedupe=f"{r['key']}:{x['id']}:{x['last_sync_at']}", title=f"Connector “{x['name']}” failed to sync", body=x["last_message"], link="/admin/connectors"))
