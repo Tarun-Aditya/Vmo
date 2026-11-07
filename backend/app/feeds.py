@@ -7,6 +7,7 @@ import csv
 import hashlib
 import io
 import random
+import re
 import time
 from datetime import date, timedelta
 from pathlib import Path
@@ -64,9 +65,8 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
         eff, exp, ann, tot = c["effective_date"], c["expiry_date"], c["annual_value"], c["total_value"]
         if not eff or c["type"] in ("MSA", "NDA", "DPA", "Amendment"):
             continue
-        late = 17 if "Delmont" in c["vendor"] and c["type"] == "SOW" else 0
         if c["type"] == "SaaS" and ann:
-            step = 3 if "Nginova" in c["vendor"] else 12
+            step = 3 if c["contract_id"] % 3 == 0 else 12            # billed quarterly or annually
             k = 0
             while _add_months(eff, k) <= today and _add_months(eff, k) < exp:
                 d = _add_months(eff, k)
@@ -76,7 +76,7 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
             k = 0
             while _add_months(eff, k + 1) + timedelta(days=5) <= today and _add_months(eff, k + 1) <= exp:
                 ps, pe = _add_months(eff, k), _add_months(eff, k + 1) - timedelta(days=1)
-                inv(c, pe + timedelta(days=5), float(ann) / 12, f"Services {ps:%d %b} – {pe:%d %b %Y}", ps, pe, paid_extra=late if k % 3 == 1 else 0)
+                inv(c, pe + timedelta(days=5), float(ann) / 12, f"Services {ps:%d %b} – {pe:%d %b %Y}", ps, pe)
                 k += 1
         elif c["type"] == "Work Order" and tot:
             term = (exp - eff).days
@@ -84,64 +84,80 @@ def generate(today: date | None = None, seed: int = 11) -> dict:
                 d = eff + timedelta(days=int(term * frac))
                 if d <= today:
                     inv(c, d, float(tot) * pct, f"Milestone invoice ({int(pct * 100)}% of fixed fee)")
-    # ---- planted problems (each one is a demo story)
-    def find(sub):
-        return next((c for c in cons if sub in c["title"]), None)
-
-    sow1 = find("SOW 1 – Application Managed Services")
-    mine = [i for i in invoices if i["contract_title"] == (sow1 or {}).get("title")]
-    for i in mine[-3:-1]:
-        i["amount"] = round(i["amount"] * 1.45, 2)
-        i["description"] += " (includes out-of-scope change requests)"
-    wo2 = find("Work Order 2 – Endpoint Security")
-    if wo2:
-        inv(wo2, date(2026, 10, 30), float(wo2["total_value"]) * 0.30, "Milestone invoice (30% of fixed fee)", force_unpaid=True)
-    for k in range(3):
-        d = date(2026, 8 + k, 28)
-        inv(None, d, 85000, f"Managed hosting – {d:%B %Y}", vendor="Orbitline Cloud Hosting Inc", title="", no=f"ORB-{d:%y%m}-{k + 1:03d}")
-    inv(None, date(2026, 9, 18), 48000, "Penetration test – external perimeter", vendor="Skyguard Security Solutions Inc", title="", no="SKY-2609-014")
-    tar = find("SOW 1 – Application Development and Maintenance")
-    dup = next((i for i in invoices if i["contract_title"] == (tar or {}).get("title")), None)
-    if dup:
+    # ---- demo problems: chosen by RULES over whatever contracts are loaded (no titles or vendors are hardcoded)
+    with SessionLocal() as s:
+        draft_only = [r[0] for r in s.execute(text("SELECT DISTINCT vendor FROM contracts WHERE status='draft' AND vendor NOT IN (SELECT vendor FROM contracts WHERE status <> 'draft') ORDER BY 1"))]
+        nda_only = [r[0] for r in s.execute(text("SELECT vendor FROM contracts WHERE status <> 'draft' GROUP BY vendor HAVING bool_and(type IN ('NDA','DPA')) ORDER BY 1"))]
+        unsigned = [dict(r) for r in s.execute(text("SELECT contract_id, title, vendor, total_value, annual_value, category FROM v_effective_terms WHERE status <> 'draft' AND fully_executed IS NOT TRUE AND COALESCE(total_value, annual_value) > 0 ORDER BY contract_id")).mappings()]
+        draft_value = {r[0]: float(r[1] or 0) for r in s.execute(text("SELECT vendor, max(annual_value) FROM contracts WHERE status='draft' GROUP BY 1"))}
+    byc = {c["contract_id"]: c for c in cons}
+    for u in unsigned[:1]:
+        c = byc.get(u["contract_id"])
+        if c:
+            inv(c, today - timedelta(days=7), float(u["total_value"] or u["annual_value"]) * 0.30, "Milestone invoice (30% of fixed fee)", force_unpaid=True)
+    for v in draft_only[:1]:
+        base = round(draft_value.get(v, 0) / 12, -3) or 85000
+        for k in range(3):
+            d0 = _add_months(date(today.year, today.month, 28), -(3 - k))
+            inv(None, d0, base, f"Managed services – {d0:%B %Y}", vendor=v, title="", no=f"{v[:3].upper()}-{d0:%y%m}-{k + 1:03d}")
+    for v in nda_only[:1]:
+        inv(None, today - timedelta(days=50), 48000, "Professional services (no statement of work on file)", vendor=v, title="", no=f"{v[:3].upper()}-{(today - timedelta(days=50)):%y%m}-014")
+    sows = sorted({i["contract_title"] for i in invoices if i["contract_title"]}, key=lambda t: -sum(x["amount"] for x in invoices if x["contract_title"] == t))
+    recurring = [t for t in sows if sum(1 for x in invoices if x["contract_title"] == t) >= 5]
+    for t in recurring[:1]:                       # the biggest recurring contract: two invoices well above the usual
+        for i in [x for x in invoices if x["contract_title"] == t][-3:-1]:
+            i["amount"] = round(i["amount"] * 1.45, 2)
+            i["description"] += " (includes out-of-scope change requests)"
+    for t in recurring[1:2]:                      # the next one: a duplicated invoice
+        dup = next(x for x in invoices if x["contract_title"] == t)
         n += 1
         invoices.append({**dup, "external_id": f"INV-{n:05d}"})
-    pulse = find("PulseHR")
-    if pulse:
-        inv(pulse, date(2026, 10, 29), 65000, "Additional seats true-up (200 users)", force_unpaid=True)
-    led = find("Ledgerline Finance Cloud")
-    if led and led["type"] == "SaaS":
-        first = next((i for i in invoices if i["contract_title"] == led["title"]), None)
-        if first:
-            first["invoice_date"], first["period_start"] = date(2025, 12, 30), date(2025, 12, 30)
-            first["due_date"] = first["invoice_date"] + timedelta(days=int(led["payment_terms_days"] or 45))
-    # ---- SLA actuals
+    saas = [c for c in cons if c["type"] == "SaaS" and c["annual_value"] and any(i["contract_title"] == c["title"] for i in invoices)]
+    def plan(c):
+        return float(c["annual_value"]) * (c["expiry_date"] - c["effective_date"]).days / 365.0
+
+    for c in sorted(saas, key=plan)[:1]:          # a true-up that takes billing to 110% of the contract's planned value
+        billed = sum(i["amount"] for i in invoices if i["contract_title"] == c["title"])
+        if plan(c) * 1.1 > billed:
+            inv(c, today - timedelta(days=9), plan(c) * 1.1 - billed, "Additional seats true-up", force_unpaid=True)
+    for c in saas[:1]:                            # first invoice dated before the contract starts
+        first = next(i for i in invoices if i["contract_title"] == c["title"])
+        first["invoice_date"], first["period_start"] = c["effective_date"] - timedelta(days=21), c["effective_date"] - timedelta(days=21)
+        first["due_date"] = first["invoice_date"] + timedelta(days=int(c["payment_terms_days"] or 45))
+    late_vendor = next(iter(sorted({c["vendor"] for c in cons if c["type"] == "SOW"})[1:2]), None)
+    for i in invoices:                            # one vendor is paid late by us
+        if late_vendor and i["vendor"] == late_vendor and i["paid_date"] and int(i["external_id"][-2:]) % 3 == 1:
+            i["paid_date"] = date.fromisoformat(str(i["due_date"])) + timedelta(days=17)
+    # ---- SLA actuals: targets come from the contracts; a few months miss them (chosen by rule)
     sla = []
-    breaches = {("Nginova", -3): 99.12, ("Nginova", -2): 99.31, ("PulseHR", -1): 99.41, ("PulseHR", -4): 99.78, ("AdSpark", -2): 99.84}
-    for c in cons:
-        tgt = sla_t.get((c["contract_id"], "sla_availability_pct"))
-        if tgt is None:
-            continue
+    sla_contracts = [c for c in cons if sla_t.get((c["contract_id"], "sla_availability_pct")) is not None]
+    breach_plan = {0: {-3: 0.38, -2: 0.19}, 1: {-1: 0.49, -4: 0.12}, 2: {-2: 0.06}}
+    for ix, c in enumerate(sla_contracts):
+        tgt = sla_t[(c["contract_id"], "sla_availability_pct")]
         for back in range(-8, 0):
             ps = _add_months(date(today.year, today.month, 1), back)
             if ps < date(c["effective_date"].year, c["effective_date"].month, 1):
                 continue
-            actual = next((v for (name, b), v in breaches.items() if name in c["vendor"] and b == back), None) or round(min(100.0, tgt + rnd.uniform(0.02, 0.35)), 2)
+            miss = breach_plan.get(ix, {}).get(back)
+            actual = round(tgt - miss, 2) if miss else round(min(100.0, tgt + rnd.uniform(0.02, 0.35)), 2)
             sla.append(dict(contract_title=c["title"], metric_key="sla_availability_pct", period=ps, actual=actual, incidents=1 if actual < tgt else rnd.choice([0, 0, 0, 1]), note="Breach: service credit claim" if actual < tgt else ""))
-        it = sla_t.get((c["contract_id"], "incident_notice_hours"))
-        if it:
-            for back in (-3, -2, -1):
-                ps = _add_months(date(today.year, today.month, 1), back)
-                if ps < date(c["effective_date"].year, c["effective_date"].month, 1):
-                    continue
-                bad = "Ledgerline" in c["vendor"] and back == -2
-                sla.append(dict(contract_title=c["title"], metric_key="incident_notice_hours", period=ps, actual=71 if bad else rnd.choice([6, 12, 20, 30]), incidents=1, note="Notified late" if bad else ""))
-    # ---- obligation status: past milestones were delivered, except two planted overdue ones
+    inc_contracts = [c for c in cons if sla_t.get((c["contract_id"], "incident_notice_hours")) is not None]
+    for ix, c in enumerate(inc_contracts):
+        it = sla_t[(c["contract_id"], "incident_notice_hours")]
+        for back in (-3, -2, -1):
+            ps = _add_months(date(today.year, today.month, 1), back)
+            if ps < date(c["effective_date"].year, c["effective_date"].month, 1):
+                continue
+            bad = ix == 1 and back == -2
+            sla.append(dict(contract_title=c["title"], metric_key="incident_notice_hours", period=ps, actual=round(it * 1.5) if bad else rnd.choice([6, 12, 20, 30]), incidents=1, note="Notified late" if bad else ""))
+    # ---- obligation status: past milestones were delivered, except the latest one on two contracts
     status, over = [], set()
-    for sub in ("SOW 1 – Application Managed Services", "SOW 1 – Application Development and Maintenance"):
-        c = find(sub)
-        past = [m for m in ms if c and m["contract_id"] == c["contract_id"] and m["due_date"] < today]
-        if past:
-            over.add((past[-1]["contract_id"], past[-1]["key"]))
+    past_by: dict[int, list] = {}
+    for m in ms:
+        if m["due_date"] < today:
+            past_by.setdefault(m["contract_id"], []).append(m)
+    for cid in sorted(past_by)[:2]:
+        over.add((cid, past_by[cid][-1]["key"]))
     for m in ms:
         if m["due_date"] < today and (m["contract_id"], m["key"]) not in over:
             status.append(dict(contract_title=m["title"], key=m["key"], status="done", completed_on=m["due_date"] + timedelta(days=rnd.randint(-4, 6)), note="Accepted by the business"))
@@ -162,16 +178,49 @@ def _d(v: str | None) -> date | None:
     return date.fromisoformat(v) if v and v.strip() else None
 
 
+class ContractIndex:
+    """Find the contract a feed row refers to: exact title, normalised title, a reference that contains a title, or - when the row names only a
+    vendor - the vendor's single contract that carries a value. Real exports carry PO / contract references of many shapes; this keeps the matching generic."""
+
+    def __init__(self, s):
+        rows = [dict(r) for r in s.execute(text("SELECT id, title, vendor, type, COALESCE(total_value, annual_value) AS value FROM contracts WHERE status <> 'draft'")).mappings()]
+        self.rows = rows
+        self.exact = {r["title"]: r["id"] for r in rows}
+        self.norm = {self._n(r["title"]): r["id"] for r in rows}
+
+    @staticmethod
+    def _n(t: str) -> str:
+        return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()
+
+    def match(self, vendor: str | None, ref: str | None) -> int | None:
+        ref = (ref or "").strip()
+        if ref:
+            if ref in self.exact:
+                return self.exact[ref]
+            n = self._n(ref)
+            if n in self.norm:
+                return self.norm[n]
+            hits = [r["id"] for r in self.rows if n and (n in self._n(r["title"]) or self._n(r["title"]) in n) and (not vendor or self._n(vendor).split()[0] in self._n(r["vendor"]))]
+            if len(hits) == 1:
+                return hits[0]
+            return None
+        if vendor:
+            vs = [r for r in self.rows if self._n(r["vendor"]) == self._n(vendor) and r["value"]]
+            if len(vs) == 1:
+                return vs[0]["id"]
+        return None
+
+
 def load_csv(name: str, content: str) -> dict:
     """Load one feed (by file name) into the tables; idempotent. Returns counts."""
     rows = list(csv.DictReader(io.StringIO(content)))
     cnt = dict(rows=len(rows), new=0, updated=0, skipped=0, unmatched=0)
     with SessionLocal() as s:
-        ids = {r[0]: r[1] for r in s.execute(text("SELECT title, id FROM contracts"))}
+        ids = ContractIndex(s)
         for r in rows:
             try:
                 if name.startswith("invoice"):
-                    cid = ids.get((r.get("contract_title") or "").strip())
+                    cid = ids.match(r.get("vendor"), r.get("contract_title"))
                     if r.get("contract_title") and not cid:
                         cnt["unmatched"] += 1
                     ex = s.execute(text("SELECT 1 FROM invoices WHERE external_id=:e"), {"e": r["external_id"]}).first()
@@ -184,7 +233,7 @@ def load_csv(name: str, content: str) -> dict:
                                "ps": _d(r.get("period_start")), "pe": _d(r.get("period_end")), "due": _d(r.get("due_date")), "paid": _d(r.get("paid_date")),
                                "a": r["amount"], "desc": r.get("description"), "cat": r.get("category")})
                 elif name.startswith("sla"):
-                    cid = ids.get(r["contract_title"].strip())
+                    cid = ids.match(r.get("vendor"), r["contract_title"])
                     if not cid:
                         cnt["unmatched"] += 1
                         continue
@@ -193,7 +242,7 @@ def load_csv(name: str, content: str) -> dict:
                                       ON CONFLICT (contract_id, metric_key, period) DO UPDATE SET actual=EXCLUDED.actual, incidents=EXCLUDED.incidents, note=EXCLUDED.note"""),
                               {"c": cid, "k": r["metric_key"], "p": _d(r["period"]), "a": r["actual"], "i": int(r.get("incidents") or 0), "n": r.get("note") or None})
                 elif name.startswith("obligation"):
-                    cid = ids.get(r["contract_title"].strip())
+                    cid = ids.match(r.get("vendor"), r["contract_title"])
                     res = s.execute(text("UPDATE obligations SET status=:st, completed_on=:d, note=COALESCE(:n, note), updated_at=now() WHERE contract_id=:c AND key=:k AND (status <> :st OR completed_on IS DISTINCT FROM :d)"),
                                     {"st": r["status"], "d": _d(r.get("completed_on")), "n": r.get("note") or None, "c": cid, "k": r["key"]})
                     ex = None if res.rowcount else True

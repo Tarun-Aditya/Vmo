@@ -182,7 +182,6 @@ def labels(seed: date) -> dict:
         eff, t = d["EFFECTIVE"], sp["type"]
         lab = dict(effective_date=eff.isoformat(), expiry_date=d["EXPIRY"].isoformat())
         if t == "Amendment":
-            par = sb[sp["amends"]]
             lab = dict(effective_date=eff.isoformat(), payment_terms_days=sp["ov"]["payment_terms_days"], expiry_date=d["NEW_EXPIRY"].isoformat())
         else:
             tfc = sp.get("tfc")

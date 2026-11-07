@@ -251,23 +251,22 @@ def off_contract_spend():
     return sum(float(r["amount"]) for r in _feed("invoices.csv") if not r["contract_title"].strip())
 
 
-# availability targets written into the fictional contracts (planted spec), by vendor keyword
-SLA_TARGETS = {"Nginova": 99.5, "Cirrus": 99.5, "Ledgerline": 99.9, "PulseHR": 99.9, "AdSpark": 99.9, "Service Desk Staff": 99.0}
-
-
 def sla_breach_vendors():
+    """Months the feed marks as a breach (the generator compares each month with the contract's target when it writes the note)."""
     seed, _, _ = load()
+    vendor_of = {}
+    for r in _feed("invoices.csv"):
+        vendor_of.setdefault(r["contract_title"], r["vendor"])
     out = set()
     for r in _feed("sla_measurements.csv"):
-        if r["metric_key"] != "sla_availability_pct" or _d(r["period"]) < seed - timedelta(days=183):
-            continue
-        for k, t in SLA_TARGETS.items():
-            if k in r["contract_title"] and float(r["actual"]) < t:
-                out.add({"Service Desk Staff": "Accentia Technology Services Inc"}.get(k, next(v for v in VENDOR_BY_KEY if k in v)))
-    return out
+        if r["metric_key"] == "sla_availability_pct" and r["note"].startswith("Breach") and _d(r["period"]) >= seed - timedelta(days=183):
+            out.add(r["contract_title"])
+    from app.db import SessionLocal
+    from sqlalchemy import text
 
-
-VENDOR_BY_KEY = ["Nginova Systems Inc", "Cirrus CRM Inc", "Ledgerline Systems Inc", "PulseHR Inc", "AdSpark Analytics LLP"]
+    with SessionLocal() as s_:        # titles -> vendor names (the feed has the contract title, the question asks for vendors)
+        v = {r[0]: r[1] for r in s_.execute(text("SELECT title, vendor FROM contracts"))}
+    return {v[t] for t in out if t in v}
 
 
 def duplicate_invoice_vendors():

@@ -4,7 +4,7 @@ extractor: {field: {value, confidence, clause_type, page}}."""
 from __future__ import annotations
 
 import re
-from datetime import date, timedelta
+from datetime import date
 
 from app import textutil as tu
 from app.config import settings
