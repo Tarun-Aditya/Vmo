@@ -13,11 +13,14 @@ from app import pipeline
 from app.connectors import crypto
 from app.connectors.base import SUPPORTED_EXT, Connector, ConnectorError, RemoteFile
 from app.connectors.gdrive import GoogleDrive
+from app.connectors.mailbox import Mailbox
+from app.connectors.rest import RestFeed
 from app.connectors.msgraph import MicrosoftGraph
 from app.db import SessionLocal
 
-TYPES = {"gdrive": "Google Drive", "onedrive": "OneDrive", "sharepoint": "SharePoint"}
-SECRET_FIELDS = {"gdrive": ["service_account_json", "client_id", "client_secret", "refresh_token"], "onedrive": ["client_id", "client_secret"], "sharepoint": ["client_id", "client_secret"]}
+TYPES = {"gdrive": "Google Drive", "onedrive": "OneDrive", "sharepoint": "SharePoint", "imap": "Mailbox (IMAP)", "coupa": "Coupa", "sap": "SAP S/4HANA", "ariba": "SAP Ariba", "rest": "Generic REST (JSON)"}
+SECRET_FIELDS = {"gdrive": ["service_account_json", "client_id", "client_secret", "refresh_token"], "onedrive": ["client_id", "client_secret"], "sharepoint": ["client_id", "client_secret"],
+                 "imap": ["password"], "coupa": ["client_id", "client_secret"], "ariba": ["client_id", "client_secret"], "sap": ["api_key"], "rest": ["token", "api_key", "client_id", "client_secret"]}
 
 
 def build(kind: str, config: dict, secrets: dict) -> Connector:
@@ -25,6 +28,10 @@ def build(kind: str, config: dict, secrets: dict) -> Connector:
         return GoogleDrive(config, secrets)
     if kind in ("onedrive", "sharepoint"):
         return MicrosoftGraph(config, secrets, kind)
+    if kind == "imap":
+        return Mailbox(config, secrets)
+    if kind in ("coupa", "sap", "ariba", "rest"):
+        return RestFeed(config, secrets, kind)
     raise ConnectorError(f"unknown connector type {kind}")
 
 
@@ -60,10 +67,12 @@ def sync(cid: int, trigger: str = "manual", run_pipeline: bool = True) -> dict:
         with SessionLocal() as s:
             root = pipeline.inbox_path(s)
             known = {r["remote_id"]: dict(r) for r in s.execute(text("SELECT * FROM connector_files WHERE connector_id=:c"), {"c": cid}).mappings()}
-        base = root / row["target"] / slug(row["name"])
+        from app import feeds
+
+        base = (feeds.feeds_dir() if row["target"] == "feeds" else root / row["target"]) / slug(row["name"])
         seen: set[str] = set()
         for f in con.list_files():
-            if not f.name.lower().endswith(SUPPORTED_EXT):
+            if not f.name.lower().endswith(SUPPORTED_EXT + ((".csv",) if row["target"] == "feeds" else ())):
                 res["skipped"] += 1
                 continue
             seen.add(f.id)
@@ -80,7 +89,7 @@ def sync(cid: int, trigger: str = "manual", run_pipeline: bool = True) -> dict:
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes(data)
                 dest.with_suffix(".meta.json").write_text(json.dumps({"origin": f"connector:{row['name']}", "source_url": f.web_url, "remote_path": f.path, "remote_modified": f.modified,
-                                                                      **({"status": "draft"} if row["target"] == "drafts" else {})}))
+                                                                      **({"status": "draft"} if row["target"] == "drafts" else {})})) if row["target"] != "feeds" else None
                 with SessionLocal() as s:
                     s.execute(text("""INSERT INTO connector_files (connector_id, remote_id, path, etag, modified, size, web_url, local_path, status, last_seen)
                                       VALUES (:c,:r,:p,:e,:m,:z,:u,:l,'synced',now())
@@ -101,7 +110,9 @@ def sync(cid: int, trigger: str = "manual", run_pipeline: bool = True) -> dict:
                     s.execute(text("UPDATE connector_files SET status='removed-upstream' WHERE id=:i"), {"i": old["id"]})
                     s.commit()
         proc = None
-        if paths and run_pipeline:
+        if paths and run_pipeline and row["target"] == "feeds":
+            proc = feeds.run_feeds("connector")
+        elif paths and run_pipeline:
             proc = pipeline.run_pipeline("connector", only=paths)
             if proc.get("status") == "busy":
                 events.append(("queued", "", "the pipeline is busy; the folder pipeline will pick the files up"))

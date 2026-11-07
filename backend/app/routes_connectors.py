@@ -15,7 +15,9 @@ from app.db import SessionLocal
 router = APIRouter(prefix="/api")
 # api_base / token_url / login_base: advanced overrides (sovereign clouds such as graph.microsoft.us, proxies, test servers)
 CONFIG_FIELDS = {"gdrive": ["folder", "recursive", "api_base", "token_url"], "onedrive": ["tenant_id", "user", "drive_id", "folder", "recursive", "api_base", "login_base"],
-                 "sharepoint": ["tenant_id", "site_url", "library", "folder", "recursive", "api_base", "login_base"]}
+                 "sharepoint": ["tenant_id", "site_url", "library", "folder", "recursive", "api_base", "login_base"],
+                 "imap": ["host", "port", "ssl", "username", "folder", "from_filter", "subject_filter"],
+                 **{k: ["base_url", "token_url", "token_path", "scope", "path", "items_path", "params", "mapping", "page_param", "page_size", "auth", "etag"] for k in ("coupa", "sap", "ariba", "rest")}}
 
 
 def rows(sql: str, **p) -> list[dict]:
@@ -45,8 +47,8 @@ class ConnectorIn(BaseModel):
 
 def _validate(c: ConnectorIn) -> None:
     if c.type not in service.TYPES:
-        raise HTTPException(422, "type must be gdrive, onedrive or sharepoint")
-    if c.target not in ("contracts", "drafts") or c.trigger_mode not in ("periodic", "manual") or not 1 <= c.interval_minutes <= 60 * 24 * 7:
+        raise HTTPException(422, "unknown connector type")
+    if c.target not in ("contracts", "drafts", "feeds") or c.trigger_mode not in ("periodic", "manual") or not 1 <= c.interval_minutes <= 60 * 24 * 7:
         raise HTTPException(422, "invalid target, trigger or interval")
     if not c.name.strip():
         raise HTTPException(422, "give the connector a name")

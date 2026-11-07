@@ -5,15 +5,20 @@ import { Pill } from "../../components/vmo";
 import { api, ago, inFuture } from "../../lib";
 import { Card, Loading } from "../../ui";
 
-type Conn = { id: number; name: string; type: "gdrive" | "onedrive" | "sharepoint"; type_label: string; config: Record<string, string | boolean>; secrets_set: Record<string, boolean>; target: "contracts" | "drafts"; enabled: boolean;
+type Conn = { id: number; name: string; type: "gdrive" | "onedrive" | "sharepoint" | "imap" | "coupa" | "sap" | "ariba" | "rest"; type_label: string; config: Record<string, string | boolean>; secrets_set: Record<string, boolean>; target: "contracts" | "drafts" | "feeds"; enabled: boolean;
   trigger_mode: "periodic" | "manual"; interval_minutes: number; last_sync_at: string | null; next_sync_at: string | null; last_status: string | null; last_message: string | null; files: number };
-type Draft = { id?: number; name: string; type: Conn["type"]; config: Record<string, string | boolean>; secrets: Record<string, string>; target: "contracts" | "drafts"; enabled: boolean; trigger_mode: "periodic" | "manual"; interval_minutes: number };
+type Draft = { id?: number; name: string; type: Conn["type"]; config: Record<string, string | boolean>; secrets: Record<string, string>; target: "contracts" | "drafts" | "feeds"; enabled: boolean; trigger_mode: "periodic" | "manual"; interval_minutes: number };
 type RemoteFile = { path: string; status: string; modified: string | null; size: number | null; web_url: string | null };
 
 const FIELDS: Record<Conn["type"], { cfg: [string, string, string?][]; sec: [string, string, string?][] }> = {
   gdrive: { cfg: [["folder", "Drive folder (link or ID)", "https://drive.google.com/drive/folders/…"]], sec: [["service_account_json", "Service account key (JSON)", "{ \"client_email\": …, \"private_key\": … } — share the folder with its e-mail"], ["refresh_token", "…or OAuth refresh token"], ["client_id", "OAuth client ID"], ["client_secret", "OAuth client secret"]] },
   onedrive: { cfg: [["tenant_id", "Tenant ID"], ["user", "User (e-mail / UPN)", "jordan@company.com"], ["drive_id", "…or drive ID"], ["folder", "Folder path", "Contracts/Vendors"]], sec: [["client_id", "Application (client) ID"], ["client_secret", "Client secret"]] },
   sharepoint: { cfg: [["tenant_id", "Tenant ID"], ["site_url", "Site URL", "https://contoso.sharepoint.com/sites/Legal"], ["library", "Document library", "Documents"], ["folder", "Folder path", "Vendor Agreements"]], sec: [["client_id", "Application (client) ID"], ["client_secret", "Client secret"]] },
+  imap: { cfg: [["host", "IMAP host", "imap.company.com"], ["port", "Port", "993"], ["username", "Mailbox user", "contracts@company.com"], ["folder", "Mail folder", "INBOX"], ["from_filter", "Only from (optional)"], ["subject_filter", "Subject contains (optional)"]], sec: [["password", "Password / app password"]] },
+  coupa: { cfg: [["base_url", "Coupa instance URL", "https://acme.coupahost.com"], ["scope", "OAuth scope", "core.invoice.read"]], sec: [["client_id", "OAuth client ID"], ["client_secret", "OAuth client secret"]] },
+  sap: { cfg: [["base_url", "SAP API host", "https://sandbox.api.sap.com/s4hanacloud"]], sec: [["api_key", "API key (Business Accelerator Hub or gateway)"]] },
+  ariba: { cfg: [["base_url", "Ariba API host"], ["token_url", "OAuth token URL"], ["path", "Reporting path"]], sec: [["client_id", "Application key / client ID"], ["client_secret", "OAuth client secret"]] },
+  rest: { cfg: [["base_url", "API base URL"], ["path", "List path", "/api/invoices"], ["items_path", "Items path in JSON", "d.results"]], sec: [["token", "Bearer token"], ["api_key", "…or API key"]] },
 };
 const blank = (): Draft => ({ name: "", type: "gdrive", config: { recursive: true }, secrets: {}, target: "contracts", enabled: true, trigger_mode: "periodic", interval_minutes: 60 });
 
@@ -54,8 +59,8 @@ export default function Connectors() {
         <Card title={edit.id ? `Edit ${edit.name}` : "New connector"}>
           <div className="grid gap-3 md:grid-cols-3">
             <Field label="Name"><input className={inputCls} aria-label="Connector name" value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></Field>
-            <Field label="Service"><select className={inputCls} aria-label="Service" value={edit.type} disabled={!!edit.id} onChange={(e) => setEdit({ ...edit, type: e.target.value as Conn["type"], config: { recursive: true }, secrets: {} })}><option value="gdrive">Google Drive</option><option value="onedrive">OneDrive</option><option value="sharepoint">SharePoint</option></select></Field>
-            <Field label="Import as"><select className={inputCls} aria-label="Import as" value={edit.target} onChange={(e) => setEdit({ ...edit, target: e.target.value as Draft["target"] })}><option value="contracts">Executed contracts</option><option value="drafts">Vendor drafts (review queue)</option></select></Field>
+            <Field label="Service"><select className={inputCls} aria-label="Service" value={edit.type} disabled={!!edit.id} onChange={(e) => setEdit({ ...edit, type: e.target.value as Conn["type"], config: { recursive: true }, secrets: {}, target: ["coupa", "sap", "ariba", "rest"].includes(e.target.value) ? "feeds" : edit.target === "feeds" ? "contracts" : edit.target })}><option value="gdrive">Google Drive</option><option value="onedrive">OneDrive</option><option value="sharepoint">SharePoint</option><option value="imap">Mailbox (IMAP)</option><option value="coupa">Coupa (invoices)</option><option value="sap">SAP S/4HANA (invoices)</option><option value="ariba">SAP Ariba (invoices)</option><option value="rest">Generic REST (invoices)</option></select></Field>
+            <Field label="Import as"><select className={inputCls} aria-label="Import as" value={edit.target} onChange={(e) => setEdit({ ...edit, target: e.target.value as Draft["target"] })}><option value="contracts">Executed contracts</option><option value="drafts">Vendor drafts (review queue)</option><option value="feeds">Invoices / reports (spend and SLA)</option></select></Field>
             {f.cfg.map(([k, label, ph]) => <Field key={k} label={label}><input className={inputCls} aria-label={label} placeholder={ph} value={String(edit.config[k] ?? "")} onChange={(e) => setEdit({ ...edit, config: { ...edit.config, [k]: e.target.value } })} /></Field>)}
             {f.sec.map(([k, label, ph]) => (
               <Field key={k} label={label} hint={edit.id ? "Leave blank to keep the stored value." : undefined}>
