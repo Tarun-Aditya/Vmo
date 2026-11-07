@@ -100,6 +100,7 @@ class FieldExtraction(Base):
         ForeignKey("clauses.id", ondelete="SET NULL")
     )
     source_page: Mapped[int | None] = mapped_column(Integer)
+    corrected: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
 
 
 class ClauseDeviation(Base):

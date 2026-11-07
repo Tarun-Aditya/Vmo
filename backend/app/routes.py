@@ -150,12 +150,16 @@ def get_contract(cid: int):
         i=cid,
     )
     fields = q(
-        """SELECT f.field, f.value, f.confidence, f.source_clause_id, f.source_page,
+        """SELECT f.field, f.value, f.confidence, f.source_clause_id, f.source_page, f.corrected,
                          cl.heading AS source_heading
                   FROM field_extractions f LEFT JOIN clauses cl ON cl.id = f.source_clause_id
                   WHERE f.contract_id = :i ORDER BY f.id""",
         i=cid,
     )
+    from app.pipeline import EDITABLE
+
+    for f in fields:
+        f["editable"] = f["field"] in EDITABLE
     titles = {r["id"]: r["title"] for r in q("SELECT id, title FROM contracts")}
     eff = q1("SELECT * FROM v_effective_terms WHERE contract_id = :i", i=cid)
     effective = []

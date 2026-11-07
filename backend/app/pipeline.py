@@ -51,6 +51,34 @@ def _coerce(field: str, v):
     return date.fromisoformat(v) if field in DATE_FIELDS else v
 
 
+EDITABLE = {"effective_date": "date", "expiry_date": "date", "customer_signed_date": "date", "supplier_signed_date": "date", "notice_period_days": "int", "payment_terms_days": "int",
+            "annual_value": "num", "total_value": "num", "liability_cap_multiple": "num", "auto_renew": "bool", "termination_for_convenience": "bool", "processes_personal_data": "bool",
+            "has_dpa": "bool", "fully_executed": "bool", "governing_law": "text", "liability_cap_text": "text", "customer_signatory": "text", "supplier_signatory": "text"}
+
+
+def coerce_input(field: str, raw):
+    """A typed value from what a person entered or what was stored: '' / None means 'not stated'. Raises ValueError for a value that does not fit the field."""
+    kind = EDITABLE.get(field)
+    if raw is None or (isinstance(raw, str) and not raw.strip()):
+        return None
+    if kind == "date":
+        return raw if isinstance(raw, date) else date.fromisoformat(str(raw).strip())
+    if kind == "int":
+        return int(float(raw))
+    if kind == "num":
+        return float(str(raw).replace(",", "").replace("$", ""))
+    if kind == "bool":
+        if isinstance(raw, bool):
+            return raw
+        v = str(raw).strip().lower()
+        if v in ("true", "yes", "y", "1"):
+            return True
+        if v in ("false", "no", "n", "0"):
+            return False
+        raise ValueError("expected yes or no")
+    return str(raw).strip()
+
+
 def infer_metadata(md: str, header: dict, clauses: list[dict], sidecar: dict, folder_hint: str = "") -> dict:
     """Vendor / type / title / parent come from the document itself (rules for real contracts); category, owner, status from an optional sidecar or the folder."""
     if not header.get("Parties") and not header.get("Document Type"):
@@ -154,6 +182,9 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     header, clauses = parse_document(md, classify)
     meta = infer_metadata(md, header, clauses, sidecar, rel)
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
+    corrections = {r[0]: r[1] for r in s.execute(text("SELECT field, corrected_value FROM field_corrections WHERE source_path=:p"), {"p": rel})}
+    for f, v in corrections.items():                 # a person's correction survives re-extraction
+        fields[f] = {**fields.get(f, {"clause_type": None, "page": 1}), "value": coerce_input(f, v), "confidence": 1.0, "corrected": True}
     val = {f: _coerce(f, d["value"]) for f, d in fields.items()}
     if meta["type"] in ("DPA", "NDA"):          # a DPA is not 'covered by a DPA'; an NDA processes no personal data: same result in every engine
         val["has_dpa"] = False
@@ -193,7 +224,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         by_type.setdefault(c["clause_type"], row.id)
         db_clauses.append({"id": row.id, "clause_type": c["clause_type"], "heading": c["heading"], "text": c["text"], "page": c["page"]})
     for f, d in fields.items():
-        s.add(FieldExtraction(contract_id=contract.id, field=f, value=None if d["value"] is None else str(d["value"]),
+        s.add(FieldExtraction(contract_id=contract.id, field=f, value=None if d["value"] is None else str(d["value"]), corrected=bool(d.get("corrected")),
                               confidence=d["confidence"], source_clause_id=by_type.get(d["clause_type"]), source_page=d["page"]))
     stats = derive(s, contract, db_clauses, cfg, meta["template_key"], redline_mode if redline_mode != "auto" else "auto")
     return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "parent_title": meta["parent_title"] or meta.get("parent_ref"),

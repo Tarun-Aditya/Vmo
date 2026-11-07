@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, fmtDate, usd } from "../lib";
@@ -8,7 +8,7 @@ type Node = { id: number; title: string; type: string; children: Node[] };
 type Detail = {
   contract: { id: number; title: string; vendor: string; category: string; type: string; owner: string; status: string };
   clauses: { id: number; clause_type: string; heading: string; text: string; page: number }[];
-  fields: { field: string; value: string | null; confidence: number | null; source_clause_id: number | null; source_page: number | null; source_heading: string | null }[];
+  fields: { field: string; value: string | null; confidence: number | null; source_clause_id: number | null; source_page: number | null; source_heading: string | null; corrected?: boolean; editable?: boolean }[];
   effective_terms: { field: string; value: unknown; source_id: number; source_title: string; overridden: boolean }[];
   hierarchy: Node; deviations: { severity: Sev; deviation_summary: string; heading: string }[];
   is_amendment: boolean; overrides: string[]; parent: { id: number; title: string } | null;
@@ -52,6 +52,9 @@ export default function ContractDetail() {
   const { id } = useParams();
   const q = useQuery({ queryKey: ["contract", id], queryFn: () => api<Detail>(`/api/contracts/${id}`) });
   const [hl, setHl] = useState<number | null>(null);
+  const qc = useQueryClient();
+  const [fix, setFix] = useState<{ field: string; value: string } | null>(null);
+  const saveFix = useMutation({ mutationFn: () => api(`/api/contracts/${id}/fields/${fix!.field}`, { method: "PUT", body: JSON.stringify({ value: fix!.value }) }), onSuccess: () => { setFix(null); qc.invalidateQueries(); } });
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
   useEffect(() => { setHl(null); }, [id]);
   useEffect(() => { if (hl) refs.current[hl]?.scrollIntoView({ behavior: "smooth", block: "center" }); }, [hl]);
@@ -133,7 +136,14 @@ export default function ContractDetail() {
                 <tr key={f.field} onClick={() => f.source_clause_id && setHl(f.source_clause_id)}
                   className={`border-t border-slate-100 dark:border-slate-700 ${f.source_clause_id ? "cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700" : ""} ${hl && hl === f.source_clause_id ? "bg-yellow-50 dark:bg-yellow-900/30" : ""}`}>
                   <Td className="text-slate-500">{LABEL[f.field] ?? f.field}</Td>
-                  <Td className="font-medium tabular-nums">{show(f.field, f.value, d.lineage.length > 0 && ["SOW", "Work Order"].includes(c.type))}</Td>
+                  <Td className="font-medium tabular-nums">{fix?.field === f.field ? (
+                      <span className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                        <input className="w-36 rounded border border-slate-300 px-1 py-0.5 text-sm dark:border-slate-600 dark:bg-slate-800" aria-label={`Correct ${LABEL[f.field] ?? f.field}`} autoFocus value={fix.value} onChange={(e) => setFix({ ...fix, value: e.target.value })} onKeyDown={(e) => e.key === "Enter" && saveFix.mutate()} />
+                        <button className="text-xs font-medium text-emerald-700" onClick={() => saveFix.mutate()}>Save</button><button className="text-xs text-slate-500" onClick={() => setFix(null)}>Cancel</button>
+                        {saveFix.error && <span className="text-xs text-red-600">{String(saveFix.error).replace("Error: ", "")}</span>}</span>)
+                    : <>{show(f.field, f.value, d.lineage.length > 0 && ["SOW", "Work Order"].includes(c.type))}
+                        {f.corrected && <span className="ml-1 rounded bg-emerald-100 px-1 text-[10px] font-semibold text-emerald-900" title="A person corrected this value">corrected</span>}
+                        {f.editable && <button className="ml-2 text-xs font-normal text-indigo-600 hover:underline dark:text-indigo-400" aria-label={`Edit ${LABEL[f.field] ?? f.field}`} onClick={(e) => { e.stopPropagation(); setFix({ field: f.field, value: f.value ?? "" }); }}>edit</button>}</>}</Td>
                   <Td className="text-right"><ConfidenceBadge v={f.confidence} />
                     <div className="text-[11px] text-slate-500">{f.source_heading ? `${f.source_heading} · p.${f.source_page}` : `header · p.${f.source_page ?? 1}`}</div></Td>
                 </tr>
