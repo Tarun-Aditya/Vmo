@@ -1,0 +1,1 @@
+["sla_report", [{"contract_title": "SaaS Subscription Agreement", "vendor": "Resorts Ltd", "period": "2026-09-01", "metric_key": "sla_availability_pct", "actual": 100.0, "incidents": 0, "note": ""}, {"contract_title": "SaaS Subscription Agreement", "vendor": "Resorts Ltd", "period": "2026-09-01", "metric_key": "incident_notice_hours", "actual": 6.0, "incidents": 1, "note": ""}]]

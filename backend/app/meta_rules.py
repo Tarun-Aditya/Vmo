@@ -25,10 +25,18 @@ def vendor_short(v: str) -> str:
 
 def clean_vendor(v: str) -> str:
     v = re.sub(r"\s+", " ", v).strip(" ,.;")
-    v = re.sub(r"^(?:Supplier|Vendor|Provider|Contractor|Client|Customer|Party|Between|And|The)\s+", "", v)
+    while (v2 := re.sub(r"^(?:Supplier|Vendor|Provider|Contractor|Client|Customer|Party|Between|And|The)\s+", "", v)) != v:     # 'Customer Supplier Acme Ltd'
+        v = v2
     if v.isupper():                              # 'TATVA INFOSYSTEMS LTD' -> 'Tatva Infosystems Ltd'
         v = " ".join(w if w in ("LLC", "LLP", "PLC", "LP", "AG", "GmbH") else w.capitalize() for w in v.split())
     return v
+
+
+def _mask_customer(head: str, markers: list[str]) -> str:
+    """Our own company's full name (it may contain '&' or 'and', e.g. 'Seabright Hotels & Resorts Ltd') is replaced by 'the Customer', so that its words are not read as the supplier."""
+    for k in markers:
+        head = re.sub(rf"(?:[A-Z][\w'’.-]*\s+(?:(?:&|and)\s+)?){{0,4}}(?i:\b{re.escape(k)}\b)(?:\s+(?:(?:&|and)\s+)?[A-Z][\w'’.-]*){{0,4}}?\s+(?:Inc\.?|Ltd\.?|LLC|LLP|PLC|Pte Ltd|Pte\. Ltd\.|Corp\.?|Corporation|Company|Co\.|Limited|GmbH|Group|Holdings)", "the Customer", head)
+    return head
 
 
 def find_vendor(md: str, header: dict, sidecar: dict) -> str | None:
@@ -38,13 +46,14 @@ def find_vendor(md: str, header: dict, sidecar: dict) -> str | None:
         if m:
             return clean_vendor(m.group(1))
     head = re.sub(r"[*_`|]", " ", re.sub(r"<!--.*?-->", " ", md))[:2600]
-    head = re.sub(r"\s+", " ", head)
+    head = re.sub(r"\s+", " ", head.replace("\\&", "&").replace("&amp;", "&"))        # markdown / HTML escapes of an ampersand in a company name
+    head = _mask_customer(head, cm)
     for rx in (r"(?:between|by and between|made between|entered into by and between)\s+(.{5,260}?)\s+(?:and|&)\s+(.{5,200})", r"(?:Supplier|Vendor|Provider|Contractor|Service Provider|Client|Counterparty)\s*[:|]\s*(.{4,120})"):
         m = re.search(rx, head, re.I)
         if not m:
             continue
         cands = []
-        for g in m.groups():
+        for g in (m.group(0),):          # whole span: a supplier name containing '&' must not be cut in two at the separator
             cands += [clean_vendor(c) for c in COMPANY.findall(g)]
         cands = [c for c in cands if not any(k in c.lower() for k in cm)]
         if cands:

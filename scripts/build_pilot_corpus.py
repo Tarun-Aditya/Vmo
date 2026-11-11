@@ -32,11 +32,13 @@ def write(spec: dict, force: bool) -> str:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
+    ap.add_argument("--pack", default="pilot", help="pilot (IT services) or hotel")
     ap.add_argument("--only", default="")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--workers", type=int, default=3)
     a = ap.parse_args()
-    specs = [d for d in DOCS if not a.only or d["key"] in a.only.split(",")]
+    pilot.use_pack(a.pack)
+    specs = [d for d in pilot.DOCS if not a.only or d["key"] in a.only.split(",")]
     print("provider:", llm.provider())
     with ThreadPoolExecutor(a.workers) as ex:
         for line in ex.map(lambda s: write(s, a.force), specs):

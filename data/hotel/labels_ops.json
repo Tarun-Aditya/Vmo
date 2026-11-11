@@ -1,0 +1,1774 @@
+{
+ "invoices": {
+  "invoice_001.md": {
+   "vendor": "BookWave Distribution Inc",
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "invoice_no": "BOO-2512-001",
+   "invoice_date": "2025-11-15",
+   "due_date": "2025-12-15",
+   "paid_date": "2026-01-06",
+   "amount": 420000.0
+  },
+  "invoice_002.docx": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2511-002",
+   "invoice_date": "2025-11-21",
+   "due_date": "2025-12-21",
+   "paid_date": "2025-12-23",
+   "amount": 35000.0
+  },
+  "invoice_003.pdf": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2512-003",
+   "invoice_date": "2025-12-21",
+   "due_date": "2026-01-20",
+   "paid_date": "2026-01-21",
+   "amount": 35000.0
+  },
+  "invoice_004.md": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2601-004",
+   "invoice_date": "2026-01-21",
+   "due_date": "2026-02-20",
+   "paid_date": "2026-02-21",
+   "amount": 35000.0
+  },
+  "invoice_005.docx": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2602-005",
+   "invoice_date": "2026-02-21",
+   "due_date": "2026-03-23",
+   "paid_date": "2026-03-25",
+   "amount": 35000.0
+  },
+  "invoice_006.pdf": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2603-006",
+   "invoice_date": "2026-03-21",
+   "due_date": "2026-04-20",
+   "paid_date": "2026-04-17",
+   "amount": 35000.0
+  },
+  "invoice_007.md": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2604-007",
+   "invoice_date": "2026-04-21",
+   "due_date": "2026-05-21",
+   "paid_date": "2026-05-17",
+   "amount": 35000.0
+  },
+  "invoice_008.docx": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2605-008",
+   "invoice_date": "2026-05-21",
+   "due_date": "2026-06-20",
+   "paid_date": "2026-06-22",
+   "amount": 35000.0
+  },
+  "invoice_009.pdf": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2606-009",
+   "invoice_date": "2026-06-21",
+   "due_date": "2026-07-21",
+   "paid_date": "2026-07-22",
+   "amount": 35000.0
+  },
+  "invoice_010.md": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2607-010",
+   "invoice_date": "2026-07-21",
+   "due_date": "2026-08-20",
+   "paid_date": "2026-08-16",
+   "amount": 35000.0
+  },
+  "invoice_011.docx": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2608-011",
+   "invoice_date": "2026-08-21",
+   "due_date": "2026-09-20",
+   "paid_date": "2026-09-15",
+   "amount": 35000.0
+  },
+  "invoice_012.pdf": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2609-012",
+   "invoice_date": "2026-09-21",
+   "due_date": "2026-10-21",
+   "paid_date": "2026-10-22",
+   "amount": 35000.0
+  },
+  "invoice_013.md": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Security Services at Seabright Harbour",
+   "invoice_no": "BRI-2610-013",
+   "invoice_date": "2026-10-21",
+   "due_date": "2026-11-20",
+   "paid_date": null,
+   "amount": 35000.0
+  },
+  "invoice_014.docx": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "invoice_no": "BRI-2605-014",
+   "invoice_date": "2026-05-29",
+   "due_date": "2026-06-28",
+   "paid_date": "2026-06-24",
+   "amount": 20000.0
+  },
+  "invoice_015.pdf": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "invoice_no": "BRI-2606-015",
+   "invoice_date": "2026-06-29",
+   "due_date": "2026-07-29",
+   "paid_date": "2026-07-24",
+   "amount": 20000.0
+  },
+  "invoice_016.md": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "invoice_no": "BRI-2607-016",
+   "invoice_date": "2026-07-29",
+   "due_date": "2026-08-28",
+   "paid_date": "2026-08-30",
+   "amount": 20000.0
+  },
+  "invoice_017.docx": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "invoice_no": "BRI-2608-017",
+   "invoice_date": "2026-08-29",
+   "due_date": "2026-09-28",
+   "paid_date": "2026-09-22",
+   "amount": 20000.0
+  },
+  "invoice_018.pdf": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "invoice_no": "BRI-2609-018",
+   "invoice_date": "2026-09-29",
+   "due_date": "2026-10-29",
+   "paid_date": "2026-10-29",
+   "amount": 20000.0
+  },
+  "invoice_019.md": {
+   "vendor": "Brightstar Security Services Inc",
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "invoice_no": "BRI-2610-019",
+   "invoice_date": "2026-10-29",
+   "due_date": "2026-11-28",
+   "paid_date": null,
+   "amount": 20000.0
+  },
+  "invoice_020.docx": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2602-020",
+   "invoice_date": "2026-02-19",
+   "due_date": "2026-04-05",
+   "paid_date": "2026-04-06",
+   "amount": 16500.0
+  },
+  "invoice_021.pdf": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2603-021",
+   "invoice_date": "2026-03-19",
+   "due_date": "2026-05-03",
+   "paid_date": "2026-04-29",
+   "amount": 16500.0
+  },
+  "invoice_022.md": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2604-022",
+   "invoice_date": "2026-04-19",
+   "due_date": "2026-06-03",
+   "paid_date": "2026-05-28",
+   "amount": 16500.0
+  },
+  "invoice_023.docx": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2605-023",
+   "invoice_date": "2026-05-19",
+   "due_date": "2026-07-03",
+   "paid_date": "2026-07-05",
+   "amount": 16500.0
+  },
+  "invoice_024.pdf": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2606-024",
+   "invoice_date": "2026-06-19",
+   "due_date": "2026-08-03",
+   "paid_date": "2026-07-29",
+   "amount": 16500.0
+  },
+  "invoice_025.md": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2607-025",
+   "invoice_date": "2026-07-19",
+   "due_date": "2026-09-02",
+   "paid_date": "2026-08-27",
+   "amount": 16500.0
+  },
+  "invoice_026.docx": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2608-026",
+   "invoice_date": "2026-08-19",
+   "due_date": "2026-10-03",
+   "paid_date": "2026-09-27",
+   "amount": 16500.0
+  },
+  "invoice_027.pdf": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2609-027",
+   "invoice_date": "2026-09-19",
+   "due_date": "2026-11-03",
+   "paid_date": "2026-10-31",
+   "amount": 16500.0
+  },
+  "invoice_028.md": {
+   "vendor": "Linen Services Ltd",
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "invoice_no": "LIN-2610-028",
+   "invoice_date": "2026-10-19",
+   "due_date": "2026-12-03",
+   "paid_date": null,
+   "amount": 16500.0
+  },
+  "invoice_029.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2508-029",
+   "invoice_date": "2025-08-02",
+   "due_date": "2025-09-16",
+   "paid_date": "2025-09-13",
+   "amount": 25833.33
+  },
+  "invoice_030.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2509-030",
+   "invoice_date": "2025-09-02",
+   "due_date": "2025-10-17",
+   "paid_date": "2025-10-11",
+   "amount": 25833.33
+  },
+  "invoice_031.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2510-031",
+   "invoice_date": "2025-10-03",
+   "due_date": "2025-11-17",
+   "paid_date": "2025-12-04",
+   "amount": 25833.33
+  },
+  "invoice_032.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2511-032",
+   "invoice_date": "2025-11-02",
+   "due_date": "2025-12-17",
+   "paid_date": "2025-12-16",
+   "amount": 25833.33
+  },
+  "invoice_033.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2512-033",
+   "invoice_date": "2025-12-03",
+   "due_date": "2026-01-17",
+   "paid_date": "2026-01-18",
+   "amount": 25833.33
+  },
+  "invoice_034.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2601-034",
+   "invoice_date": "2026-01-02",
+   "due_date": "2026-02-16",
+   "paid_date": "2026-03-05",
+   "amount": 25833.33
+  },
+  "invoice_035.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2602-035",
+   "invoice_date": "2026-02-02",
+   "due_date": "2026-03-19",
+   "paid_date": "2026-03-21",
+   "amount": 25833.33
+  },
+  "invoice_036.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2603-036",
+   "invoice_date": "2026-03-04",
+   "due_date": "2026-04-18",
+   "paid_date": "2026-04-15",
+   "amount": 25833.33
+  },
+  "invoice_037.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2604-037",
+   "invoice_date": "2026-04-02",
+   "due_date": "2026-05-17",
+   "paid_date": "2026-06-03",
+   "amount": 25833.33
+  },
+  "invoice_038.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2605-038",
+   "invoice_date": "2026-05-03",
+   "due_date": "2026-06-17",
+   "paid_date": "2026-06-18",
+   "amount": 25833.33
+  },
+  "invoice_039.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2606-039",
+   "invoice_date": "2026-06-02",
+   "due_date": "2026-07-17",
+   "paid_date": "2026-07-11",
+   "amount": 25833.33
+  },
+  "invoice_040.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2607-040",
+   "invoice_date": "2026-07-03",
+   "due_date": "2026-08-17",
+   "paid_date": "2026-09-03",
+   "amount": 25833.33
+  },
+  "invoice_041.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2608-041",
+   "invoice_date": "2026-08-02",
+   "due_date": "2026-09-16",
+   "paid_date": "2026-09-17",
+   "amount": 25833.33
+  },
+  "invoice_042.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2609-042",
+   "invoice_date": "2026-09-02",
+   "due_date": "2026-10-17",
+   "paid_date": "2026-10-15",
+   "amount": 25833.33
+  },
+  "invoice_043.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2610-043",
+   "invoice_date": "2026-10-03",
+   "due_date": "2026-11-17",
+   "paid_date": null,
+   "amount": 25833.33
+  },
+  "invoice_044.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "invoice_no": "CRE-2611-044",
+   "invoice_date": "2026-11-02",
+   "due_date": "2026-12-17",
+   "paid_date": null,
+   "amount": 25833.33
+  },
+  "invoice_045.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2508-045",
+   "invoice_date": "2025-08-23",
+   "due_date": "2025-10-07",
+   "paid_date": "2025-10-09",
+   "amount": 22083.33
+  },
+  "invoice_046.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2509-046",
+   "invoice_date": "2025-09-23",
+   "due_date": "2025-11-07",
+   "paid_date": "2025-11-24",
+   "amount": 22083.33
+  },
+  "invoice_047.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2510-047",
+   "invoice_date": "2025-10-23",
+   "due_date": "2025-12-07",
+   "paid_date": "2025-12-05",
+   "amount": 22083.33
+  },
+  "invoice_048.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2511-048",
+   "invoice_date": "2025-11-23",
+   "due_date": "2026-01-07",
+   "paid_date": "2026-01-06",
+   "amount": 22083.33
+  },
+  "invoice_049.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2512-049",
+   "invoice_date": "2025-12-23",
+   "due_date": "2026-02-06",
+   "paid_date": "2026-02-23",
+   "amount": 22083.33
+  },
+  "invoice_050.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2601-050",
+   "invoice_date": "2026-01-23",
+   "due_date": "2026-03-09",
+   "paid_date": "2026-03-11",
+   "amount": 22083.33
+  },
+  "invoice_051.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2602-051",
+   "invoice_date": "2026-02-23",
+   "due_date": "2026-04-09",
+   "paid_date": "2026-04-07",
+   "amount": 22083.33
+  },
+  "invoice_052.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2603-052",
+   "invoice_date": "2026-03-23",
+   "due_date": "2026-05-07",
+   "paid_date": "2026-05-24",
+   "amount": 22083.33
+  },
+  "invoice_053.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2604-053",
+   "invoice_date": "2026-04-23",
+   "due_date": "2026-06-07",
+   "paid_date": "2026-06-02",
+   "amount": 22083.33
+  },
+  "invoice_054.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2605-054",
+   "invoice_date": "2026-05-23",
+   "due_date": "2026-07-07",
+   "paid_date": "2026-07-02",
+   "amount": 22083.33
+  },
+  "invoice_055.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2606-055",
+   "invoice_date": "2026-06-23",
+   "due_date": "2026-08-07",
+   "paid_date": "2026-08-24",
+   "amount": 22083.33
+  },
+  "invoice_056.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2607-056",
+   "invoice_date": "2026-07-23",
+   "due_date": "2026-09-06",
+   "paid_date": "2026-09-01",
+   "amount": 22083.33
+  },
+  "invoice_057.pdf": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2608-057",
+   "invoice_date": "2026-08-23",
+   "due_date": "2026-10-07",
+   "paid_date": "2026-10-05",
+   "amount": 22083.33
+  },
+  "invoice_058.md": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2609-058",
+   "invoice_date": "2026-09-23",
+   "due_date": "2026-11-07",
+   "paid_date": "2026-11-24",
+   "amount": 22083.33
+  },
+  "invoice_059.docx": {
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Lakeside Resort",
+   "invoice_no": "CRE-2610-059",
+   "invoice_date": "2026-10-23",
+   "due_date": "2026-12-07",
+   "paid_date": null,
+   "amount": 22083.33
+  },
+  "invoice_060.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2502-060",
+   "invoice_date": "2025-02-04",
+   "due_date": "2025-03-06",
+   "paid_date": "2025-03-01",
+   "amount": 8000.0
+  },
+  "invoice_061.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2503-061",
+   "invoice_date": "2025-03-04",
+   "due_date": "2025-04-03",
+   "paid_date": "2025-03-28",
+   "amount": 8000.0
+  },
+  "invoice_062.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2504-062",
+   "invoice_date": "2025-04-04",
+   "due_date": "2025-05-04",
+   "paid_date": "2025-04-28",
+   "amount": 8000.0
+  },
+  "invoice_063.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2505-063",
+   "invoice_date": "2025-05-02",
+   "due_date": "2025-06-01",
+   "paid_date": "2025-05-29",
+   "amount": 8000.0
+  },
+  "invoice_064.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2506-064",
+   "invoice_date": "2025-06-04",
+   "due_date": "2025-07-04",
+   "paid_date": "2025-07-01",
+   "amount": 8000.0
+  },
+  "invoice_065.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2507-065",
+   "invoice_date": "2025-07-02",
+   "due_date": "2025-08-01",
+   "paid_date": "2025-07-26",
+   "amount": 8000.0
+  },
+  "invoice_066.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2508-066",
+   "invoice_date": "2025-08-04",
+   "due_date": "2025-09-03",
+   "paid_date": "2025-09-04",
+   "amount": 8000.0
+  },
+  "invoice_067.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2509-067",
+   "invoice_date": "2025-09-04",
+   "due_date": "2025-10-04",
+   "paid_date": "2025-10-04",
+   "amount": 8000.0
+  },
+  "invoice_068.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2510-068",
+   "invoice_date": "2025-10-02",
+   "due_date": "2025-11-01",
+   "paid_date": "2025-11-01",
+   "amount": 8000.0
+  },
+  "invoice_069.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2511-069",
+   "invoice_date": "2025-11-04",
+   "due_date": "2025-12-04",
+   "paid_date": "2025-12-04",
+   "amount": 8000.0
+  },
+  "invoice_070.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2512-070",
+   "invoice_date": "2025-12-02",
+   "due_date": "2026-01-01",
+   "paid_date": "2025-12-27",
+   "amount": 8000.0
+  },
+  "invoice_071.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2601-071",
+   "invoice_date": "2026-01-04",
+   "due_date": "2026-02-03",
+   "paid_date": "2026-01-31",
+   "amount": 8000.0
+  },
+  "invoice_072.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2602-072",
+   "invoice_date": "2026-02-04",
+   "due_date": "2026-03-06",
+   "paid_date": "2026-03-04",
+   "amount": 8000.0
+  },
+  "invoice_073.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2603-073",
+   "invoice_date": "2026-03-04",
+   "due_date": "2026-04-03",
+   "paid_date": "2026-04-02",
+   "amount": 8000.0
+  },
+  "invoice_074.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2604-074",
+   "invoice_date": "2026-04-04",
+   "due_date": "2026-05-04",
+   "paid_date": "2026-04-29",
+   "amount": 8000.0
+  },
+  "invoice_075.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2605-075",
+   "invoice_date": "2026-05-02",
+   "due_date": "2026-06-01",
+   "paid_date": "2026-05-30",
+   "amount": 8000.0
+  },
+  "invoice_076.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2606-076",
+   "invoice_date": "2026-06-04",
+   "due_date": "2026-07-04",
+   "paid_date": "2026-07-03",
+   "amount": 8000.0
+  },
+  "invoice_077.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2607-077",
+   "invoice_date": "2026-07-02",
+   "due_date": "2026-08-01",
+   "paid_date": "2026-07-26",
+   "amount": 8000.0
+  },
+  "invoice_078.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2608-078",
+   "invoice_date": "2026-08-04",
+   "due_date": "2026-09-03",
+   "paid_date": "2026-09-03",
+   "amount": 8000.0
+  },
+  "invoice_079.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2609-079",
+   "invoice_date": "2026-09-04",
+   "due_date": "2026-10-04",
+   "paid_date": "2026-09-29",
+   "amount": 8000.0
+  },
+  "invoice_080.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2610-080",
+   "invoice_date": "2026-10-02",
+   "due_date": "2026-11-01",
+   "paid_date": "2026-10-28",
+   "amount": 8000.0
+  },
+  "invoice_081.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "invoice_no": "HAL-2611-081",
+   "invoice_date": "2026-11-04",
+   "due_date": "2026-12-04",
+   "paid_date": null,
+   "amount": 8000.0
+  },
+  "invoice_082.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2503-082",
+   "invoice_date": "2025-03-04",
+   "due_date": "2025-04-03",
+   "paid_date": "2025-03-31",
+   "amount": 7000.0
+  },
+  "invoice_083.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2504-083",
+   "invoice_date": "2025-04-03",
+   "due_date": "2025-05-03",
+   "paid_date": "2025-04-28",
+   "amount": 7000.0
+  },
+  "invoice_084.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2505-084",
+   "invoice_date": "2025-05-04",
+   "due_date": "2025-06-03",
+   "paid_date": "2025-05-28",
+   "amount": 7000.0
+  },
+  "invoice_085.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2506-085",
+   "invoice_date": "2025-06-03",
+   "due_date": "2025-07-03",
+   "paid_date": "2025-06-27",
+   "amount": 7000.0
+  },
+  "invoice_086.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2507-086",
+   "invoice_date": "2025-07-04",
+   "due_date": "2025-08-03",
+   "paid_date": "2025-08-04",
+   "amount": 7000.0
+  },
+  "invoice_087.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2508-087",
+   "invoice_date": "2025-08-03",
+   "due_date": "2025-09-02",
+   "paid_date": "2025-09-03",
+   "amount": 7000.0
+  },
+  "invoice_088.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2509-088",
+   "invoice_date": "2025-09-03",
+   "due_date": "2025-10-03",
+   "paid_date": "2025-09-29",
+   "amount": 7000.0
+  },
+  "invoice_089.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2510-089",
+   "invoice_date": "2025-10-04",
+   "due_date": "2025-11-03",
+   "paid_date": "2025-11-05",
+   "amount": 7000.0
+  },
+  "invoice_090.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2511-090",
+   "invoice_date": "2025-11-03",
+   "due_date": "2025-12-03",
+   "paid_date": "2025-11-30",
+   "amount": 7000.0
+  },
+  "invoice_091.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2512-091",
+   "invoice_date": "2025-12-04",
+   "due_date": "2026-01-03",
+   "paid_date": "2026-01-04",
+   "amount": 7000.0
+  },
+  "invoice_092.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2601-092",
+   "invoice_date": "2026-01-03",
+   "due_date": "2026-02-02",
+   "paid_date": "2026-02-04",
+   "amount": 7000.0
+  },
+  "invoice_093.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2602-093",
+   "invoice_date": "2026-02-03",
+   "due_date": "2026-03-05",
+   "paid_date": "2026-03-02",
+   "amount": 7000.0
+  },
+  "invoice_094.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2603-094",
+   "invoice_date": "2026-03-04",
+   "due_date": "2026-04-03",
+   "paid_date": "2026-03-30",
+   "amount": 7000.0
+  },
+  "invoice_095.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2604-095",
+   "invoice_date": "2026-04-03",
+   "due_date": "2026-05-03",
+   "paid_date": "2026-05-03",
+   "amount": 7000.0
+  },
+  "invoice_096.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2605-096",
+   "invoice_date": "2026-05-04",
+   "due_date": "2026-06-03",
+   "paid_date": "2026-06-03",
+   "amount": 7000.0
+  },
+  "invoice_097.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2606-097",
+   "invoice_date": "2026-06-03",
+   "due_date": "2026-07-03",
+   "paid_date": "2026-06-28",
+   "amount": 7000.0
+  },
+  "invoice_098.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2607-098",
+   "invoice_date": "2026-07-04",
+   "due_date": "2026-08-03",
+   "paid_date": "2026-08-03",
+   "amount": 7000.0
+  },
+  "invoice_099.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2608-099",
+   "invoice_date": "2026-08-03",
+   "due_date": "2026-09-02",
+   "paid_date": "2026-09-02",
+   "amount": 7000.0
+  },
+  "invoice_100.md": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2609-100",
+   "invoice_date": "2026-09-03",
+   "due_date": "2026-10-03",
+   "paid_date": "2026-09-30",
+   "amount": 7000.0
+  },
+  "invoice_101.docx": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2610-101",
+   "invoice_date": "2026-10-04",
+   "due_date": "2026-11-03",
+   "paid_date": "2026-10-28",
+   "amount": 7000.0
+  },
+  "invoice_102.pdf": {
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "invoice_no": "HAL-2611-102",
+   "invoice_date": "2026-11-03",
+   "due_date": "2026-12-03",
+   "paid_date": null,
+   "amount": 7000.0
+  },
+  "invoice_103.md": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2512-103",
+   "invoice_date": "2025-12-10",
+   "due_date": "2026-01-24",
+   "paid_date": "2026-01-22",
+   "amount": 45000.0
+  },
+  "invoice_104.docx": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2601-104",
+   "invoice_date": "2026-01-10",
+   "due_date": "2026-02-24",
+   "paid_date": "2026-02-22",
+   "amount": 45000.0
+  },
+  "invoice_105.pdf": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2602-105",
+   "invoice_date": "2026-02-10",
+   "due_date": "2026-03-27",
+   "paid_date": "2026-03-21",
+   "amount": 45000.0
+  },
+  "invoice_106.md": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2603-106",
+   "invoice_date": "2026-03-10",
+   "due_date": "2026-04-24",
+   "paid_date": "2026-04-21",
+   "amount": 45000.0
+  },
+  "invoice_107.docx": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2604-107",
+   "invoice_date": "2026-04-10",
+   "due_date": "2026-05-25",
+   "paid_date": "2026-05-21",
+   "amount": 45000.0
+  },
+  "invoice_108.pdf": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2605-108",
+   "invoice_date": "2026-05-10",
+   "due_date": "2026-06-24",
+   "paid_date": "2026-06-24",
+   "amount": 45000.0
+  },
+  "invoice_109.md": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2606-109",
+   "invoice_date": "2026-06-10",
+   "due_date": "2026-07-25",
+   "paid_date": "2026-07-20",
+   "amount": 45000.0
+  },
+  "invoice_110.docx": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2607-110",
+   "invoice_date": "2026-07-10",
+   "due_date": "2026-08-24",
+   "paid_date": "2026-08-18",
+   "amount": 45000.0
+  },
+  "invoice_111.pdf": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2608-111",
+   "invoice_date": "2026-08-10",
+   "due_date": "2026-09-24",
+   "paid_date": "2026-09-20",
+   "amount": 45000.0
+  },
+  "invoice_112.md": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2609-112",
+   "invoice_date": "2026-09-10",
+   "due_date": "2026-10-25",
+   "paid_date": "2026-10-22",
+   "amount": 45000.0
+  },
+  "invoice_113.docx": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2610-113",
+   "invoice_date": "2026-10-10",
+   "due_date": "2026-11-24",
+   "paid_date": null,
+   "amount": 45000.0
+  },
+  "invoice_114.pdf": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2611-114",
+   "invoice_date": "2026-11-10",
+   "due_date": "2026-12-25",
+   "paid_date": null,
+   "amount": 45000.0
+  },
+  "invoice_115.md": {
+   "vendor": "PayGuard Payments Pte Ltd",
+   "contract_title": "SaaS Subscription Agreement",
+   "invoice_no": "PAY-2605-115",
+   "invoice_date": "2026-05-15",
+   "due_date": "2026-06-14",
+   "paid_date": "2026-06-15",
+   "amount": 190000.0
+  },
+  "invoice_116.docx": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2511-116",
+   "invoice_date": "2025-11-11",
+   "due_date": "2025-11-25",
+   "paid_date": "2025-11-23",
+   "amount": 50833.33
+  },
+  "invoice_117.pdf": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2512-117",
+   "invoice_date": "2025-12-11",
+   "due_date": "2025-12-25",
+   "paid_date": "2025-12-19",
+   "amount": 50833.33
+  },
+  "invoice_118.md": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2601-118",
+   "invoice_date": "2026-01-11",
+   "due_date": "2026-01-25",
+   "paid_date": "2026-01-24",
+   "amount": 50833.33
+  },
+  "invoice_119.docx": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2602-119",
+   "invoice_date": "2026-02-11",
+   "due_date": "2026-02-25",
+   "paid_date": "2026-02-23",
+   "amount": 50833.33
+  },
+  "invoice_120.pdf": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2603-120",
+   "invoice_date": "2026-03-11",
+   "due_date": "2026-03-25",
+   "paid_date": "2026-03-25",
+   "amount": 50833.33
+  },
+  "invoice_121.md": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2604-121",
+   "invoice_date": "2026-04-11",
+   "due_date": "2026-04-25",
+   "paid_date": "2026-04-20",
+   "amount": 50833.33
+  },
+  "invoice_122.docx": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2605-122",
+   "invoice_date": "2026-05-11",
+   "due_date": "2026-05-25",
+   "paid_date": "2026-05-20",
+   "amount": 50833.33
+  },
+  "invoice_123.pdf": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2606-123",
+   "invoice_date": "2026-06-11",
+   "due_date": "2026-06-25",
+   "paid_date": "2026-06-20",
+   "amount": 50833.33
+  },
+  "invoice_124.md": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2607-124",
+   "invoice_date": "2026-07-11",
+   "due_date": "2026-07-25",
+   "paid_date": "2026-07-22",
+   "amount": 50833.33
+  },
+  "invoice_125.docx": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2608-125",
+   "invoice_date": "2026-08-11",
+   "due_date": "2026-08-25",
+   "paid_date": "2026-08-22",
+   "amount": 73708.33
+  },
+  "invoice_126.pdf": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2609-126",
+   "invoice_date": "2026-09-11",
+   "due_date": "2026-09-25",
+   "paid_date": "2026-09-19",
+   "amount": 73708.33
+  },
+  "invoice_127.md": {
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "invoice_no": "STA-2610-127",
+   "invoice_date": "2026-10-11",
+   "due_date": "2026-10-25",
+   "paid_date": "2026-10-24",
+   "amount": 50833.33
+  },
+  "invoice_128.docx": {
+   "vendor": "Stayflow Property Systems Inc",
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "invoice_no": "STA-2602-128",
+   "invoice_date": "2026-02-24",
+   "due_date": "2026-03-26",
+   "paid_date": "2026-03-25",
+   "amount": 348000.0
+  },
+  "invoice_129.pdf": {
+   "vendor": "Lumen Energy Supply Ltd",
+   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
+   "invoice_no": "LUM-2611-129",
+   "invoice_date": "2026-11-04",
+   "due_date": "2026-11-25",
+   "paid_date": null,
+   "amount": 1890000.0
+  },
+  "invoice_130.md": {
+   "vendor": "Amenity Supplies Inc",
+   "contract_title": "",
+   "invoice_no": "AME-2608-001",
+   "invoice_date": "2026-08-28",
+   "due_date": "2026-10-12",
+   "paid_date": "2026-10-13",
+   "amount": 28000.0
+  },
+  "invoice_131.docx": {
+   "vendor": "Amenity Supplies Inc",
+   "contract_title": "",
+   "invoice_no": "AME-2609-002",
+   "invoice_date": "2026-09-28",
+   "due_date": "2026-11-12",
+   "paid_date": "2026-11-08",
+   "amount": 28000.0
+  },
+  "invoice_132.pdf": {
+   "vendor": "Amenity Supplies Inc",
+   "contract_title": "",
+   "invoice_no": "AME-2610-003",
+   "invoice_date": "2026-10-28",
+   "due_date": "2026-12-12",
+   "paid_date": null,
+   "amount": 28000.0
+  },
+  "invoice_133.md": {
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "invoice_no": "NOR-2512-103",
+   "invoice_date": "2025-12-10",
+   "due_date": "2026-01-24",
+   "paid_date": "2026-01-22",
+   "amount": 45000.0
+  },
+  "invoice_134.docx": {
+   "vendor": "BookWave Distribution Inc",
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "invoice_no": "BOO-2611-134",
+   "invoice_date": "2026-11-02",
+   "due_date": "2026-12-02",
+   "paid_date": null,
+   "amount": 42000.0
+  }
+ },
+ "sla": {
+  "sla_report_001.md": {
+   "contract_title": "Master Services Agreement \u2013 Brightstar Security Services",
+   "vendor": "Brightstar Security Services Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_002.docx": {
+   "contract_title": "Master Services Agreement \u2013 Brightstar Security Services",
+   "vendor": "Brightstar Security Services Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 1080,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_003.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Brightstar Security Services",
+   "vendor": "Brightstar Security Services Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_004.md": {
+   "contract_title": "Master Services Agreement \u2013 Evergreen Waste & Recycling",
+   "vendor": "Evergreen Waste & Recycling Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_005.docx": {
+   "contract_title": "Master Services Agreement \u2013 Evergreen Waste & Recycling",
+   "vendor": "Evergreen Waste & Recycling Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_006.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Evergreen Waste & Recycling",
+   "vendor": "Evergreen Waste & Recycling Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_007.md": {
+   "contract_title": "Master Services Agreement \u2013 Halcyon Elevator & Lift Maintenance",
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_008.docx": {
+   "contract_title": "Master Services Agreement \u2013 Halcyon Elevator & Lift Maintenance",
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_009.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Halcyon Elevator & Lift Maintenance",
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_010.md": {
+   "contract_title": "Master Services Agreement \u2013 Hearth & Table Foods",
+   "vendor": "Hearth & Table Foods Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_011.docx": {
+   "contract_title": "Master Services Agreement \u2013 Hearth & Table Foods",
+   "vendor": "Hearth & Table Foods Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_012.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Hearth & Table Foods",
+   "vendor": "Hearth & Table Foods Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_013.md": {
+   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
+   "vendor": "Lumen Energy Supply Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_014.docx": {
+   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
+   "vendor": "Lumen Energy Supply Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_015.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
+   "vendor": "Lumen Energy Supply Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_016.md": {
+   "contract_title": "Master Services Agreement \u2013 Northgate Facilities & HVAC",
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_017.docx": {
+   "contract_title": "Master Services Agreement \u2013 Northgate Facilities & HVAC",
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_018.pdf": {
+   "contract_title": "Master Services Agreement \u2013 Northgate Facilities & HVAC",
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_019.md": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.34,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_020.docx": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.29,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_021.pdf": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.31,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_022.md": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.23,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_023.docx": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.32,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_024.pdf": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 98.62,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_025.md": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 98.81,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_026.docx": {
+   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.26,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_027.pdf": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Pte Ltd",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_028.md": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Pte Ltd",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_029.docx": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Pte Ltd",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.83,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_030.pdf": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Pte Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_031.md": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Pte Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_032.docx": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Pte Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.46,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_033.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.96,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_034.md": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_035.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_036.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_037.md": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_038.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.96,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_039.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.84,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_040.md": {
+   "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
+   "vendor": "Stayflow Property Systems Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 6,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_041.docx": {
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 30,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_042.pdf": {
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_043.md": {
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  }
+ },
+ "acceptance": {}
+}

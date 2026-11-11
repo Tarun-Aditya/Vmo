@@ -1,7 +1,7 @@
 Tables and views (PostgreSQL). Prefer the VIEWS for any question about current terms or dates.
 
 v_effective_terms  -- one row per non-amendment contract, with amendments already applied.
-  contract_id, title, vendor, category, type, parent_id, status, currency, owner, effective_date,
+  contract_id, title, vendor, category, type, parent_id, status, currency, owner, property, effective_date,
   expiry_date, notice_period_days, auto_renew, annual_value, total_value, payment_terms_days,
   liability_cap_multiple, liability_cap_text, termination_for_convenience, governing_law,
   processes_personal_data, has_dpa,

@@ -23,9 +23,10 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
     seed_date = seed_date or date.today()
     root = data_path()
     corpus = corpus or os.environ.get("CORPUS", "synthetic")
-    if corpus == "pilot":      # ~36 realistic contracts in their own formats (docx / pdf / md), written by Claude from a spec
+    if corpus in ("pilot", "hotel"):      # realistic contracts in their own formats (docx / pdf / md), written by Claude from a spec; hotel = a fictional hotel group
         from app.docgen import pilot
 
+        pilot.use_pack(corpus)
         for sub in ("generated", "uploads"):
             shutil.rmtree(root / "inbox" / sub, ignore_errors=True)
         info = pilot.render(root, seed_date)
@@ -38,6 +39,10 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
         s.execute(text("TRUNCATE templates, template_clauses, contracts, clauses, field_extractions, clause_deviations, "
                        "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages, vendor_scores RESTART IDENTITY CASCADE"))
         kcc.ensure_defaults(s)
+        if corpus == "hotel":
+            from app import hotel_pack
+
+            log(f"hospitality pack: {hotel_pack.ensure(s)}")
         kcc.refresh_builtins(s)          # a seed starts from the code's built-in patterns
         s.execute(text("UPDATE pipeline_config SET inbox_path = NULL, last_run_at = NULL, next_run_at = NULL, last_fingerprint = NULL"))
         s.execute(text("UPDATE pipeline_config SET enabled = false, trigger_mode = 'periodic', interval_minutes = 120, folders = 'contracts,uploads' WHERE key = 'contracts'"))
@@ -71,4 +76,4 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
 if __name__ == "__main__":
     args = sys.argv[1:]
     d = date.fromisoformat(args[0]) if args and args[0][0].isdigit() else None
-    run(d, corpus="pilot" if "--pilot" in args else None)
+    run(d, corpus="hotel" if "--hotel" in args else "pilot" if "--pilot" in args else None)

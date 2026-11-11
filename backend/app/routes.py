@@ -66,10 +66,11 @@ def list_contracts(
     owner: str | None = None,
     status: str | None = None,
     search: str | None = None,
+    property: str | None = None,
 ):
     where, p = [], {}
     for k, v in dict(
-        vendor=vendor, category=category, type=type, owner=owner, status=status
+        vendor=vendor, category=category, type=type, owner=owner, status=status, property=property
     ).items():
         if v:
             where.append(f"c.{k} = :{k}")
@@ -79,7 +80,7 @@ def list_contracts(
         p["s"] = f"%{search}%"
     return q(
         f"""
-      SELECT c.id, c.title, c.vendor, c.category, c.type, c.owner, c.status, c.parent_id,
+      SELECT c.id, c.title, c.vendor, c.category, c.type, c.owner, c.property, c.status, c.parent_id,
              c.effective_date,
              COALESCE(e.expiry_date, c.expiry_date) AS expiry_date,
              COALESCE(e.annual_value, c.annual_value) AS annual_value,

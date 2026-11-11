@@ -171,6 +171,7 @@ Set in `.env` (see `.env.example`):
 | `AUTH_MODE`, `OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_ROLES_CLAIM`, `SECRET_KEY`, `CORS_ORIGINS` | Access and encryption |
 | `SIMULATORS`, `PUBLIC_API_URL`, `SIM_IMAP_PORT`, `SIM_SMTP_PORT` | Demo stand-ins (set `SIMULATORS=0` in production) |
 | `SCHEDULER_ENABLED` | Background pipeline scheduler (tests turn it off) |
+| `CUSTOMER_NAMES` | How your own company is named in contracts (comma-separated, default `Arcadia`): needed so the other party is read as the vendor |
 
 ## Tests
 
@@ -195,6 +196,22 @@ scripts/             seed, backup, demo walkthroughs
 docs/, HANDOVER.md   security notes; handover with measured results and limits
 CLAUDE.md            original scope and conventions
 ```
+
+## Hotel edition (in progress)
+
+A second, fictional corpus for the hospitality idea: **Seabright Hotels & Resorts**, a hotel group with six properties and 32 vendor documents
+(laundry and linen, security, lifts, HVAC, pest control, waste, food and beverage, housekeeping staffing, property and booking systems, payments, energy), with
+group-level master agreements, per-property schedules, an amendment, NDAs, DPAs, and five vendor drafts (one clean control). It is written from the owner-operator's side;
+all names are fictional.
+
+* Sources: `backend/app/docgen/hotel_spec.py` (spec and ground truth), `corpus/hotel/*.md` (contract text written by Claude from the spec), seeded files in `data/hotel/`.
+* Load: `CUSTOMER_NAMES=Seabright DATA_DIR=data/hotel python -m app.seed --hotel` (uses its own database in the demo setup).
+* **Property level:** `contracts.property` (migration 0028) is read from the document or its sidecar and filterable in the API (`/api/contracts?property=...`) and in Ask.
+* **Hospitality pack** (`backend/app/hotel_pack.py`): ten key clauses (food safety, guest-injury indemnity, labour compliance, termination on sale of property, brand standards, seasonal pricing, payment-card
+  security, response times, inspection certificates, distribution commission), three values (laundry rate per kilogram, fault response hours, booking commission) and five checklist rules, all ordinary Admin configuration.
+* Measured offline on this corpus: **97% of fields and 96% of document metadata correct** against the spec (`LABELS=labels_hotel.json python evals/pilot_eval.py`). Writing it exposed and fixed real extraction bugs
+  (a customer name containing "&", supplier names containing "&", repeated role words before a vendor name).
+* Not yet done: hotel-specific standard templates for redlining (the template library is still the IT-services one), the property screens in the UI, and the new design applied to the front end.
 
 ## Roadmap (future scope, not built)
 
