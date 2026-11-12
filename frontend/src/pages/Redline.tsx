@@ -132,10 +132,16 @@ export default function Redline() {
   const idx = list.findIndex((d) => d.id === id);
   const go = (d: number) => list[idx + d] && nav(`/redline/${list[idx + d].id}`);
   const accepted = r ? Object.values(r.decisions).filter((v) => v === "accepted").length : 0;
+  const cur = list.find((d) => d.id === id) ?? all.find((d) => d.id === id);
   return (
+    <div className="space-y-4">
+    <header>
+      <p className="text-sm text-slate-500">{cur ? `${cur.status === "draft" ? "Vendor draft" : "Executed contract"} · ${cur.type}${cur.vendor ? ` · ${cur.vendor}` : ""} · compared with the standard template and the playbook` : "Drafts are compared with the standard template and the playbook"}</p>
+      <h1>{cur ? cur.title : "Review"}</h1>
+    </header>
     <div className="grid gap-4 lg:grid-cols-4">
       <div className="space-y-2 lg:col-span-1">
-        <h1>Review queue</h1>
+        <h2 className="text-lg font-semibold">Review queue</h2>
         <p className="text-xs text-slate-500">Drafts dropped in the drafts folder are redlined automatically and wait here, one by one, for your review.</p>
         <div className="flex flex-wrap gap-1 text-xs" role="tablist" aria-label="Queue filter">
           <button role="tab" aria-selected={filter === "all"} onClick={() => setFilter("all")} className={`rounded px-2 py-0.5 ${filter === "all" ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>All {all.length}</button>
@@ -250,6 +256,7 @@ export default function Redline() {
           </>
         )}
       </div>
+    </div>
     </div>
   );
 }
