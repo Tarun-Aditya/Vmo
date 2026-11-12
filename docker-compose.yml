@@ -18,10 +18,14 @@ services:
     env_file: [.env]
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://vmo:vmo@db:5432/vmo}
+      STANDARDS: hotel            # the hotel group's house standards for the template library
+      CUSTOMER_NAMES: Seabright   # how our own company is named in the contracts
+      DATA_DIR: /data
+      SIMULATORS: ${SIMULATORS:-1}
     depends_on:
       db: { condition: service_healthy }
     ports: ["8000:8000"]
-    volumes: ["./backend:/app", "./data:/data", "./corpus:/corpus", "./scripts:/scripts", "./evals:/evals"]
+    volumes: ["./backend:/app", "./data/hotel:/data", "./corpus:/corpus", "./scripts:/scripts", "./evals:/evals"]
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   web:
