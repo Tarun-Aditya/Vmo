@@ -270,8 +270,8 @@ Everything the demo needs is committed: the documents, the labels, the rules and
 
 ```
 make showcase          # Docker: database + API + web, migrate, seed the hotel corpus
-# or without Docker (Postgres 16 with pgvector, Python 3.12, Node 20):
-cd backend && pip install -r requirements.txt && alembic upgrade head
+# or without Docker (Postgres 16 with pgvector, Python 3.12, Node 20; pandoc, LibreOffice, poppler and tesseract to render and read Word/PDF):
+cd backend && pip install -e ".[dev]" && alembic upgrade head
 DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright python -m app.seed --hotel
 SIMULATORS=1 DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright uvicorn app.main:app --port 8000     # stand-in ERP and e-signature systems for the demo
 cd ../frontend && npm ci && npm run dev                 # http://localhost:5173
