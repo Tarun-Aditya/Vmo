@@ -44,6 +44,9 @@ export default function DocumentEditor() {
   if (!q.data || md === null) return <Loading q={q} />;
   const d = q.data;
   const dirty = md !== d.md;
+  const outline = md.split("\n").map((l) => /^(#{1,3})\s+(.+?)\s*$/.exec(l)).filter(Boolean).map((m) => ({ level: m![1].length, text: m![2].replace(/\*+/g, "") }));
+  const failed = (analysis?.checks ?? []).filter((c) => c.status === "fail");
+  const jump = (t: string) => { const els = Array.from(document.querySelectorAll(".docpage h1, .docpage h2, .docpage h3")); (els.find((e) => (e.textContent ?? "").trim().startsWith(t.slice(0, 30))) as HTMLElement | undefined)?.scrollIntoView({ behavior: "smooth", block: "center" }); };
   const restore = async (v: number) => { const r = await api<{ md: string }>(`/api/documents/${id}/versions/${v}`); setMd(r.md); check.mutate(r.md); setSaved(`Loaded version ${v} — save to keep it`); };
   return (
     <div className="space-y-3">
@@ -66,8 +69,25 @@ export default function DocumentEditor() {
           {collab.newer.by} saved version {collab.newer.version}. {dirty ? "You have unsaved changes: copy them before loading the latest." : ""}
           <Btn kind="ghost" onClick={() => { collab.dismiss(); qc.invalidateQueries({ queryKey: ["doc-content", id] }); }}>Load latest</Btn>
         </div>)}
-      <div className="grid gap-4 lg:grid-cols-4">
-        <div className="lg:col-span-3">
+      <div className="grid gap-4 lg:grid-cols-[13rem_minmax(0,1fr)_22rem]">
+        <nav aria-label="Outline" className="space-y-4 text-sm lg:sticky lg:top-16 lg:max-h-[calc(100vh-6rem)] lg:self-start lg:overflow-auto">
+          <div>
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Outline</div>
+            <ul className="space-y-0.5">
+              {outline.map((h, i) => (
+                <li key={i}><button className={`block w-full rounded px-2 py-1 text-left hover:bg-slate-100 dark:hover:bg-slate-700 ${h.level > 1 ? "pl-4 text-xs" : ""}`} onClick={() => jump(h.text)}>{h.text}</button></li>))}
+              {outline.length === 0 && <li className="px-2 text-xs text-slate-500">No headings yet.</li>}
+            </ul>
+          </div>
+          <div>
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Findings ({failed.length})</div>
+            <ul className="space-y-1">
+              {failed.map((c) => (<li key={c.rule_key} className="rounded border border-slate-200 px-2 py-1 text-xs dark:border-slate-700"><SeverityChip sev={c.severity} /> <span className="font-medium">{c.name}</span></li>))}
+              {failed.length === 0 && <li className="px-2 text-xs text-slate-500">{analysis ? "Nothing failing." : "Checking…"}</li>}
+            </ul>
+          </div>
+        </nav>
+        <div>
           <DocEditor value={md} onChange={setMd} readOnly={!d.editable || mode === "suggesting"} title={d.title} status={dirty ? "Unsaved changes" : saved || `Version ${d.version}`} height="75vh" />
         </div>
         <div className="space-y-3">
