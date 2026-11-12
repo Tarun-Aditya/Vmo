@@ -54,7 +54,7 @@ def contract_filters():
             r["v"]
             for r in q(f"SELECT DISTINCT {k} AS v FROM contracts WHERE {k} IS NOT NULL ORDER BY 1")
         ]
-        for k in ("vendor", "category", "type", "owner", "status")
+        for k in ("vendor", "category", "type", "owner", "property", "status")
     }
 
 
@@ -423,7 +423,7 @@ def dashboard():
         count(*) FILTER (WHERE liability_uncapped) AS uncapped
         FROM v_renewals""")
     rows = q(
-        """SELECT contract_id AS id, title, vendor, category, type, owner, annual_value, auto_renew,
+        """SELECT contract_id AS id, title, vendor, category, type, owner, (SELECT c.property FROM contracts c WHERE c.id = contract_id) AS property, annual_value, auto_renew,
                   expiry_date, notice_period_days, notice_deadline, days_left, notice_days_left,
                   liability_uncapped, fully_executed
            FROM v_renewals WHERE days_left BETWEEN 0 AND 90 ORDER BY expiry_date, title"""
