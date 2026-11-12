@@ -21,6 +21,32 @@ const STATUS: Record<Ob["status"], { label: string; cls: string }> = {
 const KIND: Record<string, string> = { milestone: "Milestone", sla: "SLA", notice: "Notice", payment: "Payment", acceptance: "Acceptance", personnel: "Key personnel", cure: "Breach cure", audit: "Audit", renewal: "Renewal", warranty: "Warranty", insurance: "Insurance" };
 const METRIC: Record<string, string> = { sla_availability_pct: "Availability", incident_notice_hours: "Incident notification time" };
 
+/** Vendor x month table of SLA actuals, below-target months shaded; and the credits that follow from the breaches. */
+function SlaMatrix({ d }: { d: SlaRes }) {
+  const series = d.series.filter((x) => x.metric_key === "sla_availability_pct" && x.points.length);
+  if (!series.length) return null;
+  const months = Array.from(new Set(series.flatMap((x) => x.points.map((p) => p.period)))).sort().slice(-6);
+  const credits = Object.values(d.series.reduce<Record<string, { vendor: string; months: number; credit: number }>>((a, x) => { if (x.breaches) { const r = (a[x.vendor] ??= { vendor: x.vendor, months: 0, credit: 0 }); r.months += x.breaches; r.credit += x.credit_usd; } return a; }, {}));
+  return (
+    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <Card title="SLA performance, last 6 months" right={<span className="text-xs text-slate-500">▼ below target</span>}>
+        <div className="overflow-x-auto"><table className="w-full text-sm" aria-label="SLA performance by vendor and month">
+          <thead><tr><Th>Vendor</Th><Th className="text-right">Target %</Th>{months.map((m) => <Th key={m} className="text-right">{new Date(m).toLocaleDateString("en-US", { month: "short" }).toUpperCase()}</Th>)}</tr></thead>
+          <tbody>{series.map((x) => (
+            <tr key={`${x.contract_id}${x.metric_key}`} className="border-t border-slate-100 dark:border-slate-700">
+              <Td><Link className="text-indigo-600 hover:underline" to={`/contracts/${x.contract_id}`}>{x.vendor}</Link></Td><Td className="num text-right">{x.target ?? "—"}</Td>
+              {months.map((m) => { const pt = x.points.find((q) => q.period === m); return <td key={m} className={`num px-3 py-2 text-right ${pt?.breach ? "bg-red-50 font-semibold text-red-800 dark:bg-red-950/40 dark:text-red-200" : ""}`}>{pt ? <>{pt.actual}{pt.breach ? " ▼" : ""}</> : "—"}</td>; })}
+            </tr>))}</tbody></table></div>
+      </Card>
+      <Card title="Credits by vendor">
+        {credits.length === 0 ? <p className="text-sm text-slate-500">No SLA breaches, so no credits due.</p> : (
+          <table className="w-full text-sm"><thead><tr><Th>Vendor</Th><Th className="text-right">Months</Th><Th className="text-right">Credit</Th></tr></thead>
+            <tbody>{credits.map((c) => <tr key={c.vendor} className="border-t border-slate-100 dark:border-slate-700"><Td>{c.vendor}</Td><Td className="num text-right">{c.months}</Td><Td className="num text-right">{usd(c.credit)}</Td></tr>)}</tbody></table>)}
+      </Card>
+    </div>
+  );
+}
+
 function SlaCard({ s }: { s: Series }) {
   const data = s.points.map((p) => ({ ...p, label: new Date(p.period).toLocaleDateString("en-US", { month: "short", year: "2-digit" }) }));
   const lo = Math.min(...data.map((d) => d.actual), s.target ?? Infinity), hi = Math.max(...data.map((d) => d.actual), s.target ?? -Infinity);
@@ -84,6 +110,8 @@ export default function Obligations() {
       <div className="flex gap-2" role="tablist">
         {([["obl", "Obligations"], ["sla", "SLA performance"]] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-t px-3 py-1.5 text-sm font-medium ${tab === k ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>{l}</button>)}
       </div>
+
+      {sla.data && <SlaMatrix d={sla.data} />}
 
       {tab === "obl" && (
         <Card>

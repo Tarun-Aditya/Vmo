@@ -29,13 +29,20 @@ export default function DocEditor({ value, onChange, readOnly, title, status, ri
             <Tool wide label="Title" title="Title" onClick={() => cmd("formatBlock", "H1")} /><Tool wide label="Heading" title="Heading" onClick={() => cmd("formatBlock", "H2")} /><Tool wide label="Text" title="Normal text" onClick={() => cmd("formatBlock", "P")} />
             <span className="mx-1 h-5 w-px bg-slate-300 dark:bg-slate-600" />
             <Tool label={<b>B</b>} title="Bold" onClick={() => cmd("bold")} /><Tool label={<i>I</i>} title="Italic" onClick={() => cmd("italic")} />
-            <Tool label="•" title="Bulleted list" onClick={() => cmd("insertUnorderedList")} /><Tool label="1." title="Numbered list" onClick={() => cmd("insertOrderedList")} />
+            <Tool label={<u>U</u>} title="Underline" onClick={() => cmd("underline")} />
+            <span className="mx-1 h-5 w-px bg-slate-300 dark:bg-slate-600" />
+            <Tool wide label="Left" title="Align left" onClick={() => cmd("justifyLeft")} /><Tool wide label="Centre" title="Align centre" onClick={() => cmd("justifyCenter")} /><Tool wide label="Right" title="Align right" onClick={() => cmd("justifyRight")} /><Tool wide label="Justify" title="Justify" onClick={() => cmd("justifyFull")} />
+            <span className="mx-1 h-5 w-px bg-slate-300 dark:bg-slate-600" />
+            <Tool label="•" title="Bulleted list" onClick={() => cmd("insertUnorderedList")} /><Tool label="1." title="Numbered list" onClick={() => cmd("insertOrderedList")} /><Tool wide label="Indent" title="Indent" onClick={() => cmd("indent")} />
           </div>)}
         <span className="ml-auto flex items-center gap-3 text-xs text-slate-500">{status && <span>{status}</span>}<span>{wordCount(value).toLocaleString()} words</span>{right}</span>
       </div>
       <div className="overflow-auto px-2 py-6 sm:px-6" style={{ maxHeight: height, minHeight: "24rem" }}>
         <div ref={ref} className="docpage mx-auto" role="textbox" aria-multiline="true" aria-label="Contract text" contentEditable={!readOnly} suppressContentEditableWarning spellCheck
           onInput={emit} onBlur={emit} />
+      </div>
+      <div className="flex flex-wrap items-center gap-4 border-t border-slate-300 bg-white px-3 py-1 text-xs text-slate-500 dark:border-slate-600 dark:bg-slate-800" role="status">
+        <span>{wordCount(value).toLocaleString()} words</span>{readOnly ? <span>Read only</span> : <span>Editing</span>}<span className="ml-auto">{status}</span>
       </div>
     </div>
   );

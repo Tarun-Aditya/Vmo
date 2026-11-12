@@ -31,9 +31,12 @@ export default function Spend() {
   const s = sum.data;
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h1>Spend vs contract</h1>
         <p className="text-sm text-slate-500">Every invoice from the AP/ERP feed is matched to the contract it bills and checked: unsigned or missing contracts, over-billing, duplicates, billing outside the term, late payment.</p>
+      </div>
+      <Link to="/admin" className="inline-flex min-h-[36px] items-center rounded-md border border-line bg-white px-3 text-[13px] font-semibold hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800">Feeds in Admin</Link>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <Tile l="Billed to date" v={usd(s.billed)} sub={`${s.invoices} invoices · ${usd(s.billed_90d)} in 90 days`} />
@@ -48,7 +51,7 @@ export default function Spend() {
             <ResponsiveContainer><BarChart data={s.monthly} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" /><XAxis dataKey="month" tick={{ fontSize: 11 }} /><YAxis tickFormatter={(v) => usd(v)} tick={{ fontSize: 11 }} width={56} />
               <Tooltip formatter={(v: number) => usd(v)} /><Legend />
-              <Bar dataKey="on_contract" name="On contract" stackId="a" fill="#4f46e5" /><Bar dataKey="off_contract" name="No contract on file" stackId="a" fill="#dc2626" />
+              <Bar dataKey="on_contract" name="On contract" stackId="a" fill="#2347D9" /><Bar dataKey="off_contract" name="No contract on file" stackId="a" fill="#E89B2D" />
             </BarChart></ResponsiveContainer>
           </div>
         </Card>

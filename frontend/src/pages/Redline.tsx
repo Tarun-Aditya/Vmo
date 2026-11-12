@@ -132,40 +132,51 @@ export default function Redline() {
   const idx = list.findIndex((d) => d.id === id);
   const go = (d: number) => list[idx + d] && nav(`/redline/${list[idx + d].id}`);
   const accepted = r ? Object.values(r.decisions).filter((v) => v === "accepted").length : 0;
+  const cur = list.find((d) => d.id === id) ?? all.find((d) => d.id === id);
   return (
-    <div className="grid gap-4 lg:grid-cols-4">
-      <div className="space-y-2 lg:col-span-1">
-        <h1>Review queue</h1>
+    <div className="space-y-4">
+    <header>
+      <p className="text-sm text-slate-500">{cur ? `${cur.status === "draft" ? "Vendor draft" : "Executed contract"} · ${cur.type}${cur.vendor ? ` · ${cur.vendor}` : ""} · compared with the standard template and the playbook` : "Drafts are compared with the standard template and the playbook"}</p>
+      <h1>{cur ? cur.title : "Review"}</h1>
+    </header>
+    <div className="space-y-4">
+      <section className="grid gap-5 rounded-xl border border-line bg-white p-4 dark:border-slate-700 dark:bg-slate-800 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]" aria-label="Upload and queue">
+        <div className="space-y-2">
+        <h2 className="text-lg font-semibold">Upload a vendor draft</h2>
         <p className="text-xs text-slate-500">Drafts dropped in the drafts folder are redlined automatically and wait here, one by one, for your review.</p>
+        <Upload onDone={(cid) => cid && nav(`/redline/${cid}`)} />
+        <Link to="/new" className="block rounded border border-dashed border-slate-400 px-3 py-1.5 text-center text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">+ New contract from a template</Link>
+        <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"><input type="checkbox" checked={showExec} onChange={(e) => setShowExec(e.target.checked)} /> Include executed contracts</label>
+        </div>
+        <div className="space-y-2">
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Drafts in the queue</div>
         <div className="flex flex-wrap gap-1 text-xs" role="tablist" aria-label="Queue filter">
           <button role="tab" aria-selected={filter === "all"} onClick={() => setFilter("all")} className={`rounded px-2 py-0.5 ${filter === "all" ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>All {all.length}</button>
           {counts.map(([s, n]) => <button key={s} role="tab" aria-selected={filter === s} onClick={() => setFilter(s)} className={`rounded px-2 py-0.5 ${filter === s ? "bg-indigo-600 text-white" : STATUS[s].cls}`}>{STATUS[s].label} {n}</button>)}
         </div>
-        <Upload onDone={(cid) => cid && nav(`/redline/${cid}`)} />
-        <Link to="/new" className="block rounded border border-dashed border-slate-400 px-3 py-1.5 text-center text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800">+ New contract from a template</Link>
-        <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"><input type="checkbox" checked={showExec} onChange={(e) => setShowExec(e.target.checked)} /> Include executed contracts</label>
-        {list.map((d) => (
-          <button key={d.id} onClick={() => nav(`/redline/${d.id}`)} className={`block w-full rounded-lg border p-3 text-left ${d.id === id ? "border-indigo-600 bg-indigo-50 dark:bg-slate-700" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"}`}>
-            <div className="text-sm font-medium leading-snug">{d.title}</div>
-            <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-slate-500">
-              <span className="rounded bg-slate-200 px-1 font-semibold uppercase dark:bg-slate-700">{d.type}</span>
-              <span className={`rounded px-1 font-medium ${STATUS[d.review_status].cls}`}>{STATUS[d.review_status].label}</span>
-              {d.assignee && <span title={d.due_date ? `due ${d.due_date}` : undefined}>→ {d.assignee}{d.due_date ? ` · ${d.due_date}` : ""}</span>}
-              {d.origin === "generated" && <span className="rounded border border-indigo-400 px-1 text-indigo-700 dark:text-indigo-300">from template</span>}
-              {d.origin === "upload" && <span className="rounded border border-slate-400 px-1">uploaded</span>}
-            </div>
-            <div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
-              {d.checks_failed === 0 && d.deviations === 0 ? <span className="rounded bg-emerald-100 px-1 text-emerald-900">✓ passes checklist, matches standard</span>
-                : <>{d.checks_failed > 0 && <><span className="text-slate-500">checklist:</span>{chips(d.check_counts)}</>}{d.deviations > 0 && <><span className="ml-1 text-slate-500">changes:</span>{chips(d.counts)}</>}</>}
-            </div>
-          </button>))}
+        <ul className="divide-y divide-line dark:divide-slate-700" aria-label="Drafts in the queue">
+          {list.map((d) => (
+            <li key={d.id}>
+              <button onClick={() => nav(`/redline/${d.id}`)} aria-current={d.id === id} className={`flex w-full flex-wrap items-center gap-2 px-2 py-2 text-left text-sm ${d.id === id ? "bg-indigo-50 dark:bg-slate-700" : "hover:bg-slate-50 dark:hover:bg-slate-700/40"}`}>
+                <span className="min-w-0 flex-1 truncate font-medium">{d.title}</span>
+                <span className="rounded bg-slate-200 px-1 text-[10px] font-semibold uppercase dark:bg-slate-700">{d.type}</span>
+                <span className={`rounded px-1.5 text-xs font-medium ${STATUS[d.review_status].cls}`}>{STATUS[d.review_status].label}</span>
+                {d.checks_failed === 0 && d.deviations === 0 ? <span className="rounded bg-emerald-100 px-1.5 text-xs text-emerald-900">clean</span> : <span className="rounded bg-amber-100 px-1.5 text-xs text-amber-900">{d.checks_failed + d.deviations} findings</span>}
+                {d.assignee && <span className="text-xs text-slate-500">→ {d.assignee}{d.due_date ? ` · ${d.due_date}` : ""}</span>}
+              </button>
+            </li>))}
+        </ul>
         {docs.data && list.length === 0 && <p className="text-sm text-slate-500">Nothing in this view. Upload a document, drop one in the drafts folder, or create a new contract.</p>}
-      </div>
-
-      <div className="space-y-4 lg:col-span-3">
+        </div>
+      </section>
+      <div className="space-y-4">
         <Loading q={red} />
         {r && (
           <>
+            <ol className="flex flex-wrap gap-x-8 gap-y-2 rounded-xl border border-line bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-800" aria-label="Same pipeline as every document">
+              {([["Hash check", "content hash identifies the file"], ["Read and split", "clauses found in the text"], ["Tag clauses", "including your custom ones"], ["Compare", `with ${r.template?.name ?? "the standard template"} and the playbook`], ["Findings", `${r.items.length} raised, ${r.checklist_summary.fail} checklist failed`]] as const).map(([t, d]) => (
+                <li key={t} className="flex items-start gap-2"><span aria-hidden className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[11px] text-white">✓</span><span><span className="font-semibold">{t}</span><span className="block text-xs text-slate-500">{d}</span></span></li>))}
+            </ol>
             <Card title={r.title} right={
               <div className="flex items-center gap-3 text-xs text-slate-500">
                 <button className="rounded border border-slate-300 px-2 py-0.5 disabled:opacity-40 dark:border-slate-600" disabled={idx <= 0} onClick={() => go(-1)} aria-label="Previous document">← Prev</button>
@@ -250,6 +261,7 @@ export default function Redline() {
           </>
         )}
       </div>
+    </div>
     </div>
   );
 }

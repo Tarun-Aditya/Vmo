@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 body { @apply bg-paper font-sans text-ink antialiased; font-variant-numeric: tabular-nums; }
+main h1 { font-size: 1.5rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
 .dark body { background: #0B1220; @apply text-slate-100; }
 
 /* ---- Word / Docs style page ---- */

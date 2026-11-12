@@ -110,8 +110,46 @@ function Benchmarks() {
   );
 }
 
+const dots = (n: number) => { const k = n >= 50 ? 3 : n >= 25 ? 2 : n > 0 ? 1 : 0; return <span className="tracking-widest" aria-label={`${k} of 3`}>{"●".repeat(k)}<span className="text-slate-300 dark:text-slate-600">{"●".repeat(3 - k)}</span></span>; };
+
+/** The console view: vendor x component table with contribution dots, and the two headline benchmarks beside it. */
+function RiskBoard() {
+  const q = useQuery({ queryKey: ["risk"], queryFn: () => api<Res>("/api/risk/vendors") });
+  const b = useQuery({ queryKey: ["bench"], queryFn: () => api<Bench>("/api/benchmarks") });
+  if (!q.data) return <Loading q={q} />;
+  const ws = q.data.weights.filter((w) => w.enabled), maxCap = Math.max(...(b.data?.liability_caps.map((c) => c.n) ?? [1]), 1);
+  return (
+    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <Card title="Vendor risk scorecards" right={<span className="text-xs text-slate-500">dots = contribution, 3 is highest</span>}>
+        <div className="overflow-x-auto"><table className="w-full text-sm" aria-label="Vendor risk scorecards">
+          <thead><tr><th className="p-2 text-left text-[11px] uppercase tracking-wide text-slate-500">Vendor</th><th className="p-2 text-left text-[11px] uppercase tracking-wide text-slate-500">Score</th>{ws.map((w) => <th key={w.key} className="p-2 text-left text-[11px] uppercase tracking-wide text-slate-500">{w.label.replace("Contract terms", "Terms").replace("Renewal exposure", "Renewal").replace("Performance", "SLA").replace("Spend compliance", "Spend")}</th>)}<th className="p-2 text-left text-[11px] uppercase tracking-wide text-slate-500">Main reason</th></tr></thead>
+          <tbody>{q.data.vendors.slice(0, 25).map((v) => {
+            const top = ws.map((w) => ({ w, c: v.components[w.key] })).filter((x) => x.c && x.c.drivers.length).sort((a, c) => c.c.score - a.c.score)[0];
+            return (
+              <tr key={v.vendor} className="border-t border-slate-100 dark:border-slate-700">
+                <td className="p-2"><Link className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400" to={`/vendors/${encodeURIComponent(v.vendor)}`}>{v.vendor}</Link></td>
+                <td className="p-2"><TierChip tier={v.tier} /> <span className="num ml-1 font-semibold">{v.score.toFixed(0)}</span></td>
+                {ws.map((w) => <td key={w.key} className="p-2">{dots(v.components[w.key]?.score ?? 0)}</td>)}
+                <td className="p-2 text-slate-600 dark:text-slate-300">{top ? top.c.drivers[0] : "Nothing flagged"}</td>
+              </tr>);
+          })}</tbody></table></div>
+      </Card>
+      <div className="space-y-4">
+        <Card title="Benchmark: liability cap">
+          <ul className="space-y-2 text-sm">{(b.data?.liability_caps ?? []).map((c) => (
+            <li key={c.cap} className="grid grid-cols-[7rem_1fr_2rem] items-center gap-2"><span>{c.cap}</span><span className="h-2 rounded bg-slate-200 dark:bg-slate-700"><span className={`block h-2 rounded ${/uncapped/i.test(c.cap) ? "bg-red-600" : "bg-indigo-600"}`} style={{ width: `${(c.n / maxCap) * 100}%` }} /></span><b className="num text-right">{c.n}</b></li>))}</ul>
+        </Card>
+        <Card title="Benchmark: governing law">
+          <table className="w-full text-sm"><thead><tr><th className="p-1 text-left text-[11px] uppercase text-slate-500">Law</th><th className="p-1 text-right text-[11px] uppercase text-slate-500">Contracts</th></tr></thead>
+            <tbody>{(b.data?.governing_law ?? []).map((c) => <tr key={c.governing_law} className="border-t border-slate-100 dark:border-slate-700"><td className="p-1">{c.governing_law}</td><td className="num p-1 text-right">{c.n}</td></tr>)}</tbody></table>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 export default function Risk() {
-  const [tab, setTab] = useState<"score" | "bench">("score");
+  const [tab, setTab] = useState<"board" | "score" | "bench">("board");
   return (
     <div className="space-y-4">
       <div>
@@ -119,9 +157,9 @@ export default function Risk() {
         <p className="text-sm text-slate-500">Which vendors need attention and why, and how every term compares across the portfolio.</p>
       </div>
       <div className="flex gap-2" role="tablist">
-        {([["score", "Vendor scorecards"], ["bench", "Term benchmarks"]] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-t px-3 py-1.5 text-sm font-medium ${tab === k ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>{l}</button>)}
+        {([["board", "Overview"], ["score", "Score detail"], ["bench", "Term benchmarks"]] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-t px-3 py-1.5 text-sm font-medium ${tab === k ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>{l}</button>)}
       </div>
-      {tab === "score" ? <Scorecards /> : <Benchmarks />}
+      {tab === "board" ? <RiskBoard /> : tab === "score" ? <Scorecards /> : <Benchmarks />}
     </div>
   );
 }

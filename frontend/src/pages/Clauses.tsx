@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib";
+import { Tile } from "../components/vmo";
 import { Card, Loading } from "../ui";
 
 type Cell = { present: boolean; expected: boolean; heading: string; page: number | null; text: string | null; note: string | null };
@@ -12,13 +13,24 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
   const q = useQuery({ queryKey: ["matrix", vendor ?? ""], queryFn: () => api<M>(`/api/clause-matrix${vendor ? `?vendor=${encodeURIComponent(vendor)}` : ""}`) });
   const [tip, setTip] = useState<{ row: Row; col: string; x: number; y: number } | null>(null);
   const [onlyGaps, setOnlyGaps] = useState(false);
+  const [picked, setPicked] = useState<{ row: Row; col: string } | null>(null);
   const nav = useNavigate();
   if (!q.data) return <Loading q={q} />;
   const m = q.data;
   const label = (k: string) => m.columns.find((c) => c.key === k)!.label;
   const cell = tip ? tip.row.cells[tip.col] : null;
+  const execRows = m.groups.filter((g) => g.rows.some((r) => r.kind === "contract")).flatMap((g) => g.rows.filter((r) => r.kind === "contract"));
+  const expected = execRows.reduce((a, r) => a + Object.values(r.cells).filter((c) => c.expected).length, 0);
+  const present = execRows.reduce((a, r) => a + Object.values(r.cells).filter((c) => c.expected && c.present).length, 0);
+  const gaps = execRows.reduce((a, r) => a + r.gap_count, 0), gapDocs = execRows.filter((r) => r.gap_count > 0).length;
   return (
     <div className="space-y-4">
+      {!vendor && (
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Tile l="Coverage" v={expected ? `${Math.round((present / expected) * 100)}%` : "—"} sub="of required clauses present" />
+          <Tile l="Gaps to fix" v={gaps} tone={gaps ? "red" : undefined} sub={`across ${gapDocs} contract${gapDocs === 1 ? "" : "s"}`} />
+          <Tile l="Clauses tracked" v={m.columns.length} sub="columns; add more in Admin" />
+        </div>)}
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           {vendor ? <h2 className="text-lg font-semibold">Key clauses in {vendor}&rsquo;s documents</h2> : <h1>Key contract clauses across all documents</h1>}
@@ -60,7 +72,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
                         <td key={c.key} className="border-t border-slate-100 p-0.5 text-center dark:border-slate-700"
                           onMouseEnter={(e) => { const b = (e.currentTarget as HTMLElement).getBoundingClientRect(); setTip({ row: r, col: c.key, x: b.left + b.width / 2, y: b.top }); }}
                           onMouseLeave={() => setTip(null)}>
-                          <button type="button" onClick={() => r.kind === "contract" && nav(`/contracts/${r.id}`)} aria-label={`${r.title}: ${c.label} ${ce.present ? "present" : "absent"}`}
+                          <button type="button" onClick={() => (ce.expected && !ce.present ? setPicked({ row: r, col: c.key }) : r.kind === "contract" && nav(`/contracts/${r.id}`))} aria-label={`${r.title}: ${c.label} ${ce.present ? "present" : "absent"}`}
                             onFocus={(e) => { const b = e.currentTarget.getBoundingClientRect(); setTip({ row: r, col: c.key, x: b.left + b.width / 2, y: b.top }); }} onBlur={() => setTip(null)}
                             className={`h-7 w-8 rounded text-base font-bold ${ce.present ? "text-emerald-600" : gap ? "bg-red-100 text-red-700 ring-1 ring-red-400 dark:bg-red-950 dark:text-red-300" : "text-red-400"} ${onlyGaps && !gap ? "opacity-20" : ""}`}>
                             {ce.present ? "✓" : "✗"}
@@ -78,6 +90,28 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
           </table>
         </div>
       </Card>
+      {picked && (() => { const pc = picked.row.cells[picked.col]; return (
+        <Card>
+          <div className="flex flex-wrap items-center gap-2"><span className="rounded bg-red-100 px-1.5 text-xs font-semibold text-red-900 ring-1 ring-red-300">◆ Gap</span><b>{picked.row.title}</b> · <span>{label(picked.col)}</span>
+            <button className="ml-auto text-xs text-slate-500 hover:underline" onClick={() => setPicked(null)}>Close</button></div>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{pc?.note ?? "Required by the standard template, not found in the document."}{pc?.text ? ` Closest text${pc.page ? ` (page ${pc.page})` : ""}: “${pc.text.slice(0, 220)}”` : ""}</p>
+          <div className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
+            <Link className="inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 px-4 hover:bg-slate-50 dark:border-slate-600" to={`/contracts/${picked.row.id}`}>Open contract</Link>
+            <Link className="inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 px-4 hover:bg-slate-50 dark:border-slate-600" to={`/redline/${picked.row.id}`}>Start a redline</Link>
+          </div>
+        </Card>)})()}
+      {!vendor && gaps > 0 && (
+        <Card title={`Gaps to fix (${gaps})`}>
+          <ul className="divide-y divide-slate-100 text-sm dark:divide-slate-700">
+            {execRows.flatMap((r) => Object.entries(r.cells).filter(([, c]) => c.expected && !c.present).map(([k, c]) => ({ r, k, c }))).slice(0, 8).map(({ r, k, c }) => (
+              <li key={`${r.id}-${k}`} className="flex flex-wrap items-center gap-3 py-2">
+                <span className="rounded bg-red-100 px-1.5 text-xs font-semibold text-red-900 ring-1 ring-red-300">◆ Gap</span>
+                <span className="min-w-0 flex-1"><b>{r.title}</b> · {label(k)}<span className="block text-xs text-slate-500">{c.note ?? "Required by the standard template, not found in the document."}</span></span>
+                <Link className="text-indigo-600 hover:underline" to={`/contracts/${r.id}`}>Open contract</Link>
+              </li>))}
+          </ul>
+          {gaps > 8 && <p className="mt-2 text-xs text-slate-500">Showing 8 of {gaps}. Tick “Highlight gaps only” to scan the matrix.</p>}
+        </Card>)}
       {tip && cell && (
         <div role="tooltip" className="pointer-events-none fixed z-50 w-96 max-w-[90vw] -translate-x-1/2 -translate-y-full rounded-lg border border-slate-300 bg-white p-3 text-sm shadow-xl dark:border-slate-600 dark:bg-slate-900"
           style={{ left: Math.min(Math.max(tip.x, 200), window.innerWidth - 200), top: tip.y - 8 }}>

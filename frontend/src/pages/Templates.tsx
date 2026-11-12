@@ -24,11 +24,14 @@ export default function Templates() {
   const [focus, setFocus] = useState<{ title: string; heading: string; cell: NonNullable<Cell> } | null>(null);
   return (
     <div className="space-y-4">
-      <h1>Template library</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div><h1>Template library</h1><p className="mt-1 text-sm text-slate-500">{list.data ? `${list.data.length} standard templates` : "Standard templates"} · clause by clause, and where executed contracts drift from them</p></div>
+        <Link to="/redline" className="inline-flex min-h-[44px] items-center rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">Compare a draft</Link>
+      </div>
       <div className="flex flex-wrap gap-2">
         {list.data?.map((t) => (
-          <button key={t.id} onClick={() => { setSel(t.id); setFocus(null); }} className={`rounded-lg border px-3 py-2 text-left text-sm ${t.id === id ? "border-indigo-600 bg-indigo-50 dark:bg-slate-700" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"}`}>
-            <div className="font-medium">{t.name}</div><div className="text-xs text-slate-500">{t.clause_count} clauses · {t.deviating_contracts}/{t.contracts} contracts deviate</div>
+          <button key={t.id} onClick={() => { setSel(t.id); setFocus(null); }} className={`rounded-lg border px-4 py-2 text-left text-sm ${t.id === id ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"}`}>
+            <div className="font-semibold">{t.name.replace(" (Standard)", "")}</div><div className={`text-xs ${t.id === id ? "text-indigo-100" : "text-slate-500"}`}>{t.clause_count} clauses · {t.deviating_contracts}/{t.contracts} contracts deviate</div>
           </button>))}
       </div>
       {list.data && id && (
@@ -55,6 +58,19 @@ export default function Templates() {
       <Loading q={d} />
       {d.data && (
         <>
+          <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <Card title={`${d.data.template.name} — clause by clause`}>
+            <div className="max-h-[75vh] space-y-3 overflow-auto pr-1">
+              {d.data.clauses.map((c, i) => (
+                <div key={c.id} className="rounded border border-slate-200 p-3 text-sm dark:border-slate-700">
+                  <div className="flex items-center gap-2"><b>{i + 1}. {c.heading}</b>
+                    {c.variable && <span className="rounded bg-slate-200 px-1 text-[10px] dark:bg-slate-700">DEAL-SPECIFIC</span>}
+                    {c.deviation_count > 0 && <span className="rounded border border-slate-400 px-1 text-[11px]">{c.deviation_count} contract{c.deviation_count > 1 ? "s" : ""} deviate</span>}</div>
+                  <p className="mt-1">{c.standard_text}</p>
+                  {c.playbook_position && <p className="mt-1 text-xs text-slate-500"><b>Playbook:</b> {c.playbook_position}{c.fallback_text && <> <b>Fallback:</b> {c.fallback_text}</>}</p>}
+                </div>))}
+            </div>
+          </Card>
           <Card title="Deviation heatmap — executed contracts vs this template">
             {d.data.matrix.length === 0 ? <p className="text-sm text-slate-500">No executed contracts use this template.</p> : (
               <div className="overflow-x-auto">
@@ -78,18 +94,7 @@ export default function Templates() {
               </div>)}
             {focus && <div className="mt-3 rounded border border-slate-300 p-3 text-sm dark:border-slate-600"><b>{focus.title}</b> · {focus.heading} <SeverityChip sev={focus.cell.severity} /><p className="mt-1">{focus.cell.deviation_summary}</p></div>}
           </Card>
-          <Card title={`${d.data.template.name} — clause by clause`}>
-            <div className="space-y-3">
-              {d.data.clauses.map((c, i) => (
-                <div key={c.id} className="rounded border border-slate-200 p-3 text-sm dark:border-slate-700">
-                  <div className="flex items-center gap-2"><b>{i + 1}. {c.heading}</b>
-                    {c.variable && <span className="rounded bg-slate-200 px-1 text-[10px] dark:bg-slate-700">DEAL-SPECIFIC</span>}
-                    {c.deviation_count > 0 && <span className="rounded border border-slate-400 px-1 text-[11px]">{c.deviation_count} contract{c.deviation_count > 1 ? "s" : ""} deviate</span>}</div>
-                  <p className="mt-1">{c.standard_text}</p>
-                  {c.playbook_position && <p className="mt-1 text-xs text-slate-500"><b>Playbook:</b> {c.playbook_position}{c.fallback_text && <> <b>Fallback:</b> {c.fallback_text}</>}</p>}
-                </div>))}
-            </div>
-          </Card>
+          </div>
         </>)}
     </div>
   );
