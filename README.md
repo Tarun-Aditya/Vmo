@@ -1,5 +1,7 @@
 # ContractIQ
 
+> **Branches.** This branch is the **hotel / property operations edition** (fictional hotel group, property level, hospitality pack, portfolio map, new design shell). The **VMO edition** (vendor management office, IT-services corpus) lives on `claude/new-session-70au83`.
+
 **Vendor contract intelligence for Vendor Management Offices (VMOs).**
 Load your vendor contracts and drafts; ContractIQ reads them, keeps one unified dataset, and tells you what needs action:
 which renewals have a notice deadline coming, where liability is uncapped, which drafts deviate from your playbook, what you
