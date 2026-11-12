@@ -35,6 +35,7 @@ def meta():
 
     row = q1("SELECT min(created_at) AS seeded_at FROM contracts")
     return {
+        "customer": ((__import__("app.config", fromlist=["settings"]).settings.customer_names or "Arcadia").split(",")[0].strip() or "Arcadia").title(),
         "demo_mode": __import__("app.mode", fromlist=["demo_on"]).demo_on(),
         "llm_available": llm.available(),
         "llm_provider": llm.provider(),
