@@ -1,7 +1,7 @@
 Tables and views (PostgreSQL). Prefer the VIEWS for any question about current terms or dates.
 
 v_effective_terms  -- one row per non-amendment contract, with amendments already applied.
-  contract_id, title, vendor, category, type, parent_id, status, currency, owner, property, effective_date,
+  contract_id, title, vendor, category, type, parent_id, status, currency, owner, effective_date,
   expiry_date, notice_period_days, auto_renew, annual_value, total_value, payment_terms_days,
   liability_cap_multiple, liability_cap_text, termination_for_convenience, governing_law,
   processes_personal_data, has_dpa,
@@ -11,6 +11,15 @@ v_effective_terms  -- one row per non-amendment contract, with amendments alread
                          itself, or the latest amendment that overrode it); join contracts for its title.
   Also: customer_signatory, customer_signed_date, supplier_signatory, supplier_signed_date, fully_executed
   (true only when both parties signed; false = e.g. supplier countersignature pending).
+  The property (hotel / site) a contract names is NOT in this view: it is contracts.property (NULL = a group-level agreement). To filter or group by property use
+  v_property_contracts, or join: JOIN contracts c ON c.id = v_effective_terms.contract_id.
+properties  -- one row per property: id, name, city, country, kind, rooms.
+v_property_contracts  -- one row per (property, contract that applies there), INCLUDING each property's share of group-level agreements. Columns: property_id, property,
+  rooms, contract_id, title, vendor, category, type, expiry_date, contract_annual_value, basis ('named' = the document names the property; 'children' = a group agreement
+  whose schedules name it; 'group' = a group agreement covering every property; 'stated' = coverage recorded by a person), share (0-1: the part of the contract's yearly
+  value attributed to the property, by rooms). Cost of a property = sum(contract_annual_value * share); cost per room = that / rooms. NDAs, DPAs and amendments are not in it.
+certificates  -- the certificate each vendor must hold under its contract: vendor, kind ('insurance' | 'food_safety' | 'inspection_certificates' | 'payment_card_data'),
+  name, contract_id, expiry_date (NULL = no copy on file), received_on, reference. Expired = expiry_date < current_date.
 v_key_clauses  -- one row per non-amendment contract (join USING (contract_id)) with a boolean per key clause:
   has_term, has_renewal, has_payment, has_termination_for_convenience, has_termination_for_cause,
   has_liability_cap, has_indemnity, has_ip_ownership, has_confidentiality, has_data_protection,

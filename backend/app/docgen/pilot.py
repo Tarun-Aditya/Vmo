@@ -229,7 +229,13 @@ def fill(md: str, spec: dict, seed: date) -> str:
     for k, v in dates(spec, seed).items():
         s = v.strftime(fmt)
         md = md.replace("{{" + k + "}}", s.replace(" 0", " ") if fmt.startswith("%d") else re.sub(r" 0(\d),", r" \1,", s))
-    return md
+    eff = dates(spec, seed)["EFFECTIVE"]
+
+    def mobilisation(m):          # a milestone token the text uses but the spec gives no date for: a mobilisation date two weeks per step after the start, never a raw token
+        s = (eff + timedelta(days=14 * int(m.group(1)))).strftime(fmt)
+        return s.replace(" 0", " ") if fmt.startswith("%d") else re.sub(r" 0(\d),", r" \1,", s)
+
+    return re.sub(r"\{\{MS(\d)\}\}", mobilisation, md)
 
 
 def _convert(md_path: Path, out: Path, fmt: str) -> bool:

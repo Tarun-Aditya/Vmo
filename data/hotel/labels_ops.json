@@ -1153,13 +1153,13 @@
    "amount": 348000.0
   },
   "invoice_129.pdf": {
-   "vendor": "Lumen Energy Supply Ltd",
-   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
-   "invoice_no": "LUM-2611-129",
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "contract_title": "Statement of Work No.\u00a01",
+   "invoice_no": "STA-2611-129",
    "invoice_date": "2026-11-05",
-   "due_date": "2026-11-26",
+   "due_date": "2026-11-19",
    "paid_date": null,
-   "amount": 1890000.0
+   "amount": 135000.0
   },
   "invoice_130.md": {
    "vendor": "Marlowe Hospitality Consulting LLP",
@@ -1770,5 +1770,54 @@
    ]
   }
  },
- "acceptance": {}
+ "acceptance": {
+  "acceptance_001.md": {
+   "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
+   "vendor": "Brightstar Security Services Inc",
+   "key": "milestone:2026-04-26",
+   "completed_on": "2026-04-29"
+  },
+  "acceptance_002.docx": {
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "key": "milestone:2026-01-16",
+   "completed_on": "2026-01-13"
+  },
+  "acceptance_003.pdf": {
+   "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "key": "milestone:2026-01-30",
+   "completed_on": "2026-01-30"
+  },
+  "acceptance_004.md": {
+   "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbour Hotel",
+   "vendor": "Crestline Laundry & Linen Services Ltd",
+   "key": "milestone:2025-07-14",
+   "completed_on": "2025-07-15"
+  },
+  "acceptance_005.docx": {
+   "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "key": "milestone:2025-01-15",
+   "completed_on": "2025-01-13"
+  },
+  "acceptance_006.pdf": {
+   "contract_title": "Statement of Work No.\u00a01 -- Lift Maintenance Services at Seabright Summit Lodge",
+   "vendor": "Halcyon Elevator & Lift Maintenance Ltd",
+   "key": "milestone:2025-02-14",
+   "completed_on": "2025-02-11"
+  },
+  "acceptance_007.md": {
+   "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
+   "vendor": "Northgate Facilities & HVAC Inc",
+   "key": "milestone:2025-11-27",
+   "completed_on": "2025-11-24"
+  },
+  "acceptance_008.docx": {
+   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
+   "vendor": "Staffwell Hospitality Staffing Ltd",
+   "key": "milestone:2025-10-22",
+   "completed_on": "2025-10-25"
+  }
+ }
 }

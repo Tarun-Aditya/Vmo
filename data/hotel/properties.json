@@ -1,0 +1,50 @@
+[
+ {
+  "name": "Seabright Harbour Hotel",
+  "city": "Portsmouth",
+  "country": "United Kingdom",
+  "kind": "Full-service city hotel",
+  "rooms": 312,
+  "opened_year": 2009
+ },
+ {
+  "name": "Seabright Midtown Suites",
+  "city": "New York",
+  "country": "United States",
+  "kind": "All-suite city hotel",
+  "rooms": 184,
+  "opened_year": 2015
+ },
+ {
+  "name": "Seabright Lakeside Resort",
+  "city": "Windermere",
+  "country": "United Kingdom",
+  "kind": "Resort",
+  "rooms": 226,
+  "opened_year": 2004
+ },
+ {
+  "name": "Seabright Airport Inn",
+  "city": "Chicago",
+  "country": "United States",
+  "kind": "Airport hotel",
+  "rooms": 268,
+  "opened_year": 2012
+ },
+ {
+  "name": "Seabright Old Town Boutique",
+  "city": "York",
+  "country": "United Kingdom",
+  "kind": "Boutique hotel",
+  "rooms": 58,
+  "opened_year": 2018
+ },
+ {
+  "name": "Seabright Summit Lodge",
+  "city": "Aviemore",
+  "country": "United Kingdom",
+  "kind": "Lodge",
+  "rooms": 96,
+  "opened_year": 2001
+ }
+]

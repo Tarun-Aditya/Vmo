@@ -5,6 +5,7 @@ from __future__ import annotations
 from sqlalchemy import text
 
 from app import kcc
+from app.docgen.hotel_house import HOUSE
 
 CAT = "Hospitality"
 
@@ -36,6 +37,11 @@ CLAUSES = [
     _k("distribution_commission", "Distribution commission", "Commission payable on bookings through a distribution channel", [r"commission of \d", "commission rate", r"commission[^.]{0,40}room revenue"], ["Commission", "Distribution Fees"],
        "The commission payable on each booking shall not exceed 15 percent of the room revenue of that booking.", "high", ["SaaS"], matrix=False),
 ]
+
+
+for _c in CLAUSES:            # one wording for the template and the clause library
+    if _c["key"] in HOUSE:
+        _c["standard_text"] = HOUSE[_c["key"]][1]
 
 
 def _m(key, name, kcc_key, pattern, kind, unit, desc):

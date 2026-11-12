@@ -2,21 +2,27 @@
 
 > **Branches.** This branch is the **hotel / property operations edition** (fictional hotel group, property level, hospitality pack, portfolio map, new design shell). The **VMO edition** (vendor management office, IT-services corpus) lives on `claude/new-session-70au83`.
 
-**Vendor contract intelligence for Vendor Management Offices (VMOs).**
-Load your vendor contracts and drafts; ContractIQ reads them, keeps one unified dataset, and tells you what needs action:
-which renewals have a notice deadline coming, where liability is uncapped, which drafts deviate from your playbook, what you
-billed against what you signed, and the answer to any question about the portfolio, with the evidence to check it.
+**Vendor contract intelligence for a hotel group's property operations.**
+Load the group's vendor contracts and drafts; ContractIQ reads them, keeps one dataset, and tells the operations and procurement leads what needs action:
+which renewals have a notice deadline coming, what each property really costs under contract, where the same vendor charges one hotel more than another,
+which vendor certificates have lapsed, which drafts depart from the house standards, and the answer to any question about the portfolio, with the clause to check it.
 
 > **Status: proof of concept.** It runs end to end on a fictional corpus and on public real-world contracts, with simulated
 > ERP, e-signature, cloud-drive and mailbox systems. It has not been used on a customer's real contracts or connected to
-> real tenants. See [Known limits](#known-limits). The fictional customer is **Arcadia Retail**; every vendor, person and
-> document in the demo data is fictional.
+> real tenants. See [Known limits](#known-limits). The fictional customer is **Seabright Hotels & Resorts** (six properties); every vendor,
+> person and document in the demo data is fictional.
+
+**Navigation.** Seven screens are always visible: Overview · Properties · Compare · Renewals · Contracts · Ask · Review. Everything else (vendors, portfolio map,
+certificates, obligations, spend, risk, key clauses, templates, admin) is under **More**.
 
 ## What it does
 
 | Area | What you get |
 |---|---|
 | **Portfolio** | KPI tiles, a decision queue sorted by the *last day to act* (expiry minus notice period), 30/60/90-day buckets with value at stake, expiries by month, vendor operations. |
+| **Properties** | One record per property (rooms, city, kind). Each property's yearly cost is its own schedules **plus its share of group-level agreements** (by rooms), so the energy contract or the booking system is counted where it is used. Cost per room, what makes up the cost, what ends soon. |
+| **Compare** | Where one vendor serves several properties: the rates and terms each property signed, side by side, with the gap between best and worst and an estimate of what the best rate is worth. |
+| **Certificates** | The certificates each vendor's contract obliges it to hold (insurance, food safety, statutory inspections, payment-card attestation), with the expiry of the copy on file: expired, expiring, not on file. |
 | **Contracts and hierarchy** | Repository with filters. Contract detail shows the text beside extracted fields (click a field to see its source passage, page and confidence), parent/child links (MSA → SOW → Work Order, amendments), and **effective terms** after amendments, with where each value comes from. |
 | **Key clauses** | Matrix of every document × every key clause, with a citation for each tick and boxed gaps where the template requires a clause. The clause library is configurable in Admin. |
 | **Ask** | Plain-English questions over the whole portfolio or chosen documents. Structured questions become read-only SQL; clause questions use semantic search; every answer shows its steps, SQL, result table and cited clauses. Conversation history, follow-ups, stop. |
@@ -38,15 +44,13 @@ Requirements: Docker with Compose, or Python 3.12 + Node 20 + Postgres 16 with p
 
 ```bash
 cp .env.example .env     # ANTHROPIC_API_KEY is optional, see "Demo and Live"
-make dev                 # db + api + web   ->  http://localhost:5173   (API health: http://localhost:8000/health)
-make seed-pilot          # load the 36-document pilot corpus (PDF, Word, Markdown) and run the pipeline
+make showcase            # db + api + web, migrate, seed the hotel corpus  ->  http://localhost:5173   (API health: http://localhost:8000/health)
 ```
 
-`make seed` loads the older 32-document synthetic corpus instead (deterministic; the test suite uses it). Dates inside the
-documents are relative to the seed run, so re-seed on the day of a demo.
+Dates inside the documents are relative to the seed run, so re-seed (`make seed-hotel`) on the day of a demo. The hotel seed takes about eight minutes
+(it renders Word and PDF files). `make seed` loads the older synthetic corpus the test suite uses.
 
-Without Docker: set `DATABASE_URL` and `DATA_DIR`, run `alembic upgrade head`, then `python -m app.seed --pilot`, then
-`uvicorn app.main:app` in `backend/` and `npm run dev` in `frontend/`.
+Without Docker: see [Run it from a clean clone](#run-it-from-a-clean-clone-verified).
 
 Other targets: `make eval`, `make test`, `make lint`, `make docs`, `make migrate`, `make down`.
 
@@ -173,11 +177,12 @@ Set in `.env` (see `.env.example`):
 | `AUTH_MODE`, `OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_ROLES_CLAIM`, `SECRET_KEY`, `CORS_ORIGINS` | Access and encryption |
 | `SIMULATORS`, `PUBLIC_API_URL`, `SIM_IMAP_PORT`, `SIM_SMTP_PORT` | Demo stand-ins (set `SIMULATORS=0` in production) |
 | `SCHEDULER_ENABLED` | Background pipeline scheduler (tests turn it off) |
-| `CUSTOMER_NAMES` | How your own company is named in contracts (comma-separated, default `Arcadia`): needed so the other party is read as the vendor |
+| `CUSTOMER_NAMES` | How your own company is named in contracts (comma-separated; the hotel setup uses `Seabright`): needed so the other party is read as the vendor |
+| `STANDARDS` | `hotel` gives the template library the hotel group's values and its own clauses |
 
 ## Tests
 
-* `make test`: backend suite (167 tests) against the offline-seeded synthetic corpus.
+* `make test`: backend suite (178 tests) against the offline-seeded synthetic corpus.
 * Outside Docker, use a separate database and data folder so tests never touch demo data:
   `DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`.
 * Browser walkthroughs: `scripts/demo_pilot.js` (any corpus) and `scripts/demo_walkthrough.js` (synthetic corpus).
@@ -187,7 +192,7 @@ Set in `.env` (see `.env.example`):
 ```
 backend/app/         FastAPI app: pipeline, extraction, kcc (clause library), kcc_ai, deviations, ask*, routes_*,
                      connectors/, simulators/, collab, mode (Demo/Live), llm, embeddings
-backend/alembic/     migrations (0001 to 0027; below 0005 cannot be downgraded)
+backend/alembic/     migrations (0001 to 0029; below 0005 cannot be downgraded)
 backend/tests/       pytest suite
 frontend/src/        React + Vite + TypeScript + Tailwind + TanStack Query
 evals/               extraction, redline, Ask, module, OCR, retrieval, CUAD and pilot evals

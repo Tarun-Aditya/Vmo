@@ -22,11 +22,11 @@ from app.routes_chat import router as chat_router
 from app.routes_comments import router as comments_router
 from app.routes_connectors import router as connectors_router
 from app.routes_docs import router as docs_router
+from app.routes_hotel import router as hotel_router
 from app.routes_quality import router as quality_router
 from app.routes_scim import router as scim_router
 from app.routes_signatures import router as signatures_router
 from app.routes_vmo import router as vmo_router
-from app.routes_hotel import router as hotel_router
 
 log = logging.getLogger("app")
 

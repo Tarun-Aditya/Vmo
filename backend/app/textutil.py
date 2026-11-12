@@ -8,7 +8,9 @@ UNITS = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six":
          "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
 _WORD = r"(?:%s)" % "|".join(sorted(UNITS, key=len, reverse=True))
 NUM_PHRASE = re.compile(rf"\b({_WORD})(?:[- ](one|two|three|four|five|six|seven|eight|nine))?\b", re.I)
-PAREN_DUP = re.compile(rf"\b(?:{_WORD}(?:[- ](?:one|two|three|four|five|six|seven|eight|nine))?|hundred)\s*\(\s*(\d+(?:\.\d+)?)\s*\)", re.I)
+# a number in words followed by the same number in figures: 'forty-five (45)', 'one hundred and eighty (180)', 'two hundred (200)' -> the figures
+_SMALL = rf"{_WORD}(?:[- ](?:one|two|three|four|five|six|seven|eight|nine))?"
+PAREN_DUP = re.compile(rf"\b(?:(?:{_WORD}|an?)\s+hundred(?:\s+(?:and\s+)?{_SMALL})?|{_SMALL}|hundred)\s*\(\s*(\d+(?:\.\d+)?)\s*\)", re.I)
 UNIT_AFTER = r"(?=\s*(?:days?|months?|years?|hours?|business days|weeks?|times|percent|%))"
 MONTHS = {m: i for i, m in enumerate("january february march april may june july august september october november december".split(), 1)}
 MONTH_RE = "(" + "|".join(list(MONTHS) + [m[:3] for m in MONTHS]) + ")"

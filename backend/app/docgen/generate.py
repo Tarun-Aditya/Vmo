@@ -146,7 +146,7 @@ def render_template(ttype: str) -> tuple[str, list[dict]]:
     clauses = [(CLAUSES[c].heading, standard_text(c, doc)) for c in t["clauses"]]
     md = _layout(
         f"Standard Template – {t['name']} (v1.0)",
-        _header(None, "[Effective Date]", ttype, f"ARC-TPL-{ttype}"),
+        _header(None, "[Effective Date]", ttype, f"{CUSTOMER[:3].upper()}-TPL-{ttype}"),
         clauses,
     )
     meta = [

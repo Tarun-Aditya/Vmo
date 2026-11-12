@@ -126,6 +126,7 @@ export default function Redline() {
   const assign = useMutation({ mutationFn: (v: { assignee?: string; due_date?: string }) => api(`/api/redline/${id}/review`, { method: "PUT", body: JSON.stringify({ status: r?.review.status ?? "pending", ...v }) }), onSuccess: refresh });
   const apply = useMutation({ mutationFn: () => api<{ applied: number; version: number }>(`/api/redline/${id}/apply`, { method: "POST" }), onSuccess: () => { qc.invalidateQueries(); } });
   const [onlyFail, setOnlyFail] = useState(false);
+  const [minor, setMinor] = useState(false);
   const r = red.data;
   const html = useMemo(() => (r ? trackedHtml(r.body_md, r.items, r.decisions) : ""), [r]);
   const counts = (["pending", "in_review", "changes_requested", "approved"] as RStatus[]).map((s) => [s, all.filter((d) => d.review_status === s).length] as const);
@@ -231,7 +232,8 @@ export default function Redline() {
                   {apply.error && <p className="text-xs text-red-600">{String(apply.error)}</p>}
                   {apply.data && <p className="text-xs text-emerald-700">✓ {apply.data.applied} change(s) written to the document as version {apply.data.version}; re-checked.</p>}
                   {r.items.length === 0 && <p className="rounded border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900">No deviations — this document matches the standard.</p>}
-                  {r.items.map((i) => {
+                  {/* what must be negotiated first; smaller differences from the standard stay folded away until asked for */}
+                  {[...r.items].sort((a, b) => ORDER.indexOf(a.severity) - ORDER.indexOf(b.severity)).filter((i) => minor || i.severity === "critical" || i.severity === "high" || active === i.clause_type || !r.items.some((x) => x.severity === "critical" || x.severity === "high")).map((i) => {
                     const d = r.decisions[i.clause_type];
                     return (
                       <div key={i.clause_type} id={`cmt-${i.clause_type}`} className={`rounded-lg border bg-white p-3 text-sm dark:bg-slate-800 ${active === i.clause_type ? "border-indigo-500 ring-1 ring-indigo-500" : "border-slate-200 dark:border-slate-700"} ${sevStripe(i.severity)}`}>
@@ -247,6 +249,9 @@ export default function Redline() {
                         </div>
                       </div>);
                   })}
+                  {(() => { const n = r.items.filter((i) => i.severity !== "critical" && i.severity !== "high").length, big = r.items.length - n;
+                    return n > 0 && big > 0 ? <button type="button" onClick={() => setMinor(!minor)} aria-expanded={minor} className="min-h-[44px] w-full rounded-lg border border-dashed border-slate-300 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800">
+                      {minor ? "Hide" : "Show"} {n} smaller difference{n !== 1 ? "s" : ""} (medium and low)</button> : null; })()}
                 </div>
               </div>)}
 

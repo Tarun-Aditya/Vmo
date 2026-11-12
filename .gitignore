@@ -19,3 +19,5 @@ data_test/
 # connector pulls from the simulated systems and uploads made while testing
 data/**/*-simulated/
 data/**/inbox/uploads/
+backend/*.egg-info/
+data/hotel/.cache/

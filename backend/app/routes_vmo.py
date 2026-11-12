@@ -134,7 +134,8 @@ def sla_add(m: Measurement):
 def spend_summary():
     tot = one("""SELECT COALESCE(sum(amount),0) AS billed, COALESCE(sum(amount) FILTER (WHERE invoice_date >= CURRENT_DATE - 90),0) AS billed_90d, count(*) AS invoices,
                         COALESCE(sum(amount) FILTER (WHERE contract_id IS NULL),0) AS off_contract FROM invoices""")
-    ex = one("SELECT count(*) AS n, COALESCE(sum(amount_at_risk),0) AS at_risk, count(*) FILTER (WHERE severity IN ('critical','high')) AS serious FROM spend_exceptions")
+    ex = one("SELECT count(*) AS n, COALESCE(sum(amount_at_risk),0) AS at_risk, count(*) FILTER (WHERE severity IN ('critical','high')) AS serious, "
+             "COALESCE(sum(amount_at_risk) FILTER (WHERE severity IN ('critical','high')),0) AS serious_at_risk FROM spend_exceptions")
     plan = one("SELECT COALESCE(sum(planned_value),0) AS planned FROM v_contract_spend")
     by_vendor = rows("""SELECT v.vendor, COALESCE(i.billed,0) AS billed, COALESCE(p.planned,0) AS planned, COALESCE(e.n,0) AS exceptions, COALESCE(e.risk,0) AS at_risk
                         FROM (SELECT DISTINCT vendor FROM invoices UNION SELECT DISTINCT vendor FROM contracts WHERE status <> 'draft') v
@@ -147,7 +148,7 @@ def spend_summary():
                       GROUP BY 1 ORDER BY 1""")
     by_kind = rows("SELECT kind, severity, count(*) AS n, sum(amount_at_risk) AS at_risk FROM spend_exceptions GROUP BY 1,2 ORDER BY at_risk DESC")
     return {"billed": tot["billed"], "billed_90d": tot["billed_90d"], "invoices": tot["invoices"], "off_contract": tot["off_contract"], "planned": plan["planned"],
-            "exceptions": ex["n"], "at_risk": ex["at_risk"], "serious": ex["serious"], "by_vendor": by_vendor, "monthly": monthly, "by_kind": by_kind}
+            "exceptions": ex["n"], "at_risk": ex["at_risk"], "serious": ex["serious"], "serious_at_risk": ex["serious_at_risk"], "by_vendor": by_vendor, "monthly": monthly, "by_kind": by_kind}
 
 
 @router.get("/spend/contracts")

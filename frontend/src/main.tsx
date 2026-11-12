@@ -13,6 +13,8 @@ import Redline from "./pages/Redline";
 import Templates from "./pages/Templates";
 import PortfolioMap from "./pages/PortfolioMap";
 import Properties from "./pages/Properties";
+import Compare from "./pages/Compare";
+import Certificates from "./pages/Certificates";
 import Renewals from "./pages/Renewals";
 import Clauses from "./pages/Clauses";
 import Vendors from "./pages/Vendors";
@@ -73,6 +75,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="map" element={<PortfolioMap />} />
             <Route path="properties" element={<Properties />} />
             <Route path="renewals" element={<Renewals />} />
+            <Route path="compare" element={<Compare />} />
+            <Route path="certificates" element={<Certificates />} />
             <Route path="contracts" element={<Contracts />} />
             <Route path="contracts/:id" element={<ContractDetail />} />
             <Route path="vendors" element={<Vendors />} />

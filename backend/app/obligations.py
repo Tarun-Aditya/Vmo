@@ -18,6 +18,12 @@ MONTHS = "january february march april may june july august september october no
 
 def _milestone_title(ctx: str) -> str:
     """A readable milestone name from the text before a date: start at the last table-row number or sentence start, never mid-word, at most ~9 words."""
+    if "|" in ctx:                   # a table row: the milestone is the first cell of this row that is words, not a row label ('3', 'D3', 'Milestone 1')
+        row = re.split(r"\|\s*\|", ctx)[-1]
+        cells = [c.strip(" *_`") for c in row.split("|")]
+        named = [c for c in cells if len(c.split()) >= 2 and not re.fullmatch(r"(?:milestone|deliverable|phase|stage)?\s*[A-Za-z]?\d+", c, re.I)]
+        if named:
+            return " ".join(named[0].split()[:9]).strip(" .,;:-–")
     t = re.sub(r"\s+", " ", re.sub(r"[|_*`]+|\b(?:due|by|on|date|no\.?|milestone|key deliverables?)\b[:]?", " ", ctx, flags=re.I)).strip(" .,;:-–")
     rows = list(re.finditer(r"(?:^|\s)\d{1,2}\s+(?=[A-Z])", t))
     if rows:
@@ -27,6 +33,8 @@ def _milestone_title(ctx: str) -> str:
         t = sent[-1]
     words = t.split()
     while words and not (words[0][0].isupper() or words[0][0].isdigit()):       # drop a leading fragment cut mid-word / mid-sentence
+        words.pop(0)
+    if len(words) > 2 and re.fullmatch(r"[A-Za-z]?\d{1,2}[.)]?", words[0]):         # a row label ('D1', '3.') is not part of the name
         words.pop(0)
     return " ".join(words[:9]).strip(" .,;:-–")
 
@@ -84,6 +92,8 @@ def rule_obligations(c: dict, clauses: list[dict], vals: list[dict], today: date
             if d0 in seen_dates:
                 continue
             ctx = body[max(0, pos - 110):pos]
+            if "|" in ctx:                      # in a table the whole row is needed, however long its first cells are
+                ctx = body[max(0, pos - 260):pos]
             if re.search(r"effective date|dated|expires?|until|initial term|commenc|signed|executed|terminat", ctx[-60:], re.I):
                 continue
             title = _milestone_title(ctx)

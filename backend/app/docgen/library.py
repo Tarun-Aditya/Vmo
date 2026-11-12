@@ -849,3 +849,15 @@ def standard_text(ctype: str, doc: str) -> str:
         notice_period_days="[notice]",
     )
     return clause_text(ctype, doc, ph)
+
+
+if __import__("os").environ.get("STANDARDS", "").lower() == "hotel":       # the hotel group's templates carry its own clauses, placed before governing law
+    from app.docgen.hotel_house import HOUSE
+
+    for _k, (_h, _t, _pb, _sev, _types) in HOUSE.items():
+        CLAUSES[_k] = ClauseDef(_k, _h, _t, _pb, "", _sev)
+        HEADING_TO_TYPE[_h] = _k
+        for _tt in _types:
+            _cl = TEMPLATES[_tt]["clauses"]
+            if _k not in _cl:
+                _cl.insert(_cl.index("governing_law"), _k)

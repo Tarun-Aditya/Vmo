@@ -23,7 +23,7 @@ function Kpi({ label, value, sub, sev }: { label: string; value: string | number
 
 function OpsStrip() {
   const ob = useQuery({ queryKey: ["obligations", ""], queryFn: () => api<{ summary: { overdue: number; due_30: number } }>("/api/obligations") });
-  const sp = useQuery({ queryKey: ["spend-summary"], queryFn: () => api<{ exceptions: number; at_risk: number; off_contract: number }>("/api/spend/summary") });
+  const sp = useQuery({ queryKey: ["spend-summary"], queryFn: () => api<{ exceptions: number; at_risk: number; off_contract: number; serious: number; serious_at_risk: number }>("/api/spend/summary") });
   const sla = useQuery({ queryKey: ["sla"], queryFn: () => api<{ summary: { breach_months: number; credit_usd: number } }>("/api/sla") });
   const rk = useQuery({ queryKey: ["risk"], queryFn: () => api<{ vendors: { vendor: string; score: number; tier: string }[] }>("/api/risk/vendors") });
   if (!ob.data || !sp.data || !sla.data || !rk.data) return null;
@@ -33,7 +33,7 @@ function OpsStrip() {
       <h2 className="mb-2 text-lg font-semibold">Vendor operations</h2>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Link to="/obligations"><Tile l="Overdue obligations" v={ob.data.summary.overdue} tone={ob.data.summary.overdue ? "red" : "green"} sub={`${ob.data.summary.due_30} more due in 30 days`} /></Link>
-        <Link to="/spend"><Tile l="Spend exceptions" v={sp.data.exceptions} tone="amber" sub={`${usd(sp.data.at_risk)} at risk · ${usd(sp.data.off_contract)} off-contract`} /></Link>
+        <Link to="/spend"><Tile l="Invoices to query" v={sp.data.serious} tone="amber" sub={`${usd(sp.data.serious_at_risk)} at stake${sp.data.exceptions - sp.data.serious ? ` · ${sp.data.exceptions - sp.data.serious} minor` : ""}`} /></Link>
         <Link to="/obligations"><Tile l="SLA breach months" v={sla.data.summary.breach_months} tone={sla.data.summary.breach_months ? "red" : "green"} sub={`~${usd(sla.data.summary.credit_usd)} estimated credits`} /></Link>
         {top && <Link to="/risk"><Tile l="Highest-risk vendor" v={<span className="text-lg">{top.vendor.replace(/ (Inc|LLP|Ltd)$/, "")}</span>} sub={<span className="inline-flex items-center gap-2">score {top.score.toFixed(0)} <TierChip tier={top.tier} /></span>} /></Link>}
       </div>
@@ -52,6 +52,7 @@ function action(i: Item): { label: string; sev: Sev; chip: string; primary: bool
 export default function Dashboard() {
   const q = useQuery({ queryKey: ["dash"], queryFn: () => api<Dash>("/api/dashboard"), refetchInterval: 30000 });
   const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ today: string }>("/api/meta") });
+  const certs = useQuery({ queryKey: ["certificates"], queryFn: () => api<{ summary: { expired: number; expiring: number; missing: number; valid: number } }>("/api/certificates") });
   if (!q.data) return <Loading q={q} />;
   const { kpis: k, lanes, monthly, risks } = q.data;
   const all = (["30", "60", "90"] as const).flatMap((key) => lanes[key].items);
@@ -106,10 +107,13 @@ export default function Dashboard() {
           </Card>
           <Card title="Needs attention">
             <div className="space-y-3 text-sm">
-              {([["uncapped", "Uncapped liability", "critical"], ["pd_without_dpa", "Personal data, no DPA", "critical"], ["no_tfc", "No termination for convenience", "high"]] as [string, string, Sev][]).map(([key, label, sev]) => (
+              {([["uncapped", "Uncapped liability", "critical"], ["pd_without_dpa", "Vendors handling personal data, no DPA", "critical"], ["no_tfc", "No termination for convenience", "high"]] as [string, string, Sev][]).map(([key, label, sev]) => (
                 <div key={key}><div className="mb-1 flex items-center gap-2 font-medium">{label} <SeverityChip sev={sev} label={String(risks[key].length)} /></div>
-                  <ul className="space-y-0.5">{risks[key].slice(0, 4).map((r) => <li key={r.id}><Link className="text-indigo-600 hover:underline dark:text-indigo-400" to={`/contracts/${r.id}`}>{r.title}</Link></li>)}{!risks[key].length && <li className="text-ink-mute">None</li>}</ul></div>
+                  <ul className="space-y-0.5">{risks[key].slice(0, 4).map((r) => <li key={r.id + r.vendor}><Link className="text-indigo-600 hover:underline dark:text-indigo-400" to={`/contracts/${r.id}`}>{key === "pd_without_dpa" ? r.vendor : r.title}</Link></li>)}{!risks[key].length && <li className="text-ink-mute">None</li>}</ul></div>
               ))}
+              {certs.data && (certs.data.summary.expired + certs.data.summary.expiring + certs.data.summary.missing > 0) && (
+                <div><div className="mb-1 flex items-center gap-2 font-medium">Vendor certificates <SeverityChip sev={certs.data.summary.expired ? "critical" : "high"} label={String(certs.data.summary.expired + certs.data.summary.expiring)} /></div>
+                  <Link className="text-indigo-600 hover:underline dark:text-indigo-400" to="/certificates">{certs.data.summary.expired} expired · {certs.data.summary.expiring} expiring · {certs.data.summary.missing} not on file</Link></div>)}
             </div>
           </Card>
         </aside>
