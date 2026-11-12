@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Invoice number | BRI-2604-007 |
-| Date | 2026-04-21 |
+| Date | 2026-04-22 |
 | Agreement | Statement of Work No. 1 – Security Services at Seabright Harbour |
-| Description | Services 17 Mar – 16 Apr 2026 |
-| Period | 2026-03-17 to 2026-04-16 |
+| Description | Services 18 Mar – 17 Apr 2026 |
+| Period | 2026-03-18 to 2026-04-17 |
 | Total | USD 35,000.00 |
-| Due date | 2026-05-21 |
-| Date paid | 2026-05-17 |
+| Due date | 2026-05-22 |
+| Date paid | 2026-05-18 |
 
-Billed to Arcadia Retail Inc.
+Billed to Seabright Hotels & Resorts Ltd

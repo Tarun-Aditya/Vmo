@@ -1,16 +1,16 @@
 # TAX INVOICE
 
-Amenity Supplies Inc
+Marlowe Hospitality Consulting LLP
 
 Date of issue: August 28, 2026
 
-Invoice number: AME-2608-001
+Invoice number: MAR-2608-001
 
-To: Arcadia Retail Inc.
+To: Seabright Hotels & Resorts Ltd
 
 For: Managed services – August 2026
 
-Amount payable: USD 28,000.00
+Amount payable: USD 85,000.00
 
 Payment due by 12 October 2026
 

@@ -5,11 +5,11 @@
 | | |
 |---|---|
 | Invoice number | CRE-2610-043 |
-| Date | 2026-10-03 |
+| Date | 2026-10-04 |
 | Agreement | Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbour Hotel |
-| Description | Services 29 Aug – 28 Sep 2026 |
-| Period | 2026-08-29 to 2026-09-28 |
+| Description | Services 30 Aug – 29 Sep 2026 |
+| Period | 2026-08-30 to 2026-09-29 |
 | Total | USD 25,833.33 |
-| Due date | 2026-11-17 |
+| Due date | 2026-11-18 |
 
-Billed to Arcadia Retail Inc.
+Billed to Seabright Hotels & Resorts Ltd

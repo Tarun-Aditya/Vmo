@@ -8,15 +8,15 @@
 
 **From:** Halcyon Elevator & Lift Maintenance Ltd
 
-**Bill to:** Arcadia Retail Inc.
+**Bill to:** Seabright Hotels & Resorts Ltd
 
 **Reference:** Statement of Work No. 1 -- Lift Maintenance Services at Seabright Summit Lodge
 
-**Service period:** 30 Jan 2025 – 27 Feb 2025
+**Service period:** 31 Jan 2025 – 27 Feb 2025
 
 | Description | Amount (USD) |
 |---|---|
-| Services 30 Jan – 27 Feb 2025 | 7,000.00 |
+| Services 31 Jan – 27 Feb 2025 | 7,000.00 |
 
 **Total due: USD 7,000.00**
 

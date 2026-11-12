@@ -2,17 +2,17 @@
 
 **Invoice No.:** BOO-2512-001
 
-**Invoice date:** 15 November 2025
+**Invoice date:** 16 November 2025
 
-**Due date:** 15 December 2025
+**Due date:** 16 December 2025
 
 **From:** BookWave Distribution Inc
 
-**Bill to:** Arcadia Retail Inc.
+**Bill to:** Seabright Hotels & Resorts Ltd
 
 **Reference:** SOFTWARE AS A SERVICE AGREEMENT – BookWave Distribution
 
-**Service period:** 15 Nov 2025 – 05 Dec 2026
+**Service period:** 16 Nov 2025 – 06 Dec 2026
 
 | Description | Amount (USD) |
 |---|---|
@@ -20,4 +20,4 @@
 
 **Total due: USD 420,000.00**
 
-Paid on: 06 January 2026
+Paid on: 07 January 2026
