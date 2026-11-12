@@ -13,6 +13,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
   const q = useQuery({ queryKey: ["matrix", vendor ?? ""], queryFn: () => api<M>(`/api/clause-matrix${vendor ? `?vendor=${encodeURIComponent(vendor)}` : ""}`) });
   const [tip, setTip] = useState<{ row: Row; col: string; x: number; y: number } | null>(null);
   const [onlyGaps, setOnlyGaps] = useState(false);
+  const [picked, setPicked] = useState<{ row: Row; col: string } | null>(null);
   const nav = useNavigate();
   if (!q.data) return <Loading q={q} />;
   const m = q.data;
@@ -71,7 +72,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
                         <td key={c.key} className="border-t border-slate-100 p-0.5 text-center dark:border-slate-700"
                           onMouseEnter={(e) => { const b = (e.currentTarget as HTMLElement).getBoundingClientRect(); setTip({ row: r, col: c.key, x: b.left + b.width / 2, y: b.top }); }}
                           onMouseLeave={() => setTip(null)}>
-                          <button type="button" onClick={() => r.kind === "contract" && nav(`/contracts/${r.id}`)} aria-label={`${r.title}: ${c.label} ${ce.present ? "present" : "absent"}`}
+                          <button type="button" onClick={() => (ce.expected && !ce.present ? setPicked({ row: r, col: c.key }) : r.kind === "contract" && nav(`/contracts/${r.id}`))} aria-label={`${r.title}: ${c.label} ${ce.present ? "present" : "absent"}`}
                             onFocus={(e) => { const b = e.currentTarget.getBoundingClientRect(); setTip({ row: r, col: c.key, x: b.left + b.width / 2, y: b.top }); }} onBlur={() => setTip(null)}
                             className={`h-7 w-8 rounded text-base font-bold ${ce.present ? "text-emerald-600" : gap ? "bg-red-100 text-red-700 ring-1 ring-red-400 dark:bg-red-950 dark:text-red-300" : "text-red-400"} ${onlyGaps && !gap ? "opacity-20" : ""}`}>
                             {ce.present ? "✓" : "✗"}
@@ -89,6 +90,16 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
           </table>
         </div>
       </Card>
+      {picked && (() => { const pc = picked.row.cells[picked.col]; return (
+        <Card>
+          <div className="flex flex-wrap items-center gap-2"><span className="rounded bg-red-100 px-1.5 text-xs font-semibold text-red-900 ring-1 ring-red-300">◆ Gap</span><b>{picked.row.title}</b> · <span>{label(picked.col)}</span>
+            <button className="ml-auto text-xs text-slate-500 hover:underline" onClick={() => setPicked(null)}>Close</button></div>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{pc?.note ?? "Required by the standard template, not found in the document."}{pc?.text ? ` Closest text${pc.page ? ` (page ${pc.page})` : ""}: “${pc.text.slice(0, 220)}”` : ""}</p>
+          <div className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
+            <Link className="inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 px-4 hover:bg-slate-50 dark:border-slate-600" to={`/contracts/${picked.row.id}`}>Open contract</Link>
+            <Link className="inline-flex min-h-[40px] items-center rounded-lg border border-slate-300 px-4 hover:bg-slate-50 dark:border-slate-600" to={`/redline/${picked.row.id}`}>Start a redline</Link>
+          </div>
+        </Card>)})()}
       {!vendor && gaps > 0 && (
         <Card title={`Gaps to fix (${gaps})`}>
           <ul className="divide-y divide-slate-100 text-sm dark:divide-slate-700">
