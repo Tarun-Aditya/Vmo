@@ -37,7 +37,7 @@ function SlaCard({ s }: { s: Series }) {
             <YAxis domain={[Math.floor((lo - pad) * 100) / 100, Math.ceil((hi + pad) * 100) / 100]} tick={{ fontSize: 11 }} width={46} />
             <Tooltip formatter={(v: number) => [`${v}${s.unit === "%" ? "%" : " h"}`, "Actual"]} />
             {s.target !== null && <ReferenceLine y={s.target} stroke="#dc2626" strokeDasharray="5 4" label={{ value: "target", position: "insideTopRight", fontSize: 10, fill: "#dc2626" }} />}
-            <Line type="linear" dataKey="actual" stroke="#4f46e5" strokeWidth={2} isAnimationActive={false} dot={(p: { cx?: number; cy?: number; payload?: { breach: boolean }; index?: number }) => <circle key={p.index} cx={p.cx} cy={p.cy} r={p.payload?.breach ? 6 : 3.5} fill={p.payload?.breach ? "#dc2626" : "#4f46e5"} stroke="#fff" strokeWidth={1.5} />} />
+            <Line type="linear" dataKey="actual" stroke="#0E6B5E" strokeWidth={2} isAnimationActive={false} dot={(p: { cx?: number; cy?: number; payload?: { breach: boolean }; index?: number }) => <circle key={p.index} cx={p.cx} cy={p.cy} r={p.payload?.breach ? 6 : 3.5} fill={p.payload?.breach ? "#dc2626" : "#4f46e5"} stroke="#fff" strokeWidth={1.5} />} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -71,7 +71,7 @@ export default function Obligations() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Obligations & SLAs</h1>
+        <h1>Obligations & SLAs</h1>
         <p className="text-sm text-slate-500">What each party must do under every contract — milestones, SLA targets, notices, renewals, insurance — read from the documents, with dates and status. SLA actuals come from monitoring feeds.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">

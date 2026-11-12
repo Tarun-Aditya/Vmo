@@ -48,7 +48,7 @@ export default function DocumentEditor() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold">{d.title}</h1>
+        <h1>{d.title}</h1>
         <span className="rounded bg-slate-200 px-1.5 text-xs font-semibold uppercase dark:bg-slate-700">{d.type}</span>
         <span className={`rounded px-1.5 text-xs font-semibold ${d.editable ? "bg-amber-100 text-amber-900" : "bg-slate-200 text-slate-700"}`}>{d.editable ? "DRAFT" : "EXECUTED · read only"}</span>
         <span className="ml-auto flex gap-3 text-sm"><a className="text-indigo-600 hover:underline" href={authUrl(`/api/documents/${d.id}/export.docx`)} download>⬇ Download .docx</a><Link className="text-indigo-600 hover:underline" to={`/redline/${d.id}`}>Review redline</Link><Link className="text-indigo-600 hover:underline" to={`/contracts/${d.id}`}>Open details</Link></span>

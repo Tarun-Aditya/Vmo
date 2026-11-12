@@ -135,7 +135,7 @@ export default function Redline() {
   return (
     <div className="grid gap-4 lg:grid-cols-4">
       <div className="space-y-2 lg:col-span-1">
-        <h1 className="text-xl font-semibold">Review queue</h1>
+        <h1>Review queue</h1>
         <p className="text-xs text-slate-500">Drafts dropped in the drafts folder are redlined automatically and wait here, one by one, for your review.</p>
         <div className="flex flex-wrap gap-1 text-xs" role="tablist" aria-label="Queue filter">
           <button role="tab" aria-selected={filter === "all"} onClick={() => setFilter("all")} className={`rounded px-2 py-0.5 ${filter === "all" ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-700"}`}>All {all.length}</button>

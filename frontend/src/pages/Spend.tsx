@@ -32,7 +32,7 @@ export default function Spend() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Spend vs contract</h1>
+        <h1>Spend against contract</h1>
         <p className="text-sm text-slate-500">Every invoice from the AP/ERP feed is matched to the contract it bills and checked: unsigned or missing contracts, over-billing, duplicates, billing outside the term, late payment.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
@@ -48,7 +48,7 @@ export default function Spend() {
             <ResponsiveContainer><BarChart data={s.monthly} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" /><XAxis dataKey="month" tick={{ fontSize: 11 }} /><YAxis tickFormatter={(v) => usd(v)} tick={{ fontSize: 11 }} width={56} />
               <Tooltip formatter={(v: number) => usd(v)} /><Legend />
-              <Bar dataKey="on_contract" name="On contract" stackId="a" fill="#4f46e5" /><Bar dataKey="off_contract" name="No contract on file" stackId="a" fill="#dc2626" />
+              <Bar dataKey="on_contract" name="On contract" stackId="a" fill="#0E6B5E" /><Bar dataKey="off_contract" name="No contract on file" stackId="a" fill="#C2570C" />
             </BarChart></ResponsiveContainer>
           </div>
         </Card>

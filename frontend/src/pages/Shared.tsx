@@ -28,7 +28,7 @@ export default function SharedDoc() {
   const save = async () => { try { const r = await api<{ version: number }>(`/api/shared/${token}/content`, { method: "PUT", body: JSON.stringify({ md, name }) }); setSaved(`Saved as version ${r.version}`); } catch (e) { setSaved(String(e).replace("Error: ", "")); } };
   return (
     <div className="mx-auto max-w-7xl space-y-3 p-4">
-      <div className="flex flex-wrap items-center gap-3"><h1 className="text-xl font-semibold">{d.title}</h1><span className="rounded bg-slate-200 px-1.5 text-xs font-semibold uppercase dark:bg-slate-700">{d.level}</span>
+      <div className="flex flex-wrap items-center gap-3"><h1>{d.title}</h1><span className="rounded bg-slate-200 px-1.5 text-xs font-semibold uppercase dark:bg-slate-700">{d.level}</span>
         <span className="text-sm text-slate-500">Signed in as {name} (guest)</span>{d.level === "edit" && <span className="ml-auto"><Btn onClick={save}>Save new version</Btn></span>}{saved && <span className="text-xs text-slate-500">{saved}</span>}</div>
       <div className="grid gap-4 lg:grid-cols-4">
         <div className="lg:col-span-3"><DocEditor value={md} onChange={setMd} readOnly={d.level !== "edit"} title={d.title} status={`Version ${d.version}`} height="75vh" /></div>

@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 body { @apply bg-paper font-sans text-ink antialiased; font-variant-numeric: tabular-nums; }
+main h1 { font-family: Newsreader, Georgia, serif; font-size: 2.25rem; line-height: 1.15; font-weight: 400; letter-spacing: -0.01em; }
 .dark body { background: #14171B; @apply text-slate-100; }
 
 /* ---- Word / Docs style page ---- */

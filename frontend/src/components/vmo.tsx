@@ -4,7 +4,7 @@ import { Card, Sev, SeverityChip } from "../ui";
 export const Tile = ({ l, v, sub, tone }: { l: string; v: ReactNode; sub?: ReactNode; tone?: "red" | "amber" | "green" }) => (
   <Card className={tone === "red" ? "border-l-4 border-l-red-500" : tone === "amber" ? "border-l-4 border-l-amber-500" : tone === "green" ? "border-l-4 border-l-emerald-500" : ""}>
     <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{l}</div>
-    <div className="mt-1 text-2xl font-semibold tabular-nums">{v}</div>
+    <div className="mt-1 font-serif text-4xl tabular-nums">{v}</div>
     {sub && <div className="mt-0.5 text-xs text-slate-500">{sub}</div>}
   </Card>
 );

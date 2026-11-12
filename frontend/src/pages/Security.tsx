@@ -14,7 +14,7 @@ export default function Security() {
   const disable = useMutation({ mutationFn: () => api("/api/auth/mfa/disable", { method: "POST", body: JSON.stringify({ code }) }), onSuccess: () => { setCode(""); setCodes(null); } });
   return (
     <div className="mx-auto max-w-xl space-y-4">
-      <h1 className="text-xl font-semibold">My security</h1>
+      <h1>My security</h1>
       <Card title="Two-factor authentication">
         {!setup && !codes && <div className="space-y-2 text-sm"><p className="text-slate-500">Add a one-time code from an authenticator app (Microsoft Authenticator, Google Authenticator, 1Password…) to your sign-in.</p><Btn onClick={() => start.mutate()}>Set up authenticator</Btn></div>}
         {setup && (

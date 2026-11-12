@@ -107,7 +107,7 @@ export default function Contracts() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-xl font-semibold">Contract repository</h1>
+        <h1>Contract repository</h1>
         <div className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white text-[12.5px] font-semibold dark:border-slate-600 dark:bg-slate-800" role="group" aria-label="Saved views">
           {([["all", "All"], ["expiring", "Expiring"], ["flagged", "Flagged"], ["unsigned", "Unsigned"]] as const).map(([k, t]) => <button key={k} className={`min-h-[32px] px-3 ${saved === k ? "bg-ink text-white" : "text-ink-mute"}`} onClick={() => setSaved(k)}>{t}</button>)}</div>
         <div className="inline-flex overflow-hidden rounded border border-slate-300 text-sm dark:border-slate-600" role="tablist">

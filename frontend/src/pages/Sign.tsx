@@ -20,7 +20,7 @@ export default function Sign() {
   const d = q.data;
   return (
     <div className="mx-auto max-w-6xl space-y-3 p-4">
-      <h1 className="text-xl font-semibold">{d.title}</h1>
+      <h1>{d.title}</h1>
       <p className="text-sm text-slate-500">For signature by {d.signer.name} ({d.signer.email}) · document fingerprint {d.doc_hash.slice(0, 12)}…</p>
       <DocEditor value={d.md} onChange={() => undefined} readOnly title={d.title} status="Read only" height="60vh" />
       <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">

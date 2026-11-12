@@ -69,9 +69,9 @@ function Strip({ m }: { m: Metric }) {
   const seen: Record<string, number> = {};
   return (
     <svg viewBox="0 0 1000 190" className="w-full" role="img" aria-label={`${m.metric}: values by contract, median ${fmt(m.median, m.unit)}`}>
-      <rect x={x(m.p25)} y={34} width={Math.max(x(m.p75) - x(m.p25), 4)} height={84} fill="#e0e7ff" opacity={0.75} />
-      <line x1={x(m.median)} x2={x(m.median)} y1={28} y2={124} stroke="#4f46e5" strokeWidth={3} />
-      <text x={x(m.median)} y={22} fontSize={24} textAnchor={anchor(m.median)} fill="#4f46e5">median {fmt(m.median, m.unit)}</text>
+      <rect x={x(m.p25)} y={34} width={Math.max(x(m.p75) - x(m.p25), 4)} height={84} fill="#DCEFEA" opacity={0.75} />
+      <line x1={x(m.median)} x2={x(m.median)} y1={28} y2={124} stroke="#0E6B5E" strokeWidth={3} />
+      <text x={x(m.median)} y={22} fontSize={24} textAnchor={anchor(m.median)} fill="#0E6B5E">median {fmt(m.median, m.unit)}</text>
       {m.policy.map((p, i) => (<g key={i}><line x1={x(p.threshold)} x2={x(p.threshold)} y1={34} y2={124} stroke="#dc2626" strokeWidth={2.5} strokeDasharray="8 6" /><text x={x(p.threshold)} y={150 + (i % 2) * 0} fontSize={22} textAnchor={anchor(p.threshold)} fill="#dc2626">policy {p.operator} {fmt(p.threshold, m.unit)}</text></g>))}
       <line x1={40} x2={960} y1={76} y2={76} stroke="#94a3b8" strokeWidth={2} />
       {m.values.map((v) => {
@@ -115,7 +115,7 @@ export default function Risk() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Vendor risk & benchmarks</h1>
+        <h1>Vendor risk & benchmarks</h1>
         <p className="text-sm text-slate-500">Which vendors need attention and why, and how every term compares across the portfolio.</p>
       </div>
       <div className="flex gap-2" role="tablist">
