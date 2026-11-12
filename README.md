@@ -204,29 +204,43 @@ docs/, HANDOVER.md   security notes; handover with measured results and limits
 CLAUDE.md            original scope and conventions
 ```
 
-## Hotel edition (in progress)
+## Hotel edition: details
 
-A second, fictional corpus for the hospitality idea: **Seabright Hotels & Resorts**, a hotel group with six properties and 32 vendor documents
+The fictional corpus: **Seabright Hotels & Resorts**, a hotel group with six properties and 32 vendor documents
 (laundry and linen, security, lifts, HVAC, pest control, waste, food and beverage, housekeeping staffing, property and booking systems, payments, energy), with
 group-level master agreements, per-property schedules, an amendment, NDAs, DPAs, and five vendor drafts (one clean control). It is written from the owner-operator's side;
 all names are fictional.
 
-* Sources: `backend/app/docgen/hotel_spec.py` (spec and ground truth), `corpus/hotel/*.md` (contract text written by Claude from the spec), seeded files in `data/hotel/`.
-* Load: `CUSTOMER_NAMES=Seabright DATA_DIR=data/hotel python -m app.seed --hotel` (uses its own database in the demo setup).
-* **Property level:** `contracts.property` (migration 0028) is read from the document or its sidecar and filterable in the API (`/api/contracts?property=...`) and in Ask.
-* **Hospitality pack** (`backend/app/hotel_pack.py`): ten key clauses (food safety, guest-injury indemnity, labour compliance, termination on sale of property, brand standards, seasonal pricing, payment-card
-  security, response times, inspection certificates, distribution commission), three values (laundry rate per kilogram, fault response hours, booking commission) and five checklist rules, all ordinary Admin configuration.
-* Measured offline on this corpus: **98.2% of fields and 98.4% of document metadata correct** against the spec (`LABELS=labels_hotel.json python evals/pilot_eval.py`). Writing it exposed and fixed real extraction bugs
-  (a customer name containing "&", supplier names containing "&", repeated role words before a vendor name).
-* **Redline for hotel drafts** (offline engine): drafts not written from our template are judged against the playbook rules (value outside its threshold, forbidden wording, required clause absent) and not by a word diff.
-  `python evals/hotel_redline_eval.py`: **16 of 17 planted deviations found, 0 findings on the clean control draft, about 7 findings per draft** (the one miss is a 180-day renewal notice written in words).
-* **Ask** understands property: "which properties have the most contracts?", "contracts at Lakeside Resort", and "the laundry rate per kilogram at each property" (1.42, 1.58 and 1.71 USD/kg).
-* **Hotel clauses found:** 14 of 16 expected hotel clause hits in the seeded documents (fault-response times missed in two).
-* **Portfolio map** (`/map`, API `/api/portfolio-map`): every contract family on one timeline with the last day to act, plus hierarchy problems (a schedule that outlives its master agreement, an NDA that ends before its agreement, an SOW with no parent, no end date).
-* **Properties** (`/properties`, API `/api/properties`): one card per hotel with contracts, vendors, yearly value and what ends soon, linking to the filtered contracts, the map and Ask.
-* **House standards:** `STANDARDS=hotel` gives the template library the hotel group's values (England and Wales law, 60-day exit notice and so on). The template clause wording is still the generic one; hotel-specific rules and clauses live in the hospitality pack.
-* **End-to-end video on the hotel data** (`reports/e2e_hotel/`): all 22 steps pass in Demo mode with the new design.
-* Not yet done: hotel-specific template wording, the new layout on contract detail, Ask, Redline and the Admin pages (they run inside the new shell with the new accent and headings), and any Claude-mode measurement on this corpus.
+* Sources: `backend/app/docgen/hotel_spec.py` (spec, ground truth, the properties' attributes, the certificates on file), `corpus/hotel/*.md` (contract text written by Claude
+  from the spec), seeded files in `data/hotel/`.
+* **Properties are records** (migration 0029): `properties` (rooms, city, kind) is filled from the documents and from `properties.json` in the data folder, and edited with
+  `PATCH /api/properties/{id}`. View `v_property_contracts` attributes every contract to the properties it covers: a contract that names a property counts there in full; a
+  group agreement with schedules counts at the properties its schedules name; a group agreement without schedules counts at every property; `PUT /api/contracts/{id}/coverage`
+  records an exception. The share is by rooms. The six properties' costs add up to the portfolio's yearly value exactly.
+* **Compare** (`/compare`, API `/api/properties/compare`): on the seeded data the same laundry supplier charges 1.42, 1.58 and 1.71 USD/kg at three hotels, a 20% gap worth
+  about $60K a year at the best rate (an estimate: same volumes assumed). Cost per room is compared for every vendor that serves two or more properties.
+* **Certificates** (`/certificates`, API `/api/certificates`): required certificates are derived from the clauses (a clause must actually oblige one); expiry dates come from
+  `feeds/certificates.csv` or are recorded on the screen, never guessed from the contract. Seeded state: 2 expired, 2 expiring within 60 days, 4 not on file, 5 valid.
+* **Hospitality pack** (`backend/app/hotel_pack.py`): ten key clauses, three values (laundry rate per kilogram, fault response hours, booking commission) and checklist rules,
+  all ordinary Admin configuration.
+* **House templates:** `STANDARDS=hotel` gives the template library the group's values (England and Wales law, 60-day exit notice) **and its own clauses**
+  (`backend/app/docgen/hotel_house.py`): guest and staff injury, labour and wage compliance, exit on sale of a property and brand standards in the MSA, payment-card security in
+  the SaaS template. Clauses that only suit one kind of supplier (food safety, statutory inspections) stay as key clauses and checklist rules.
+* **Measured offline on this corpus** (`LABELS=labels_hotel.json python evals/pilot_eval.py`, `python evals/hotel_redline_eval.py`): **99.8% of fields (456/457), 98.4% of
+  document metadata, 98.8% of values and limits; all 17 planted draft deviations found, none on the clean control, about 7 findings per draft.** The numbers rose from 98.2% and
+  16/17 after fixes that also apply to real documents: tables in PDFs are rebuilt row by row, signature sentences wrapped over lines and signature tables with dates but no
+  typed names are read as signed, and numbers above one hundred written in words are understood. Two security schedules had labels that contradicted their own text
+  (they do handle CCTV and guest data); the labels now follow the documents.
+* **Less noise:** the Overview counts only invoices worth querying (high and critical; late payments are listed as minor), personal data without a DPA is reported once per
+  vendor, a contract misread as unsigned no longer raises a false critical exception, an invoice that quotes no agreement says how many agreements are on file, and Review
+  shows critical and high findings first with the smaller differences folded away.
+* **Ask** understands property: "which properties have the most contracts?", "contracts at Lakeside Resort", and "the laundry rate per kilogram at each property". The schema
+  given to Claude now describes `properties`, `v_property_contracts` and `certificates` (it previously promised a `property` column that the view did not have).
+* **Portfolio map** (`/map`): every contract family on one timeline with the last day to act, plus hierarchy problems.
+* **End-to-end walkthrough** (`node scripts/demo_e2e.js`): all 22 steps pass on this build with no page errors. The committed video in `reports/e2e_hotel/` was recorded before
+  the seven-screen navigation and the Properties, Compare and Certificates screens; re-record with `make video` after a fresh seed.
+* Not yet done: the walkthrough does not visit Compare or Certificates; certificates are not yet read from uploaded certificate documents or raised as alerts; Claude-mode
+  measurement has not been repeated since these changes; the new layout on Ask, Review and the Admin pages.
 
 ## Roadmap (future scope, not built)
 
@@ -246,9 +260,9 @@ connectors verified against real tenants (Coupa, SAP, Ariba), multi-tenancy, SSO
 **Product:** port the redesign in `design/` to the front end, one headline demo path (renewals, portfolio map, Ask), and measured accuracy on a
 design partner's own redacted contracts.
 
-**Verticals:** a hospitality version (property-level hierarchy across many sites, hotel-specific clauses such as food safety, guest data and
-brand standards, rate cards per room-night or per kilo). It would use fictional data only and be built from public knowledge and customers'
-own contracts, never from any employer's confidential material. The first decision is who the first buyer is.
+**Hospitality next:** management and franchise agreements, leases and distribution contracts alongside supplier contracts; rate cards per room-night;
+certificates read from the certificate documents themselves. Fictional data only, built from public knowledge and customers' own contracts, never from any
+employer's confidential material. The first decision is still who the first buyer is, and in which country.
 
 ## Known limits
 
@@ -260,6 +274,7 @@ own contracts, never from any employer's confidential material. The first decisi
 6. The Docker image and CI workflow were written but not run in the build environment.
 7. OCR is tested on clean and noisy scans only; stamps, handwriting and low resolution will be worse.
 8. The redesign in the design review is not yet implemented in the front end.
+9. A property's share of a group agreement is an attribution by rooms, not a figure from the contract; the saving on Compare assumes unchanged volumes.
 
 ## Notes
 
@@ -281,4 +296,4 @@ DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright python -m app.se
 SIMULATORS=1 DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright uvicorn app.main:app --port 8000     # stand-in ERP and e-signature systems for the demo
 cd ../frontend && npm ci && npm run dev                 # http://localhost:5173
 ```
-Checked on a fresh clone with an empty database: seed, evals (fields 98.2%, redline recall 16/17), type check, build and the 22-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).
+Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 178 backend tests, type check, build and the 22-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).

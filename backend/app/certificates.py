@@ -4,6 +4,7 @@ the copy on file runs out. A clause only says a certificate is required; the exp
 from __future__ import annotations
 
 import csv
+import json
 from datetime import date
 
 from sqlalchemy import text
@@ -17,6 +18,9 @@ REQUIRED = {
     "inspection_certificates": "Statutory inspection certificate",
     "payment_card_data": "PCI DSS attestation of compliance",
 }
+# a clause can carry the tag without obliging a certificate ('treatments comply with food-safety standards'; a PCI 'attestation of compliance' is not a statutory
+# inspection): the clause text must also say this before a certificate is asked of the vendor
+MUST_SAY = {"food_safety": r"haccp|certif", "inspection_certificates": r"inspection|examination", "payment_card_data": r"pci|attestation"}
 SOON_DAYS = 60
 
 
@@ -32,7 +36,8 @@ def sync(s) -> int:
     need = s.execute(text("""SELECT DISTINCT ON (c.vendor, cl.clause_type) c.vendor, cl.clause_type, c.id, cl.page
                              FROM clauses cl JOIN contracts c ON c.id = cl.contract_id
                              WHERE c.status <> 'draft' AND cl.clause_type = ANY(:k)
-                             ORDER BY c.vendor, cl.clause_type, (c.parent_id IS NOT NULL), c.id"""), {"k": list(REQUIRED)}).all()
+                               AND (cl.clause_type = 'insurance' OR cl.text ~* (CAST(:must AS jsonb) ->> cl.clause_type))
+                             ORDER BY c.vendor, cl.clause_type, (c.parent_id IS NOT NULL), c.id"""), {"k": list(REQUIRED), "must": json.dumps(MUST_SAY)}).all()
     for vendor, kind, cid, page in need:
         s.execute(text("""INSERT INTO certificates (vendor, kind, name, contract_id, clause_type, page) VALUES (:v, :k, :n, :c, :k, :p)
                           ON CONFLICT (vendor, kind) DO UPDATE SET contract_id = EXCLUDED.contract_id, page = EXCLUDED.page, name = EXCLUDED.name"""),

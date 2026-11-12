@@ -7,7 +7,7 @@ type Pt = { property: string; contract_id: number; vendor: string; value: number
 type M = { key: string; name: string; unit: string | null; lower_better: boolean | null; spread_pct: number; best: number | null; saving_estimate?: number; points: Pt[] };
 type B = { vendor?: string; category: string; properties: string[]; measures: M[]; saving_estimate: number };
 
-const fmt = (v: number, unit: string | null) => (unit?.startsWith("USD/") ? (v >= 100 ? usd(Math.round(v)) : "$" + v.toFixed(2)) : v.toLocaleString("en-US", { maximumFractionDigits: 2 }));
+const fmt = (v: number, unit: string | null) => (unit?.startsWith("USD/") ? (v >= 100 ? "$" + Math.round(v).toLocaleString("en-US") : "$" + v.toFixed(2)) : v.toLocaleString("en-US", { maximumFractionDigits: 2 }));
 const short = (p: string, all: string[]) => { const w = all.map((x) => x.split(" ")[0]); return w.every((x) => x === w[0]) ? p.split(" ").slice(1).join(" ") : p; };
 
 function Measure({ m, props }: { m: M; props: string[] }) {
@@ -24,7 +24,7 @@ function Measure({ m, props }: { m: M; props: string[] }) {
           <li key={p.contract_id + p.property} className="grid grid-cols-[minmax(90px,170px)_1fr_auto] items-center gap-3 text-[13px]">
             <Link to={`/contracts/${p.contract_id}`} className="truncate text-indigo-600 hover:underline dark:text-indigo-300" title={`${p.property} · ${p.vendor}`}>{short(p.property, props)}</Link>
             <span className="h-2.5 rounded bg-slate-100 dark:bg-slate-700"><span className={`block h-2.5 rounded ${best ? "bg-emerald-600" : worst ? "bg-orange-500" : "bg-slate-400"}`} style={{ width: `${(p.value / max) * 100}%` }} /></span>
-            <span className="min-w-[92px] text-right tabular-nums">{fmt(p.value, m.unit)}{best ? <span className="ml-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">best</span> : worst ? <span className="ml-1 text-xs font-semibold text-orange-700 dark:text-orange-300">▲ worst</span> : null}</span>
+            <span className="min-w-[104px] text-right tabular-nums">{fmt(p.value, m.unit)}{best ? <span className="ml-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">best</span> : worst ? <span className="ml-1 text-xs font-semibold text-orange-700 dark:text-orange-300">▲ worst</span> : null}</span>
           </li>);
       })}</ul>
     </div>);

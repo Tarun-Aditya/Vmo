@@ -2,6 +2,11 @@
 
 Working name: **ContractIQ**. Change it freely.
 
+> **This branch (`hotel-property-ops`) has moved past the scope below.** It is the hotel / property-operations edition: a fictional hotel group (Seabright, six
+> properties, USD), upload and connectors, and screens beyond the original five. The sections below are the original VMO POC brief and its conventions (section 10 still
+> applies). For what this branch is and does today, read `README.md`; for measured results and limits, `HANDOVER.md`.
+
+
 ## 1. Context
 
 - I'm building a product for **Vendor Management Offices (VMOs)**: the internal teams that manage an enterprise's vendor contracts, renewals, spend and risk.

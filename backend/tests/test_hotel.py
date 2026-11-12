@@ -141,7 +141,8 @@ def test_required_certificates_follow_the_clauses_and_keep_what_was_recorded(db)
         t = c.begin()
         w = _world(c)
         c.execute(text("DELETE FROM certificates"))
-        c.execute(text("INSERT INTO clauses (contract_id, clause_type, text, page) VALUES (:c, 'insurance', 'cover', 3), (:c, 'food_safety', 'haccp', 4)"), {"c": w["msa"]})
+        c.execute(text("INSERT INTO clauses (contract_id, clause_type, text, page) VALUES (:c, 'insurance', 'cover', 3), (:c, 'food_safety', 'haccp', 4), "
+                       "(:c, 'inspection_certificates', 'annual attestation of compliance', 5)"), {"c": w["msa"]})      # the last is a PCI attestation, not an inspection
         s = Session(bind=c)
         assert certificates.sync(s) == 2
         got = certificates.listing(s)
