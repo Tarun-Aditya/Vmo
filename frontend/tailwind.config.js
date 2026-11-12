@@ -1,9 +1,9 @@
-const blue = { 50: "#F1F4FE", 100: "#E4EAFD", 200: "#C7D3FA", 300: "#9DB1F5", 400: "#6F8CFF", 500: "#3F62EB", 600: "#2347D9", 700: "#1C3AA8", 800: "#182F85", 900: "#142767", 950: "#0B1740" };
+const teal = { 50: "#E9F4F1", 100: "#DCEFEA", 200: "#BFDDD6", 300: "#8CC4B8", 400: "#4FA595", 500: "#178273", 600: "#0E6B5E", 700: "#0B564B", 800: "#09453D", 900: "#073A33", 950: "#04211E" };
 export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"], darkMode: "class",
   theme: { extend: {
-    colors: { indigo: blue, paper: "#EEF1F5", ink: { DEFAULT: "#0E1726", soft: "#1B2A44", mute: "#566275" }, line: "#D9DFE7" },
-    fontFamily: { sans: ['"Inter Tight"', "system-ui", "sans-serif"], mono: ['"JetBrains Mono"', "ui-monospace", "monospace"], serif: ['"Inter Tight"', "system-ui", "sans-serif"] },
+    colors: { indigo: teal, paper: "#F4F2EE", ink: { DEFAULT: "#1B1F24", soft: "#2A3038", mute: "#5E6670" }, line: "#E4E0D8" },
+    fontFamily: { sans: ['"Instrument Sans"', "system-ui", "sans-serif"], serif: ["Newsreader", "Georgia", "serif"] },
   } },
   plugins: [],
 };

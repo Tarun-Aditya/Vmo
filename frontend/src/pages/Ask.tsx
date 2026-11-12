@@ -246,7 +246,7 @@ export default function Ask() {
 
       <div className="flex min-h-[70vh] min-w-0 flex-col">
         <div className="flex-1 space-y-4 pb-4">
-          <h1>Ask your vendor portfolio</h1>
+          <h1 className="text-xl font-semibold">Ask your vendor portfolio</h1>
           <p className="-mt-2 text-sm text-slate-500">Analytical questions across all documents, or questions about the specific documents you pick on the right. Follow-ups stay in the same conversation.</p>
           {msgs.length === 0 && (
             <div className="flex flex-wrap items-center gap-2">

@@ -71,7 +71,7 @@ export default function Obligations() {
   return (
     <div className="space-y-4">
       <div>
-        <h1>Obligations & SLAs</h1>
+        <h1 className="text-xl font-semibold">Obligations & SLAs</h1>
         <p className="text-sm text-slate-500">What each party must do under every contract — milestones, SLA targets, notices, renewals, insurance — read from the documents, with dates and status. SLA actuals come from monitoring feeds.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">

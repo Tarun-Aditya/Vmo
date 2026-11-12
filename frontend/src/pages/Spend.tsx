@@ -32,7 +32,7 @@ export default function Spend() {
   return (
     <div className="space-y-4">
       <div>
-        <h1>Spend vs contract</h1>
+        <h1 className="text-xl font-semibold">Spend vs contract</h1>
         <p className="text-sm text-slate-500">Every invoice from the AP/ERP feed is matched to the contract it bills and checked: unsigned or missing contracts, over-billing, duplicates, billing outside the term, late payment.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">

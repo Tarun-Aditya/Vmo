@@ -2,11 +2,11 @@ import { ReactNode } from "react";
 import { Card, Sev, SeverityChip } from "../ui";
 
 export const Tile = ({ l, v, sub, tone }: { l: string; v: ReactNode; sub?: ReactNode; tone?: "red" | "amber" | "green" }) => (
-  <div className={`rounded-lg border bg-white p-3.5 dark:bg-slate-800 ${tone === "red" ? "border-red-300" : tone === "amber" ? "border-orange-300" : tone === "green" ? "border-indigo-300" : "border-line dark:border-slate-700"}`}>
-    <div className="text-[11.5px] font-semibold uppercase tracking-wider text-ink-mute dark:text-slate-400">{l}</div>
-    <div className="num mt-0.5 text-[26px] font-semibold leading-tight tracking-tight">{v}</div>
-    {sub && <div className="text-[12.5px] text-ink-mute dark:text-slate-400">{sub}</div>}
-  </div>
+  <Card className={tone === "red" ? "border-l-4 border-l-red-500" : tone === "amber" ? "border-l-4 border-l-amber-500" : tone === "green" ? "border-l-4 border-l-emerald-500" : ""}>
+    <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{l}</div>
+    <div className="mt-1 text-2xl font-semibold tabular-nums">{v}</div>
+    {sub && <div className="mt-0.5 text-xs text-slate-500">{sub}</div>}
+  </Card>
 );
 
 export const TIER_SEV: Record<string, Sev> = { critical: "critical", high: "high", medium: "medium", low: "low" };

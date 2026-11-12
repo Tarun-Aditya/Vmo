@@ -21,7 +21,7 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          {vendor ? <h2 className="text-lg font-semibold">Key clauses in {vendor}&rsquo;s documents</h2> : <h1>Key contract clauses across all documents</h1>}
+          {vendor ? <h2 className="text-lg font-semibold">Key clauses in {vendor}&rsquo;s documents</h2> : <h1 className="text-xl font-semibold">Key contract clauses across all documents</h1>}
           <p className="text-sm text-slate-500">One row per document, one column per key clause. Hover a mark to see the citation (or why it is absent); click it to open the contract. Clauses you add in Admin appear as new columns, tagged by heading, keyword or (with Claude) by meaning.</p>
         </div>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={onlyGaps} onChange={(e) => setOnlyGaps(e.target.checked)} /> Highlight gaps only</label>

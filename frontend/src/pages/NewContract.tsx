@@ -105,7 +105,7 @@ export default function NewContract() {
   return (
     <div className="space-y-4">
       <div>
-        <h1>New contract from a template</h1>
+        <h1 className="text-xl font-semibold">New contract from a template</h1>
         <p className="text-sm text-slate-500">Start from one of the standard templates, set the key terms, edit the text, and check it against the pre-signature checklist before it goes to the vendor. Saving it drops the document into the pipeline folder, so it is extracted and appears everywhere.</p>
       </div>
 
