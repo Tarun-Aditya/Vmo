@@ -34,7 +34,64 @@ def pdf_to_text(path: Path) -> str:
         pages = pages[:-1]
     if not "".join(pages).strip():
         return ocr_pdf(path)
-    return "\n".join(f"<!-- page: {i} -->\n{p}" for i, p in enumerate(pages, 1))
+    return "\n".join(f"<!-- page: {i} -->\n{merge_layout_tables(p)}" for i, p in enumerate(pages, 1))
+
+
+_GAP = re.compile(r"\s{2,}")
+
+
+def _segments(line: str) -> list[tuple[int, str]]:
+    """(start offset, text) of each run of words separated by two or more spaces."""
+    out, pos = [], len(line) - len(line.lstrip())
+    for part in _GAP.split(line.strip()):
+        pos = line.find(part, pos)
+        out.append((pos, part))
+        pos += len(part)
+    return out
+
+
+def merge_layout_tables(page: str) -> str:
+    """pdftotext -layout prints a table as aligned columns and wraps a long cell over several lines, so reading line by line mixes the columns
+    ('Planned-  27 November 2025  Schedule approved in / maintenance  writing by the'). A block of lines with three or more aligned columns is
+    rebuilt as one pipe-separated line per table row, each wrapped cell joined back together. Two-column layouts (signature blocks) are left alone."""
+    lines = page.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        j = i
+        while j < len(lines) and lines[j].strip():
+            j += 1
+        block = lines[i:j]
+        segs = [_segments(ln) for ln in block]
+        wide = [sg for sg in segs if len(sg) >= 3]
+        ncol = max((len(sg) for sg in wide), default=0)
+        anchors = [sg for sg in wide if len(sg) == ncol]
+        cols = [min(sg[k][0] for sg in anchors) for k in range(ncol)] if anchors else []
+        aligned = len(anchors) >= 2 and all(abs(sg[k][0] - cols[k]) <= 2 for sg in anchors for k in range(ncol))
+        if not aligned:
+            out.extend(block)
+        else:
+            first = next(k for k, sg in enumerate(segs) if len(sg) == ncol)
+            head = max((k for k in range(first) if len(segs[k]) == 1 and segs[k][0][0] < cols[1] - 2), default=-1) + 1
+            out.extend(block[:head])              # a paragraph or heading directly above the table stays as it is
+            rows: list[list[str]] = []
+            for sg in segs[head:]:
+                cells = [""] * ncol
+                for off, txt in sg:
+                    k = max((c for c in range(ncol) if cols[c] <= off + 2), default=0)
+                    cells[k] = (cells[k] + " " + txt).strip()
+                if rows and not cells[0] and len(sg) < ncol:       # a continuation line of the row above
+                    for k in range(ncol):
+                        if cells[k]:
+                            rows[-1][k] = (rows[-1][k] + cells[k]) if re.search(r"[a-z]-$", rows[-1][k]) else (rows[-1][k] + " " + cells[k]).strip()
+                elif rows and not rows[-1][0] and not any(len(x) == ncol for x in segs[head:head + len(rows)]):
+                    rows[-1] = [(a + " " + b).strip() for a, b in zip(rows[-1], cells)]      # a header that started on the line above
+                else:
+                    rows.append(cells)
+            out.extend("| " + " | ".join(r) + " |" for r in rows)
+        out.extend(lines[j:j + 1])
+        i = j + 1
+    return "\n".join(out)
 
 
 def ocr_pdf(path: Path) -> str:

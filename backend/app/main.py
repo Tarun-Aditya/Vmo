@@ -26,6 +26,7 @@ from app.routes_quality import router as quality_router
 from app.routes_scim import router as scim_router
 from app.routes_signatures import router as signatures_router
 from app.routes_vmo import router as vmo_router
+from app.routes_hotel import router as hotel_router
 
 log = logging.getLogger("app")
 
@@ -154,6 +155,7 @@ if os.environ.get('SIMULATORS', '0') == '1':        # stand-ins for ERP and e-si
     app.mount('/sim/gdrive', sim_cloud.Lazy(0))
     app.mount('/sim/graph', sim_cloud.Lazy(1))
 app.include_router(vmo_router)
+app.include_router(hotel_router)
 
 
 _addin = Path(__file__).resolve().parents[2] / "addin"

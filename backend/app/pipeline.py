@@ -378,6 +378,10 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
             linked = link_parents(s, pending)
             s.execute(text("""UPDATE contracts c SET has_dpa = true WHERE c.type <> 'DPA' AND c.status <> 'draft' AND COALESCE(c.has_dpa, false) = false
                               AND EXISTS (SELECT 1 FROM contracts d WHERE d.type = 'DPA' AND d.status <> 'draft' AND d.vendor = c.vendor)"""))
+            from app import certificates, properties
+
+            properties.sync(s)             # a record for every property a document names; group agreements are attributed through v_property_contracts
+            certificates.sync(s)           # the certificates the clauses oblige each vendor to hold
             now = datetime.now(timezone.utc)
             s.execute(text("UPDATE pipeline_runs SET finished_at=now(), status=:st, scanned=:a, new_docs=:b, updated=:c, unchanged=:d, failed=:e, message=:m WHERE id=:i"),
                       {"st": "failed" if counts["failed"] and not (counts["new_docs"] + counts["updated"]) else "completed",

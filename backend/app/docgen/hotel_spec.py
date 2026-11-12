@@ -11,6 +11,28 @@ CUSTOMER_DESC = "a hotel group that owns and operates six hotels; the 'Customer'
 DOMAIN = "hotel-operations vendor relationship (hotel group buying services and supplies for its properties)"
 
 H, M, L, A, S, O = ("Seabright Harbour Hotel", "Seabright Midtown Suites", "Seabright Lakeside Resort", "Seabright Airport Inn", "Seabright Old Town Boutique", "Seabright Summit Lodge")
+# The properties themselves (fictional): attributes a contract never states but every comparison needs. Written to properties.json by the hotel seed.
+PROPERTIES = [
+    dict(name=H, city="Portsmouth", country="United Kingdom", kind="Full-service city hotel", rooms=312, opened_year=2009),
+    dict(name=M, city="New York", country="United States", kind="All-suite city hotel", rooms=184, opened_year=2015),
+    dict(name=L, city="Windermere", country="United Kingdom", kind="Resort", rooms=226, opened_year=2004),
+    dict(name=A, city="Chicago", country="United States", kind="Airport hotel", rooms=268, opened_year=2012),
+    dict(name=S, city="York", country="United Kingdom", kind="Boutique hotel", rooms=58, opened_year=2018),
+    dict(name=O, city="Aviemore", country="United Kingdom", kind="Lodge", rooms=96, opened_year=2001),
+]
+# Certificates on file for the demo: (vendor, kind, days until expiry from the seed date, reference). Vendors not listed have sent nothing yet.
+CERTIFICATES = [
+    ("Hearth & Table Foods Inc", "food_safety", -12, "HACCP-HT-2291"),
+    ("Hearth & Table Foods Inc", "insurance", 204, "POL-7741-A"),
+    ("Halcyon Elevator & Lift Maintenance Ltd", "inspection_certificates", 21, "LOLER-HAL-0456"),
+    ("Halcyon Elevator & Lift Maintenance Ltd", "insurance", 150, "POL-3310-C"),
+    ("Stayflow Property Systems Inc", "payment_card_data", 48, "AOC-SF-2026"),
+    ("PayGuard Payments Pte Ltd", "payment_card_data", 240, "AOC-PG-2026"),
+    ("Brightstar Security Services Inc", "insurance", 95, "POL-9902-B"),
+    ("Crestline Laundry & Linen Services Ltd", "insurance", 310, "POL-1187-D"),
+    ("Northgate Facilities & HVAC Inc", "insurance", -40, "POL-5521-F"),
+]
+
 OWN = ["Rhea Kapoor", "Daniel Moreau", "Imani Okoye", "Tomas Lindqvist"]
 
 DOCS: list[dict] = [

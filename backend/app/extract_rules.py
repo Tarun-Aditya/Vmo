@@ -249,7 +249,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     cs, ss = signatures(d)
     ctype = "execution" if "execution" in d.by else None
     for pre, s in (("customer", cs), ("supplier", ss)):
-        put(f"{pre}_signatory", s[0] if s else None, 0.9 if s else 0.5, ctype)
+        put(f"{pre}_signatory", (s[0] or None) if s else None, 0.9 if s else 0.5, ctype)
         put(f"{pre}_signed_date", _iso(s[1]) if s else None, 0.9 if s and s[1] else 0.5, ctype)
     put("fully_executed", bool(cs and ss), 0.88, ctype)
     return out
@@ -285,6 +285,13 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
     for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^,\n]{{2,70}}?),?\s*(?i:on|dated)\s+(?P<date>[A-Za-z0-9,/ \-]{{6,24}})", tail):
         role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
         res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
+    # the same sentence wrapped over lines by a PDF ('... by Helena Cruz, VP Technology / Sourcing, on 07 January 2024'), or with the date on its own 'Date:' line
+    flat = re.sub(r"(?<!\n)\n(?!\n)", " ", tail)
+    for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^,\n]{{2,70}}?)"
+                         rf"(?:,?\s*(?i:on|dated)\s+|\s+Signature\s*:\s*[_\s]*Date\s*:\s*)(?P<date>\d{{1,2}}\s+[A-Za-z]+,?\s+\d{{4}}|[A-Za-z]+\s+\d{{1,2}},?\s+\d{{4}}|\d[\d/.\-]{{5,9}})", flat):
+        role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
+        if tu.first_date(m.group("date")):
+            res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
     lines = [re.sub(r"[*_`]", "", ln).rstrip() for ln in tail.splitlines()]
     is_name = re.compile(r"^\W*(?:Printed\s+Name|Signed\s+by|Name)\b", re.I)
     for i, ln in enumerate(lines):
@@ -354,6 +361,15 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
         for role, nm, dt_ in zip(order, names, dates):
             if nm:
                 res.setdefault(role, (nm.strip(), dt_))
+    if not res:          # a two-column signature table with a date under each party but the names left blank (signed by hand): both signed, signatory unknown
+        for i, ln in enumerate(lines):
+            ds = [x for _, x in tu.find_dates(ln)] if re.match(r"^\W*Date\b", ln.strip(), re.I) else []
+            head = " ".join(lines[max(0, i - 12):i]).lower()
+            if len(ds) >= 2 and re.search(r"\bsignature\b", head) and any(k in head for k in cm) and len(COMPANY_RX.findall(" ".join(lines[max(0, i - 12):i]))) >= 2:
+                cfirst = min(head.find(k) for k in cm if k in head) <= min((m.start() for m in COMPANY_RX.finditer(" ".join(lines[max(0, i - 12):i])) if not any(k in m.group(0).lower() for k in cm)), default=10**9)
+                c_d, s_d = (ds[0], ds[1]) if cfirst else (ds[1], ds[0])
+                res["customer"], res["supplier"] = ("", c_d), ("", s_d)
+                break
     return res.get("customer"), res.get("supplier")
 
 

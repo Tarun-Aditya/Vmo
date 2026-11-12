@@ -33,7 +33,7 @@ def feed_files() -> list[Path]:
     from app.opsdocs import DOC_EXT
 
     d = feeds_dir()
-    return sorted(f for f in d.rglob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXT | {".csv"})
+    return sorted(f for f in d.rglob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXT | {".csv"} and f.name != "certificates.csv")       # certificates.csv is read by app.certificates
 
 
 FEED_OF = {"invoice": "invoices", "sla_report": "sla", "acceptance": "obligation_status"}
@@ -335,6 +335,11 @@ def run_feeds(trigger: str = "manual") -> dict:
             s.commit()
         tot = dict(new=0, updated=0, skipped=0)
         failed = 0
+        with SessionLocal() as s:
+            from app import certificates
+
+            certificates.sync(s)
+            s.commit()
         for f in files:
             try:
                 if f.suffix.lower() == ".csv":

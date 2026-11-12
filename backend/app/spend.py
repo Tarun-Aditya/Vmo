@@ -19,6 +19,7 @@ def compute_exceptions(s, today: date | None = None) -> int:
         "SELECT contract_id, title, vendor, effective_date, expiry_date, fully_executed, planned_value FROM v_contract_spend "
         "JOIN (SELECT id, fully_executed FROM contracts) c ON c.id = contract_id")).mappings()}
     drafts = {r[0]: r[1] for r in s.execute(text("SELECT vendor, min(title) FROM contracts WHERE status='draft' GROUP BY vendor"))}
+    on_file = {r[0]: r[1] for r in s.execute(text("SELECT vendor, count(*) FROM contracts WHERE status <> 'draft' GROUP BY vendor"))}
     invs = [dict(r) for r in s.execute(text("SELECT id, vendor, contract_id, invoice_no, invoice_date, due_date, paid_date, amount FROM invoices ORDER BY invoice_date, id")).mappings()]
     typical: dict[int, float] = {}
     for cid in {i["contract_id"] for i in invs if i["contract_id"]}:
@@ -37,7 +38,11 @@ def compute_exceptions(s, today: date | None = None) -> int:
     for i in invs:
         c, amt, label = contracts.get(i["contract_id"]), float(i["amount"]), f"Invoice {i['invoice_no']}"
         if not c:
-            why = f"only a draft ({drafts[i['vendor']]}) is on file" if i["vendor"] in drafts else "no agreement of any kind is on file"
+            k = on_file.get(i["vendor"], 0)
+            if k:          # the vendor has agreements, but this invoice quotes none of them (no reference, or a reference that matches nothing)
+                why = f"it does not match any of the {k} agreement{'s' if k != 1 else ''} on file with this vendor"
+            else:
+                why = f"only a draft ({drafts[i['vendor']]}) is on file" if i["vendor"] in drafts else "no agreement of any kind is on file"
             add(i["id"], None, i["vendor"], "no_contract", "high", amt, f"{label} for ${amt:,.0f} from {i['vendor']}: {why}.")
             continue
         if not c["fully_executed"]:

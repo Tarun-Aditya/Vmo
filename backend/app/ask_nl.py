@@ -18,6 +18,7 @@ from app.ask import execute_tool
 from app.ask_present import label_of
 from app.ask_scripted import money
 from app.db import SessionLocal
+from app.extract_rules import customer_markers
 
 BASE = "v_effective_terms JOIN v_key_clauses USING (contract_id)"
 BASE_ALL = "v_document_terms JOIN v_key_clauses USING (contract_id)"
@@ -95,6 +96,11 @@ def parse_window(q: str, today: dt.date) -> dict | None:
     return None
 
 
+def _lit(v: str) -> str:
+    """A SQL string literal for a value read from the data (a vendor called O'Brien must not break, or bend, the query)."""
+    return "'" + str(v).replace("'", "''") + "'"
+
+
 def _distinct(col: str) -> list[str]:
     with SessionLocal() as s:
         return [r[0] for r in s.execute(text(f"SELECT DISTINCT {col} FROM contracts WHERE {col} IS NOT NULL"))]
@@ -157,22 +163,22 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         adj.append("/".join(sorted(set(types))))
     for c in cats:
         if c.lower() != "saas" and not scope and re.search(rf"\b{re.escape(c.lower())}\b", q):
-            where.append(f"category = '{c}'")
+            where.append(f"category = {_lit(c)}")
             adj.append(c)
     for pr in _distinct("property"):                                    # a hotel property named in the question
-        toks = [w for w in re.findall(r"[a-z]+", pr.lower()) if w not in {"seabright", "hotel", "hotels", "resort", "inn", "lodge", "suites", "boutique", "the", "and"}]
+        toks = [w for w in re.findall(r"[a-z]+", pr.lower()) if w not in {*customer_markers(), "hotel", "hotels", "resort", "inn", "lodge", "suites", "boutique", "the", "and"}]
         if toks and not scope and all(re.search(rf"\b{t}\b", q) for t in toks):
-            where.append(f"(SELECT c.property FROM contracts c WHERE c.id = contract_id) = '{pr}'")
+            where.append(f"(SELECT c.property FROM contracts c WHERE c.id = contract_id) = {_lit(pr)}")
             adj.append(f"at {pr}")
     vendor_hit = False
     for v in vendors:
         if not scope and re.search(rf"\b{re.escape(v.split()[0].lower())}\b", q):
-            where.append(f"vendor = '{v}'")
+            where.append(f"vendor = {_lit(v)}")
             adj.append(v.split()[0])
             vendor_hit = True
     for o in owners:
         if not scope and re.search(rf"\b{re.escape(o.split()[0].lower())}\b", q):
-            where.append(f"owner = '{o}'")
+            where.append(f"owner = {_lit(o)}")
             suffix.append(f"owned by {o.split()[0]}")
     if re.search(r"auto[- ]?renew", q):
         where.append("auto_renew")

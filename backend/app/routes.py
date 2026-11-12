@@ -473,8 +473,12 @@ def dashboard():
         "no_tfc": q(
             "SELECT contract_id AS id, title, vendor FROM v_effective_terms WHERE termination_for_convenience = false"
         ),
-        "pd_without_dpa": q("""SELECT contract_id AS id, title, vendor FROM v_effective_terms
-                              WHERE processes_personal_data AND NOT has_dpa AND type <> 'DPA'"""),
+        # a DPA is signed once per vendor, not per schedule: one line per vendor relationship (its head agreement), however many of its documents handle personal data
+        "pd_without_dpa": q("""SELECT DISTINCT ON (e.vendor) COALESCE(e.parent_id, e.contract_id) AS id,
+                                      COALESCE((SELECT p.title FROM contracts p WHERE p.id = e.parent_id), e.title) AS title, e.vendor,
+                                      count(*) OVER (PARTITION BY e.vendor) AS documents
+                               FROM v_effective_terms e WHERE e.processes_personal_data AND NOT e.has_dpa AND e.type <> 'DPA'
+                               ORDER BY e.vendor, (e.parent_id IS NOT NULL), e.contract_id"""),
     }
     return {"kpis": k, "lanes": lanes, "monthly": months, "risks": risks}
 
@@ -696,21 +700,6 @@ def portfolio_map(property: str | None = None, vendor: str | None = None):
         "summary": {"families": len(fams), "documents": len(rows), "ending_90": sum(1 for r in rows if r["days_left"] is not None and 0 <= r["days_left"] <= 90),
                     "problems": len(issues), "no_end_date": sum(1 for i in issues if i["kind"] == "no_end_date"), "notice_passed": sum(1 for r in rows if r["notice_deadline"] and r["notice_deadline"] < today)},
     }
-
-
-@router.get("/properties")
-def properties():
-    """One row per hotel (property): what is contracted there, with whom, and what ends soon. Group-level agreements are counted separately."""
-    rows = q(
-        """SELECT c.property, count(*) AS contracts, count(DISTINCT c.vendor) AS vendors, COALESCE(sum(COALESCE(e.annual_value, c.annual_value)), 0) AS annual_value,
-                  count(*) FILTER (WHERE COALESCE(e.expiry_date, c.expiry_date) BETWEEN current_date AND current_date + 90) AS ending_90,
-                  array_agg(DISTINCT c.category) AS categories, array_agg(DISTINCT c.vendor) AS vendor_names
-           FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
-           WHERE c.property IS NOT NULL AND c.status <> 'draft' GROUP BY c.property ORDER BY c.property"""
-    )
-    grp = q("SELECT count(*) AS n FROM contracts WHERE property IS NULL AND status <> 'draft'")[0]["n"]
-    return {"properties": rows, "group_level": grp}
-
 
 # ------------------------------------------------------------------ renewal decisions
 class DecisionIn(BaseModel):
