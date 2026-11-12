@@ -160,6 +160,8 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
         use = mode if (scope == "all" or (scope == "drafts" and contract.status == "draft")) else "heuristic"
         items = deviations.compare_document(clauses_db, template_key, use)
         items += deviations.compare_custom(clauses_db, cfg["kcc"], contract.type)       # clauses added in Admin
+        if contract.status == "draft" and not (use == "llm" or (use == "auto" and llm.available())):
+            items = deviations.playbook_items(items, results, cfg["rules"], cfg["metrics"], clauses_db, cfg["kcc"])      # offline: findings come from the playbook, not a word diff
         items.sort(key=lambda i: -deviations.SEV_ORDER.index(i["severity"]))
         for it in items:
             tcid = cfg["tclause"].get((template_key, it["clause_type"]))

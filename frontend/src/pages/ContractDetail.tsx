@@ -35,6 +35,11 @@ function show(field: string, v: unknown, inherits = false): string {
   return String(v);
 }
 
+/** Clause text keeps the Markdown bold of the source (**defined term**): show it as bold instead of asterisks. */
+function inline(t: string) {
+  return t.split(/(\*\*[^*]+\*\*)/g).map((x, i) => (x.startsWith("**") && x.endsWith("**") && x.length > 4 ? <b key={i}>{x.slice(2, -2)}</b> : x.replace(/\*\*/g, "")));
+}
+
 function Tree({ n, current }: { n: Node; current: number }) {
   return (
     <ul className="ml-3 border-l border-slate-300 pl-3 text-sm dark:border-slate-600">
@@ -51,6 +56,7 @@ function Tree({ n, current }: { n: Node; current: number }) {
 export default function ContractDetail() {
   const { id } = useParams();
   const q = useQuery({ queryKey: ["contract", id], queryFn: () => api<Detail>(`/api/contracts/${id}`) });
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ customer?: string }>("/api/meta") });
   const [hl, setHl] = useState<number | null>(null);
   const qc = useQueryClient();
   const [fix, setFix] = useState<{ field: string; value: string } | null>(null);
@@ -64,14 +70,23 @@ export default function ContractDetail() {
   return (
     <div className="space-y-4">
       <div>
-        <Link to="/contracts" className="text-sm text-slate-500 hover:underline">← Contracts</Link>
-        <h1 className="text-xl font-semibold">{c.title} {c.status === "draft" && <span className="ml-2 rounded border border-amber-500 px-2 py-0.5 align-middle text-xs font-medium text-amber-700 dark:text-amber-300">DRAFT</span>}</h1>
-        <div className="mt-1 flex gap-4 text-sm"><Link className="text-indigo-600 hover:underline" to={`/ask?doc=${c.id}`}>💬 Ask about this document</Link><Link className="text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Review & checklist</Link><Link className="text-indigo-600 hover:underline" to={`/documents/${c.id}/edit`}>{c.status === "draft" ? "✎ Open in document editor" : "📄 View as document"}</Link>{(c as { source_url?: string | null }).source_url && <a className="text-indigo-600 hover:underline" href={(c as { source_url?: string | null }).source_url ?? ""} target="_blank" rel="noreferrer">↗ Open the original</a>}</div>
-        <p className="text-sm text-slate-500">{c.vendor} · {c.type} · {c.category} · owner {c.owner} · <span className="capitalize">{c.status}</span>
-          {d.parent && <> · amends/under <Link className="text-indigo-600 hover:underline" to={`/contracts/${d.parent.id}`}>{d.parent.title}</Link></>}</p>
+        <Link to="/contracts" className="text-sm text-ink-mute hover:underline">← Contracts</Link>
+        <h1 className="mt-1 max-w-4xl text-3xl leading-tight md:text-4xl">{c.title}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {c.status === "draft" && <SeverityChip sev="medium" label="Draft" />}
+          {c.status !== "draft" && (d.signatures.fully_executed ? <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-900">✓ Fully executed</span> : <SeverityChip sev="high" label="Not fully signed" />)}
+          {d.checks.some((x) => x.rule_key === "no_unlimited_liability" && x.status === "fail") && <SeverityChip sev="critical" label="Uncapped liability" />}
+          {d.deviations.filter((v) => v.severity === "critical" || v.severity === "high").length > 0 && <SeverityChip sev="high" label={`${d.deviations.filter((v) => v.severity === "critical" || v.severity === "high").length} serious deviations`} />}
+          <span className="text-sm text-ink-mute dark:text-slate-400">{c.vendor} · {c.type} · {c.category} · owner {c.owner}{d.parent && <> · under <Link className="text-indigo-600 hover:underline" to={`/contracts/${d.parent.id}`}>{d.parent.title}</Link></>}</span>
+        </div>
+        <nav aria-label="Contract sections" className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-b border-line text-sm font-semibold dark:border-slate-700">
+          {[["#document", "Document and fields"], ["#hierarchy", "Hierarchy and effective terms"], ["#checks", "Checklist and deviations"]].map(([h, t]) => <a key={h} href={h} className="border-b-[3px] border-transparent py-2.5 text-ink-mute hover:border-indigo-600 hover:text-ink dark:text-slate-300">{t}</a>)}
+          <Link className="border-b-[3px] border-transparent py-2.5 text-ink-mute hover:border-indigo-600 hover:text-ink dark:text-slate-300" to={`/ask?doc=${c.id}`}>Ask about this document</Link>
+          <Link className="border-b-[3px] border-transparent py-2.5 text-ink-mute hover:border-indigo-600 hover:text-ink dark:text-slate-300" to={`/redline/${c.id}`}>{c.status === "draft" ? "Review and redline" : "Review and checklist"}</Link>
+        </nav>
       </div>
-      <div className="grid gap-4 lg:grid-cols-5">
-        <div className="space-y-4 lg:col-span-2">
+      <div className="grid gap-5 lg:grid-cols-5">
+        <div className="space-y-5 lg:order-2 lg:col-span-2">
           {d.lineage.length > 0 && !d.is_amendment && (
             <Card title={d.inherited_terms.length ? "Built on top of its parent agreements" : "Parent agreements"}>
               <ol className="mb-2 space-y-1 text-sm">
@@ -110,7 +125,7 @@ export default function ContractDetail() {
           )}
 
           {d.checks.length > 0 && (
-            <Card title={`Checklist — ${d.checks.filter((x) => x.status === "pass").length} pass · ${d.checks.filter((x) => x.status === "fail").length} fail`} right={<Link className="text-xs text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Open in Redline</Link>}>
+            <Card className="scroll-mt-20" title={<><span id="checks" />{`Checklist — ${d.checks.filter((x) => x.status === "pass").length} pass · ${d.checks.filter((x) => x.status === "fail").length} fail`}</>} right={<Link className="text-xs text-indigo-600 hover:underline" to={`/redline/${c.id}`}>Open in Redline</Link>}>
               <ul className="space-y-1 text-sm">
                 {d.checks.filter((x) => x.status !== "na").map((x) => (
                   <li key={x.rule_key} className="flex items-start gap-2">
@@ -124,7 +139,7 @@ export default function ContractDetail() {
 
           <Card title="Signatures" right={d.signatures.fully_executed ? <span className="font-bold text-emerald-600">✓ fully signed</span> : <span className="font-bold text-red-600">✗ not fully signed</span>}>
             <table className="w-full text-sm"><tbody>
-              {([["Arcadia Retail Ltd", d.signatures.customer_signatory, d.signatures.customer_signed_date], [c.vendor, d.signatures.supplier_signatory, d.signatures.supplier_signed_date]] as [string, string | null, string | null][]).map(([party, who, when]) => (
+              {([[`${meta.data?.customer ?? "Customer"} (customer)`, d.signatures.customer_signatory, d.signatures.customer_signed_date], [c.vendor, d.signatures.supplier_signatory, d.signatures.supplier_signed_date]] as [string, string | null, string | null][]).map(([party, who, when]) => (
                 <tr key={party} className="border-t border-slate-100 dark:border-slate-700"><Td className="text-slate-500">{party}</Td>
                   <Td className="font-medium">{who ?? <span className="text-red-600">signature pending</span>}</Td><Td className="text-right tabular-nums">{when ? fmtDate(when) : "—"}</Td></tr>))}
             </tbody></table>
@@ -144,7 +159,7 @@ export default function ContractDetail() {
                     : <>{show(f.field, f.value, d.lineage.length > 0 && ["SOW", "Work Order"].includes(c.type))}
                         {f.corrected && <span className="ml-1 rounded bg-emerald-100 px-1 text-[10px] font-semibold text-emerald-900" title="A person corrected this value">corrected</span>}
                         {f.editable && <button className="ml-2 text-xs font-normal text-indigo-600 hover:underline dark:text-indigo-400" aria-label={`Edit ${LABEL[f.field] ?? f.field}`} onClick={(e) => { e.stopPropagation(); setFix({ field: f.field, value: f.value ?? "" }); }}>edit</button>}</>}</Td>
-                  <Td className="text-right"><ConfidenceBadge v={f.confidence} />
+                  <Td className="text-right"><span className="mr-1 inline-block h-1.5 w-10 overflow-hidden rounded bg-slate-200 align-middle dark:bg-slate-700" aria-hidden><i className="block h-full bg-indigo-600" style={{ width: `${Math.round(Number(f.confidence ?? 0) * 100)}%` }} /></span><ConfidenceBadge v={f.confidence} />
                     <div className="text-[11px] text-slate-500">{f.source_heading ? `${f.source_heading} · p.${f.source_page}` : `header · p.${f.source_page ?? 1}`}</div></Td>
                 </tr>
               ))}
@@ -171,7 +186,7 @@ export default function ContractDetail() {
           )}
           {d.is_amendment && <Card title="This amendment overrides"><p className="text-sm">{d.overrides.map((o) => LABEL[o]).join(", ")}</p></Card>}
 
-          <Card title="Hierarchy"><Tree n={d.hierarchy} current={c.id} /></Card>
+          <Card title="Hierarchy" className="scroll-mt-20"><span id="hierarchy" /><Tree n={d.hierarchy} current={c.id} /></Card>
 
           {d.deviations.length > 0 && (
             <Card title="Deviations from standard template">
@@ -181,16 +196,16 @@ export default function ContractDetail() {
           )}
         </div>
 
-        <Card title="Document" className="lg:col-span-3">
-          <div className="max-h-[75vh] space-y-3 overflow-y-auto pr-2 text-sm leading-relaxed">
+        <Card title="Document" className="scroll-mt-20 lg:order-1 lg:col-span-3"><span id="document" />
+          <div className="max-h-[80vh] space-y-3 overflow-y-auto pr-3 font-serif text-[16px] leading-7">
             {d.clauses.map((cl, i) => {
               const newPage = cl.page !== lastPage; lastPage = cl.page;
               return (
                 <div key={cl.id}>
                   {newPage && <div className="my-2 border-b border-dashed border-slate-300 text-[11px] uppercase tracking-wider text-slate-400 dark:border-slate-600">Page {cl.page}</div>}
                   <div ref={(el) => { refs.current[cl.id] = el; }} onClick={() => setHl(cl.id)}
-                    className={`rounded p-2 transition ${hl === cl.id ? "bg-yellow-100 ring-2 ring-yellow-400 dark:bg-yellow-900/40" : ""}`}>
-                    <div className="font-semibold">{i + 1}. {cl.heading}</div><p>{cl.text}</p>
+                    className={`rounded-md p-2 transition ${hl === cl.id ? "border-b-2 border-amber-600 bg-amber-100 dark:bg-amber-900/40" : ""}`}>
+                    <div className="font-sans text-xs font-semibold uppercase tracking-wider text-ink-mute dark:text-slate-400">{i + 1} · {cl.heading}</div><p className="mt-1">{inline(cl.text)}</p>
                   </div>
                 </div>
               );

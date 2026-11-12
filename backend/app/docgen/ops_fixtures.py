@@ -16,7 +16,15 @@ from app import feeds
 from app.config import data_path
 from app.db import SessionLocal
 
-CUSTOMER = "Arcadia Retail Inc."
+def _customer() -> str:
+    """The fixtures are addressed to the loaded corpus's customer (hotel group or retailer), not to a fixed name."""
+    import os
+
+    n = (os.environ.get("CUSTOMER_NAMES") or "Arcadia").split(",")[0].strip()
+    return "Arcadia Retail Inc." if n.lower() == "arcadia" else n
+
+
+CUSTOMER = _customer()
 FMT = ["md", "docx", "pdf"]
 
 
