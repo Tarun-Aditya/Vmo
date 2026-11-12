@@ -76,6 +76,8 @@ function PipelineCard({ pl, running }: { pl: Pl; running: boolean }) {
 export default function Pipeline() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["pipeline"], queryFn: () => api<Cfg>("/api/admin/pipeline"), refetchInterval: 4000 });
+  const srcs = useQuery({ queryKey: ["pipeline-sources"], queryFn: () => api<{ connectors: { id: number; name: string; type_label: string; files: number; enabled: boolean }[] }>("/api/connectors") });
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<{ simulators?: boolean }>("/api/meta") });
   const pls = useQuery({ queryKey: ["pipelines"], queryFn: () => api<{ pipelines: Pl[]; running: boolean }>("/api/admin/pipelines"), refetchInterval: 4000 });
   const runs = useQuery({ queryKey: ["runs"], queryFn: () => api<Run[]>("/api/admin/pipeline/runs"), refetchInterval: 4000 });
   const [open, setOpen] = useState<number | null>(null);
@@ -91,6 +93,19 @@ export default function Pipeline() {
           {pls.data?.pipelines.map((pl) => <PipelineCard key={pl.key} pl={pl} running={pls.data!.running} />)}
           <p className="text-xs text-slate-500">Inbox folder: <span className="break-all font-mono">{q.data.inbox}</span> · {q.data.inbox_files} files · {(q.data.documents.active ?? 0)} executed · {(q.data.documents.draft ?? 0)} draft</p>
         </div>
+
+        <Card title="Sources" className="lg:col-span-2">
+          {!srcs.data && <p className="text-sm text-slate-500">Loading…</p>}
+          {srcs.data && srcs.data.connectors.length === 0 && <p className="text-sm text-slate-500">No external sources yet. Add one under <Link className="text-indigo-600 hover:underline" to="/admin/connectors">Connectors</Link>.</p>}
+          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
+            {srcs.data?.connectors.map((c) => (
+              <li key={c.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+                <div><span className="font-medium">{c.name}</span> <span className="text-slate-500">· {c.type_label} · {c.files} file{c.files === 1 ? "" : "s"} synced{c.enabled ? "" : " · paused"}</span></div>
+                {meta.data?.simulators && <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-semibold text-violet-900 dark:bg-violet-950 dark:text-violet-200">Simulated</span>}
+              </li>))}
+          </ul>
+          <p className="mt-2 text-xs text-slate-500">{meta.data?.simulators ? "Violet “Simulated” badges mark stand-ins that speak the real APIs; in production each is replaced by the customer’s own tenant. " : ""}Manage sources in <Link className="text-indigo-600 hover:underline" to="/admin/connectors">Connectors</Link>.</p>
+        </Card>
 
         <Card title="Add a document to the folder" className="lg:col-span-2">
           <p className="mb-2 text-sm text-slate-500">Anything placed in the inbox folder is picked up on the next run. Paste a document here to drop it in and process it immediately (Markdown or plain text; vendor, type and parent are read from the document).</p>

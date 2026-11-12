@@ -25,10 +25,10 @@ export default function Vendors() {
         <p className="text-sm text-slate-500">Each vendor’s whole relationship in one place: contracts, spend, upcoming dates and risk. Open a vendor for its MSA → SOW → Work Order tree and key-clause coverage.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Tile l="Vendors" v={v.length} />
-        <Tile l="Annual value" v={usd(total)} />
-        <Tile l="Critical flags" v={critical} tone={critical ? "red" : undefined} sub="vendors" />
-        <Tile l="Contracts & work orders" v={v.reduce((a, x) => a + x.contracts, 0)} />
+        <Tile l="Vendors" v={v.length} sub={`${usd(total)} a year`} />
+        <Tile l="High risk" v={v.filter((x) => x.risk === "critical" || x.risk === "high").length} tone={critical || v.some((x) => x.risk === "high") ? "red" : undefined} sub="high or critical" />
+        <Tile l="With open flags" v={v.filter((x) => x.flags.length > 0).length} tone="amber" sub="need a decision" />
+        <Tile l="Top vendor share" v={total ? `${Math.round((max / total) * 100)}%` : "—"} sub={[...v].sort((x, y) => y.annual_value - x.annual_value)[0]?.vendor} />
       </div>
       <div className="flex flex-wrap items-center gap-2 text-[13px]">
         <input aria-label="Find a vendor" placeholder="Find a vendor…" className="min-h-[36px] rounded border border-line bg-white px-3 dark:border-slate-600 dark:bg-slate-900" value={find} onChange={(e) => setFind(e.target.value)} />

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib";
+import { Tile } from "../components/vmo";
 import { Card, Loading } from "../ui";
 
 type Cell = { present: boolean; expected: boolean; heading: string; page: number | null; text: string | null; note: string | null };
@@ -17,8 +18,18 @@ export function ClauseMatrix({ vendor }: { vendor?: string }) {
   const m = q.data;
   const label = (k: string) => m.columns.find((c) => c.key === k)!.label;
   const cell = tip ? tip.row.cells[tip.col] : null;
+  const execRows = m.groups.filter((g) => g.rows.some((r) => r.kind === "contract")).flatMap((g) => g.rows.filter((r) => r.kind === "contract"));
+  const expected = execRows.reduce((a, r) => a + Object.values(r.cells).filter((c) => c.expected).length, 0);
+  const present = execRows.reduce((a, r) => a + Object.values(r.cells).filter((c) => c.expected && c.present).length, 0);
+  const gaps = execRows.reduce((a, r) => a + r.gap_count, 0), gapDocs = execRows.filter((r) => r.gap_count > 0).length;
   return (
     <div className="space-y-4">
+      {!vendor && (
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Tile l="Coverage" v={expected ? `${Math.round((present / expected) * 100)}%` : "—"} sub="of required clauses present" />
+          <Tile l="Gaps to fix" v={gaps} tone={gaps ? "red" : undefined} sub={`across ${gapDocs} contract${gapDocs === 1 ? "" : "s"}`} />
+          <Tile l="Clauses tracked" v={m.columns.length} sub="columns; add more in Admin" />
+        </div>)}
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           {vendor ? <h2 className="text-lg font-semibold">Key clauses in {vendor}&rsquo;s documents</h2> : <h1>Key contract clauses across all documents</h1>}

@@ -24,11 +24,14 @@ export default function Templates() {
   const [focus, setFocus] = useState<{ title: string; heading: string; cell: NonNullable<Cell> } | null>(null);
   return (
     <div className="space-y-4">
-      <h1>Template library</h1>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div><h1>Template library</h1><p className="mt-1 text-sm text-slate-500">{list.data ? `${list.data.length} standard templates` : "Standard templates"} · clause by clause, and where executed contracts drift from them</p></div>
+        <Link to="/redline" className="inline-flex min-h-[44px] items-center rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">Compare a draft</Link>
+      </div>
       <div className="flex flex-wrap gap-2">
         {list.data?.map((t) => (
-          <button key={t.id} onClick={() => { setSel(t.id); setFocus(null); }} className={`rounded-lg border px-3 py-2 text-left text-sm ${t.id === id ? "border-indigo-600 bg-indigo-50 dark:bg-slate-700" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"}`}>
-            <div className="font-medium">{t.name}</div><div className="text-xs text-slate-500">{t.clause_count} clauses · {t.deviating_contracts}/{t.contracts} contracts deviate</div>
+          <button key={t.id} onClick={() => { setSel(t.id); setFocus(null); }} className={`rounded-lg border px-4 py-2 text-left text-sm ${t.id === id ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"}`}>
+            <div className="font-semibold">{t.name.replace(" (Standard)", "")}</div><div className={`text-xs ${t.id === id ? "text-indigo-100" : "text-slate-500"}`}>{t.clause_count} clauses · {t.deviating_contracts}/{t.contracts} contracts deviate</div>
           </button>))}
       </div>
       {list.data && id && (

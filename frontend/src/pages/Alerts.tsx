@@ -9,6 +9,7 @@ export type AlertRow = { id: number; rule_key: string; title: string; body: stri
 
 export default function Alerts() {
   const qc = useQueryClient();
+  const [view, setView] = useState<"all" | "unread" | "critical">("all");
   const [status, setStatus] = useState<"open" | "acknowledged" | "resolved">("open");
   const q = useQuery({ queryKey: ["alerts", status], queryFn: () => api<{ items: AlertRow[]; unread: number }>(`/api/alerts?status=${status}&limit=300`) });
   const refresh = () => { qc.invalidateQueries({ queryKey: ["alerts"] }); qc.invalidateQueries({ queryKey: ["alerts-summary"] }); };
@@ -16,12 +17,13 @@ export default function Alerts() {
   const readAll = useMutation({ mutationFn: () => api("/api/alerts/read-all", { method: "POST" }), onSuccess: refresh });
   const run = useMutation({ mutationFn: () => api<{ new: number }>("/api/alerts/evaluate", { method: "POST" }), onSuccess: refresh });
   if (!q.data) return <Loading q={q} />;
-  const items = q.data.items;
+  const items = q.data.items.filter((a) => view === "all" || (view === "unread" && !a.read_at) || (view === "critical" && a.severity === "critical"));
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h1>Alerts</h1>
+          <p className="text-sm text-slate-500">{q.data.unread} unread · rules and channels are set in Admin</p>
           <p className="text-sm text-slate-500">Raised once per event from the live data: renewal notices, expiries, overdue duties, SLA breaches, spend exceptions, vendor risk. Rules and channels are in <Link className="text-indigo-600 hover:underline dark:text-indigo-400" to="/admin/alerts">Admin → Alerts</Link>.</p>
         </div>
         <div className="flex gap-2">
@@ -32,6 +34,10 @@ export default function Alerts() {
       <div className="flex gap-1" role="tablist" aria-label="Alert status">
         {(["open", "acknowledged", "resolved"] as const).map((s) => (
           <button key={s} role="tab" aria-selected={status === s} onClick={() => setStatus(s)} className={`rounded px-3 py-1 text-sm capitalize ${status === s ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800"}`}>{s}</button>))}
+      </div>
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Alert view">
+        {([["all", "All"], ["unread", `Unread ${q.data.unread}`], ["critical", "Critical"]] as const).map(([k, l]) => (
+          <button key={k} aria-pressed={view === k} onClick={() => setView(k)} className={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${view === k ? "border-indigo-600 bg-indigo-600 text-white" : "border-line bg-white dark:border-slate-600 dark:bg-slate-800"}`}>{l}</button>))}
       </div>
       <Card>
         {items.length === 0 && <p className="text-sm text-slate-500">Nothing here.</p>}
