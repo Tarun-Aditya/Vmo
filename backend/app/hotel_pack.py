@@ -44,7 +44,7 @@ def _m(key, name, kcc_key, pattern, kind, unit, desc):
 
 METRICS = [
     _m("laundry_rate_per_kg", "Laundry rate per kilogram", None, r"USD\s*([\d.]+)\s*per kilogram", "number", "USD/kg", "Price per kilogram of linen laundered"),
-    _m("response_time_hours", "Fault response time", "service_response", r"within (\d+) hours?", "number", "hours", "Hours to attend a fault report"),
+    _m("response_time_hours", "Fault response time", "service_response", r"within\s+(?:[a-z\-]+\s*)?\(?(\d+)\)?\s*hours?", "number", "hours", "Hours to attend a fault report"),
     _m("commission_pct", "Booking commission", "distribution_commission", r"(\d+(?:\.\d+)?)\s*(?:percent|%)", "number", "% of room revenue", "Commission on bookings through a channel"),
 ]
 
@@ -77,5 +77,7 @@ def ensure(s) -> dict:
     rules = [dict(r, sort_order=900 + i) for i, r in enumerate(RULES)]
     out["rules"] = kcc._insert_missing(s, "checklist_rules", kcc.RULE_COLS + ["sort_order"], rules)
     s.execute(text("UPDATE checklist_rules SET enabled=false WHERE key='governing_law_ny'"))     # a hotel group is not tied to one state's law: Legal decides per vendor
+    for m in METRICS:         # pack metrics are admin rows: bring their patterns up to date on re-seed, without touching a metric an admin created
+        s.execute(text("UPDATE metrics SET pattern=:p WHERE key=:k AND NOT builtin"), {"p": m["pattern"], "k": m["key"]})
     kcc.rebuild_key_clauses_view(s)
     return out

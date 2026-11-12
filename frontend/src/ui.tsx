@@ -58,12 +58,12 @@ export function Loading({ q }: { q: { isLoading: boolean; error: unknown } }) {
 }
 
 const ICON: Record<string, string> = {
-  "/": "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z", "/map": "M6 8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6 20.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 7l8 4M8 17l8-4", "/contracts": "M6 3h9l4 4v14H6zM9 12h7M9 16h7", "/vendors": "M9 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM3 20c0-4 3-6 6-6s6 2 6 6M16 5a3 3 0 010 6M18 14c2 1 3 3 3 6",
+  "/": "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z", "/properties": "M4 21V8l8-5 8 5v13M9 21v-6h6v6M8 11h2M14 11h2", "/map": "M6 8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6 20.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 7l8 4M8 17l8-4", "/contracts": "M6 3h9l4 4v14H6zM9 12h7M9 16h7", "/vendors": "M9 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM3 20c0-4 3-6 6-6s6 2 6 6M16 5a3 3 0 010 6M18 14c2 1 3 3 3 6",
   "/clauses": "M4 6h16M4 12h10M4 18h13", "/ask": "M4 5h16v11H9l-5 4z", "/redline": "M4 20l4-1 11-11-3-3L5 16z", "/templates": "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",
   "/obligations": "M5 12l4 4 10-10M3 3h18v18H3z", "/spend": "M4 20V10M10 20V4M16 20v-7M22 20H2", "/risk": "M12 3l8 4v5c0 4-3 7-8 9-5-2-8-5-8-9V7z", "/new": "M12 5v14M5 12h14",
   "/alerts": "M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4", "/admin": "M12 15a3 3 0 100-6 3 3 0 000 6zM12 2v3M12 19v3M2 12h3M19 12h3",
 };
-const NAV = [["/", "Portfolio"], ["/map", "Portfolio map"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/risk", "Risk"], ["/new", "New contract"]];
+const NAV = [["/", "Portfolio"], ["/map", "Portfolio map"], ["/properties", "Properties"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/risk", "Risk"], ["/new", "New contract"]];
 
 function RailLink({ to, label, onClick }: { to: string; label: string; onClick?: () => void }) {
   return (

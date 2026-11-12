@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { api, fmtDate, usd } from "../lib";
 import { Card, Loading, Sev, SeverityChip } from "../ui";
 
@@ -16,7 +16,8 @@ const KIND: Record<string, string> = { child_outlives_parent: "Child outlives pa
 
 /** Every contract family on one timeline: the parent first, its schedules and amendments beneath, the last day to act marked on each. */
 export default function PortfolioMap() {
-  const [property, setProperty] = useState(""); const [vendor, setVendor] = useState("");
+  const [sp] = useSearchParams();
+  const [property, setProperty] = useState(sp.get("property") ?? ""); const [vendor, setVendor] = useState(sp.get("vendor") ?? "");
   const f = useQuery({ queryKey: ["filters"], queryFn: () => api<Record<string, string[]>>("/api/contracts/filters") });
   const q = useQuery({ queryKey: ["map", property, vendor], queryFn: () => api<Map>(`/api/portfolio-map?${new URLSearchParams({ ...(property && { property }), ...(vendor && { vendor }) })}`) });
   if (!q.data) return <Loading q={q} />;

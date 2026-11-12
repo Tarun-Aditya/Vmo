@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { api, fmtDate, usd } from "../lib";
 import { Card, Loading, SeverityChip, Td, Th } from "../ui";
@@ -68,7 +69,8 @@ export function Hierarchy({ rows }: { rows: Row[] }) {
 }
 
 export default function Contracts() {
-  const [f, setF] = useState<Record<string, string>>({});
+  const [sp] = useSearchParams();
+  const [f, setF] = useState<Record<string, string>>(() => Object.fromEntries(FILTERS.filter((k) => sp.get(k)).map((k) => [k, sp.get(k) as string])));
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"table" | "tree">("table");
   const filters = useQuery({ queryKey: ["filters"], queryFn: () => api<Record<string, string[]>>("/api/contracts/filters") });

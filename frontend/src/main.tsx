@@ -12,6 +12,7 @@ import Ask from "./pages/Ask";
 import Redline from "./pages/Redline";
 import Templates from "./pages/Templates";
 import PortfolioMap from "./pages/PortfolioMap";
+import Properties from "./pages/Properties";
 import Clauses from "./pages/Clauses";
 import Vendors from "./pages/Vendors";
 import VendorProfile from "./pages/VendorProfile";
@@ -69,6 +70,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
             <Route path="map" element={<PortfolioMap />} />
+            <Route path="properties" element={<Properties />} />
             <Route path="contracts" element={<Contracts />} />
             <Route path="contracts/:id" element={<ContractDetail />} />
             <Route path="vendors" element={<Vendors />} />
