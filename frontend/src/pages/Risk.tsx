@@ -115,7 +115,7 @@ export default function Risk() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Vendor risk & benchmarks</h1>
+        <h1>Vendor risk & benchmarks</h1>
         <p className="text-sm text-slate-500">Which vendors need attention and why, and how every term compares across the portfolio.</p>
       </div>
       <div className="flex gap-2" role="tablist">

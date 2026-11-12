@@ -21,7 +21,7 @@ export default function Alerts() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-xl font-semibold">Alerts</h1>
+          <h1>Alerts</h1>
           <p className="text-sm text-slate-500">Raised once per event from the live data: renewal notices, expiries, overdue duties, SLA breaches, spend exceptions, vendor risk. Rules and channels are in <Link className="text-indigo-600 hover:underline dark:text-indigo-400" to="/admin/alerts">Admin → Alerts</Link>.</p>
         </div>
         <div className="flex gap-2">

@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { api, daysLabel, fmtDate, usd } from "../lib";
+import { Tile } from "../components/vmo";
 import { Card, Loading, Sev, SeverityChip, Td, Th } from "../ui";
 
 export type Vendor = {
@@ -10,27 +12,35 @@ export type Vendor = {
 };
 
 export default function Vendors() {
+  const [find, setFind] = useState(""); const [risky, setRisky] = useState(false);
   const q = useQuery({ queryKey: ["vendors"], queryFn: () => api<Vendor[]>("/api/vendors") });
   if (!q.data) return <Loading q={q} />;
   const v = q.data, total = v.reduce((a, x) => a + x.annual_value, 0), max = Math.max(...v.map((x) => x.annual_value), 1);
+  const shown = v.filter((x) => (!risky || x.risk === "critical" || x.risk === "high") && x.vendor.toLowerCase().includes(find.toLowerCase()));
   const critical = v.filter((x) => x.risk === "critical").length;
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold">Vendors</h1>
+        <h1>Vendors</h1>
         <p className="text-sm text-slate-500">Each vendor’s whole relationship in one place: contracts, spend, upcoming dates and risk. Open a vendor for its MSA → SOW → Work Order tree and key-clause coverage.</p>
       </div>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {[["Vendors", String(v.length)], ["Annual value", usd(total)], ["Vendors with critical flags", String(critical)], ["Contracts & work orders", String(v.reduce((a, x) => a + x.contracts, 0))]].map(([l, x]) => (
-          <Card key={l}><div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{l}</div><div className="mt-1 text-3xl font-semibold tabular-nums">{x}</div></Card>
-        ))}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Tile l="Vendors" v={v.length} />
+        <Tile l="Annual value" v={usd(total)} />
+        <Tile l="Critical flags" v={critical} tone={critical ? "red" : undefined} sub="vendors" />
+        <Tile l="Contracts & work orders" v={v.reduce((a, x) => a + x.contracts, 0)} />
+      </div>
+      <div className="flex flex-wrap items-center gap-2 text-[13px]">
+        <input aria-label="Find a vendor" placeholder="Find a vendor…" className="min-h-[36px] rounded border border-line bg-white px-3 dark:border-slate-600 dark:bg-slate-900" value={find} onChange={(e) => setFind(e.target.value)} />
+        <button aria-pressed={risky} onClick={() => setRisky(!risky)} className={`min-h-[36px] rounded border px-3 font-medium ${risky ? "border-indigo-600 bg-indigo-600 text-white" : "border-line bg-white dark:border-slate-600 dark:bg-slate-900"}`}>High or critical only</button>
+        <span className="text-ink-mute">{shown.length} of {v.length}</span>
       </div>
       <Card>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead><tr><Th>Vendor</Th><Th>Risk</Th><Th className="text-right">Contracts</Th><Th className="w-56">Annual value</Th><Th>Next end date</Th><Th>Deviations</Th><Th>Flags</Th></tr></thead>
             <tbody>
-              {v.map((x) => (
+              {shown.map((x) => (
                 <tr key={x.vendor} className="border-t border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/40">
                   <Td>
                     <Link to={`/vendors/${encodeURIComponent(x.vendor)}`} className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">{x.vendor}</Link>
