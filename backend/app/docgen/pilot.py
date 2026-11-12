@@ -10,26 +10,9 @@ import tempfile
 from datetime import date, timedelta
 from pathlib import Path
 
-from app.docgen import pilot_spec
 from app.docgen.pilot_spec import CUSTOMER, DOCS, STYLES
 
 CORPUS_DIR = Path(__file__).resolve().parents[3] / "corpus" / "pilot"
-PACK = {"name": "pilot", "customer": CUSTOMER, "customer_desc": "a retailer; US headquarters", "domain": "IT-services engagement", "docs": DOCS, "styles": STYLES,
-        "dir": CORPUS_DIR, "labels": "labels_pilot.json", "manifest": "manifest_pilot.json"}
-
-
-def use_pack(name: str) -> None:
-    """Switch the generator to another corpus (e.g. 'hotel'): its customer, documents, styles and corpus folder."""
-    global CUSTOMER, DOCS, STYLES, CORPUS_DIR
-    if name == "hotel":
-        from app.docgen import hotel_spec as hs
-
-        PACK.update(name="hotel", customer=hs.CUSTOMER, customer_desc=hs.CUSTOMER_DESC, domain=hs.DOMAIN, docs=hs.DOCS, styles=hs.STYLES,
-                    dir=Path(__file__).resolve().parents[3] / "corpus" / "hotel", labels="labels_hotel.json", manifest="manifest_hotel.json")
-    else:
-        PACK.update(name="pilot", customer=pilot_spec.CUSTOMER, customer_desc="a retailer; US headquarters", domain="IT-services engagement", docs=pilot_spec.DOCS, styles=pilot_spec.STYLES,
-                    dir=Path(__file__).resolve().parents[3] / "corpus" / "pilot", labels="labels_pilot.json", manifest="manifest_pilot.json")
-    CUSTOMER, DOCS, STYLES, CORPUS_DIR = PACK["customer"], PACK["docs"], PACK["styles"], PACK["dir"]
 DATE_FMT = {"us_articles": "%B %d, %Y", "us_sections": "%B %d, %Y", "uk_numbered": "%d %B %Y", "plain": "%B %d, %Y", "schedule_heavy": "%d %B %Y", "short_form": "%d %B %Y", "vendor_paper": "%B %d, %Y", "sow_form": "%d %B %Y"}
 SIGNERS = {"customer": [("Michael Brennan", "Chief Procurement Officer"), ("Helena Cruz", "VP Technology Sourcing")], "supplier": ["Richard Hale", "Anika Rao", "Daniel Okafor", "Sofia Marchetti", "Kenji Watanabe", "Grace Mbeki"]}
 
@@ -74,9 +57,7 @@ def money(n) -> str:
 
 def facts(spec: dict) -> list[str]:
     t = spec["type"]
-    f = [f"Document type: {t}" + (" (a vendor draft not yet signed)" if spec.get("status") == "draft" else ""), f"Customer: {CUSTOMER} ({PACK['customer_desc']})", f"Supplier / counterparty: {spec['vendor']}"]
-    if spec.get("prop"):
-        f.append(f"Property: the services are delivered at {spec['prop']} (state the property name in the agreement, in the parties or services section)")
+    f = [f"Document type: {t}" + (" (a vendor draft not yet signed)" if spec.get("status") == "draft" else ""), f"Customer: {CUSTOMER} (a retailer; US headquarters)", f"Supplier / counterparty: {spec['vendor']}"]
     if spec.get("parent"):
         f.append(f"It is issued under the parent agreement ({spec_by_key()[spec['parent']]['type']}) dated {{{{PARENT_DATE}}}} between the same parties; refer to the parent by type and date")
     if spec.get("amends"):
@@ -139,7 +120,7 @@ def facts(spec: dict) -> list[str]:
 
 
 def prompt(spec: dict) -> tuple[str, str]:
-    system = ("You are a senior commercial contracts lawyer drafting a realistic, complete, internally consistent contract for a " + PACK["domain"] + ". "
+    system = ("You are a senior commercial contracts lawyer drafting a realistic, complete, internally consistent contract for an IT-services engagement. "
               "All parties and people are fictional. Output ONLY the contract as Markdown (a single # title line, then ## headings for clauses, tables as Markdown tables where natural), "
               "with no commentary, no code fences and no notes to the user. Use real contract language, not summaries.")
     style = STYLES[spec["style"]]
@@ -218,7 +199,7 @@ def labels(seed: date) -> dict:
                                                confidentiality_years=sp.get("conf"), renewal_notice_days=sp.get("notice") if sp.get("auto") else None, tfc_notice_days=int(sp["tfc"]) if str(sp.get("tfc") or "").isdigit() else None).items() if v is not None}
         lab["milestones"] = [{"title": m, "date": d[f"MS{i}"].isoformat()} for i, (m, _) in enumerate(sp.get("ms") or [], 1)]
         lab["deviations"] = sp.get("dev", [])
-        lab["meta"] = dict(property=sp.get("prop"), key=sp["key"], type=t, vendor=sp["vendor"], status="draft" if draft else "active", parent=sp.get("parent") or sp.get("amends"), category=sp["cat"], owner=sp["owner"])
+        lab["meta"] = dict(key=sp["key"], type=t, vendor=sp["vendor"], status="draft" if draft else "active", parent=sp.get("parent") or sp.get("amends"), category=sp["cat"], owner=sp["owner"])
         (out["drafts"] if draft else out["contracts"])[sp["key"]] = lab
     return out
 
@@ -277,9 +258,9 @@ def render(root: Path, seed: date, formats: bool = True) -> dict:
                 fallbacks.append(sp["key"])
             target = dest / f"{sp['key']}.md"
             target.write_text(md)
-        target.with_suffix(".meta.json").write_text(json.dumps({k: v for k, v in {"category": sp["cat"], "owner": sp["owner"], "property": sp.get("prop")}.items() if v}))
+        target.with_suffix(".meta.json").write_text(json.dumps({"category": sp["cat"], "owner": sp["owner"]}))
         n += 1
     lab = labels(seed)
-    (root / PACK["labels"]).write_text(json.dumps(lab, indent=1))
-    (root / PACK["manifest"]).write_text(json.dumps({"seed_date": seed.isoformat(), "customer": CUSTOMER, "corpus": PACK["name"], "documents": n, "format_fallbacks": fallbacks}, indent=1))
+    (root / "labels_pilot.json").write_text(json.dumps(lab, indent=1))
+    (root / "manifest_pilot.json").write_text(json.dumps({"seed_date": seed.isoformat(), "customer": CUSTOMER, "corpus": "pilot", "documents": n, "format_fallbacks": fallbacks}, indent=1))
     return {"documents": n, "format_fallbacks": fallbacks}

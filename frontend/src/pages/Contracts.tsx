@@ -1,14 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { api, fmtDate, usd } from "../lib";
 import { Card, Loading, SeverityChip, Td, Th } from "../ui";
 
-type Row = { id: number; title: string; vendor: string; category: string; type: string; owner: string; property?: string | null; status: string; parent_id: number | null;
+type Row = { id: number; title: string; vendor: string; category: string; type: string; owner: string; status: string; parent_id: number | null;
   effective_date: string | null; expiry_date: string | null; annual_value: number | null; total_value: number | null; auto_renew: boolean;
   liability_uncapped: boolean; deviation_count: number; fully_executed: boolean; customer_signatory: string | null; supplier_signatory: string | null };
-const FILTERS = ["vendor", "category", "type", "owner", "property", "status"] as const;
+const FILTERS = ["vendor", "category", "type", "owner", "status"] as const;
 const RANK: Record<string, number> = { MSA: 0, SaaS: 0, SOW: 1, "Work Order": 2, Amendment: 3, NDA: 4, DPA: 5 };
 const TYPE_STYLE: Record<string, string> = {
   MSA: "bg-indigo-600 text-white", SaaS: "bg-indigo-600 text-white", SOW: "bg-sky-600 text-white", "Work Order": "bg-teal-600 text-white",
@@ -69,8 +68,7 @@ export function Hierarchy({ rows }: { rows: Row[] }) {
 }
 
 export default function Contracts() {
-  const [sp] = useSearchParams();
-  const [f, setF] = useState<Record<string, string>>(() => Object.fromEntries(FILTERS.filter((k) => sp.get(k)).map((k) => [k, sp.get(k) as string])));
+  const [f, setF] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"table" | "tree">("table");
   const filters = useQuery({ queryKey: ["filters"], queryFn: () => api<Record<string, string[]>>("/api/contracts/filters") });
@@ -105,12 +103,12 @@ export default function Contracts() {
       {q.data && view === "table" && (
         <Card>
           <div className="overflow-x-auto"><table className="w-full text-sm">
-            <thead><tr><Th>Contract</Th><Th>Type</Th><Th>Category</Th><Th>Property</Th><Th>Owner</Th><Th>Start date</Th><Th>End date</Th><Th className="text-right">Value</Th><Th>Signatures</Th><Th>Flags</Th></tr></thead>
+            <thead><tr><Th>Contract</Th><Th>Type</Th><Th>Category</Th><Th>Owner</Th><Th>Start date</Th><Th>End date</Th><Th className="text-right">Value</Th><Th>Signatures</Th><Th>Flags</Th></tr></thead>
             <tbody>
               {q.data.map((c) => (
                 <tr key={c.id} className="border-t border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/40">
                   <Td><Link to={`/contracts/${c.id}`} className={`font-medium text-indigo-600 hover:underline dark:text-indigo-400 ${c.parent_id ? "pl-4" : ""}`}>{c.parent_id ? "↳ " : ""}{c.title}</Link><Link to={`/vendors/${encodeURIComponent(c.vendor)}`} className="block text-xs text-slate-500 hover:underline">{c.vendor}</Link></Td>
-                  <Td><TypeBadge t={c.type} /></Td><Td>{c.category}</Td><Td>{c.property ?? <span className="text-ink-mute">Group</span>}</Td><Td>{c.owner}</Td>
+                  <Td><TypeBadge t={c.type} /></Td><Td>{c.category}</Td><Td>{c.owner}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.effective_date)}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.expiry_date)}</Td>
                   <Td className="text-right tabular-nums">{c.annual_value ? usd(c.annual_value) : c.total_value ? <span title="fixed fee">{usd(c.total_value)}*</span> : "—"}</Td>

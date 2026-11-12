@@ -3,7 +3,6 @@ Works in any engine mode: LLM_PROVIDER=offline for the rule engine, anything els
 metadata, values & limits, milestones found as obligations, and the first misses. Exit code 1 below --threshold (default 0.80)."""
 import argparse
 import json
-import os
 import sys
 from datetime import date
 from pathlib import Path
@@ -38,7 +37,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--threshold", type=float, default=0.80)
     a = ap.parse_args()
-    lab = json.loads((data_path() / os.environ.get("LABELS", "labels_pilot.json")).read_text())
+    lab = json.loads((data_path() / "labels_pilot.json").read_text())
     docs = {**lab["contracts"], **lab["drafts"]}
     with SessionLocal() as s:
         rows = {}

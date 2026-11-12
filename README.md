@@ -171,7 +171,6 @@ Set in `.env` (see `.env.example`):
 | `AUTH_MODE`, `OIDC_ISSUER`, `OIDC_AUDIENCE`, `OIDC_ROLES_CLAIM`, `SECRET_KEY`, `CORS_ORIGINS` | Access and encryption |
 | `SIMULATORS`, `PUBLIC_API_URL`, `SIM_IMAP_PORT`, `SIM_SMTP_PORT` | Demo stand-ins (set `SIMULATORS=0` in production) |
 | `SCHEDULER_ENABLED` | Background pipeline scheduler (tests turn it off) |
-| `CUSTOMER_NAMES` | How your own company is named in contracts (comma-separated, default `Arcadia`): needed so the other party is read as the vendor |
 
 ## Tests
 
@@ -196,30 +195,6 @@ scripts/             seed, backup, demo walkthroughs
 docs/, HANDOVER.md   security notes; handover with measured results and limits
 CLAUDE.md            original scope and conventions
 ```
-
-## Hotel edition (in progress)
-
-A second, fictional corpus for the hospitality idea: **Seabright Hotels & Resorts**, a hotel group with six properties and 32 vendor documents
-(laundry and linen, security, lifts, HVAC, pest control, waste, food and beverage, housekeeping staffing, property and booking systems, payments, energy), with
-group-level master agreements, per-property schedules, an amendment, NDAs, DPAs, and five vendor drafts (one clean control). It is written from the owner-operator's side;
-all names are fictional.
-
-* Sources: `backend/app/docgen/hotel_spec.py` (spec and ground truth), `corpus/hotel/*.md` (contract text written by Claude from the spec), seeded files in `data/hotel/`.
-* Load: `CUSTOMER_NAMES=Seabright DATA_DIR=data/hotel python -m app.seed --hotel` (uses its own database in the demo setup).
-* **Property level:** `contracts.property` (migration 0028) is read from the document or its sidecar and filterable in the API (`/api/contracts?property=...`) and in Ask.
-* **Hospitality pack** (`backend/app/hotel_pack.py`): ten key clauses (food safety, guest-injury indemnity, labour compliance, termination on sale of property, brand standards, seasonal pricing, payment-card
-  security, response times, inspection certificates, distribution commission), three values (laundry rate per kilogram, fault response hours, booking commission) and five checklist rules, all ordinary Admin configuration.
-* Measured offline on this corpus: **98.2% of fields and 98.4% of document metadata correct** against the spec (`LABELS=labels_hotel.json python evals/pilot_eval.py`). Writing it exposed and fixed real extraction bugs
-  (a customer name containing "&", supplier names containing "&", repeated role words before a vendor name).
-* **Redline for hotel drafts** (offline engine): drafts not written from our template are judged against the playbook rules (value outside its threshold, forbidden wording, required clause absent) and not by a word diff.
-  `python evals/hotel_redline_eval.py`: **16 of 17 planted deviations found, 0 findings on the clean control draft, about 7 findings per draft** (the one miss is a 180-day renewal notice written in words).
-* **Ask** understands property: "which properties have the most contracts?", "contracts at Lakeside Resort", and "the laundry rate per kilogram at each property" (1.42, 1.58 and 1.71 USD/kg).
-* **Hotel clauses found:** 14 of 16 expected hotel clause hits in the seeded documents (fault-response times missed in two).
-* **Portfolio map** (`/map`, API `/api/portfolio-map`): every contract family on one timeline with the last day to act, plus hierarchy problems (a schedule that outlives its master agreement, an NDA that ends before its agreement, an SOW with no parent, no end date).
-* **Properties** (`/properties`, API `/api/properties`): one card per hotel with contracts, vendors, yearly value and what ends soon, linking to the filtered contracts, the map and Ask.
-* **House standards:** `STANDARDS=hotel` gives the template library the hotel group's values (England and Wales law, 60-day exit notice and so on). The template clause wording is still the generic one; hotel-specific rules and clauses live in the hospitality pack.
-* **End-to-end video on the hotel data** (`reports/e2e_hotel/`): all 22 steps pass in Demo mode with the new design.
-* Not yet done: hotel-specific template wording, the new layout on contract detail, Ask, Redline and the Admin pages (they run inside the new shell with the new accent and headings), and any Claude-mode measurement on this corpus.
 
 ## Roadmap (future scope, not built)
 

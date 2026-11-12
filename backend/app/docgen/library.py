@@ -32,10 +32,6 @@ STD: dict[str, str | int] = dict(
 )
 
 
-if __import__("os").environ.get("STANDARDS", "").lower() == "hotel":      # the hotel group's house standards (STANDARDS=hotel): the same templates, with its own values
-    STD.update(governing_law="England and Wales", venue="London", tfc_notice_days=60, cap="1", sec_hours=24, breach_hours=24, insurance_cover="USD 5,000,000", audit_freq="once per year")
-
-
 @dataclass(frozen=True)
 class ClauseDef:
     ctype: str

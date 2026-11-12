@@ -79,21 +79,11 @@ def coerce_input(field: str, raw):
     return str(raw).strip()
 
 
-_PROP_RX = re.compile(r"(?im)^\W*(?:Property|Hotel|Site|Location)\W{0,3}[:\-–]\s*\**\s*([A-Z][^\n|*]{3,70}?)\s*\**\s*$")
-
-
-def _property_in_text(md: str) -> str | None:
-    """A line such as 'Property: Harbour Hotel' near the top of the document (hotel groups: one contract per site)."""
-    m = _PROP_RX.search(md[:3000])
-    return m.group(1).strip() if m else None
-
-
 def infer_metadata(md: str, header: dict, clauses: list[dict], sidecar: dict, folder_hint: str = "") -> dict:
     """Vendor / type / title / parent come from the document itself (rules for real contracts); category, owner, status from an optional sidecar or the folder."""
-    prop = sidecar.get("property") or header.get("Property") or _property_in_text(md)
     if not header.get("Parties") and not header.get("Document Type"):
         m = meta_rules.infer(md, header, clauses, sidecar, folder_hint)
-        return dict(property=prop, title=m["title"], vendor=m["vendor"], type=m["type"], category=m["category"], owner=m["owner"], status=m["status"],
+        return dict(title=m["title"], vendor=m["vendor"], type=m["type"], category=m["category"], owner=m["owner"], status=m["status"],
                     parent_title=sidecar.get("parent_title"), parent_ref=m["parent_ref"], template_key=TEMPLATE_KEY[m["type"]])
     title = next((ln[2:].strip() for ln in md.splitlines() if ln.startswith("# ")), "Untitled document")
     parties = header.get("Parties", "")
@@ -114,7 +104,7 @@ def infer_metadata(md: str, header: dict, clauses: list[dict], sidecar: dict, fo
             parent = mm.group(1)
         elif doc_type == "DPA" and (mm := re.search(r"supplements the (.+?) and applies", " ".join(c["text"] for c in clauses))):
             parent = mm.group(1)
-    return dict(property=prop, title=title, vendor=vendor, type=doc_type, category=sidecar.get("category") or "Uncategorised",
+    return dict(title=title, vendor=vendor, type=doc_type, category=sidecar.get("category") or "Uncategorised",
                 owner=sidecar.get("owner") or "Unassigned", status=sidecar.get("status") or "active",
                 parent_title=parent, parent_ref=None, template_key=TEMPLATE_KEY[doc_type])
 
@@ -170,8 +160,6 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
         use = mode if (scope == "all" or (scope == "drafts" and contract.status == "draft")) else "heuristic"
         items = deviations.compare_document(clauses_db, template_key, use)
         items += deviations.compare_custom(clauses_db, cfg["kcc"], contract.type)       # clauses added in Admin
-        if contract.status == "draft" and not (use == "llm" or (use == "auto" and llm.available())):
-            items = deviations.playbook_items(items, results, cfg["rules"], cfg["metrics"], clauses_db, cfg["kcc"])      # offline: findings come from the playbook, not a word diff
         items.sort(key=lambda i: -deviations.SEV_ORDER.index(i["severity"]))
         for it in items:
             tcid = cfg["tclause"].get((template_key, it["clause_type"]))
@@ -226,7 +214,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
             val["processes_personal_data"] = False
     tid = cfg["templates"].get(meta["template_key"])
     attrs = dict(
-        title=meta["title"], vendor=meta["vendor"], property=meta.get("property"), category=meta["category"], type=meta["type"], template_id=tid,
+        title=meta["title"], vendor=meta["vendor"], category=meta["category"], type=meta["type"], template_id=tid,
         status=meta["status"], owner=meta["owner"], body_md=md, currency="USD", source_path=rel, content_hash=chash,
         source_size=st.st_size, source_mtime_ns=st.st_mtime_ns, ingested_at=datetime.now(timezone.utc), origin=sidecar.get("origin", "inbox"), source_url=sidecar.get("source_url"),
         overrides=sorted(set(val) & OVERRIDABLE) if meta["type"] == "Amendment" else [],

@@ -35,7 +35,6 @@ def meta():
 
     row = q1("SELECT min(created_at) AS seeded_at FROM contracts")
     return {
-        "customer": ((__import__("app.config", fromlist=["settings"]).settings.customer_names or "Arcadia").split(",")[0].strip() or "Arcadia").title(),
         "demo_mode": __import__("app.mode", fromlist=["demo_on"]).demo_on(),
         "llm_available": llm.available(),
         "llm_provider": llm.provider(),
@@ -55,7 +54,7 @@ def contract_filters():
             r["v"]
             for r in q(f"SELECT DISTINCT {k} AS v FROM contracts WHERE {k} IS NOT NULL ORDER BY 1")
         ]
-        for k in ("vendor", "category", "type", "owner", "property", "status")
+        for k in ("vendor", "category", "type", "owner", "status")
     }
 
 
@@ -67,11 +66,10 @@ def list_contracts(
     owner: str | None = None,
     status: str | None = None,
     search: str | None = None,
-    property: str | None = None,
 ):
     where, p = [], {}
     for k, v in dict(
-        vendor=vendor, category=category, type=type, owner=owner, status=status, property=property
+        vendor=vendor, category=category, type=type, owner=owner, status=status
     ).items():
         if v:
             where.append(f"c.{k} = :{k}")
@@ -81,7 +79,7 @@ def list_contracts(
         p["s"] = f"%{search}%"
     return q(
         f"""
-      SELECT c.id, c.title, c.vendor, c.category, c.type, c.owner, c.property, c.status, c.parent_id,
+      SELECT c.id, c.title, c.vendor, c.category, c.type, c.owner, c.status, c.parent_id,
              c.effective_date,
              COALESCE(e.expiry_date, c.expiry_date) AS expiry_date,
              COALESCE(e.annual_value, c.annual_value) AS annual_value,
@@ -424,7 +422,7 @@ def dashboard():
         count(*) FILTER (WHERE liability_uncapped) AS uncapped
         FROM v_renewals""")
     rows = q(
-        """SELECT contract_id AS id, title, vendor, category, type, owner, (SELECT c.property FROM contracts c WHERE c.id = contract_id) AS property, annual_value, auto_renew,
+        """SELECT contract_id AS id, title, vendor, category, type, owner, annual_value, auto_renew,
                   expiry_date, notice_period_days, notice_deadline, days_left, notice_days_left,
                   liability_uncapped, fully_executed
            FROM v_renewals WHERE days_left BETWEEN 0 AND 90 ORDER BY expiry_date, title"""
@@ -636,77 +634,3 @@ def usage():
         "llm_available": llm.available(),
         "llm_provider": llm.provider(),
     }
-
-
-# ------------------------------------------------------------------ portfolio map: every contract family on one timeline, with hierarchy problems
-@router.get("/portfolio-map")
-def portfolio_map(property: str | None = None, vendor: str | None = None):
-    """Contracts grouped by vendor family (parent, children, amendments) with the dates a VMO acts on, and the hierarchy / data problems found:
-    a child that outlives its parent, an NDA that ends before its MSA, an SOW or work order with no parent, no end date, auto-renewal with no notice period."""
-    rows = q(
-        """SELECT c.id, c.title, c.vendor, c.type, c.parent_id, c.property, c.category, c.fully_executed,
-                  c.effective_date, COALESCE(e.expiry_date, c.expiry_date) AS expiry_date, COALESCE(e.auto_renew, c.auto_renew) AS auto_renew,
-                  COALESCE(e.notice_period_days, c.notice_period_days) AS notice_days, COALESCE(e.annual_value, c.annual_value) AS annual_value,
-                  COALESCE(e.liability_uncapped, false) AS uncapped
-           FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
-           WHERE c.status <> 'draft' AND (CAST(:p AS text) IS NULL OR c.property = :p OR c.type IN ('MSA')) AND (CAST(:v AS text) IS NULL OR c.vendor = :v)
-           ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SaaS' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, c.effective_date""",
-        p=property, v=vendor,
-    )
-    today = dt.date.today()
-    by_id = {r["id"]: r for r in rows}
-    for r in rows:
-        exp, nd = r["expiry_date"], r["notice_days"]
-        r["notice_deadline"] = (exp - dt.timedelta(days=int(nd))) if (exp and r["auto_renew"] and nd) else None
-        r["days_left"] = (exp - today).days if exp else None
-    issues = []
-
-    def issue(sev, kind, r, text_, fix):
-        issues.append({"severity": sev, "kind": kind, "contract_id": r["id"], "title": r["title"], "vendor": r["vendor"], "detail": text_, "action": fix})
-
-    for r in rows:
-        par = by_id.get(r["parent_id"]) if r["parent_id"] else None
-        if r["type"] in ("SOW", "Work Order") and not r["parent_id"]:
-            issue("high", "orphan", r, f"{r['type']} with no parent agreement found for {r['vendor']}.", "Upload the parent agreement or link it")
-        if par and par["expiry_date"] and r["expiry_date"] and r["expiry_date"] > par["expiry_date"] and r["type"] in ("SOW", "Work Order", "DPA"):
-            gap = (r["expiry_date"] - par["expiry_date"]).days
-            issue("critical" if gap > 30 else "high", "child_outlives_parent", r, f"Ends {r['expiry_date']:%d %b %Y}, {gap} day{'s' if gap != 1 else ''} after its parent ({par['expiry_date']:%d %b %Y}).", "Extend the parent or end the child sooner")
-        if r["type"] == "NDA":
-            msa = next((x for x in rows if x["vendor"] == r["vendor"] and x["type"] in ("MSA", "SaaS") and x["expiry_date"]), None)
-            if msa and r["expiry_date"] and r["expiry_date"] < msa["expiry_date"]:
-                issue("high", "nda_before_msa", r, f"NDA ends {r['expiry_date']:%d %b %Y}, before the agreement it protects ({msa['expiry_date']:%d %b %Y}).", "Renew or replace the NDA")
-        if r["type"] != "Amendment" and not r["expiry_date"]:
-            issue("medium", "no_end_date", r, "No end date could be read.", "Open the contract and correct the field")
-        if r["auto_renew"] and not r["notice_days"]:
-            issue("medium", "notice_unknown", r, "Auto-renews but the notice period is not stated.", "Check the renewal clause")
-    sev = {"critical": 0, "high": 1, "medium": 2}
-    issues.sort(key=lambda i: sev[i["severity"]])
-    props: dict[str, int] = {}
-    for r in rows:
-        if r["property"]:
-            props[r["property"]] = props.get(r["property"], 0) + 1
-    fams = {}
-    for r in rows:
-        fams.setdefault(r["vendor"], []).append(r)
-    return {
-        "today": today.isoformat(),
-        "families": [{"vendor": v, "category": items[0]["category"], "items": items} for v, items in fams.items()],
-        "issues": issues,
-        "properties": [{"property": k, "contracts": n} for k, n in sorted(props.items())],
-        "summary": {"families": len(fams), "documents": len(rows), "ending_90": sum(1 for r in rows if r["days_left"] is not None and 0 <= r["days_left"] <= 90),
-                    "problems": len(issues), "no_end_date": sum(1 for i in issues if i["kind"] == "no_end_date"), "notice_passed": sum(1 for r in rows if r["notice_deadline"] and r["notice_deadline"] < today)},
-    }
-
-
-@router.get("/properties")
-def properties():
-    """One row per hotel (property): what is contracted there, with whom, and what ends soon. Group-level agreements are counted separately."""
-    rows = q(
-        """SELECT c.property, count(*) AS contracts, count(DISTINCT c.vendor) AS vendors, COALESCE(sum(COALESCE(e.annual_value, c.annual_value)), 0) AS annual_value,
-                  count(*) FILTER (WHERE COALESCE(e.expiry_date, c.expiry_date) BETWEEN current_date AND current_date + 90) AS ending_90,
-                  array_agg(DISTINCT c.category) AS categories, array_agg(DISTINCT c.vendor) AS vendor_names
-           FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
-           WHERE c.property IS NOT NULL AND c.status <> 'draft' GROUP BY c.property ORDER BY c.property"""
-    )
-    grp = q("SELECT count(*) AS n FROM contracts WHERE property IS NULL AND status <> 'draft'")[0]["n"]
-    return {"properties": rows, "group_level": grp}

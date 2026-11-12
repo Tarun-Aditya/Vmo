@@ -62,7 +62,6 @@ class Contract(Base):
     processes_personal_data: Mapped[bool] = mapped_column(Boolean, default=False)
     has_dpa: Mapped[bool] = mapped_column(Boolean, default=False)
     owner: Mapped[str | None] = mapped_column(Text)
-    property: Mapped[str | None] = mapped_column(Text)
     # Amendments only: names of the contract columns this amendment overrides. Needed because
     # liability_cap_multiple NULL means "uncapped", so NULL can't also mean "not overridden".
     customer_signatory: Mapped[str | None] = mapped_column(Text)

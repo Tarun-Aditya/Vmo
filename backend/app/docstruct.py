@@ -130,9 +130,7 @@ def structure_text(text: str) -> str:
             i += 1
             continue
         letters = re.sub(r"[^A-Za-z]", "", line)
-        pv = lines[i - 1].strip() if i else ""
-        continuation = len(pv) > 40 and not SENTENCE_END.search(pv) and not pv.startswith(("#", "<!--"))      # a wrapped line of an ALL-CAPS paragraph is not a heading
-        if 3 <= len(letters) and not continuation and line.upper() == line and len(line) <= 70 and not SENTENCE_END.search(line) and not re.search(r"\d{4}", line) and len(line.split()) <= 9:
+        if 3 <= len(letters) and line.upper() == line and len(line) <= 70 and not SENTENCE_END.search(line) and not re.search(r"\d{4}", line) and len(line.split()) <= 9:
             out.append(f"## {_clean_heading(line.title())}")
             i += 1
             continue
