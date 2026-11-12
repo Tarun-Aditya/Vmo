@@ -13,3 +13,6 @@ pgdata/
 data/docs/
 
 data_test/
+
+# auto-generated on first use (connector secrets); never commit
+.secret_key
