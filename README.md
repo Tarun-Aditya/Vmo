@@ -239,3 +239,18 @@ own contracts, never from any employer's confidential material. The first decisi
 * Currency is USD in the demo data. Drafts are documents with status `draft` and are excluded from portfolio numbers.
 * Catalogue metadata (category, owner, parent links) comes from an optional `.meta.json` next to a document, else is inferred.
   `data/labels*.json` are ground truth used only by the evals.
+
+
+## Run it from a clean clone (verified)
+
+Everything the demo needs is committed: the documents, the labels, the rules and templates, the cached results and the fixtures. Nothing is downloaded and no API key is needed (the offline engine is the default; turn Demo mode off and set `LLM_PROVIDER` for Claude).
+
+```
+make showcase          # Docker: database + API + web, migrate, seed the IT-services corpus
+# or without Docker (Postgres 16 with pgvector, Python 3.12, Node 20):
+cd backend && pip install -r requirements.txt && alembic upgrade head
+DATA_DIR=../data python -m app.seed --pilot
+SIMULATORS=1 DATA_DIR=../data uvicorn app.main:app --port 8000     # stand-in ERP and e-signature systems for the demo
+cd ../frontend && npm ci && npm run dev                              # http://localhost:5173
+```
+Checked on a fresh clone with an empty database: seed, evals (fields 99.6%), type check, build and the 22-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).
