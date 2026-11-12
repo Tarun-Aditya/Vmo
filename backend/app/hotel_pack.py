@@ -2,6 +2,8 @@
 Loaded with `python -m app.seed --hotel` (or `hotel_pack.ensure(session)`); every row is ordinary Admin configuration (editable, deletable, not built in)."""
 from __future__ import annotations
 
+from sqlalchemy import text
+
 from app import kcc
 
 CAT = "Hospitality"
@@ -57,6 +59,10 @@ RULES = [
        fix="The Supplier shall respond to a fault report within 4 hours."),
     _r("hotel_commission_max", "Booking commission at most 15%", "Distribution commission above 15 percent of room revenue needs approval.", "metric_threshold", "high", ["SaaS"], metric="commission_pct", op="<=", num=15,
        fix="The commission payable on each booking shall not exceed 15 percent of room revenue."),
+    _r("hotel_renewal_notice_max", "Renewal notice at most 90 days", "A hotel needs a short, workable window to stop an auto-renewal (seasonal budgets change).", "metric_threshold", "high", ["MSA", "SOW", "SaaS"],
+       metric="renewal_notice_days", op="<=", num=90, fix="The agreement renews automatically unless a party gives at least 60 days' written notice of non-renewal."),
+    _r("hotel_liability_cap_min", "Supplier liability cap at least 1x annual fees", "A supplier whose staff or systems can harm guests must stand behind at least a year's fees.", "metric_threshold", "high", ["MSA", "SaaS", "SOW"],
+       metric="liability_cap_multiple", op=">=", num=1, fix="The Supplier's aggregate liability is limited to one (1) times the fees paid or payable in the twelve months preceding the claim."),
     _r("hotel_pci_required", "Payment-card security present", "Required where a supplier handles card data.", "clause_required", "critical", ["SaaS"], kcc="payment_card_data", fix=CLAUSES[6]["standard_text"]),
     _r("hotel_sale_termination", "Exit on sale of property", "Hotel groups buy and sell hotels: every property contract needs an exit on sale.", "clause_required", "medium", ["MSA"], kcc="property_sale_termination", fix=CLAUSES[3]["standard_text"]),
     _r("hotel_labour_compliance", "Labour and wage compliance clause present", "Staffing and security suppliers must commit to wage and working-time law.", "clause_required", "medium", ["MSA"], kcc="labour_compliance", fix=CLAUSES[2]["standard_text"]),
@@ -70,5 +76,6 @@ def ensure(s) -> dict:
            "metrics": kcc._insert_missing(s, "metrics", kcc.MET_COLS, METRICS)}
     rules = [dict(r, sort_order=900 + i) for i, r in enumerate(RULES)]
     out["rules"] = kcc._insert_missing(s, "checklist_rules", kcc.RULE_COLS + ["sort_order"], rules)
+    s.execute(text("UPDATE checklist_rules SET enabled=false WHERE key='governing_law_ny'"))     # a hotel group is not tied to one state's law: Legal decides per vendor
     kcc.rebuild_key_clauses_view(s)
     return out

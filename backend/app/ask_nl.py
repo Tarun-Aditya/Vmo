@@ -22,7 +22,7 @@ from app.db import SessionLocal
 BASE = "v_effective_terms JOIN v_key_clauses USING (contract_id)"
 BASE_ALL = "v_document_terms JOIN v_key_clauses USING (contract_id)"
 NOTICE = "(expiry_date - COALESCE(notice_period_days, 0))"
-DIMS = {"category": "category", "vendor": "vendor", "type": "type", "owner": "owner", "status": "status",
+DIMS = {"property": "COALESCE((SELECT c.property FROM contracts c WHERE c.id = contract_id), 'Group level')", "category": "category", "vendor": "vendor", "type": "type", "owner": "owner", "status": "status",
         "month": "to_char(date_trunc('month', {d}), 'YYYY-MM')", "quarter": "to_char(date_trunc('quarter', {d}), 'YYYY \"Q\"Q')"}
 TYPE_WORDS = {"msa": "MSA", "sow": "SOW", "nda": "NDA", "dpa": "DPA", "saas": "SaaS", "work orders?": "Work Order", "wos?": "Work Order"}
 SIG_COLS = ["customer_signatory", "customer_signed_date", "supplier_signatory", "supplier_signed_date", "fully_executed"]
@@ -159,6 +159,11 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         if c.lower() != "saas" and not scope and re.search(rf"\b{re.escape(c.lower())}\b", q):
             where.append(f"category = '{c}'")
             adj.append(c)
+    for pr in _distinct("property"):                                    # a hotel property named in the question
+        toks = [w for w in re.findall(r"[a-z]+", pr.lower()) if w not in {"seabright", "hotel", "hotels", "resort", "inn", "lodge", "suites", "boutique", "the", "and"}]
+        if toks and not scope and all(re.search(rf"\b{t}\b", q) for t in toks):
+            where.append(f"(SELECT c.property FROM contracts c WHERE c.id = contract_id) = '{pr}'")
+            adj.append(f"at {pr}")
     vendor_hit = False
     for v in vendors:
         if not scope and re.search(rf"\b{re.escape(v.split()[0].lower())}\b", q):
@@ -233,6 +238,10 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     hit_metrics = [m for _, m in sorted(hit_metrics, key=lambda x: x[0])]        # columns follow the order of the question
     want_cols.extend("mv:" + m["key"] for m in hit_metrics)
     cmp_ = re.search(rf"({LT}|{GT})\s*{NUM}", q)
+    if hit_metrics and not cmp_ and not scope and _distinct("property"):         # hotel groups: 'the laundry rate per kilogram (across properties)': only contracts that state it, with vendor and property beside the value
+        where.append(f"EXISTS (SELECT 1 FROM extracted_values ev WHERE ev.contract_id = {bname}.contract_id AND ev.metric_key = '{hit_metrics[0]['key']}')")
+        want_cols[:0] = [c for c in ("vendor", "property") if c not in want_cols]
+        adj.append(f"stating {hit_metrics[0]['name'].lower()}")
     if cmp_ and hit_metrics:
         op_word, val, suf = cmp_.group(1), cmp_.group(2), cmp_.group(3)
         lt = re.fullmatch(LT, op_word) is not None
@@ -256,8 +265,10 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     rule_hits = [r["key"] for r in rules if r["name"].lower() in q]
     metric = ("count" if re.search(r"how many|number of|\bcount\b", q) else "sum" if re.search(r"\btotal\b(?! value)|\bsum\b|worth|spend|how much", q)
               else "avg" if re.search(r"average|\bavg\b|mean", q) else "list")
-    g = re.search(r"\bby (category|vendor|type|owner|status|month|quarter)\b|(?:each|per) (category|vendor|type|owner|status|month|quarter)", q)
+    g = re.search(r"\bby (category|vendor|type|owner|status|month|quarter|property)\b|(?:each|per) (category|vendor|type|owner|status|month|quarter|property)", q)
     group = (g.group(1) or g.group(2)) if g else None
+    if not group and re.search(r"\b(?:which|what|how many) (?:properties|hotels)\b|\b(?:by|per|each) (?:hotel|site)\b|(?:properties|hotels) (?:with|have|has|by)", q):
+        group = "property"
     topn = re.search(r"\btop\s+(\d+)\s+vendors?\b|\b(?:largest|biggest)\s+(\d+)\s+vendors?\b", q)
     top = int(topn.group(1) or topn.group(2)) if topn else None
     if top:
@@ -265,6 +276,11 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     vendor_level = bool(re.search(r"how many vendors|which vendors|what vendors|list (?:all )?(?:the )?vendors|vendors (?:with|that|having|who|have)", q))
     if vendor_level and not group:
         group = "vendor"
+    if group == "property" and hit_metrics and metric in ("list", "count"):
+        group = None                       # 'the laundry rate at each property' wants the values with the property beside them, not a count per property
+    if group == "property" and metric == "list" and not hit_metrics:
+        metric = "count"
+        where.append("(SELECT c.property FROM contracts c WHERE c.id = contract_id) IS NOT NULL")
     all_clauses = bool(re.search(r"key clauses|all clauses|which clauses|clause (?:presence|checklist|coverage)", q))
     overview = bool(re.search(r"summar|overview|key terms|tell me about|describe|details|what is this|about this", q))
 
@@ -301,6 +317,8 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
 def _col_sql(c: str, plan: dict) -> str:
     if c == "notice_deadline":
         return f"{NOTICE} AS notice_deadline"
+    if c == "property":
+        return "COALESCE((SELECT c.property FROM contracts c WHERE c.id = contract_id), 'Group level') AS property"
     if c.startswith("mv:"):
         key = c[3:]
         m = next((x for x in plan["mets"] if x["key"] == key), {"kind": "number"})

@@ -993,7 +993,7 @@
    "auto_renew": true,
    "annual_value": 348000,
    "total_value": 696000,
-   "payment_terms_days": 75,
+   "payment_terms_days": 10,
    "liability_cap_multiple": 0.25,
    "liability_cap_text": "0.25 times annual fees",
    "termination_for_convenience": false,
@@ -1006,7 +1006,7 @@
    "supplier_signed_date": null,
    "fully_executed": false,
    "values": {
-    "payment_terms_days": 75,
+    "payment_terms_days": 10,
     "renewal_notice_days": 180
    },
    "milestones": [],
@@ -1014,8 +1014,7 @@
     "payment_terms",
     "liability_cap",
     "termination_for_convenience",
-    "renewal",
-    "governing_law"
+    "renewal"
    ],
    "meta": {
     "property": "Seabright Harbour Hotel",
@@ -1035,7 +1034,7 @@
    "auto_renew": true,
    "annual_value": null,
    "total_value": null,
-   "payment_terms_days": 60,
+   "payment_terms_days": 10,
    "liability_cap_multiple": null,
    "liability_cap_text": "Unlimited",
    "termination_for_convenience": false,
@@ -1048,7 +1047,7 @@
    "supplier_signed_date": null,
    "fully_executed": false,
    "values": {
-    "payment_terms_days": 60,
+    "payment_terms_days": 10,
     "insurance_cover_usd": 1000000,
     "confidentiality_years": 2,
     "renewal_notice_days": 180
@@ -1101,8 +1100,7 @@
    "deviations": [
     "payment_terms",
     "liability_cap",
-    "termination_for_convenience",
-    "warranties"
+    "termination_for_convenience"
    ],
    "meta": {
     "property": null,
