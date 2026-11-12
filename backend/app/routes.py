@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
 
@@ -710,3 +710,34 @@ def properties():
     )
     grp = q("SELECT count(*) AS n FROM contracts WHERE property IS NULL AND status <> 'draft'")[0]["n"]
     return {"properties": rows, "group_level": grp}
+
+
+# ------------------------------------------------------------------ renewal decisions
+class DecisionIn(BaseModel):
+    contract_id: int
+    decision: str
+    owner: str | None = None
+    note: str | None = None
+
+
+@router.post("/renewals/decisions")
+def record_decision(b: DecisionIn, request: Request):
+    """Record what the VMO decided for a contract coming up for renewal. Later decisions supersede earlier ones; the history is kept."""
+    from app.routes_auth import me
+
+    if b.decision not in ("renew", "renegotiate", "exit", "extend"):
+        raise HTTPException(422, "decision must be renew, renegotiate, exit or extend")
+    if not q1("SELECT 1 AS x FROM contracts WHERE id = :i", i=b.contract_id):
+        raise HTTPException(404, "contract not found")
+    with SessionLocal() as s:
+        rid = s.execute(text("INSERT INTO renewal_decisions (contract_id, decision, owner, note, decided_by) VALUES (:c,:d,:o,:n,:u) RETURNING id"),
+                        {"c": b.contract_id, "d": b.decision, "o": (b.owner or "").strip() or None, "n": (b.note or "").strip() or None, "u": me(request).get("email")}).scalar()
+        s.commit()
+    return {"id": rid, "contract_id": b.contract_id, "decision": b.decision}
+
+
+@router.get("/renewals/decisions")
+def list_decisions():
+    """The latest decision per contract, with who and when."""
+    return q("""SELECT DISTINCT ON (contract_id) id, contract_id, decision, owner, note, decided_by, decided_at
+                FROM renewal_decisions ORDER BY contract_id, decided_at DESC, id DESC""")
