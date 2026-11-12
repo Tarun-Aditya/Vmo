@@ -71,8 +71,9 @@ class DocuSign:
         body = {"emailSubject": f"Please sign: {title}", "status": "sent",
                 "documents": [{"documentBase64": base64.b64encode(pdf_or_docx).decode(), "name": title, "fileExtension": ext, "documentId": "1"}],
                 "recipients": {"signers": [{"email": s["email"], "name": s["name"], "recipientId": str(i + 1), "routingOrder": str(i + 1)} for i, s in enumerate(signers)]}}
-        if os.environ.get("PUBLIC_API_URL"):                  # DocuSign Connect: tell us when the envelope changes
-            body["eventNotification"] = {"url": os.environ["PUBLIC_API_URL"].rstrip("/") + "/api/signatures/webhook/docusign", "requireAcknowledgment": "true", "envelopeEvents": [{"envelopeEventStatusCode": "completed"}, {"envelopeEventStatusCode": "declined"}]}
+        pub = os.environ.get("PUBLIC_API_URL") or ("http://localhost:8000" if simulated() else "")
+        if pub:                                               # DocuSign Connect: tell us when the envelope changes
+            body["eventNotification"] = {"url": pub.rstrip("/") + "/api/signatures/webhook/docusign", "requireAcknowledgment": "true", "envelopeEvents": [{"envelopeEventStatusCode": "completed"}, {"envelopeEventStatusCode": "declined"}]}
         r = httpx.post(f"{self.base}/v2.1/accounts/{self.account}/envelopes", json=body, headers=self._h(), timeout=60)
         r.raise_for_status()
         j = r.json()

@@ -227,6 +227,14 @@ async def docusign_webhook(request: Request):
 def mark_executed(cid: int):
     """Move a fully signed draft into the executed-contracts folder and re-ingest it, so every screen treats it as an executed contract."""
     done = rows("SELECT id FROM signature_requests WHERE contract_id=:c AND status='completed' ORDER BY id DESC LIMIT 1", c=cid)
+    if not done:        # a missed callback is recovered here: ask the signing service for the latest status before refusing
+        pend = rows("SELECT id FROM signature_requests WHERE contract_id=:c AND status='pending' AND provider='docusign' ORDER BY id DESC LIMIT 1", c=cid)
+        if pend:
+            try:
+                sync_docusign(pend[0]["id"])
+            except HTTPException:
+                pass
+            done = rows("SELECT id FROM signature_requests WHERE contract_id=:c AND status='completed' ORDER BY id DESC LIMIT 1", c=cid)
     if not done:
         raise HTTPException(409, "the draft has no completed signature request")
     d = rows("SELECT id, source_path FROM contracts WHERE id=:c AND status='draft'", c=cid)
