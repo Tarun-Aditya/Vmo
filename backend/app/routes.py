@@ -5,7 +5,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
 
@@ -690,3 +690,34 @@ def portfolio_map(vendor: str | None = None):
         "summary": {"families": len(fams), "documents": len(rows), "ending_90": sum(1 for r in rows if r["days_left"] is not None and 0 <= r["days_left"] <= 90),
                     "problems": len(issues), "no_end_date": sum(1 for i in issues if i["kind"] == "no_end_date"), "notice_passed": sum(1 for r in rows if r["notice_deadline"] and r["notice_deadline"] < today)},
     }
+
+
+# ------------------------------------------------------------------ renewal decisions
+class DecisionIn(BaseModel):
+    contract_id: int
+    decision: str
+    owner: str | None = None
+    note: str | None = None
+
+
+@router.post("/renewals/decisions")
+def record_decision(b: DecisionIn, request: Request):
+    """Record what the VMO decided for a contract coming up for renewal. Later decisions supersede earlier ones; the history is kept."""
+    from app.routes_auth import me
+
+    if b.decision not in ("renew", "renegotiate", "exit", "extend"):
+        raise HTTPException(422, "decision must be renew, renegotiate, exit or extend")
+    if not q1("SELECT 1 AS x FROM contracts WHERE id = :i", i=b.contract_id):
+        raise HTTPException(404, "contract not found")
+    with SessionLocal() as s:
+        rid = s.execute(text("INSERT INTO renewal_decisions (contract_id, decision, owner, note, decided_by) VALUES (:c,:d,:o,:n,:u) RETURNING id"),
+                        {"c": b.contract_id, "d": b.decision, "o": (b.owner or "").strip() or None, "n": (b.note or "").strip() or None, "u": me(request).get("email")}).scalar()
+        s.commit()
+    return {"id": rid, "contract_id": b.contract_id, "decision": b.decision}
+
+
+@router.get("/renewals/decisions")
+def list_decisions():
+    """The latest decision per contract, with who and when."""
+    return q("""SELECT DISTINCT ON (contract_id) id, contract_id, decision, owner, note, decided_by, decided_at
+                FROM renewal_decisions ORDER BY contract_id, decided_at DESC, id DESC""")

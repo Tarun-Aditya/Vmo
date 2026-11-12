@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { api, daysLabel, fmtDate, usd } from "../lib";
@@ -8,11 +8,19 @@ type Item = { id: number; title: string; vendor: string; type: string; expiry_da
 type MapData = { today: string; families: { vendor: string; items: Item[] }[] };
 
 const MONTHS = 12, DAY = 86400000;
+type Decision = { contract_id: number; decision: string; owner: string | null; note: string | null; decided_by: string | null; decided_at: string };
+const DECISIONS: [string, string][] = [["renew", "Renew as is"], ["renegotiate", "Renegotiate"], ["exit", "Exit"], ["extend", "Extend short term"]];
 
 /** What expires in the next 12 months, and the last day to act on each (expiry minus the notice period). */
 export default function Renewals() {
   const q = useQuery({ queryKey: ["map", ""], queryFn: () => api<MapData>("/api/portfolio-map") });
   const [view, setView] = useState<"timeline" | "list">("timeline");
+  const qc = useQueryClient();
+  const dq = useQuery({ queryKey: ["renewal-decisions"], queryFn: () => api<Decision[]>("/api/renewals/decisions") });
+  const [form, setForm] = useState({ contract_id: "", decision: "renegotiate", owner: "", note: "" });
+  const save = useMutation({ mutationFn: () => api("/api/renewals/decisions", { method: "POST", body: JSON.stringify({ ...form, contract_id: Number(form.contract_id) }) }),
+    onSuccess: () => { setForm({ ...form, note: "" }); qc.invalidateQueries({ queryKey: ["renewal-decisions"] }); } });
+  const decided = Object.fromEntries((dq.data ?? []).map((d) => [d.contract_id, d]));
   if (!q.data) return <Loading q={q} />;
   const today = new Date(q.data.today + "T00:00:00"), start = new Date(today.getFullYear(), today.getMonth(), 1), end = new Date(start.getFullYear(), start.getMonth() + MONTHS, 1);
   const span = end.getTime() - start.getTime();
@@ -43,7 +51,7 @@ export default function Renewals() {
                 <div className="pointer-events-none absolute bottom-0 top-0 z-10 w-0.5 bg-indigo-600" style={{ left: `calc(260px + (100% - 340px) * ${pos(q.data.today) / 100})` }} title="today" />
                 {rows.map((i) => (
                   <div key={i.id} className="grid grid-cols-[260px_1fr_80px] items-center border-t border-slate-100 dark:border-slate-700">
-                    <div className="min-w-0 px-3 py-2"><Link to={`/contracts/${i.id}`} className="block truncate text-[13px] font-semibold hover:underline" title={i.title}>{i.title}</Link><div className="truncate text-[11.5px] text-ink-mute">{i.vendor} · {i.type}</div></div>
+                    <div className="min-w-0 px-3 py-2"><Link to={`/contracts/${i.id}`} className="block truncate text-[13px] font-semibold hover:underline" title={i.title}>{i.title}</Link><div className="truncate text-[11.5px] text-ink-mute">{i.vendor} · {i.type}{decided[i.id] && <span className="ml-1 rounded bg-indigo-100 px-1 font-semibold text-indigo-900">{decided[i.id].decision}</span>}</div></div>
                     <div className="relative h-9">
                       <span className="absolute top-3 h-3.5 rounded" style={{ left: `${pos(q.data.today)}%`, width: `${Math.max(pos(i.expiry_date!) - pos(q.data.today), 1)}%`, background: colour(i) }} />
                       {i.auto_renew && i.notice_deadline && <span className="absolute top-[9px] z-10" style={{ left: `calc(${pos(i.notice_deadline)}% - 7px)` }} title={`Last day to act: ${fmtDate(i.notice_deadline)}`}>
@@ -57,13 +65,24 @@ export default function Renewals() {
             </div></div>
           ) : (
             <table className="w-full text-[13px]"><thead className="bg-slate-50 dark:bg-slate-900"><tr>{["Why", "Contract", "Vendor", "Ends", "Annual value"].map((h, n) => <th key={h} className={`px-3 py-2 text-[11.5px] font-semibold uppercase tracking-wide text-ink-mute ${n === 4 ? "text-right" : "text-left"}`}>{h}</th>)}</tr></thead>
-              <tbody>{rows.map((i) => <tr key={i.id} className="border-t border-slate-100 dark:border-slate-700"><td className="px-3 py-2"><SeverityChip sev={sevOf(i)} label={why(i)} /></td><td className="px-3 py-2"><Link to={`/contracts/${i.id}`} className="font-semibold text-indigo-600 hover:underline">{i.title}</Link></td><td className="px-3 py-2">{i.vendor}</td><td className="num px-3 py-2">{fmtDate(i.expiry_date)}</td><td className="num px-3 py-2 text-right">{usd(i.annual_value)}</td></tr>)}</tbody></table>)}
+              <tbody>{rows.map((i) => <tr key={i.id} className="border-t border-slate-100 dark:border-slate-700"><td className="px-3 py-2"><SeverityChip sev={sevOf(i)} label={why(i)} /></td><td className="px-3 py-2"><Link to={`/contracts/${i.id}`} className="font-semibold text-indigo-600 hover:underline">{i.title}</Link></td><td className="px-3 py-2">{i.vendor}{decided[i.id] && <span className="ml-1 rounded bg-indigo-100 px-1 text-[11px] font-semibold text-indigo-900">{decided[i.id].decision}</span>}</td><td className="num px-3 py-2">{fmtDate(i.expiry_date)}</td><td className="num px-3 py-2 text-right">{usd(i.annual_value)}</td></tr>)}</tbody></table>)}
           <div className="border-t border-line px-3 py-2 text-xs text-ink-mute dark:border-slate-700">Blue line = today · bar ends at expiry · ◆ ▲ = last day to act (passed or within 30 days · later)</div>
         </section>
         <aside className="flex min-w-0 flex-[1_1_300px] flex-col gap-4">
           <Card title="Decisions this month">
             <ul className="space-y-2 text-[13px]">{month.map((i) => <li key={i.id} className="flex items-start justify-between gap-2"><Link to={`/contracts/${i.id}`} className="font-semibold hover:underline">{i.vendor.replace(/ (Inc|LLC|LLP|Ltd)\.?$/, "")}</Link><SeverityChip sev={sevOf(i)} label={why(i)} /></li>)}
               {!month.length && <li className="text-ink-mute">No decision is due in the next 30 days.</li>}</ul>
+          </Card>
+          <Card title="Record a decision">
+            <form className="space-y-2.5 text-[13px]" onSubmit={(e) => { e.preventDefault(); if (form.contract_id) save.mutate(); }}>
+              <label className="block">Contract<select className="mt-1 block min-h-[36px] w-full rounded border border-slate-300 bg-white px-2 dark:border-slate-600 dark:bg-slate-900" value={form.contract_id} onChange={(e) => setForm({ ...form, contract_id: e.target.value })} required>
+                <option value="">Choose…</option>{rows.map((i) => <option key={i.id} value={i.id}>{i.vendor} · {i.title}</option>)}</select></label>
+              <label className="block">Decision<select className="mt-1 block min-h-[36px] w-full rounded border border-slate-300 bg-white px-2 dark:border-slate-600 dark:bg-slate-900" value={form.decision} onChange={(e) => setForm({ ...form, decision: e.target.value })}>{DECISIONS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
+              <label className="block">Owner<input className="mt-1 block min-h-[36px] w-full rounded border border-slate-300 bg-white px-2 dark:border-slate-600 dark:bg-slate-900" value={form.owner} onChange={(e) => setForm({ ...form, owner: e.target.value })} placeholder="who will act" /></label>
+              <label className="block">Note<input className="mt-1 block min-h-[36px] w-full rounded border border-slate-300 bg-white px-2 dark:border-slate-600 dark:bg-slate-900" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} placeholder="why" /></label>
+              <button className="inline-flex min-h-[36px] items-center rounded-md border border-indigo-600 bg-indigo-600 px-4 text-[13px] font-semibold text-white disabled:opacity-50" disabled={!form.contract_id || save.isPending}>{save.isPending ? "Saving…" : "Save decision"}</button>
+              {save.isSuccess && <span className="ml-2 text-indigo-700">Saved</span>}{save.isError && <span className="ml-2 text-red-700">Could not save</span>}
+            </form>
           </Card>
         </aside>
       </div>

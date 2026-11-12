@@ -376,3 +376,17 @@ def test_demo_mode_switch_turns_claude_off_everywhere_and_back(client, seeded, m
         assert m["demo_mode"] is True and m["llm_provider"] == "offline" and not llm.available()
     finally:
         mode.set_demo(False)
+
+
+def test_renewal_decisions_are_recorded_and_the_latest_wins(client, seeded):
+    cid = client.get("/api/contracts").json()[0]["id"]
+    assert client.post("/api/renewals/decisions", json={"contract_id": cid, "decision": "maybe"}).status_code == 422
+    assert client.post("/api/renewals/decisions", json={"contract_id": 999999, "decision": "exit"}).status_code == 404
+    assert client.post("/api/renewals/decisions", json={"contract_id": cid, "decision": "renegotiate", "owner": "Priya", "note": "ask for 2x cap"}).status_code == 200
+    assert client.post("/api/renewals/decisions", json={"contract_id": cid, "decision": "exit"}).status_code == 200
+    got = [d for d in client.get("/api/renewals/decisions").json() if d["contract_id"] == cid]
+    assert len(got) == 1 and got[0]["decision"] == "exit"                                  # the later decision supersedes
+    with SessionLocal() as s:
+        assert s.execute(text("SELECT count(*) FROM renewal_decisions WHERE contract_id=:c"), {"c": cid}).scalar() == 2      # history is kept
+        s.execute(text("DELETE FROM renewal_decisions WHERE contract_id=:c"), {"c": cid})
+        s.commit()
