@@ -12,17 +12,17 @@ export default function Properties() {
   const { properties, group_level } = q.data;
   return (
     <div className="space-y-6">
-      <header><h1 className="font-serif text-3xl md:text-4xl">Properties</h1>
+      <header><h1>Properties</h1>
         <p className="mt-1 text-sm text-ink-mute dark:text-slate-400">What is contracted at each property, with whom, and what ends soon. {group_level} group-level agreement{group_level !== 1 ? "s" : ""} apply to all properties.</p></header>
-      {!properties.length && <p className="rounded-xl border border-line bg-white p-6 text-sm text-ink-mute dark:border-slate-700 dark:bg-slate-800">No contracts carry a property yet. A property is read from the document (a "Property:" line or the sidecar file).</p>}
+      {!properties.length && <p className="rounded-lg border border-line bg-white p-6 text-sm text-ink-mute dark:border-slate-700 dark:bg-slate-800">No contracts carry a property yet. A property is read from the document (a "Property:" line or the sidecar file).</p>}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {properties.map((p) => (
-          <section key={p.property} className="rounded-xl border border-line bg-white p-5 dark:border-slate-700 dark:bg-slate-800" aria-label={p.property}>
-            <h2 className="font-serif text-2xl">{p.property}</h2>
+          <section key={p.property} className="rounded-lg border border-line bg-white p-5 dark:border-slate-700 dark:bg-slate-800" aria-label={p.property}>
+            <h2 className="text-lg font-semibold">{p.property}</h2>
             <dl className="mt-3 grid grid-cols-3 gap-2 text-sm">
-              <div><dt className="text-xs uppercase text-ink-mute">Contracts</dt><dd className="font-serif text-2xl tabular-nums">{p.contracts}</dd></div>
-              <div><dt className="text-xs uppercase text-ink-mute">Vendors</dt><dd className="font-serif text-2xl tabular-nums">{p.vendors}</dd></div>
-              <div><dt className="text-xs uppercase text-ink-mute">Per year</dt><dd className="font-serif text-2xl tabular-nums">{usd(p.annual_value)}</dd></div>
+              <div><dt className="text-xs uppercase text-ink-mute">Contracts</dt><dd className="text-lg font-semibold tabular-nums">{p.contracts}</dd></div>
+              <div><dt className="text-xs uppercase text-ink-mute">Vendors</dt><dd className="text-lg font-semibold tabular-nums">{p.vendors}</dd></div>
+              <div><dt className="text-xs uppercase text-ink-mute">Per year</dt><dd className="text-lg font-semibold tabular-nums">{usd(p.annual_value)}</dd></div>
             </dl>
             {p.ending_90 > 0 && <p className="mt-2 text-sm font-semibold text-orange-700 dark:text-orange-300">▲ {p.ending_90} ending within 90 days</p>}
             <ul className="mt-3 flex flex-wrap gap-1.5 text-xs">{p.categories.map((c) => <li key={c} className="rounded-full bg-paper px-2 py-0.5 dark:bg-slate-700">{c}</li>)}</ul>

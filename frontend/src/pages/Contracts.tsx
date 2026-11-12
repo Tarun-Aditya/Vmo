@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { api, fmtDate, usd } from "../lib";
 import { Card, Loading, SeverityChip, Td, Th } from "../ui";
@@ -68,18 +67,47 @@ export function Hierarchy({ rows }: { rows: Row[] }) {
   );
 }
 
+type Insp = { contract: { id: number; title: string; vendor: string; type: string; status: string }; fields: { field: string; value: string | null; confidence: number | null; source_page: number | null }[];
+  checks: { rule_key: string; name: string; status: string; severity: string }[] };
+const SHOW: [string, string][] = [["effective_date", "Effective"], ["expiry_date", "Expires"], ["liability_cap_text", "Liability"], ["termination_for_convenience", "Termination for convenience"], ["payment_terms_days", "Payment terms (days)"], ["governing_law", "Governing law"], ["auto_renew", "Auto-renew"]];
+
+/** Right-hand panel for the selected row: the fields a VMO scans for, with their confidence. */
+function Inspector({ id }: { id: number | null }) {
+  const q = useQuery({ queryKey: ["contract", String(id)], enabled: id !== null, queryFn: () => api<Insp>(`/api/contracts/${id}`) });
+  if (id === null) return <aside className="flex-[1_1_320px] rounded-lg border border-dashed border-line p-6 text-sm text-ink-mute dark:border-slate-700">Select a contract to see its key terms here.</aside>;
+  if (!q.data) return <aside className="flex-[1_1_320px] p-4 text-sm text-ink-mute">Loading…</aside>;
+  const d = q.data, fail = d.checks.filter((c) => c.status === "fail").length;
+  const val = (f: string, v: string | null) => (v === null || v === "null" ? "—" : f.endsWith("_date") ? fmtDate(v) : v === "True" || v === "true" ? "Yes" : v === "False" || v === "false" ? "No" : v);
+  return (
+    <aside className="min-w-0 flex-[1_1_320px] rounded-lg border border-line bg-white dark:border-slate-700 dark:bg-slate-800" aria-label="Inspector">
+      <div className="border-b border-line p-4 dark:border-slate-700"><div className="text-[11.5px] font-semibold uppercase tracking-wider text-ink-mute">Selected</div><div className="font-semibold">{d.contract.title}</div><div className="text-sm text-ink-mute">{d.contract.vendor} · {d.contract.type}</div></div>
+      <dl className="space-y-2 p-4 text-[13px]">
+        {SHOW.map(([f, l]) => { const x = d.fields.find((y) => y.field === f); return x ? <div key={f} className="flex justify-between gap-3"><dt className="text-ink-mute">{l}</dt><dd className="num text-right">{val(f, x.value)}{x.confidence !== null && x.confidence < 0.7 && <span className="ml-1 rounded bg-amber-100 px-1 text-[10px] font-semibold text-amber-900" title="Low confidence">check</span>}</dd></div> : null; })}
+        <div className="flex justify-between gap-3"><dt className="text-ink-mute">Checklist</dt><dd>{fail ? <span className="font-semibold text-red-700">{fail} failing</span> : <span className="font-semibold text-indigo-700">all passing</span>}</dd></div>
+      </dl>
+      <div className="flex gap-2 border-t border-line p-4 dark:border-slate-700"><Link to={`/contracts/${id}`} className="inline-flex min-h-[32px] items-center rounded-md border border-indigo-600 bg-indigo-600 px-3 text-[12.5px] font-semibold text-white">Open workspace</Link>
+        <Link to={`/ask?doc=${id}`} className="inline-flex min-h-[32px] items-center rounded-md border border-slate-300 px-3 text-[12.5px] font-semibold dark:border-slate-600">Ask about it</Link></div>
+    </aside>
+  );
+}
+
 export default function Contracts() {
-  const [sp] = useSearchParams();
-  const [f, setF] = useState<Record<string, string>>(() => Object.fromEntries(FILTERS.filter((k) => sp.get(k)).map((k) => [k, sp.get(k) as string])));
+  const [f, setF] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"table" | "tree">("table");
+  const [saved, setSaved] = useState<"all" | "expiring" | "flagged" | "unsigned">("all");
+  const [sel, setSel] = useState<number | null>(null);
   const filters = useQuery({ queryKey: ["filters"], queryFn: () => api<Record<string, string[]>>("/api/contracts/filters") });
   const qs = new URLSearchParams({ ...Object.fromEntries(Object.entries(f).filter(([, v]) => v)), ...(search ? { search } : {}) }).toString();
   const q = useQuery({ queryKey: ["contracts", qs], queryFn: () => api<Row[]>(`/api/contracts?${qs}`) });
+  const now = Date.now();
+  const shown = (q.data ?? []).filter((c) => saved === "all" || (saved === "expiring" && !!c.expiry_date && new Date(c.expiry_date).getTime() - now < 90 * 864e5 && new Date(c.expiry_date).getTime() > now) || (saved === "flagged" && (c.liability_uncapped || (c.deviation_count ?? 0) > 5)) || (saved === "unsigned" && !c.fully_executed));
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Contract repository</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1>Contracts</h1>
+        <div className="inline-flex overflow-hidden rounded-md border border-slate-300 bg-white text-[12.5px] font-semibold dark:border-slate-600 dark:bg-slate-800" role="group" aria-label="Saved views">
+          {([["all", "All"], ["expiring", "Expiring"], ["flagged", "Flagged"], ["unsigned", "Unsigned"]] as const).map(([k, t]) => <button key={k} className={`min-h-[32px] px-3 ${saved === k ? "bg-ink text-white" : "text-ink-mute"}`} onClick={() => setSaved(k)}>{t}</button>)}</div>
         <div className="inline-flex overflow-hidden rounded border border-slate-300 text-sm dark:border-slate-600" role="tablist">
           {(["table", "tree"] as const).map((v) => (
             <button key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)} className={`px-3 py-1.5 ${view === v ? "bg-indigo-600 text-white" : "bg-white dark:bg-slate-800"}`}>{v === "table" ? "Table" : "Hierarchy"}</button>
@@ -97,18 +125,18 @@ export default function Contracts() {
             </label>
           ))}
           <button className="rounded border px-2 py-1" onClick={() => { setF({}); setSearch(""); }}>Reset</button>
-          <span className="ml-auto text-slate-500">{q.data?.length ?? 0} documents</span>
+          <span className="ml-auto text-slate-500">{shown.length} of {q.data?.length ?? 0} documents</span>
         </div>
       </Card>
       <Loading q={q} />
       {q.data && view === "tree" && <Hierarchy rows={q.data} />}
       {q.data && view === "table" && (
-        <Card>
+        <div className="flex flex-wrap items-start gap-4"><Card className="min-w-0 flex-[999_1_720px]">
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead><tr><Th>Contract</Th><Th>Type</Th><Th>Category</Th><Th>Property</Th><Th>Owner</Th><Th>Start date</Th><Th>End date</Th><Th className="text-right">Value</Th><Th>Signatures</Th><Th>Flags</Th></tr></thead>
             <tbody>
-              {q.data.map((c) => (
-                <tr key={c.id} className="border-t border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/40">
+              {shown.map((c) => (
+                <tr key={c.id} onClick={() => setSel(c.id)} className={`cursor-pointer border-t border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/40 ${sel === c.id ? "bg-indigo-50 dark:bg-slate-700" : ""}`}>
                   <Td><Link to={`/contracts/${c.id}`} className={`font-medium text-indigo-600 hover:underline dark:text-indigo-400 ${c.parent_id ? "pl-4" : ""}`}>{c.parent_id ? "↳ " : ""}{c.title}</Link><Link to={`/vendors/${encodeURIComponent(c.vendor)}`} className="block text-xs text-slate-500 hover:underline">{c.vendor}</Link></Td>
                   <Td><TypeBadge t={c.type} /></Td><Td>{c.category}</Td><Td>{c.property ?? <span className="text-ink-mute">Group</span>}</Td><Td>{c.owner}</Td>
                   <Td className="whitespace-nowrap tabular-nums">{fmtDate(c.effective_date)}</Td>
@@ -120,8 +148,10 @@ export default function Contracts() {
               ))}
             </tbody>
           </table></div>
-          <p className="mt-2 text-xs text-slate-500">* fixed fee (Work Orders carry a total fee, not an annual value)</p>
+          <p className="mt-2 text-xs text-slate-500">* fixed fee (Work Orders carry a total fee, not an annual value) · click a row to inspect it</p>
         </Card>
+        <Inspector id={sel} />
+        </div>
       )}
     </div>
   );

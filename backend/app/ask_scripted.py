@@ -222,7 +222,7 @@ def _plan(key: str, r: Run) -> str:
         own = [x for x in h if x["text"].startswith("The Supplier owns")]
         return (
             f"{len(own)} contract gives the vendor ownership of deliverables; the standard position is "
-            "that Arcadia owns bespoke deliverables."
+            "that the Customer owns bespoke deliverables."
         )
     if key == "non_indian_law":
         d = rows(

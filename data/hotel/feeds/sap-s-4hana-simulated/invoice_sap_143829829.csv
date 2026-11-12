@@ -1,0 +1,2 @@
+external_id,vendor,contract_title,invoice_no,invoice_date,period_start,period_end,due_date,paid_date,amount,description,category
+sap:143829829,PayGuard Payments Pte Ltd,,PAY-2611-S020,2026-11-09,,,2026-12-09,,15833.33,Services November 2026,Procurement

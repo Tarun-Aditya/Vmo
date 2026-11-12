@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 body { @apply bg-paper font-sans text-ink antialiased; font-variant-numeric: tabular-nums; }
-.dark body { background: #14171B; @apply text-slate-100; }
+.dark body { background: #0B1220; @apply text-slate-100; }
 
 /* ---- Word / Docs style page ---- */
 .docpage { background: #fff; color: #1f2328; width: 100%; max-width: 8.5in; min-height: 11in; padding: 0.9in 1in; box-shadow: 0 1px 3px rgba(0,0,0,.25); outline: none;

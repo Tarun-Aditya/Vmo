@@ -24,7 +24,7 @@ export default function Templates() {
   const [focus, setFocus] = useState<{ title: string; heading: string; cell: NonNullable<Cell> } | null>(null);
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Template library</h1>
+      <h1>Template library</h1>
       <div className="flex flex-wrap gap-2">
         {list.data?.map((t) => (
           <button key={t.id} onClick={() => { setSel(t.id); setFocus(null); }} className={`rounded-lg border px-3 py-2 text-left text-sm ${t.id === id ? "border-indigo-600 bg-indigo-50 dark:bg-slate-700" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"}`}>

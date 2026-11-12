@@ -148,7 +148,7 @@ def default_rules() -> list[dict]:
     return [
         _r("liability_cap_required", "Liability cap clause present", "Every MSA and SaaS agreement must cap liability.", "clause_required", "high", [M, SA], kcc="liability_cap", fix=_fix("liability_cap")),
         _r("liability_cap_max", "Liability cap ≤ 2× annual fees", "Cap on liability must not exceed 2× annual fees (standard 1×).", "metric_threshold", "high", [M, SA], metric="liability_cap_multiple", op="<=", num=2, fix=_fix("liability_cap")),
-        _r("no_unlimited_liability", "No unlimited liability", "Unlimited liability exposes Arcadia and is never acceptable.", "text_forbidden", "critical", [M, SA, S], phrase=r"unlimited", fix=_fix("liability_cap")),
+        _r("no_unlimited_liability", "No unlimited liability", "Unlimited liability exposes the Customer and is never acceptable.", "text_forbidden", "critical", [M, SA, S], phrase=r"unlimited", fix=_fix("liability_cap")),
         _r("payment_terms_min", "Payment terms ≥ 30 days", "Never accept terms shorter than 30 days.", "metric_threshold", "high", [M, S, W, SA], metric="payment_terms_days", op=">=", num=30, fix=_fix("payment")),
         _r("payment_terms_target", "Payment terms ≥ 45 days (target)", "Standard is Net 45.", "metric_threshold", "low", [M, S, W, SA], metric="payment_terms_days", op=">=", num=45, fix=_fix("payment")),
         _r("tfc_required", "Termination for convenience present", "Customer must be able to exit without cause.", "clause_required", "high", [M, S, SA], kcc="termination_for_convenience", fix=_fix("termination_for_convenience")),

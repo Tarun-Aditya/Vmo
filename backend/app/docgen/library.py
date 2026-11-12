@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-CUSTOMER = "Arcadia Retail Inc."
+CUSTOMER = "Seabright Hotels & Resorts Ltd" if __import__("os").environ.get("STANDARDS", "").lower() == "hotel" else "Arcadia Retail Inc."
 
 # Standard (template) values for every placeholder used in clause text.
 STD: dict[str, str | int] = dict(
@@ -186,7 +186,7 @@ CLAUSES: dict[str, ClauseDef] = {
             "The Supplier shall process personal data only on the "
             "Customer's documented instructions and in accordance with applicable data protection law. "
             "A Data Processing Agreement must be executed before any personal data is processed.",
-            "Any vendor processing personal data must sign the Arcadia DPA before go-live.",
+            "Any vendor processing personal or guest data must sign the " + CUSTOMER.split()[0] + " DPA before go-live.",
             "",
             "critical",
             by_doc={

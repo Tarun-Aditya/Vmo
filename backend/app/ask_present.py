@@ -5,6 +5,9 @@ from __future__ import annotations
 import re
 
 from app.docgen.library import CLAUSES
+from app.config import settings as _settings
+
+_CUST = (_settings.customer_names or "Arcadia").split(",")[0].strip() or "Arcadia"
 
 HIDE = {"contract_id", "clause_id", "id", "parent_id"}
 LABELS = {
@@ -17,7 +20,7 @@ LABELS = {
     "liability_cap_multiple": "Liability cap (× fees)", "governing_law": "Governing law",
     "auto_renew": "Auto-renews", "termination_for_convenience": "Termination for convenience",
     "processes_personal_data": "Processes personal data", "has_dpa": "Has DPA",
-    "customer_signatory": "Signed by (Arcadia)", "customer_signed_date": "Arcadia signed on",
+    "customer_signatory": f"Signed by ({_CUST})", "customer_signed_date": f"{_CUST} signed on",
     "supplier_signatory": "Signed by (Supplier)", "supplier_signed_date": "Supplier signed on",
     "fully_executed": "Fully signed", "days_left": "Days left", "notice_days_left": "Notice days left",
     "contracts": "Contracts", "heading": "Clause", "page": "Page", "text": "Clause text",

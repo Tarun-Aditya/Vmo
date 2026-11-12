@@ -1,0 +1,2 @@
+external_id,vendor,contract_title,invoice_no,invoice_date,period_start,period_end,due_date,paid_date,amount,description,category
+sap:233741116,BookWave Distribution Inc,,BOO-2611-S001,2026-11-07,,,2026-12-07,,35000.0,Services November 2026,Procurement

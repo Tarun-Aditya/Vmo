@@ -5,7 +5,10 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
-CUSTOMER = "Arcadia Retail Inc."
+import os
+
+_HOTEL = os.environ.get("STANDARDS", "").lower() == "hotel"
+CUSTOMER = "Seabright Hotels & Resorts Ltd" if _HOTEL else "Arcadia Retail Inc."
 
 
 def add_months(d: date, n: int) -> date:
@@ -21,7 +24,7 @@ def add_months(d: date, n: int) -> date:
 
 def _sig(vendor: str, eff: date, who: tuple[str, str]) -> str:
     return (f"\n## 12. Signatures\n\n| | **Customer** | **Supplier** |\n|---|---|---|\n| **Party** | {CUSTOMER} | {vendor} |\n| **Signed by** | Helena Cruz | {who[0]} |\n"
-            f"| **Title** | VP Technology Sourcing | {who[1]} |\n| **Date** | {(eff - timedelta(days=6)):%B %d, %Y} | {(eff - timedelta(days=3)):%B %d, %Y} |\n")
+            f"| **Title** | {"Director of Procurement" if _HOTEL else "VP Technology Sourcing"} | {who[1]} |\n| **Date** | {(eff - timedelta(days=6)):%B %d, %Y} | {(eff - timedelta(days=3)):%B %d, %Y} |\n")
 
 
 def _body(kind: str, vendor: str, eff: date, months: int, pay: int, cap: float | None, tfc: int | None, law: str, renew_notice: int | None, annual: int | None, who: tuple[str, str]) -> str:
@@ -56,6 +59,15 @@ def erp_contracts(today: date | None = None) -> list[dict]:
         ("ariba", 9301, "SaaS", "Quantum Ledger Systems Inc", 350, 12, 60, 1.0, None, "California", 60, 144000, ("Mia Zhou", "VP Sales")),
         ("ariba", 9302, "NDA", "Harbor Point Security LLP", 15, 24, 0, None, None, "New York", None, None, ("Greg Dunn", "Partner")),
     ]
+    if _HOTEL:      # a hotel group's procurement systems hold hotel-operations suppliers
+        spec = [
+            ("coupa", 7101, "SaaS", "Roomwise Revenue Systems Inc", 40, 24, 45, 1.0, 60, "New York", 90, 216000, ("Ravi Menon", "Chief Revenue Officer")),
+            ("coupa", 7102, "NDA", "Harborline Interiors LLC", 25, 36, 0, None, None, "Delaware", None, None, ("Elena Voss", "Authorised Signatory")),
+            ("sap", 8201, "MSA", "Cedarwood Linen & Laundry Services LLC", 200, 36, 30, 2.0, 90, "Texas", None, None, ("Tom Hale", "Managing Director")),
+            ("sap", 8202, "SOW", "Cedarwood Linen & Laundry Services LLC", 60, 10, 30, None, 30, "Texas", None, 540000, ("Tom Hale", "Managing Director")),
+            ("ariba", 9301, "SaaS", "Tidewater Guest Messaging Inc", 350, 12, 60, 1.0, None, "California", 60, 96000, ("Mia Zhou", "VP Sales")),
+            ("ariba", 9302, "NDA", "Lighthouse Pest Control LLP", 15, 24, 0, None, None, "New York", None, None, ("Greg Dunn", "Partner")),
+        ]
     out = []
     for system, cid, kind, vendor, ago, months, pay, cap, tfc, law, rn, annual, who in spec:
         eff = today - timedelta(days=ago)
