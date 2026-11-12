@@ -86,6 +86,7 @@ export default function Obligations() {
       </div>
 
       {tab === "obl" && (
+        <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
         <Card>
           <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
             {[["", "All"], ["overdue", "Overdue"], ["open", "Open"], ["done", "Done"]].map(([v, l]) => <button key={v} onClick={() => setStatus(v)} aria-pressed={status === v} className={`rounded px-2 py-1 ${status === v ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-700"}`}>{l}</button>)}
@@ -114,7 +115,13 @@ export default function Obligations() {
               </tbody>
             </table>
           </div>
-        </Card>)}
+        </Card>
+        <aside className="space-y-4" aria-label="Contract against actual">
+          {!sla.data && <Loading q={sla} />}
+          {sla.data && sla.data.series.slice(0, 2).map((x) => <SlaCard key={`${x.contract_id}${x.metric_key}`} s={x} />)}
+          {sla.data && sla.data.series.length > 2 && <button className="text-sm font-semibold text-indigo-600 hover:underline" onClick={() => setTab("sla")}>All {sla.data.series.length} SLA series →</button>}
+        </aside>
+        </div>)}
 
       {tab === "sla" && (
         <div className="space-y-4">
