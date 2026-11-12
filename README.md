@@ -17,6 +17,7 @@ billed against what you signed, and the answer to any question about the portfol
 | Area | What you get |
 |---|---|
 | **Portfolio** | KPI tiles, a decision queue sorted by the *last day to act* (expiry minus notice period), 30/60/90-day buckets with value at stake, expiries by month, vendor operations. |
+| **Renewals** | A 12-month timeline (or list) of what expires, with the last day to act on each (expiry minus notice period), sorted by urgency. |
 | **Portfolio map** | Every contract family (parent, schedules, amendments) on one timeline with the last day to act, and the problems it finds: a schedule that outlives its parent, an NDA that ends before its agreement, an SOW with no parent, no end date. |
 | **Contracts and hierarchy** | Repository with filters. Contract detail shows the text beside extracted fields (click a field to see its source passage, page and confidence), parent/child links (MSA → SOW → Work Order, amendments), and **effective terms** after amendments, with where each value comes from. |
 | **Key clauses** | Matrix of every document × every key clause, with a citation for each tick and boxed gaps where the template requires a clause. The clause library is configurable in Admin. |
@@ -31,7 +32,7 @@ billed against what you signed, and the answer to any question about the portfol
 | **Alerts** | Rules over live data, an in-app centre, and delivery to e-mail, Slack, Teams or any webhook. |
 | **Admin** | Pipelines, key-clause library, values and limits, checklist rules, thresholds, risk weights, obligation rules, connectors, alert channels, approval rules, users and audit log, quality and corrections, AI usage and cost. |
 
-The interface uses the new design system (left rail, serif headlines, teal accent, severity by shape, word and colour). Everything shown is derived from the loaded documents plus Admin configuration. Nothing is tied to a vendor or a document.
+The interface is an operations console (top navigation, dense tables, tabular mono numbers, blue for action, amber and red only for urgency, severity by shape, word and colour); the design boards are in `design/` (hotel edition) and on the VMO design canvas. Everything shown is derived from the loaded documents plus Admin configuration. Nothing is tied to a vendor or a document.
 
 ## Quick start
 

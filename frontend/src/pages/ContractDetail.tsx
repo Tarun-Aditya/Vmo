@@ -71,7 +71,7 @@ export default function ContractDetail() {
     <div className="space-y-4">
       <div>
         <Link to="/contracts" className="text-sm text-ink-mute hover:underline">← Contracts</Link>
-        <h1 className="mt-1 max-w-4xl text-3xl leading-tight md:text-4xl">{c.title}</h1>
+        <h1 className="mt-1 max-w-4xl">{c.title}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {c.status === "draft" && <SeverityChip sev="medium" label="Draft" />}
           {c.status !== "draft" && (d.signatures.fully_executed ? <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-900">✓ Fully executed</span> : <SeverityChip sev="high" label="Not fully signed" />)}
@@ -197,7 +197,7 @@ export default function ContractDetail() {
         </div>
 
         <Card title="Document" className="scroll-mt-20 lg:order-1 lg:col-span-3"><span id="document" />
-          <div className="max-h-[80vh] space-y-3 overflow-y-auto pr-3 font-serif text-[16px] leading-7">
+          <div className="max-h-[80vh] space-y-3 overflow-y-auto pr-3 text-[14.5px] leading-7">
             {d.clauses.map((cl, i) => {
               const newPage = cl.page !== lastPage; lastPage = cl.page;
               return (

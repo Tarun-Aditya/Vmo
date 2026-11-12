@@ -27,25 +27,25 @@ export default function PortfolioMap() {
   const months = Array.from({ length: MONTHS }, (_, i) => new Date(start.getFullYear(), start.getMonth() + i, 1));
   const todayPct = ((today.getTime() - start.getTime()) / span) * 100;
   const flagged = new Set(d.issues.filter((i) => i.severity !== "medium").map((i) => i.contract_id));
-  const tone = (dl: number | null) => (dl === null ? "#B8B2A4" : dl <= 30 ? "#D9695B" : dl <= 90 ? "#E5A24F" : "#2E8F80");
+  const tone = (dl: number | null) => (dl === null ? "#B8B2A4" : dl <= 30 ? "#D14A3D" : dl <= 90 ? "#E89B2D" : "#8EA3E8");
   const sev = (i: Item): Sev | null => (i.notice_deadline ? (new Date(i.notice_deadline) < today ? "critical" : (new Date(i.notice_deadline).getTime() - today.getTime()) / DAY <= 30 ? "high" : "medium") : null);
   const shape = (s: Sev) => (s === "critical" ? <svg width="14" height="14" viewBox="0 0 10 10"><path d="M5 0l5 5-5 5-5-5z" fill="#B42318" /></svg> : s === "high" ? <svg width="14" height="14" viewBox="0 0 10 10"><path d="M5 0l5 10H0z" fill="#C2570C" /></svg> : <svg width="14" height="14" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#8A6D00" /></svg>);
   return (
     <div className="space-y-6">
-      <header><h1 className="font-serif text-3xl md:text-4xl">Portfolio map</h1>
+      <header><h1>Portfolio map</h1>
         <p className="mt-1 text-sm text-ink-mute dark:text-slate-400">All contracts as families: the parent, its schedules and amendments, with the last day to act on each.</p></header>
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-5" aria-label="Summary">
         {[["Contract families", d.summary.families, `${d.summary.documents} documents`, ""], ["Ending within 90 days", d.summary.ending_90, "", "border-orange-400"], ["Hierarchy and data problems", d.summary.problems, "need a look", "border-red-500"],
           ["Missing end dates", d.summary.no_end_date, "", ""], ["Notice already passed", d.summary.notice_passed, "", "border-red-500"]].map(([l, v, s, c]) => (
           <div key={String(l)} className={`rounded-xl border bg-white p-4 dark:bg-slate-800 ${c || "border-line dark:border-slate-700"}`}><div className="text-xs font-semibold uppercase tracking-wider text-ink-mute dark:text-slate-400">{l}</div>
-            <div className="mt-1 font-serif text-4xl tabular-nums">{v}</div><div className="text-xs text-ink-mute dark:text-slate-400">{s}</div></div>))}
+            <div className="num mt-0.5 text-[28px] font-semibold leading-tight">{v}</div><div className="text-xs text-ink-mute dark:text-slate-400">{s}</div></div>))}
       </section>
       <div className="flex flex-wrap items-start gap-5">
         <section className="min-w-0 flex-[999_1_760px] overflow-hidden rounded-xl border border-line bg-white dark:border-slate-700 dark:bg-slate-800" aria-label="Timeline of all contracts">
           <div className="flex flex-wrap items-end gap-3 border-b border-line p-3 dark:border-slate-700">
             <label className="text-xs">Vendor<select className="mt-1 block min-h-[40px] rounded border border-slate-300 bg-white px-2 text-sm dark:border-slate-600 dark:bg-slate-900" value={vendor} onChange={(e) => setVendor(e.target.value)}><option value="">All vendors</option>{(f.data?.vendor ?? []).map((p) => <option key={p}>{p}</option>)}</select></label>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-mute dark:text-slate-400">
-              {[["#D9695B", "ends within 30 days"], ["#E5A24F", "within 90 days"], ["#2E8F80", "later"]].map(([c, t]) => <span key={t}><span className="mr-1 inline-block h-2.5 w-3.5 rounded" style={{ background: c }} />{t}</span>)}
+              {[["#D14A3D", "ends within 30 days"], ["#E89B2D", "within 90 days"], ["#8EA3E8", "later"]].map(([c, t]) => <span key={t}><span className="mr-1 inline-block h-2.5 w-3.5 rounded" style={{ background: c }} />{t}</span>)}
               <span><span className="mr-1 inline-block h-2.5 w-3.5 rounded border-2 border-dashed border-slate-500" />no end date</span><span><span className="mr-1 inline-block h-2.5 w-3.5 rounded outline outline-2 outline-red-700" />hierarchy problem</span><span>◆ ▲ ● last day to act: passed, ≤30 days, later</span></div>
           </div>
           <div className="overflow-x-auto"><div className="min-w-[860px]">

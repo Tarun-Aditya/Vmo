@@ -12,6 +12,7 @@ import Ask from "./pages/Ask";
 import Redline from "./pages/Redline";
 import Templates from "./pages/Templates";
 import PortfolioMap from "./pages/PortfolioMap";
+import Renewals from "./pages/Renewals";
 import Clauses from "./pages/Clauses";
 import Vendors from "./pages/Vendors";
 import VendorProfile from "./pages/VendorProfile";
@@ -68,6 +69,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="sign/:token" element={<Sign />} />
           <Route element={<Layout />}>
             <Route index element={<Dashboard />} />
+            <Route path="renewals" element={<Renewals />} />
             <Route path="map" element={<PortfolioMap />} />
             <Route path="contracts" element={<Contracts />} />
             <Route path="contracts/:id" element={<ContractDetail />} />
