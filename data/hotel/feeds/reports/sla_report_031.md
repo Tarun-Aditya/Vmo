@@ -1,6 +1,6 @@
 # Monthly Service Level Report
 
-**Vendor:** PayGuard Payments Pte Ltd
+**Vendor:** PayGuard Payments Inc
 
 **Agreement:** SaaS Subscription Agreement
 

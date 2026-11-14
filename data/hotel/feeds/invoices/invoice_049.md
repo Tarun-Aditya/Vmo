@@ -1,6 +1,6 @@
 # TAX INVOICE
 
-Crestline Laundry & Linen Services Ltd
+Crestline Laundry & Linen Services Inc
 
 Date of issue: December 26, 2025
 

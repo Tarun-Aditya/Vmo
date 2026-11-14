@@ -6,7 +6,7 @@
 
 **Due date:** 07 July 2025
 
-**From:** Halcyon Elevator & Lift Maintenance Ltd
+**From:** Halcyon Elevator & Lift Maintenance Inc
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 

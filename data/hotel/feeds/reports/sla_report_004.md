@@ -1,6 +1,6 @@
 # Monthly Service Level Report
 
-**Vendor:** Evergreen Waste & Recycling Ltd
+**Vendor:** Evergreen Waste & Recycling Inc
 
 **Agreement:** Master Services Agreement – Evergreen Waste & Recycling
 

@@ -48,6 +48,8 @@ def find_vendor(md: str, header: dict, sidecar: dict) -> str | None:
     head = re.sub(r"[*_`|]", " ", re.sub(r"<!--.*?-->", " ", md))[:2600]
     head = re.sub(r"\s+", " ", head.replace("\\&", "&").replace("&amp;", "&"))        # markdown / HTML escapes of an ampersand in a company name
     head = _mask_customer(head, cm)
+    # 'Acme Inc, a Delaware corporation' / 'a New York limited liability company': the legal form of a party is a description, not another company
+    head = re.sub(r",?\s+an?\s+(?:[A-Z][\w.]*\s+){1,3}(?:corporation|limited liability company|limited partnership|limited company|company|partnership)\b", "", head)
     for rx in (r"(?:between|by and between|made between|entered into by and between)\s+(.{5,260}?)\s+(?:and|&)\s+(.{5,200})", r"(?:Supplier|Vendor|Provider|Contractor|Service Provider|Client|Counterparty)\s*[:|]\s*(.{4,120})"):
         m = re.search(rx, head, re.I)
         if not m:

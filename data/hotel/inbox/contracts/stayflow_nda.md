@@ -1,6 +1,6 @@
 # Mutual Non-Disclosure Agreement
 
-This Non-Disclosure Agreement (the "Agreement") is made between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer", "we" or "us" when the context is the Customer's side), and **Stayflow Property Systems Inc** (the "Supplier"). In this Agreement, "we" and "us" mean both of us together unless we say otherwise, and "you" means the party receiving information.
+This Non-Disclosure Agreement (the "Agreement") is made between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer", "we" or "us" when the context is the Customer's side), and **Stayflow Property Systems Inc** (the "Supplier"). In this Agreement, "we" and "us" mean both of us together unless we say otherwise, and "you" means the party receiving information.
 
 It takes effect on January 28, 2026 (the "Effective Date").
 
@@ -17,7 +17,7 @@ This Agreement starts on the Effective Date and runs until January 28, 2028 (the
 "Confidential Information" means any non-public information that one of us (the "Discloser") gives to the other (the "Recipient"), or that the Recipient learns through the relationship, in any form, whether or not it is marked "confidential", if a reasonable person would understand it to be confidential given its nature and the circumstances. Examples include:
 
 - pricing, quotes, contract terms and commercial plans;
-- guest, loyalty-programme and booking data;
+- guest, loyalty-program and booking data;
 - technical documents, system designs, source code, security details and integration specifications;
 - information about the Properties, their operations, staff, suppliers and financial performance;
 - the fact and content of our discussions.
@@ -49,11 +49,11 @@ If a court, regulator or other authority legally requires you to disclose Confid
 
 ## Personal data and security
 
-Some Confidential Information may include personal data, such as guest details. If so, the Recipient will process it only for the Purpose and on the Discloser's instructions, comply with applicable data protection laws, keep it secure with appropriate technical and organisational measures, and notify the Discloser without undue delay after discovering a security incident affecting it. We will not share personal data unless it is genuinely needed, and where possible we will use anonymised or sample data instead. If we later enter into a services agreement, it will contain the detailed data processing terms.
+Some Confidential Information may include personal data, such as guest details. If so, the Recipient will process it only for the Purpose and on the Discloser's instructions, comply with applicable data protection laws, keep it secure with appropriate technical and organizational measures, and notify the Discloser without undue delay after discovering a security incident affecting it. We will not share personal data unless it is genuinely needed, and where possible we will use anonymized or sample data instead. If we later enter into a services agreement, it will contain the detailed data processing terms.
 
 ## Who owns what
 
-All Confidential Information stays the property of the Discloser. Nothing in this Agreement gives the Recipient any licence or right in the Discloser's intellectual property, except the limited right to use the information for the Purpose. If you give us feedback or suggestions, we may use them freely, but this does not give us any right to your Confidential Information.
+All Confidential Information stays the property of the Discloser. Nothing in this Agreement gives the Recipient any license or right in the Discloser's intellectual property, except the limited right to use the information for the Purpose. If you give us feedback or suggestions, we may use them freely, but this does not give us any right to your Confidential Information.
 
 ## No promises about the information, and no deal yet
 
@@ -67,7 +67,7 @@ When the Discloser asks, or when this Agreement ends, the Recipient will promptl
 
 If you breach this Agreement, the Discloser may suffer harm that money alone cannot fix. The Discloser may therefore ask a court for an injunction or other equitable relief without having to prove actual damage, in addition to any other remedy available.
 
-Each of us is liable to the other for losses caused by its breach of this Agreement, subject to the following. Neither of us excludes liability for fraud, wilful misconduct, or anything else that cannot be limited by law. Otherwise, neither of us is liable for indirect or consequential losses, or loss of profit, except to the extent those arise from a breach of the confidentiality obligations above.
+Each of us is liable to the other for losses caused by its breach of this Agreement, subject to the following. Neither of us excludes liability for fraud, willful misconduct, or anything else that cannot be limited by law. Otherwise, neither of us is liable for indirect or consequential losses, or loss of profit, except to the extent those arise from a breach of the confidentiality obligations above.
 
 Each of us will indemnify the other against third-party claims, and the reasonable costs of defending them, to the extent they arise from the indemnifying party's unauthorised use or disclosure of the other's Confidential Information in breach of this Agreement.
 
@@ -87,7 +87,7 @@ No fees are payable under this Agreement. If we later agree a commercial relatio
 
 **Assignment.** Neither of us may assign or transfer this Agreement without the other's prior written consent, which will not be unreasonably withheld. Either of us may, on written notice, assign it to a successor to all or substantially all of its business.
 
-**Notices.** Notices must be in writing and delivered by hand, by recognised courier, or by email with confirmation of sending, to the address each of us gives the other in writing. A notice is received when delivered or, for email, on the next business day after sending.
+**Notices.** Notices must be in writing and delivered by hand, by recognized courier, or by email with confirmation of sending, to the address each of us gives the other in writing. A notice is received when delivered or, for email, on the next business day after sending.
 
 **Entire agreement.** This Agreement is the whole agreement between us about its subject matter and replaces all earlier discussions on it. Any change must be in writing and signed by both of us.
 
@@ -97,8 +97,8 @@ No fees are payable under this Agreement. If we later agree a commercial relatio
 
 | | For the Customer | For the Supplier |
 |---|---|---|
-| **Company** | Seabright Hotels & Resorts Ltd | Stayflow Property Systems Inc |
+| **Company** | Seabright Hotels & Resorts Inc | Stayflow Property Systems Inc |
 | **Name** | Helena Cruz | Anika Rao |
-| **Title** | VP Technology Sourcing | Authorised Signatory |
+| **Title** | VP Technology Sourcing | Authorized Signatory |
 | **Signature** | | |
 | **Date** | January 18, 2026 | January 21, 2026 |

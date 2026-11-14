@@ -6,7 +6,7 @@
 |---|---|
 | Invoice number | BRI-2604-007 |
 | Date | 2026-04-24 |
-| Agreement | Statement of Work No. 1 – Security Services at Seabright Harbour |
+| Agreement | Statement of Work No. 1 – Security Services at Seabright Harbor Hotel |
 | Description | Services 20 Mar – 19 Apr 2026 |
 | Period | 2026-03-20 to 2026-04-19 |
 | Total | USD 35,000.00 |

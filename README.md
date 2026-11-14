@@ -2,14 +2,15 @@
 
 > **Branches.** This branch is the **hotel / property operations edition** (fictional hotel group, property level, hospitality pack, portfolio map, new design shell). The **VMO edition** (vendor management office, IT-services corpus) lives on `claude/new-session-70au83`.
 
-**Vendor contract intelligence for a hotel group's property operations.**
-Load the group's vendor contracts and drafts; ContractIQ reads them, keeps one dataset, and tells the operations and procurement leads what needs action:
-which renewals have a notice deadline coming, what each property really costs under contract, where the same vendor charges one hotel more than another,
-which vendor certificates have lapsed, which drafts depart from the house standards, and the answer to any question about the portfolio, with the clause to check it.
+**Contract intelligence for the owner of a hotel portfolio.**
+Load the vendor contracts that bind your properties; ContractIQ reads them, keeps one dataset, and answers the owner's questions:
+what each property really costs under contract and per room, where one vendor charges one hotel more than another, which renewals have a notice
+deadline coming, which vendor certificates have lapsed, what a buyer would inherit if a property were sold, which drafts depart from your house
+standards, and anything else you ask about the portfolio, with the clause to check it.
 
 > **Status: proof of concept.** It runs end to end on a fictional corpus and on public real-world contracts, with simulated
 > ERP, e-signature, cloud-drive and mailbox systems. It has not been used on a customer's real contracts or connected to
-> real tenants. See [Known limits](#known-limits). The fictional customer is **Seabright Hotels & Resorts** (six properties); every vendor,
+> real tenants. See [Known limits](#known-limits). The fictional owner is **Seabright Hotels & Resorts Inc**, a United States group with six properties (Boston, New York, Lake Placid, Chicago, Savannah, Park City); every vendor,
 > person and document in the demo data is fictional.
 
 **Navigation.** The left rail keeps seven screens in view: Portfolio, Properties, Compare, Renewals, Contracts, Ask and Redline. The rest (vendors, portfolio map,
@@ -21,8 +22,9 @@ certificates, obligations, spend, risk, key clauses, templates, new contract) fo
 |---|---|
 | **Portfolio** | KPI tiles, a decision queue sorted by the *last day to act* (expiry minus notice period), 30/60/90-day buckets with value at stake, expiries by month, vendor operations. |
 | **Properties** | One record per property (rooms, city, kind). Each property's yearly cost is its own schedules **plus its share of group-level agreements** (by rooms), so the energy contract or the booking system is counted where it is used. Cost per room, what makes up the cost, what ends soon. |
+| **Sale view** | For each property: which contracts can be ended if it is sold, which can be ended on notice, and which a buyer would inherit, with the value still to run. A schedule that is silent follows its master agreement. |
 | **Compare** | Where one vendor serves several properties: the rates and terms each property signed, side by side, with the gap between best and worst and an estimate of what the best rate is worth. |
-| **Certificates** | The certificates each vendor's contract obliges it to hold (insurance, food safety, statutory inspections, payment-card attestation), with the expiry of the copy on file: expired, expiring, not on file. |
+| **Certificates** | The certificates each vendor's contract obliges it to hold (insurance, food safety, state inspections, payment-card attestation), with the expiry of the copy on file: expired, expiring, not on file. |
 | **Contracts and hierarchy** | Repository with filters. Contract detail shows the text beside extracted fields (click a field to see its source passage, page and confidence), parent/child links (MSA → SOW → Work Order, amendments), and **effective terms** after amendments, with where each value comes from. |
 | **Key clauses** | Matrix of every document × every key clause, with a citation for each tick and boxed gaps where the template requires a clause. The clause library is configurable in Admin. |
 | **Ask** | Plain-English questions over the whole portfolio or chosen documents. Structured questions become read-only SQL; clause questions use semantic search; every answer shows its steps, SQL, result table and cited clauses. Conversation history, follow-ups, stop. |
@@ -184,7 +186,7 @@ Set in `.env` (see `.env.example`):
 
 ## Tests
 
-* `make test`: backend suite (183 tests) against the offline-seeded synthetic corpus.
+* `make test`: backend suite (188 tests) against the offline-seeded synthetic corpus.
 * Outside Docker, use a separate database and data folder so tests never touch demo data:
   `DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`.
 * Browser walkthroughs: `scripts/demo_pilot.js` (any corpus) and `scripts/demo_walkthrough.js` (synthetic corpus).
@@ -210,7 +212,7 @@ CLAUDE.md            original scope and conventions
 
 The fictional corpus: **Seabright Hotels & Resorts**, a hotel group with six properties and 32 vendor documents
 (laundry and linen, security, lifts, HVAC, pest control, waste, food and beverage, housekeeping staffing, property and booking systems, payments, energy), with
-group-level master agreements, per-property schedules, an amendment, NDAs, DPAs, and five vendor drafts (one clean control). It is written from the owner-operator's side;
+group-level master agreements, per-property schedules, an amendment, NDAs, DPAs, and five vendor drafts (one clean control). It is set in the United States (US dollars, New York house law, month-first dates) and written from the property owner's side;
 all names are fictional.
 
 * Sources: `backend/app/docgen/hotel_spec.py` (spec, ground truth, the properties' attributes, the certificates on file), `corpus/hotel/*.md` (contract text written by Claude
@@ -225,17 +227,21 @@ all names are fictional.
   `feeds/certificates.csv` or are recorded on the screen, never guessed from the contract. Seeded state: 2 expired, 2 expiring within 60 days, 4 not on file, 5 valid (13 required in all).
 * **Hospitality pack** (`backend/app/hotel_pack.py`): ten key clauses, three values (laundry rate per kilogram, fault response hours, booking commission) and checklist rules,
   all ordinary Admin configuration.
-* **House templates:** `STANDARDS=hotel` gives the template library the group's values (England and Wales law, 60-day exit notice) **and its own clauses**
+* **House templates:** `STANDARDS=hotel` gives the template library the group's values (New York law, 60-day exit notice) **and its own clauses**
   (`backend/app/docgen/hotel_house.py`): guest and staff injury, labour and wage compliance, exit on sale of a property and brand standards in the MSA, payment-card security in
-  the SaaS template. Clauses that only suit one kind of supplier (food safety, statutory inspections) stay as key clauses and checklist rules.
+  the SaaS template. Clauses that only suit one kind of supplier (food safety, state inspections) stay as key clauses and checklist rules.
 * **Measured offline on this corpus** (`LABELS=labels_hotel.json python evals/pilot_eval.py`, `python evals/hotel_redline_eval.py`): **99.8% of fields (456/457), 98.4% of
   document metadata, 98.8% of values and limits; all 17 planted draft deviations found, none on the clean control, about 7 findings per draft.** The numbers rose from 98.2% and
   16/17 after fixes that also apply to real documents: tables in PDFs are rebuilt row by row, signature sentences wrapped over lines and signature tables with dates but no
   typed names are read as signed, and numbers above one hundred written in words are understood. Two security schedules had labels that contradicted their own text
   (they do handle CCTV and guest data); the labels now follow the documents.
 * **Rules by kind of supplier** (migration 0032): a checklist rule can be limited to vendor categories, so food-safety certification is asked of the food supplier,
-  statutory inspection certificates of the lift and plant contractors, a guest-injury indemnity of suppliers who work on site, and payment-card security of the
+  state inspection certificates of the elevator and plant contractors, a guest-injury indemnity of suppliers who work on site, and payment-card security of the
   hotel systems, and nobody else is failed for lacking them. Editable in Admin → Checklist ("Only for vendor categories").
+* **Certificates are read from documents:** a certificate of insurance, HACCP certificate, elevator inspection certificate or PCI attestation dropped into
+  `feeds/` (PDF, Word, Markdown) is recognised, matched to the vendor and its expiry recorded; a date a person typed is never overwritten by a file.
+* **Sale view** (Properties → What makes up the cost): on the seeded data two master agreements let the owner end services on a sale; energy, food,
+  the booking channel and the property system cannot be ended early, so a buyer inherits them.
 * **Certificate alerts:** an expired certificate, or one within 30 days of expiry, raises an alert like any other rule (Admin → Alerts).
 * **Less noise:** the Overview counts only invoices worth querying (high and critical; late payments are listed as minor), personal data without a DPA is reported once per
   vendor, a contract misread as unsigned no longer raises a false critical exception, an invoice that quotes no agreement says how many agreements are on file, and Review
@@ -244,10 +250,35 @@ all names are fictional.
 * **Ask** understands property: "which properties have the most contracts?", "contracts at Lakeside Resort", and "the laundry rate per kilogram at each property". The schema
   given to Claude now describes `properties`, `v_property_contracts` and `certificates` (it previously promised a `property` column that the view did not have).
 * **Portfolio map** (`/map`): every contract family on one timeline with the last day to act, plus hierarchy problems.
-* **End-to-end walkthrough** (`node scripts/demo_e2e.js`): all 22 steps pass on this build with no page errors. The committed video in `reports/e2e_hotel/` was recorded before
-  the Compare and Certificates screens and the richer Properties screen; re-record with `make video` after a fresh seed.
-* Not yet done: the walkthrough does not visit Compare or Certificates; certificates are not yet read from uploaded certificate documents; Claude-mode
-  measurement has not been repeated since these changes; the corpus mixes US dollars, English law and US states because no target country has been chosen; the new layout on Ask, Review and the Admin pages.
+* **End-to-end walkthrough** (`node scripts/demo_e2e.js reports/e2e_hotel`): **25 of 25 steps pass** with no page errors, recorded in `reports/e2e_hotel/`
+  (video, one screenshot per step, report). Steps 2 to 4 are the owner's screens: Properties with the sale view, Compare, Certificates.
+* **Claude mode on the five drafts** (`reports/e2e_hotel/CLAUDE_MODE.md`): all 17 planted deviations, none on the clean control, about 15 findings per draft
+  (about 20 before duplicate and irrelevant missing-clause findings were removed). A failed playbook rule is always in the redline, whichever engine wrote it.
+* Not yet done: extraction has not been re-measured with Claude since these changes; one real integration and real contracts both need you
+  (see "Measure it on your own contracts"); the new layout on the Admin pages.
+
+## Demo script for a property owner (about 7 minutes)
+
+1. **Portfolio (1 min).** "Three notice deadlines need a decision; this much renews unless someone acts." The last day to act, not the expiry date.
+2. **Properties (1.5 min).** What each hotel costs under contract and per room, including its share of the energy contract and the hotel systems. Open one property:
+   what makes up the cost, and **if this property were sold**, which contracts end, which need notice, and what the buyer inherits.
+3. **Compare (1 min).** The same laundry supplier at three hotels: 1.42, 1.58 and 1.71 dollars a kilogram. What the gap is worth at the best rate.
+4. **Certificates (30 s).** A food supplier's HACCP certificate expired twelve days ago; an insurance certificate lapsed last month.
+5. **Ask (1.5 min).** "Which contracts at Lakeside Resort cannot be terminated for convenience?", then a clause question with its citations.
+6. **Redline (1 min).** A vendor's renewal draft: what departs from the house standards, most serious first, with replacement wording.
+7. **Close (30 s).** What is simulated (ERP, e-signature, drives) and what comes next: your own contracts.
+
+## Measure it on your own contracts
+
+The figures on fictional documents show the pipeline works; only your own paper shows how accurate it is for you. The path is built:
+
+1. Put 10 to 20 redacted supplier contracts (PDF or Word) in `data/hotel/inbox/contracts/` and press **Admin → Pipeline → Run now**.
+2. Open **Admin → Extraction quality**, correct any field that was read wrongly (each correction is stored as a label and survives re-reading).
+3. Run `python evals/real_eval.py`: it re-reads every labelled document with the engine as it is now and prints accuracy per field. Use
+   `LLM_PROVIDER=offline` for the rules alone, unset it for Claude.
+
+Until then the closest evidence is the services-type subset of the public real contracts (42 held-out agreements: maintenance, outsourcing, hosting, supply),
+offline: governing law 92%, liability cap F1 0.91, assignment 0.92, insurance 0.87, termination for convenience F1 0.67 (`reports/cuad_offline_holdout_services.txt`).
 
 ## Roadmap (future scope, not built)
 
@@ -303,4 +334,4 @@ DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright python -m app.se
 SIMULATORS=1 DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright uvicorn app.main:app --port 8000     # stand-in ERP and e-signature systems for the demo
 cd ../frontend && npm ci && npm run dev                 # http://localhost:5173
 ```
-Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 183 backend tests, type check, build and the 22-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).
+Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 188 backend tests, type check, build and the 25-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).

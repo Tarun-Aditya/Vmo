@@ -6,11 +6,11 @@
 
 **Due date:** 21 May 2026
 
-**From:** Crestline Laundry & Linen Services Ltd
+**From:** Crestline Laundry & Linen Services Inc
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 
-**Reference:** Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbour Hotel
+**Reference:** Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbor Hotel
 
 **Service period:** 02 Mar 2026 – 01 Apr 2026
 

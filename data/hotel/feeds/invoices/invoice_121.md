@@ -1,6 +1,6 @@
 # TAX INVOICE
 
-Staffwell Hospitality Staffing Ltd
+Staffwell Hospitality Staffing Inc
 
 Date of issue: April 14, 2026
 

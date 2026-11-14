@@ -1,6 +1,6 @@
 # Monthly Service Level Report
 
-**Vendor:** Halcyon Elevator & Lift Maintenance Ltd
+**Vendor:** Halcyon Elevator & Lift Maintenance Inc
 
 **Agreement:** Master Services Agreement – Halcyon Elevator & Lift Maintenance
 

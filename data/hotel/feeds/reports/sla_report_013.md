@@ -1,6 +1,6 @@
 # Monthly Service Level Report
 
-**Vendor:** Lumen Energy Supply Ltd
+**Vendor:** Lumen Energy Supply Inc
 
 **Agreement:** Master Services Agreement – Lumen Energy Supply
 

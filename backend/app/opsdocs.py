@@ -16,7 +16,7 @@ from app.config import settings
 from app.db import SessionLocal
 from app.extract_rules import COMPANY_RX, customer_markers
 
-PARSER_VERSION = "7"        # bump when the readers change: parsed results are cached by content hash + this
+PARSER_VERSION = "8"        # bump when the readers change: parsed results are cached by content hash + this
 DOC_EXT = {".pdf", ".docx", ".md", ".txt"}
 AMT = r"(?:USD|US\$|\$)\s*([\d]{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)"
 DATE_RX = r"(?:\d{1,2}[ \-/][A-Za-z]{3,9}[ \-/,]*\d{4}|[A-Za-z]{3,9}\.? \d{1,2},? \d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4})"
@@ -172,8 +172,8 @@ def parse_certificate(t: str) -> dict:
     if m:
         c = _company(m.group(1))
         vendor = c if c and not any(k in c.lower() for k in cm) else None
-    head = t[:700].lower()
-    kind = next((k for k, rx in CERT_KIND if re.search(rx, head)), None)
+    title = next((ln for ln in t.splitlines() if ln.strip()), "").lower()           # the kind is in the title; a holder called 'Halcyon Elevator' does not make an insurance certificate an inspection
+    kind = next((k for k, rx in CERT_KIND if re.search(rx, title)), None) or next((k for k, rx in CERT_KIND if re.search(rx, t[:700].lower())), None)
     ref = re.search(r"(?:certificate|policy|reference|report|attestation)\s*(?:no\.?|number|#|id|ref(?:erence)?)\s*[:|]?\s*([A-Z0-9][A-Z0-9\-/]{3,30})", t, re.I)
     return {"vendor": vendor or _vendor(t), "kind": kind, "expiry_date": _date(r"expir(?:y|es|ation)(?: date)?|valid (?:until|through|to)|policy period[^\n]{0,40}?\bto\b|next inspection due|good through", t),
             "received_on": _date(r"issued(?: on)?|date of issue|issue date|effective(?: date)?|inspection date|dated", t), "reference": ref.group(1) if ref else None}

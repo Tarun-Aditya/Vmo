@@ -138,9 +138,14 @@ an admin-defined clause is located at the passage matching most of its keywords,
 expiry is an alert rule. Seeded hotel data: 24 open alerts (46 before).
 
 **Known limits specific to this edition**
-1. No real hotel contract has been read. Geography is undecided: the corpus mixes US dollars, English law and US states.
+1. No real hotel contract has been read. The corpus is set in the United States (decided 2026-11-14) and written from the property owner's side.
 2. A property's share of a group agreement is an attribution by rooms, not a contract term; the Compare saving assumes unchanged volumes.
 3. Certificate expiry dates come from a CSV or a person; certificate documents themselves are not read.
 4. The exit-on-sale rule fails on every seeded master agreement because none of the fictional contracts contains that clause: a true finding on this data, but check it against real paper.
 5. The recorded walkthrough video predates Compare, Certificates and the grouped rail.
 6. A few milestone names read from Word tables are still rough.
+
+**Later the same day.** Corpus moved to a United States setting (US dollars, New York house law, US cities, American spelling, month-first dates). Added: the owner's sale view per property
+(exit on sale / on notice / inherited by a buyer), certificates read from certificate documents in `feeds/`, three property steps in the recorded walkthrough. Reading fix: a party's legal form
+('a Delaware corporation') is no longer taken as the vendor name. Services-type subset of the real-contract hold-out (42 agreements, offline): governing law 91.9%, liability cap F1 0.91.
+Not done because it needs you: a real invoice export or sandbox credentials for one live integration; redacted real contracts for `evals/real_eval.py`.

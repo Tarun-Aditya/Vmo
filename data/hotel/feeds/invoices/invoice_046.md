@@ -6,7 +6,7 @@
 
 **Due date:** 10 November 2025
 
-**From:** Crestline Laundry & Linen Services Ltd
+**From:** Crestline Laundry & Linen Services Inc
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 

@@ -1,12 +1,12 @@
 # TAX INVOICE
 
-Crestline Laundry & Linen Services Ltd
+Crestline Laundry & Linen Services Inc
 
 Date of issue: July 06, 2026
 
 Invoice number: CRE-2607-040
 
-Your ref: Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbour Hotel
+Your ref: Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbor Hotel
 
 To: Seabright Hotels & Resorts Ltd
 

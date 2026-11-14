@@ -6,7 +6,7 @@ Date of issue: January 24, 2026
 
 Invoice number: BRI-2601-004
 
-Your ref: Statement of Work No. 1 – Security Services at Seabright Harbour
+Your ref: Statement of Work No. 1 – Security Services at Seabright Harbor Hotel
 
 To: Seabright Hotels & Resorts Ltd
 

@@ -1,12 +1,12 @@
 # TAX INVOICE
 
-Halcyon Elevator & Lift Maintenance Ltd
+Halcyon Elevator & Lift Maintenance Inc
 
 Date of issue: June 06, 2025
 
 Invoice number: HAL-2506-085
 
-Your ref: Statement of Work No. 1 -- Lift Maintenance Services at Seabright Summit Lodge
+Your ref: Statement of Work No. 1 -- Elevator Maintenance Services at Seabright Summit Lodge
 
 To: Seabright Hotels & Resorts Ltd
 

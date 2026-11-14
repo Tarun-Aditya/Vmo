@@ -197,20 +197,28 @@ def compare_document(clauses: list[dict], template_type: str, mode: str = "auto"
     return items
 
 
-def compare_custom(clauses: list[dict], kcc_cfg: list[dict], doc_type: str) -> list[dict]:
+def compare_custom(clauses: list[dict], kcc_cfg: list[dict], doc_type: str, skip: set[str] | None = None, rules: list[dict] | None = None, results: list[dict] | None = None) -> list[dict]:
     """Redline items for clauses an admin added to the library (they have no template page): missing -> insert the standard wording,
-    present but worded very differently -> flag it with the standard wording as the suggestion."""
+    present but worded very differently -> flag it with the standard wording as the suggestion.
+    `skip`: clauses the template already carries (compared there, not twice). A missing clause is a finding only when the house requires it of this document:
+    where a 'clause required' rule exists the rule decides (it knows the vendor's category: food safety is not missing from a spa supplier's contract);
+    where none exists, only a clause whose absence the library rates high or critical is reported."""
     import difflib
+
+    ruled = {r["kcc_key"] for r in (rules or []) if r.get("rule_type") == "clause_required" and r.get("kcc_key")}
+    failed = {r["kcc_key"] for r in (rules or []) if r.get("rule_type") == "clause_required" and any(x["rule_key"] == r["key"] and x["status"] == "fail" for x in (results or []))}
 
     by = {c["clause_type"]: c for c in clauses}
     items = []
     for k in kcc_cfg:
         std = (k.get("standard_text") or "").strip()
-        if k.get("builtin") or not k.get("enabled", True) or not std or (k.get("applies_to") and doc_type not in k["applies_to"]):
+        if k.get("builtin") or not k.get("enabled", True) or not std or (k.get("applies_to") and doc_type not in k["applies_to"]) or k["key"] in (skip or ()):
             continue
         found = by.get(k["key"])
         base = dict(custom=True, clause_type=k["key"], heading=k["name"], standard_text=std, standard_position=k.get("playbook_position") or "", suggested_text=std)
         if not found:
+            if rules is not None and (k["key"] not in failed if k["key"] in ruled else (k.get("severity_if_missing") or "medium") not in ("high", "critical")):
+                continue
             items.append({**base, "status": "missing", "draft_text": "", "deviation": f"The {k['name']} clause is missing.",
                           "severity": k.get("severity_if_missing") or "medium", "diff": [["ins", std]], "page": None})
         elif difflib.SequenceMatcher(None, norm(found["text"]), norm(std)).ratio() < 0.5:
@@ -224,20 +232,21 @@ def similar(a: str, b: str) -> float:
     return difflib.SequenceMatcher(None, norm(a).lower(), norm(b).lower()).ratio()
 
 
-def playbook_items(items: list[dict], results: list[dict], rules: list[dict], metrics: list[dict], clauses: list[dict], kcc_cfg: list[dict]) -> list[dict]:
+def playbook_items(items: list[dict], results: list[dict], rules: list[dict], metrics: list[dict], clauses: list[dict], kcc_cfg: list[dict], keep_all: bool = False) -> list[dict]:
     """Offline redline for drafts that are NOT written from our template: a word diff against the template flags every sentence, so instead
     - keep a clause comparison only when the draft wording is close to the standard (template-derived) or the clause is missing,
     - and raise one finding per failed playbook rule (value outside its threshold, forbidden wording, required clause absent) with the rule's severity and wording.
-    Claude mode judges meaning and does not use this."""
+    Claude mode judges meaning, so there every finding of Claude's is kept (keep_all) and this only adds the failed playbook rules Claude did not raise: a rule the
+    house has written down (renewal notice at most 90 days) must never be missing from a redline because a model read past it."""
     changed = [i for i in items if i["status"] == "changed"]
     sims = [similar(i.get("draft_text") or "", i.get("standard_text") or "") for i in changed]
-    if not changed or sum(sims) / len(sims) >= 0.45:
+    if not keep_all and (not changed or sum(sims) / len(sims) >= 0.45):
         return items                   # written from our template (its wording is close to the standard): the word diff is the right redline
     by_clause = {c["clause_type"]: c for c in clauses}
     rule = {r["key"]: r for r in rules}
     metric_clause = {m["key"]: m.get("kcc_key") for m in metrics}
     name = {k["key"]: k["name"] for k in kcc_cfg}
-    kept = [i for i in items if i["status"] != "missing" and not i.get("custom") and similar(i.get("draft_text") or "", i.get("standard_text") or "") >= 0.7]      # template-derived wording only; absent clauses come from required-clause rules
+    kept = list(items) if keep_all else [i for i in items if i["status"] != "missing" and not i.get("custom") and similar(i.get("draft_text") or "", i.get("standard_text") or "") >= 0.7]      # template-derived wording only; absent clauses come from required-clause rules
     have = {i["clause_type"] for i in kept}
     out = list(kept)
     for r in results:

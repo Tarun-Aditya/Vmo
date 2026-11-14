@@ -1,8 +1,8 @@
 # Certificate of Acceptance
 
-Supplier: Crestline Laundry & Linen Services Ltd
+Supplier: Crestline Laundry & Linen Services Inc
 
-Reference: Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbour Hotel
+Reference: Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbor Hotel
 
 Milestone: Joint linen inventory and baseline count at the Property (due 16 July 2025)
 

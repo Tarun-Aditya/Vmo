@@ -1,10 +1,10 @@
 # Mutual Non-Disclosure Agreement
 
-This Agreement is made on 03 May 2025 (the "Effective Date") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Crestline Laundry & Linen Services Ltd** (the "Supplier"). Each is a "Party" and together the "Parties".
+This Agreement is made on May 3, 2025 (the "Effective Date") between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer"), and **Crestline Laundry & Linen Services Inc** (the "Supplier"). Each is a "Party" and together the "Parties".
 
 ## Term and Fees
 
-1. **Term.** This Agreement commences on the Effective Date and continues until 03 May 2028 (the "Initial Term", being 36 months), unless terminated earlier under clause 14.
+1. **Term.** This Agreement commences on the Effective Date and continues until May 3, 2028 (the "Initial Term", being 36 months), unless terminated earlier under clause 14.
 2. **Fees.** No fees are payable by either Party under this Agreement. Each Party bears its own costs of performing it. Any fees for laundry and linen services shall be set out in a separate written agreement, and nothing in this Agreement obliges either Party to enter into one.
 
 ## Purpose and Definitions
@@ -23,8 +23,8 @@ This Agreement is made on 03 May 2025 (the "Effective Date") between **Seabright
 
 ## Rights, Data and Warranties
 
-11. **Intellectual property.** All Confidential Information and all intellectual property rights in it remain the property of the Discloser. No licence or right is granted other than the limited right to use Confidential Information for the Purpose. Neither Party shall reverse engineer, analyse or copy Confidential Information except as needed for the Purpose.
-12. **Data protection.** If Confidential Information includes personal data, each Party shall comply with applicable data protection law, including the UK GDPR and the Data Protection Act 2018, shall process such data only as necessary for the Purpose, and shall implement appropriate technical and organisational security measures. Neither Party shall disclose guest or employee personal data unless necessary for the Purpose and permitted by law. If the Parties later enter into services involving personal data, they shall agree appropriate data processing terms.
+11. **Intellectual property.** All Confidential Information and all intellectual property rights in it remain the property of the Discloser. No license or right is granted other than the limited right to use Confidential Information for the Purpose. Neither Party shall reverse engineer, analyze or copy Confidential Information except as needed for the Purpose.
+12. **Data protection.** If Confidential Information includes personal data, each Party shall comply with applicable data protection law, including the California Consumer Privacy Act and other applicable United States federal and state privacy laws, shall process such data only as necessary for the Purpose, and shall implement appropriate technical and organizational security measures. Neither Party shall disclose guest or employee personal data unless necessary for the Purpose and permitted by law. If the Parties later enter into services involving personal data, they shall agree appropriate data processing terms.
 13. **Warranties, liability and remedies.** Confidential Information is provided "as is", and the Discloser gives no warranty as to its accuracy or completeness, save that it warrants it has the right to disclose it. Neither Party is liable for loss arising from the other's use of Confidential Information in accordance with this Agreement. Nothing in this Agreement limits or excludes liability for fraud, death or personal injury caused by negligence, or any liability that cannot lawfully be limited. Each Party shall indemnify the other against losses, costs and expenses (including reasonable legal fees) arising from its breach of clauses 6 to 10. The Recipient acknowledges that damages alone may be an inadequate remedy for breach and that the Discloser is entitled to seek injunctive relief or specific performance without proof of special damage, in addition to any other remedy.
 
 ## Termination and Survival
@@ -38,14 +38,14 @@ This Agreement is made on 03 May 2025 (the "Effective Date") between **Seabright
 17. **Assignment.** Neither Party may assign, transfer or subcontract any of its rights or obligations under this Agreement without the prior written consent of the other, such consent not to be unreasonably withheld, save that the Customer may disclose to its affiliates as permitted by clause 7.
 18. **Notices.** Notices must be in writing and delivered by hand, by recorded delivery post, or by email to the address most recently notified by the receiving Party for this purpose, and are deemed received on delivery or, in the case of email, at the time of transmission if sent during business hours on a business day, and otherwise on the next business day.
 19. **Entire agreement; variation; waiver.** This Agreement is the entire agreement between the Parties on its subject matter and supersedes all prior understandings relating to it. It may be varied only in writing signed by both Parties. A failure or delay in exercising a right is not a waiver of it. If any provision is held invalid or unenforceable, the remainder continues in effect.
-20. **Governing law and jurisdiction.** This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes) are governed by the laws of England and Wales, and the courts of England and Wales have exclusive jurisdiction.
+20. **Governing law and jurisdiction.** This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes) are governed by the laws of the State of New York, and the state and federal courts located in New York County, New York have exclusive jurisdiction.
 21. **Third party rights; counterparts.** A person who is not a Party has no right under the Contracts (Rights of Third Parties) Act 1999 to enforce any term of this Agreement. This Agreement may be executed in counterparts, including by electronic signature, each of which is an original and all of which together are one instrument.
 
 ## Signatures
 
-| Signed for and on behalf of **Seabright Hotels & Resorts Ltd** | Signed for and on behalf of **Crestline Laundry & Linen Services Ltd** |
+| Signed for and on behalf of **Seabright Hotels & Resorts Inc** | Signed for and on behalf of **Crestline Laundry & Linen Services Inc** |
 |---|---|
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Sofia Marchetti |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
-| Date: 23 April 2025 | Date: 26 April 2025 |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
+| Date: April 23, 2025 | Date: April 26, 2025 |

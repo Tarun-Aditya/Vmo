@@ -6,7 +6,7 @@
 
 **Due date:** 28 January 2026
 
-**From:** Staffwell Hospitality Staffing Ltd
+**From:** Staffwell Hospitality Staffing Inc
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 

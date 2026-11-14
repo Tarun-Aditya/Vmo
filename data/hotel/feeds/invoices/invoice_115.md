@@ -1,4 +1,4 @@
-# PayGuard Payments Pte Ltd
+# PayGuard Payments Inc
 
 ## Invoice
 

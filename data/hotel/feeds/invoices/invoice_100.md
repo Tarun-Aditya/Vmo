@@ -6,11 +6,11 @@
 
 **Due date:** 06 October 2026
 
-**From:** Halcyon Elevator & Lift Maintenance Ltd
+**From:** Halcyon Elevator & Lift Maintenance Inc
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 
-**Reference:** Statement of Work No. 1 -- Lift Maintenance Services at Seabright Summit Lodge
+**Reference:** Statement of Work No. 1 -- Elevator Maintenance Services at Seabright Summit Lodge
 
 **Service period:** 02 Aug 2026 – 01 Sep 2026
 

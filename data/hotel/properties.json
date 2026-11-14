@@ -1,8 +1,8 @@
 [
  {
-  "name": "Seabright Harbour Hotel",
-  "city": "Portsmouth",
-  "country": "United Kingdom",
+  "name": "Seabright Harbor Hotel",
+  "city": "Boston",
+  "country": "United States",
   "kind": "Full-service city hotel",
   "rooms": 312,
   "opened_year": 2009
@@ -17,8 +17,8 @@
  },
  {
   "name": "Seabright Lakeside Resort",
-  "city": "Windermere",
-  "country": "United Kingdom",
+  "city": "Lake Placid",
+  "country": "United States",
   "kind": "Resort",
   "rooms": 226,
   "opened_year": 2004
@@ -33,16 +33,16 @@
  },
  {
   "name": "Seabright Old Town Boutique",
-  "city": "York",
-  "country": "United Kingdom",
+  "city": "Savannah",
+  "country": "United States",
   "kind": "Boutique hotel",
   "rooms": 58,
   "opened_year": 2018
  },
  {
   "name": "Seabright Summit Lodge",
-  "city": "Aviemore",
-  "country": "United Kingdom",
+  "city": "Park City",
+  "country": "United States",
   "kind": "Lodge",
   "rooms": 96,
   "opened_year": 2001

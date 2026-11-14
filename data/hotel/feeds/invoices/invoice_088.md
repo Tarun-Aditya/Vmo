@@ -1,4 +1,4 @@
-# Halcyon Elevator & Lift Maintenance Ltd
+# Halcyon Elevator & Lift Maintenance Inc
 
 ## Invoice
 
@@ -6,7 +6,7 @@
 |---|---|
 | Invoice number | HAL-2509-088 |
 | Date | 2025-09-06 |
-| Agreement | Statement of Work No. 1 -- Lift Maintenance Services at Seabright Summit Lodge |
+| Agreement | Statement of Work No. 1 -- Elevator Maintenance Services at Seabright Summit Lodge |
 | Description | Services 02 Aug – 01 Sep 2025 |
 | Period | 2025-08-02 to 2025-09-01 |
 | Total | USD 7,000.00 |

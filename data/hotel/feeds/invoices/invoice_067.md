@@ -1,6 +1,6 @@
 # TAX INVOICE
 
-Halcyon Elevator & Lift Maintenance Ltd
+Halcyon Elevator & Lift Maintenance Inc
 
 Date of issue: September 07, 2025
 

@@ -1,6 +1,6 @@
 # Monthly Service Level Report
 
-**Vendor:** Staffwell Hospitality Staffing Ltd
+**Vendor:** Staffwell Hospitality Staffing Inc
 
 **Agreement:** Statement of Work No. 1 -- Staffing Services at Seabright Airport Inn
 

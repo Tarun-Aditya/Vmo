@@ -171,7 +171,12 @@ def call_tool(
 
 
 def prompt(name: str) -> str:
-    return (Path(__file__).parent / "prompts" / f"{name}.md").read_text()
+    """A prompt file, speaking for the customer this installation is configured for (the files are written for the original demo customer)."""
+    t = (Path(__file__).parent / "prompts" / f"{name}.md").read_text()
+    who = (settings.customer_names or "").split(",")[0].strip()
+    if who and who.lower() != "arcadia":
+        t = t.replace("Arcadia Retail Inc.'s Vendor Management Office", f"{who}'s contracts team").replace("Arcadia Retail Inc.", who).replace("Arcadia", who)
+    return t
 
 
 def complete(purpose: str, model: str, system: str, user: str, max_tokens: int = 6000, timeout: int = 600) -> str:

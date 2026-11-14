@@ -219,3 +219,72 @@ def test_certificate_alerts(db):
         got = {a["title"].split(":")[0]: a["severity"] for a in alerts._candidates(Session(bind=c), rule, date.today())}
         assert got == {"insurance expired 3 days ago": "critical", "food_safety expires in 10 days": "high"}        # 45 days away and 'not on file' do not alert
         t.rollback()
+
+
+def test_certificate_documents_are_read(monkeypatch):
+    from app import opsdocs
+    from app.docgen import hotel_spec
+
+    monkeypatch.setattr("app.opsdocs.customer_markers", lambda: ["seabright"])
+    for kind, vendor in (("insurance", "Northgate Facilities & HVAC Inc"), ("food_safety", "Hearth & Table Foods Inc"), ("inspection_certificates", "Halcyon Elevator & Lift Maintenance Inc"),
+                         ("payment_card_data", "PayGuard Payments Inc")):
+        t = opsdocs._clean(hotel_spec.certificate_md(vendor, kind, date(2027, 3, 5), date(2026, 3, 5), "REF-1234"))
+        assert opsdocs.kind_of(t) == "certificate"
+        got = opsdocs.parse_certificate(t)
+        assert (got["vendor"], got["kind"], got["expiry_date"], got["received_on"], got["reference"]) == (vendor, kind, date(2027, 3, 5), date(2026, 3, 5), "REF-1234")      # the insured, never us
+    assert opsdocs.kind_of("ACCEPTANCE CERTIFICATE\nMilestone: go-live") == "acceptance"            # a milestone sign-off is not a compliance certificate
+    ins = opsdocs._clean(hotel_spec.certificate_md("Halcyon Elevator & Lift Maintenance Inc", "insurance", date(2027, 3, 5), date(2026, 3, 5), "POL-1"))
+    assert opsdocs.parse_certificate(ins)["kind"] == "insurance"                                    # the holder's name does not decide the kind
+
+
+def test_missing_library_clauses_are_findings_only_where_the_house_requires_them():
+    from app import deviations
+
+    lib = [dict(key=k, name=k, builtin=False, enabled=True, standard_text="Standard wording.", applies_to=["MSA"], severity_if_missing=sev, playbook_position="")
+           for k, sev in (("food_safety", "high"), ("seasonal_pricing", "medium"), ("guest_injury_indemnity", "high"), ("brand_standards", "medium"))]
+    rules = [dict(key="r_food", rule_type="clause_required", kcc_key="food_safety"), dict(key="r_injury", rule_type="clause_required", kcc_key="guest_injury_indemnity")]
+    results = [dict(rule_key="r_injury", status="fail")]                      # food safety is not asked of this vendor's category: no result for r_food
+    got = deviations.compare_custom([], lib, "MSA", skip={"brand_standards"}, rules=rules, results=results)
+    assert [i["clause_type"] for i in got] == ["guest_injury_indemnity"]      # not food safety (rule does not apply), not seasonal pricing (optional), not brand standards (in the template)
+    assert len(deviations.compare_custom([], lib, "MSA")) == 4                # without rules the old behaviour is unchanged
+
+
+def test_claude_redline_keeps_its_findings_and_gains_any_failed_rule():
+    from app import deviations
+
+    claude = [dict(clause_type="payment", heading="Payment", status="changed", draft_text="pay in 10 days", standard_text="pay in 45 days", severity="high", deviation="shorter")]
+    rules = [dict(key="renewal_max", name="Renewal notice at most 90 days", description="", kcc_key=None, metric_key="renewal_notice_days", suggested_text="At least 60 days.", severity="high"),
+             dict(key="pay", name="Payment terms", description="", kcc_key="payment", metric_key=None, suggested_text="", severity="high")]
+    results = [dict(rule_key="renewal_max", status="fail", actual="180", expected="<= 90", severity="high", clause_id=None), dict(rule_key="pay", status="fail", actual="10", expected=">= 30", severity="high", clause_id=None)]
+    metrics = [dict(key="renewal_notice_days", kcc_key="renewal")]
+    out = deviations.playbook_items(claude, results, rules, metrics, [dict(id=1, clause_type="renewal", text="renews unless 180 days notice", page=2)], [dict(key="renewal", name="Renewal")], keep_all=True)
+    assert [i["clause_type"] for i in out] == ["payment", "renewal"]          # Claude's payment finding once, plus the renewal rule it did not raise
+    assert out[0]["deviation"] == "shorter" and "180" in out[1]["deviation"]
+
+
+def test_a_partys_legal_form_is_not_the_vendor(monkeypatch):
+    from app import meta_rules
+
+    monkeypatch.setattr("app.meta_rules.customer_markers", lambda: ["seabright"])
+    md = ('# Master Services Agreement\n\nThis Agreement is made between:\n\n(1) **Seabright Hotels & Resorts Inc**, a Delaware corporation, which owns and operates six hotels (the "Client"); and\n\n'
+          '(2) **Crestline Laundry & Linen Services Inc**, a Delaware corporation (the "Supplier").\n')
+    assert meta_rules.find_vendor(md, {}, {}) == "Crestline Laundry & Linen Services Inc"
+    llc = 'This Agreement is entered into by and between Seabright Hotels & Resorts Inc and Blue Peak Services LLC, a New York limited liability company.'
+    assert meta_rules.find_vendor(llc, {}, {}) == "Blue Peak Services LLC"
+
+
+def test_how_each_contract_can_be_exited_on_a_sale(db):
+    with db.connect() as c:
+        t = c.begin()
+        w = _world(c)
+        c.execute(text("UPDATE contracts SET termination_for_convenience = true WHERE id = :i"), {"i": w["msa"]})                 # the laundry MSA can be ended on notice
+        c.execute(text("UPDATE contracts SET termination_for_convenience = false, expiry_date = current_date + 365 WHERE id = :i"), {"i": w["energy"]})
+        c.execute(text("INSERT INTO clauses (contract_id, clause_type, text, page) VALUES (:c, 'property_sale_termination', 'If a Property is sold the Customer may terminate.', 6)"), {"c": w["s2"]})
+        s = Session(bind=c)
+        ex = properties.exit_terms(s)
+        assert ex[w["s1"]]["exit"] == "notice" and ex[w["s1"]]["exit_from"] == "its master agreement"       # a schedule that is silent follows its master agreement
+        assert ex[w["s2"]]["exit"] == "sale" and ex[w["s2"]]["exit_from"] == "this contract"
+        assert ex[w["energy"]]["exit"] == "locked"
+        d = properties.detail(s, w["a"])
+        assert d["sale"]["locked_contracts"] == 1 and round(d["sale"]["locked_value"]) == 600000            # 75% of the energy contract's year still to run
+        t.rollback()

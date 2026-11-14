@@ -10,7 +10,7 @@
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 
-**Reference:** Statement of Work No. 1 – Security Services at Seabright Harbour
+**Reference:** Statement of Work No. 1 – Security Services at Seabright Harbor Hotel
 
 **Service period:** 20 Jun 2026 – 19 Jul 2026
 

@@ -1,4 +1,4 @@
-# Staffwell Hospitality Staffing Ltd
+# Staffwell Hospitality Staffing Inc
 
 ## Invoice
 

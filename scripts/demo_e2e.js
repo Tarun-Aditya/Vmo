@@ -9,7 +9,7 @@ const U = process.env.WEB || 'http://localhost:5173', A = process.env.API || 'ht
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [], errs = [];
 const RUN = Date.now().toString(36);   // unique names so a re-run is not treated as a duplicate by the hash check
-let n = 0; const TOTAL = 22;
+let n = 0; let TOTAL = 22;
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -41,10 +41,29 @@ let n = 0; const TOTAL = 22;
   const live = contracts.filter((c) => c.status !== 'draft'), drafts = contracts.filter((c) => c.status === 'draft');
   const msa = live.find((c) => c.type === 'MSA' && live.some((k) => k.parent_id === c.id)) || live[0];
   await api('/api/admin/mode', 'PUT', { demo: true });
+  if (((await api('/api/properties').catch(() => null)) || {}).properties?.length) TOTAL = 25;      // three property steps on a corpus with properties
 
   await feature('Portfolio dashboard: decision queue, 30/60/90 buckets, Demo mode badge', async (l) => {
     await go('/'); await caption(l);
     return `${live.length} contracts and ${drafts.length} drafts read from documents`; });
+
+  // the owner's questions first, when the corpus carries properties: what each property costs, where one vendor charges hotels differently, what a buyer would inherit
+  const props = await api('/api/properties').catch(() => null);
+  if (props && props.properties && props.properties.length) {
+    await feature('Properties: cost per room with the share of group agreements, and what a buyer would inherit on a sale', async (l) => {
+      await go('/properties'); await caption(l);
+      const b = p.getByRole('button', { name: /What makes up the cost/ }).first(); await b.click(); await sleep(1200);
+      if (!(await p.getByText(/If this property were sold/).count())) throw new Error('sale view missing');
+      return `${props.properties.length} properties`; });
+    await feature('Compare: one vendor across properties, rates and terms side by side, and what the gap is worth', async (l) => {
+      await go('/compare'); await caption(l);
+      const c = await api('/api/properties/compare'); if (!c.same_vendor.length) throw new Error('nothing to compare');
+      return c.saving_estimate ? `about $${Math.round(c.saving_estimate / 1000)}K a year at the best rate` : ''; });
+    await feature('Certificates: what each vendor must hold, read from the certificates on file, with expiry', async (l) => {
+      await go('/certificates'); await caption(l);
+      const c = await api('/api/certificates'); if (!c.certificates.length) throw new Error('no certificates');
+      return `${c.summary.expired} expired, ${c.summary.expiring} expiring, ${c.summary.missing} not on file`; });
+  }
 
   await feature('Contracts repository with filters', async (l) => {
     await go('/contracts'); await caption(l);
