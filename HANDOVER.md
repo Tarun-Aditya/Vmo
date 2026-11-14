@@ -113,3 +113,34 @@ Fixes that mattered: text before the first heading is no longer dropped, clauses
 Remaining gaps: IP ownership precision (licence wording), termination for convenience recall, governing law with several jurisdictions, offline effective date on messy exhibits. **CUAD has no VMO templates; the VMO-type subset above is the closest proxy, and results on real vendor MSAs from your customer are still unmeasured.**
 
 **Other:** Claude module eval 60/62 (misses are answer-format only), lint now enforces real defects (`ruff` F/B/I), 161 backend tests pass.
+
+## Update: hotel / property-operations edition (branch `hotel-property-ops`)
+Everything above describes the VMO edition and its pilot corpus; it still holds for the shared engine. This branch adds a fictional hotel group (Seabright, six properties, 32 documents) and:
+
+**Property level.** `properties` (rooms, city, kind), `contract_coverage`, view `v_property_contracts`: every contract is attributed to the properties it covers, group agreements by rooms,
+so a property's cost includes its share of the energy contract and the hotel systems. Screens: Properties (cost per room, what makes it up), Compare (one vendor's rates and terms across
+properties; the seeded laundry rates of 1.42 / 1.58 / 1.71 USD/kg are worth about $60K a year at the best rate, same volumes assumed), Certificates (what each vendor must hold, expiry of
+the copy on file, alerts).
+
+**Measured on the hotel corpus, offline (2026-11-14):** fields 456/457 (99.8%), metadata 126/128, values 84/85, planted draft deviations 17/17, clean control 0, about 7 findings per draft.
+Claude mode was last measured before these changes (98.7% fields, 16/17, about 17 findings per draft) and has not been repeated. These figures are scored against the spec the documents
+were written from: they prove the pipeline, not accuracy on unseen contracts.
+
+**Measured on real public contracts (CUAD hold-out, 133 contracts, offline, never tuned on):** governing law 89.1% (was 76.5%), effective date 75.7%, liability cap F1 0.87,
+assignment 0.94, insurance 0.90, audit rights 0.88, non-solicit 0.81, IP ownership 0.72, termination for convenience F1 0.66 (`reports/cuad_offline_holdout.txt`).
+
+**Reading fixes that apply to any document:** PDF tables are rebuilt row by row (wrapped cells joined); 'Signed for and on behalf of ... by NAME, TITLE' wrapped over lines, or with the date
+on its own line, is read; a signature table with dates but no typed names counts as signed; numbers above one hundred in words ('one hundred and eighty (180) days'); a party's state of
+incorporation is no longer taken as the governing law; a heading that contains two clause names goes to the longer one ('Data Protection and Payment-Card Security' is not a payment clause);
+an admin-defined clause is located at the passage matching most of its keywords, not its first mention.
+
+**Rules and alerts.** Checklist rules can be limited to vendor categories. Spend alerts are one per vendor and kind; an alert whose cause is gone is resolved automatically; certificate
+expiry is an alert rule. Seeded hotel data: 24 open alerts (46 before).
+
+**Known limits specific to this edition**
+1. No real hotel contract has been read. Geography is undecided: the corpus mixes US dollars, English law and US states.
+2. A property's share of a group agreement is an attribution by rooms, not a contract term; the Compare saving assumes unchanged volumes.
+3. Certificate expiry dates come from a CSV or a person; certificate documents themselves are not read.
+4. The exit-on-sale rule fails on every seeded master agreement because none of the fictional contracts contains that clause: a true finding on this data, but check it against real paper.
+5. The recorded walkthrough video predates Compare, Certificates and the grouped rail.
+6. A few milestone names read from Word tables are still rough.

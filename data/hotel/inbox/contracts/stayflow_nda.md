@@ -2,7 +2,7 @@
 
 This Non-Disclosure Agreement (the "Agreement") is made between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer", "we" or "us" when the context is the Customer's side), and **Stayflow Property Systems Inc** (the "Supplier"). In this Agreement, "we" and "us" mean both of us together unless we say otherwise, and "you" means the party receiving information.
 
-It takes effect on January 26, 2026 (the "Effective Date").
+It takes effect on January 28, 2026 (the "Effective Date").
 
 ## Why we are signing this
 
@@ -10,7 +10,7 @@ The Customer is considering buying property-management and related systems and s
 
 ## How long this Agreement lasts
 
-This Agreement starts on the Effective Date and runs until January 26, 2028 (the "Initial Term", which is 24 months). We can extend it only in writing signed by both of us. Either of us may end it earlier by written notice, as explained in "Ending this Agreement" below.
+This Agreement starts on the Effective Date and runs until January 28, 2028 (the "Initial Term", which is 24 months). We can extend it only in writing signed by both of us. Either of us may end it earlier by written notice, as explained in "Ending this Agreement" below.
 
 ## What counts as Confidential Information
 
@@ -101,4 +101,4 @@ No fees are payable under this Agreement. If we later agree a commercial relatio
 | **Name** | Helena Cruz | Anika Rao |
 | **Title** | VP Technology Sourcing | Authorised Signatory |
 | **Signature** | | |
-| **Date** | January 16, 2026 | January 19, 2026 |
+| **Date** | January 18, 2026 | January 21, 2026 |

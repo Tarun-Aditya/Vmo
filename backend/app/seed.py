@@ -3,12 +3,13 @@ The seeded data therefore takes exactly the path a document dropped into the fol
 Idempotent: content tables are rebuilt; admin configuration (KCC / metrics / checklist) is kept."""
 from __future__ import annotations
 
+import csv
 import json
 import os
 import shutil
 import sys
 import time
-from datetime import date
+from datetime import date, timedelta
 
 from sqlalchemy import text
 
@@ -31,26 +32,17 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
             shutil.rmtree(root / "inbox" / sub, ignore_errors=True)
         info = pilot.render(root, seed_date)
         log(f"pilot corpus: {info} into {root / 'inbox'} (seed date {seed_date})")
-        if corpus == "hotel":            # what a contract never states: the properties' own attributes, and the certificates received so far (a CSV export)
-            import csv
-            from datetime import timedelta
-
+        if corpus == "hotel":            # what a contract never states: the properties' own attributes
             from app.docgen import hotel_spec
 
             (root / "properties.json").write_text(json.dumps(hotel_spec.PROPERTIES, indent=1))
-            (root / "feeds").mkdir(parents=True, exist_ok=True)
-            with (root / "feeds" / "certificates.csv").open("w", newline="") as fh:
-                w = csv.writer(fh)
-                w.writerow(["vendor", "kind", "expiry_date", "received_on", "reference"])
-                for vendor, kind, days, ref in hotel_spec.CERTIFICATES:
-                    w.writerow([vendor, kind, seed_date + timedelta(days=days), seed_date + timedelta(days=days - 365), ref])
     else:
         manifest = generate(root, seed_date)
         log(f"generated {len(manifest['templates'])} templates, {len(manifest['contracts'])} contracts, "
             f"{len(manifest['drafts'])} drafts into {root / 'inbox'} (seed date {seed_date})")
     with SessionLocal() as s:
         s.execute(text("TRUNCATE templates, template_clauses, contracts, clauses, field_extractions, clause_deviations, "
-                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages, vendor_scores, properties, certificates RESTART IDENTITY CASCADE"))
+                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages, vendor_scores, properties, certificates, alerts RESTART IDENTITY CASCADE"))
         kcc.ensure_defaults(s)
         if corpus == "hotel":
             from app import hotel_pack
@@ -68,6 +60,16 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
         from app.docgen import ops_fixtures
 
         log(f"fixture documents written: {ops_fixtures.generate(seed_date)}")
+        if corpus == "hotel":           # the certificates received so far, as a CSV export (written after the fixtures, which rebuild the feeds folder)
+            from app.docgen import hotel_spec
+
+            (root / "feeds").mkdir(parents=True, exist_ok=True)
+            with (root / "feeds" / "certificates.csv").open("w", newline="") as fh:
+                w = csv.writer(fh)
+                w.writerow(["vendor", "kind", "expiry_date", "received_on", "reference"])
+                for vendor, kind, days, ref in hotel_spec.CERTIFICATES:
+                    w.writerow([vendor, kind, seed_date + timedelta(days=days), seed_date + timedelta(days=days - 365), ref])
+
         log(f"feeds loaded: {feeds.run_feeds('seed')}")
     except Exception as e:
         log(f"feeds failed: {type(e).__name__}: {e}")

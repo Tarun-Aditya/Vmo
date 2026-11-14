@@ -2,7 +2,7 @@
 
 Crestline Laundry & Linen Services Ltd
 
-Date of issue: December 24, 2025
+Date of issue: December 26, 2025
 
 Invoice number: CRE-2512-049
 
@@ -10,12 +10,12 @@ Your ref: Statement of Work No. 1 -- Laundry and Linen Services at Seabright La
 
 To: Seabright Hotels & Resorts Ltd
 
-For: Services 20 Nov – 19 Dec 2025
+For: Services 22 Nov – 21 Dec 2025
 
-Billing period: 20 November 2025 to 19 December 2025
+Billing period: 22 November 2025 to 21 December 2025
 
 Amount payable: USD 22,083.33
 
-Payment due by 07 February 2026
+Payment due by 09 February 2026
 
-Payment received on 24 February 2026
+Payment received on 26 February 2026

@@ -169,3 +169,53 @@ def test_invoice_with_no_matching_agreement_says_what_is_on_file(db):
         assert "does not match any of the 4 agreements on file" in d["Linen Co"]
         assert "no agreement of any kind is on file" in d["Nobody Ltd"]
         t.rollback()
+
+
+def test_a_rule_for_one_vendor_category_is_not_asked_of_the_others():
+    from app import kcc
+
+    rule = dict(key="food", name="Food safety", rule_type="clause_required", kcc_key="food_safety", metric_key=None, operator=None, threshold=None, threshold_text=None, phrase=None,
+                severity="critical", applies_to=["MSA"], categories=["Food & Beverage Supply"], stage="any", suggested_text=None)
+    run = lambda cat, clauses: kcc.evaluate_rules("MSA", "active", clauses, [], [], [rule], True, category=cat)      # noqa: E731
+    assert run("Lifts & Engineering", []) == []                                           # a lift contractor is not failed for having no food-safety clause
+    assert [r["status"] for r in run("Food & Beverage Supply", [])] == ["fail"]
+    assert [r["status"] for r in run("Food & Beverage Supply", [dict(clause_type="food_safety", text="HACCP", page=2)])] == ["pass"]
+    assert [r["status"] for r in kcc.evaluate_rules("MSA", "active", [], [], [], [dict(rule, categories=[])], True, category="Lifts & Engineering")] == ["fail"]      # no scope = everyone
+
+
+def test_governing_law_is_not_the_state_a_party_was_formed_in():
+    from app.extract_rules import _governing_law
+
+    assert _governing_law("Acme Inc, a corporation organized under the laws of the State of Delaware. This Agreement shall be governed by the laws of the State of New York.") == "New York"
+    assert _governing_law("Acme, organized under the laws of Delaware, agrees this Agreement is governed by the laws of England and Wales.") == "England and Wales"
+    assert _governing_law("Acme Inc, a company incorporated under the laws of Delaware. Fees are payable monthly.") is None
+    assert _governing_law("This Agreement is made under the laws of the State of Texas.") == "Texas"
+
+
+def test_spend_alerts_are_grouped_and_closed_when_the_cause_goes(db):
+    from app import alerts
+
+    rule = dict(key="spend_exception", kind="spend_exception", params={"min_severity": "high"}, severity="high")
+    with db.connect() as c:
+        t = c.begin()
+        c.execute(text("DELETE FROM spend_exceptions"))
+        for n in range(3):
+            c.execute(text("INSERT INTO spend_exceptions (vendor, kind, severity, amount_at_risk, detail) VALUES ('Linen Co', 'duplicate', 'high', 100, :d)"), {"d": f"Invoice {n} repeats."})
+        c.execute(text("INSERT INTO spend_exceptions (vendor, kind, severity, amount_at_risk, detail) VALUES ('Linen Co', 'late_payment', 'low', 5, 'late')"))
+        got = alerts._candidates(Session(bind=c), rule, date.today())
+        assert len(got) == 1 and got[0]["title"] == "3 spend exceptions (high): duplicate — Linen Co, $300"        # three invoices, one thing to chase; the low one raises nothing
+        t.rollback()
+
+
+def test_certificate_alerts(db):
+    from app import alerts
+
+    rule = dict(key="certificate_expiry", kind="certificate", params={"days": 30}, severity="high")
+    with db.connect() as c:
+        t = c.begin()
+        c.execute(text("DELETE FROM certificates"))
+        for kind, days in (("insurance", -3), ("food_safety", 10), ("payment_card_data", 45), ("inspection_certificates", None)):
+            c.execute(text("INSERT INTO certificates (vendor, kind, name, expiry_date) VALUES ('Linen Co', :k, :k, :e)"), {"k": kind, "e": (date.today() + timedelta(days=days)) if days is not None else None})
+        got = {a["title"].split(":")[0]: a["severity"] for a in alerts._candidates(Session(bind=c), rule, date.today())}
+        assert got == {"insurance expired 3 days ago": "critical", "food_safety expires in 10 days": "high"}        # 45 days away and 'not on file' do not alert
+        t.rollback()

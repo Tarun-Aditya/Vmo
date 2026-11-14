@@ -2,9 +2,9 @@
 
 **Invoice No.:** STA-2601-118
 
-**Invoice date:** 12 January 2026
+**Invoice date:** 14 January 2026
 
-**Due date:** 26 January 2026
+**Due date:** 28 January 2026
 
 **From:** Staffwell Hospitality Staffing Ltd
 
@@ -12,12 +12,12 @@
 
 **Reference:** Statement of Work No. 1 -- Staffing Services at Seabright Airport Inn
 
-**Service period:** 08 Dec 2025 – 07 Jan 2026
+**Service period:** 10 Dec 2025 – 09 Jan 2026
 
 | Description | Amount (USD) |
 |---|---|
-| Services 08 Dec – 07 Jan 2026 | 50,833.33 |
+| Services 10 Dec – 09 Jan 2026 | 50,833.33 |
 
 **Total due: USD 50,833.33**
 
-Paid on: 25 January 2026
+Paid on: 27 January 2026

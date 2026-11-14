@@ -2,9 +2,9 @@
 
 **Invoice No.:** CRE-2604-037
 
-**Invoice date:** 03 April 2026
+**Invoice date:** 06 April 2026
 
-**Due date:** 18 May 2026
+**Due date:** 21 May 2026
 
 **From:** Crestline Laundry & Linen Services Ltd
 
@@ -12,12 +12,12 @@
 
 **Reference:** Statement of Work No. 1 -- Laundry and Linen Services at Seabright Harbour Hotel
 
-**Service period:** 28 Feb 2026 – 29 Mar 2026
+**Service period:** 02 Mar 2026 – 01 Apr 2026
 
 | Description | Amount (USD) |
 |---|---|
-| Services 28 Feb – 29 Mar 2026 | 25,833.33 |
+| Services 02 Mar – 01 Apr 2026 | 25,833.33 |
 
 **Total due: USD 25,833.33**
 
-Paid on: 04 June 2026
+Paid on: 07 June 2026

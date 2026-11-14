@@ -12,8 +12,8 @@ which vendor certificates have lapsed, which drafts depart from the house standa
 > real tenants. See [Known limits](#known-limits). The fictional customer is **Seabright Hotels & Resorts** (six properties); every vendor,
 > person and document in the demo data is fictional.
 
-**Navigation.** A left rail lists every screen: Portfolio, Renewals, Portfolio map, Properties, Compare, Contracts, Vendors, Key clauses, Ask, Redline, Templates,
-Obligations, Certificates, Spend, Risk and New contract, with Admin and the Demo switch at the foot.
+**Navigation.** The left rail keeps seven screens in view: Portfolio, Properties, Compare, Renewals, Contracts, Ask and Redline. The rest (vendors, portfolio map,
+certificates, obligations, spend, risk, key clauses, templates, new contract) fold under **More**, which opens by itself when you are on one of them.
 
 ## What it does
 
@@ -143,13 +143,15 @@ One-command paths: `make showcase` (clone to running demo), `make cuad` (real-co
 * **Fictional pilot corpus** (36 documents, ground truth computed from the generating spec): extraction 98.9% offline, 98.2% with
   Claude; Ask checked against the page APIs, 60/60 offline, 57 to 60 of 60 with Claude (misses were answer-format only).
 * **Public real contracts** (CUAD v1, 510 SEC-filed contracts with expert labels, 70/30 split by file-name hash; tuning used only
-  the training split). On the 133-contract hold-out the offline engine reaches, for example, governing law 77%, effective
-  date 76%, liability-cap clause F1 0.87, assignment F1 0.94; with Claude, on a 60-contract hold-out, governing law 98% and effective
-  date 94%. Termination for convenience is the weakest area (offline recall about 0.63, Claude about 0.70).
-  CUAD is not VMO-shaped (licences, distribution and similar), so read these as robustness on messy real text.
+  the training split). This is the evidence that does not depend on documents we wrote ourselves. On the 133-contract hold-out the offline engine reaches
+  governing law **89%** (77% before a party's state of incorporation stopped being read as the governing law), effective date 76%, liability-cap clause
+  F1 0.87, assignment 0.94, insurance 0.90, audit rights 0.88 (`reports/cuad_offline_holdout.txt`); with Claude, on a 60-contract hold-out measured earlier,
+  governing law 98% and effective date 94%. Termination for convenience is the weakest area (offline recall about 0.63, Claude about 0.70).
+  CUAD is licences, distribution and similar agreements, not hotel supplier contracts, so read these as robustness on messy real text.
 * **Semantic clause search** with the local `fastembed` model (BAAI/bge-small-en-v1.5) retrieves the right clause far more often than the
   hashed fallback (about 85% vs 40% on the retrieval eval).
-* **Not measured:** accuracy on a customer's real vendor MSAs. That is the first thing to do with a pilot customer.
+* **Not measured:** accuracy on a hotel group's own supplier contracts. The fictional-corpus figures are scored against the spec the documents were written
+  from, so they show the pipeline works end to end, not how it does on unseen wording. Measuring on 10 to 20 redacted real contracts is the first thing to do with a pilot customer.
 
 Reproduce: `python evals/pilot_eval.py`, `python evals/module_eval.py`, `python evals/retrieval_eval.py`, and for CUAD `make cuad`
 (or `python evals/cuad_eval.py data/cuad/CUAD_v1 --split test`; `LLM_PROVIDER=offline` for rules, unset for Claude). Result files are in `reports/`; `HANDOVER.md` has the full tables.
@@ -182,7 +184,7 @@ Set in `.env` (see `.env.example`):
 
 ## Tests
 
-* `make test`: backend suite (178 tests) against the offline-seeded synthetic corpus.
+* `make test`: backend suite (183 tests) against the offline-seeded synthetic corpus.
 * Outside Docker, use a separate database and data folder so tests never touch demo data:
   `DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`.
 * Browser walkthroughs: `scripts/demo_pilot.js` (any corpus) and `scripts/demo_walkthrough.js` (synthetic corpus).
@@ -192,7 +194,7 @@ Set in `.env` (see `.env.example`):
 ```
 backend/app/         FastAPI app: pipeline, extraction, kcc (clause library), kcc_ai, deviations, ask*, routes_*,
                      connectors/, simulators/, collab, mode (Demo/Live), llm, embeddings
-backend/alembic/     migrations (0001 to 0031; below 0005 cannot be downgraded)
+backend/alembic/     migrations (0001 to 0032; below 0005 cannot be downgraded)
 backend/tests/       pytest suite
 frontend/src/        React + Vite + TypeScript + Tailwind + TanStack Query
 evals/               extraction, redline, Ask, module, OCR, retrieval, CUAD and pilot evals
@@ -220,7 +222,7 @@ all names are fictional.
 * **Compare** (`/compare`, API `/api/properties/compare`): on the seeded data the same laundry supplier charges 1.42, 1.58 and 1.71 USD/kg at three hotels, a 20% gap worth
   about $60K a year at the best rate (an estimate: same volumes assumed). Cost per room is compared for every vendor that serves two or more properties.
 * **Certificates** (`/certificates`, API `/api/certificates`): required certificates are derived from the clauses (a clause must actually oblige one); expiry dates come from
-  `feeds/certificates.csv` or are recorded on the screen, never guessed from the contract. Seeded state: 2 expired, 2 expiring within 60 days, 4 not on file, 5 valid.
+  `feeds/certificates.csv` or are recorded on the screen, never guessed from the contract. Seeded state: 2 expired, 2 expiring within 60 days, 4 not on file, 5 valid (13 required in all).
 * **Hospitality pack** (`backend/app/hotel_pack.py`): ten key clauses, three values (laundry rate per kilogram, fault response hours, booking commission) and checklist rules,
   all ordinary Admin configuration.
 * **House templates:** `STANDARDS=hotel` gives the template library the group's values (England and Wales law, 60-day exit notice) **and its own clauses**
@@ -231,16 +233,21 @@ all names are fictional.
   16/17 after fixes that also apply to real documents: tables in PDFs are rebuilt row by row, signature sentences wrapped over lines and signature tables with dates but no
   typed names are read as signed, and numbers above one hundred written in words are understood. Two security schedules had labels that contradicted their own text
   (they do handle CCTV and guest data); the labels now follow the documents.
+* **Rules by kind of supplier** (migration 0032): a checklist rule can be limited to vendor categories, so food-safety certification is asked of the food supplier,
+  statutory inspection certificates of the lift and plant contractors, a guest-injury indemnity of suppliers who work on site, and payment-card security of the
+  hotel systems, and nobody else is failed for lacking them. Editable in Admin → Checklist ("Only for vendor categories").
+* **Certificate alerts:** an expired certificate, or one within 30 days of expiry, raises an alert like any other rule (Admin → Alerts).
 * **Less noise:** the Overview counts only invoices worth querying (high and critical; late payments are listed as minor), personal data without a DPA is reported once per
   vendor, a contract misread as unsigned no longer raises a false critical exception, an invoice that quotes no agreement says how many agreements are on file, and Review
-  shows critical and high findings first with the smaller differences folded away.
+  shows critical and high findings first with the smaller differences folded away. Alerts are raised once per vendor and kind of problem (five duplicate invoices
+  from one supplier are one alert), and an alert whose cause has gone is closed by itself: the seeded data now opens 24 alerts where it used to show 46.
 * **Ask** understands property: "which properties have the most contracts?", "contracts at Lakeside Resort", and "the laundry rate per kilogram at each property". The schema
   given to Claude now describes `properties`, `v_property_contracts` and `certificates` (it previously promised a `property` column that the view did not have).
 * **Portfolio map** (`/map`): every contract family on one timeline with the last day to act, plus hierarchy problems.
 * **End-to-end walkthrough** (`node scripts/demo_e2e.js`): all 22 steps pass on this build with no page errors. The committed video in `reports/e2e_hotel/` was recorded before
   the Compare and Certificates screens and the richer Properties screen; re-record with `make video` after a fresh seed.
-* Not yet done: the walkthrough does not visit Compare or Certificates; certificates are not yet read from uploaded certificate documents or raised as alerts; Claude-mode
-  measurement has not been repeated since these changes; the new layout on Ask, Review and the Admin pages.
+* Not yet done: the walkthrough does not visit Compare or Certificates; certificates are not yet read from uploaded certificate documents; Claude-mode
+  measurement has not been repeated since these changes; the corpus mixes US dollars, English law and US states because no target country has been chosen; the new layout on Ask, Review and the Admin pages.
 
 ## Roadmap (future scope, not built)
 
@@ -296,4 +303,4 @@ DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright python -m app.se
 SIMULATORS=1 DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright uvicorn app.main:app --port 8000     # stand-in ERP and e-signature systems for the demo
 cd ../frontend && npm ci && npm run dev                 # http://localhost:5173
 ```
-Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 178 backend tests, type check, build and the 22-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).
+Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 183 backend tests, type check, build and the 22-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).

@@ -265,8 +265,8 @@ def render(root: Path, seed: date, formats: bool = True) -> dict:
     cdir, ddir = root / "inbox" / "contracts", root / "inbox" / "drafts"
     for d in (cdir, ddir):
         d.mkdir(parents=True, exist_ok=True)
-        for f in list(d.glob("*")):
-            f.unlink()
+        for f in list(d.glob("*")):          # files, and folders a connector pulled into (a re-seed starts from the corpus alone)
+            shutil.rmtree(f) if f.is_dir() else f.unlink()
     n, fallbacks = 0, []
     for sp in DOCS:
         src = CORPUS_DIR / f"{sp['key']}.md"

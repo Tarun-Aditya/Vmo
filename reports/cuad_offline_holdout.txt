@@ -1,0 +1,17 @@
+contracts scored: 133 (errors: 0) from text
+
+clause presence                precision  recall     F1   tp/fp/fn
+  termination_for_convenience       0.74    0.60   0.66   37/13/25
+  liability_cap                     0.97    0.78   0.87   62/2/17
+  audit_rights                      0.90    0.85   0.88   56/6/10
+  assignment                        1.00    0.88   0.94   94/0/13
+  insurance                         0.91    0.89   0.90   40/4/5
+  ip_ownership                      0.62    0.85   0.72   33/20/6
+  non_solicit                       0.77    0.85   0.81   23/7/4
+
+  termination_for_convenience=True  precision 0.71  recall 0.63  (tp/fp/fn 39/16/23)
+  governing_law                106/119 = 89.1%
+  effective_date               84/111 = 75.7%
+  liability_stated             62/79 = 78.5%
+
+OVERALL crashes: 0/133

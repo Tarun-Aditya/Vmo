@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Invoice number | HAL-2606-097 |
-| Date | 2026-06-04 |
+| Date | 2026-06-06 |
 | Agreement | Statement of Work No. 1 -- Lift Maintenance Services at Seabright Summit Lodge |
-| Description | Services 28 Apr – 30 May 2026 |
-| Period | 2026-04-28 to 2026-05-30 |
+| Description | Services 02 May – 01 Jun 2026 |
+| Period | 2026-05-02 to 2026-06-01 |
 | Total | USD 7,000.00 |
-| Due date | 2026-07-04 |
-| Date paid | 2026-06-29 |
+| Due date | 2026-07-06 |
+| Date paid | 2026-07-01 |
 
 Billed to Seabright Hotels & Resorts Ltd

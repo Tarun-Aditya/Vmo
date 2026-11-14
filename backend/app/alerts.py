@@ -120,7 +120,10 @@ def evaluate(today: date | None = None, deliver: bool = True) -> dict:
         rules = [dict(r) for r in s.execute(text("SELECT * FROM alert_rules WHERE enabled ORDER BY sort_order")).mappings()]
         fresh: list[tuple[dict, dict]] = []
         for r in rules:
-            for c in _candidates(s, r, today):
+            cands = _candidates(s, r, today)
+            # an open alert whose cause is gone (the invoice was matched, the certificate renewed, the document re-read correctly) is closed, not left to pile up
+            s.execute(text("UPDATE alerts SET status = 'resolved' WHERE rule_key = :r AND status = 'open' AND NOT (dedupe_key = ANY(:keep))"), {"r": r["key"], "keep": [c["dedupe"] for c in cands]})
+            for c in cands:
                 ins = s.execute(text("""INSERT INTO alerts (rule_key, dedupe_key, title, body, severity, link, contract_id, vendor) VALUES (:r,:d,:t,:b,:s,:l,:c,:v)
                                         ON CONFLICT (dedupe_key) DO NOTHING RETURNING id"""),
                                 {"r": r["key"], "d": c["dedupe"], "t": c["title"], "b": c.get("body"), "s": c.get("severity") or r["severity"], "l": c.get("link"), "c": c.get("contract_id"), "v": c.get("vendor")}).scalar()

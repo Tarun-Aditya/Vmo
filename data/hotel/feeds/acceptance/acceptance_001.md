@@ -6,9 +6,9 @@
 
 **Milestone:** Go-live of security coverage
 
-**Due date:** 26 April 2026
+**Due date:** 28 April 2026
 
-**Accepted on:** 29 April 2026
+**Accepted on:** 01 May 2026
 
 **Comments:** Accepted by the business
 

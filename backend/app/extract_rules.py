@@ -390,8 +390,14 @@ def _governing_law(flat: str) -> str | None:
     'State of X', 'laws of the People's Republic of China', 'internal laws of New York', or a known state / country."""
     sents = re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", flat))
     pri = [s for s in sents if re.search(r"\bgovern\w*\b[^.;]{0,160}\blaws?\b|\blaws?\b[^.;]{0,120}\bgovern\w*|governing law|(?:construed|interpreted|enforced)[^.;]{0,80}(?:in accordance with|under|pursuant to)[^.;]{0,40}\blaws?\b|\bapplicable law:|choice of law|laws? of (?:the )?state of", s, re.I)]
+    # 'a corporation organized under the laws of the State of Delaware' says where a party was formed, not what law governs: such a sentence counts only if it also
+    # speaks of governing / construing, and then the jurisdiction is read after that word. Sentences that speak of governing come before the weaker 'laws of the State of'.
+    formed = r"(?:organi[sz]ed|incorporated|existing|formed|chartered|established|qualified)\b[^.;]{0,80}\blaws? of"
+    strong = r"\bgovern\w*|\bconstrued\b|\binterpreted\b|\benforced\b|applicable law|choice of law"
+    pri = [s for s in pri if re.search(strong, s, re.I) or not re.search(formed, s, re.I)]
+    pri.sort(key=lambda s: 0 if re.search(strong, s, re.I) else 1)
     for s in pri:
-        k = re.search(r"govern\w*|laws? of|construed|interpreted|applicable law", s, re.I)
+        k = re.search(r"govern\w*|construed|interpreted|applicable law", s, re.I) or re.search(r"laws? of", s, re.I)
         tail = s[k.start():] if k else s
         best = None
         for name in US_STATES + PLACES + list(ALIASES) + ["People's Republic of China", "People’s Republic of China"]:

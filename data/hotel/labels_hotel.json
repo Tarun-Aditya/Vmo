@@ -1,9 +1,9 @@
 {
- "seed_date": "2026-11-12",
+ "seed_date": "2026-11-14",
  "contracts": {
   "crestline_msa": {
-   "effective_date": "2025-05-21",
-   "expiry_date": "2028-05-21",
+   "effective_date": "2025-05-23",
+   "expiry_date": "2028-05-23",
    "notice_period_days": 90,
    "auto_renew": true,
    "annual_value": null,
@@ -16,9 +16,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2025-05-11",
+   "customer_signed_date": "2025-05-13",
    "supplier_signatory": "Grace Mbeki",
-   "supplier_signed_date": "2025-05-14",
+   "supplier_signed_date": "2025-05-16",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 45,
@@ -41,8 +41,8 @@
    }
   },
   "crestline_sow_harbour": {
-   "effective_date": "2025-06-30",
-   "expiry_date": "2027-06-30",
+   "effective_date": "2025-07-02",
+   "expiry_date": "2027-07-02",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 310000,
@@ -55,9 +55,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2025-06-20",
+   "customer_signed_date": "2025-06-22",
    "supplier_signatory": "Sofia Marchetti",
-   "supplier_signed_date": "2025-06-23",
+   "supplier_signed_date": "2025-06-25",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 45
@@ -76,8 +76,8 @@
    }
   },
   "crestline_sow_lakeside": {
-   "effective_date": "2025-07-20",
-   "expiry_date": "2027-07-20",
+   "effective_date": "2025-07-22",
+   "expiry_date": "2027-07-22",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 265000,
@@ -90,9 +90,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-07-10",
+   "customer_signed_date": "2025-07-12",
    "supplier_signatory": "Kenji Watanabe",
-   "supplier_signed_date": "2025-07-13",
+   "supplier_signed_date": "2025-07-15",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 45
@@ -111,8 +111,8 @@
    }
   },
   "crestline_sow_airport": {
-   "effective_date": "2026-01-16",
-   "expiry_date": "2027-07-16",
+   "effective_date": "2026-01-18",
+   "expiry_date": "2027-07-18",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 198000,
@@ -125,9 +125,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2026-01-06",
+   "customer_signed_date": "2026-01-08",
    "supplier_signatory": "Grace Mbeki",
-   "supplier_signed_date": "2026-01-09",
+   "supplier_signed_date": "2026-01-11",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 45
@@ -146,13 +146,13 @@
    }
   },
   "crestline_amd1": {
-   "effective_date": "2026-06-15",
+   "effective_date": "2026-06-17",
    "payment_terms_days": 30,
-   "expiry_date": "2029-05-21",
+   "expiry_date": "2029-05-23",
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2026-06-05",
+   "customer_signed_date": "2026-06-07",
    "supplier_signatory": "Sofia Marchetti",
-   "supplier_signed_date": "2026-06-08",
+   "supplier_signed_date": "2026-06-10",
    "fully_executed": true,
    "values": {},
    "milestones": [],
@@ -169,8 +169,8 @@
    }
   },
   "crestline_nda": {
-   "effective_date": "2025-05-01",
-   "expiry_date": "2028-05-01",
+   "effective_date": "2025-05-03",
+   "expiry_date": "2028-05-03",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": null,
@@ -183,9 +183,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2025-04-21",
+   "customer_signed_date": "2025-04-23",
    "supplier_signatory": "Sofia Marchetti",
-   "supplier_signed_date": "2025-04-24",
+   "supplier_signed_date": "2025-04-26",
    "fully_executed": true,
    "values": {
     "confidentiality_years": 3
@@ -204,8 +204,8 @@
    }
   },
   "brightstar_msa": {
-   "effective_date": "2025-10-08",
-   "expiry_date": "2028-10-08",
+   "effective_date": "2025-10-10",
+   "expiry_date": "2028-10-10",
    "notice_period_days": 60,
    "auto_renew": true,
    "annual_value": null,
@@ -218,9 +218,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-09-28",
+   "customer_signed_date": "2025-09-30",
    "supplier_signatory": "Kenji Watanabe",
-   "supplier_signed_date": "2025-10-01",
+   "supplier_signed_date": "2025-10-03",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -242,8 +242,8 @@
    }
   },
   "brightstar_sow_harbour": {
-   "effective_date": "2025-10-18",
-   "expiry_date": "2027-10-18",
+   "effective_date": "2025-10-20",
+   "expiry_date": "2027-10-20",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 420000,
@@ -256,9 +256,9 @@
    "processes_personal_data": true,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-10-08",
+   "customer_signed_date": "2025-10-10",
    "supplier_signatory": "Daniel Okafor",
-   "supplier_signed_date": "2025-10-11",
+   "supplier_signed_date": "2025-10-13",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30
@@ -277,8 +277,8 @@
    }
   },
   "brightstar_sow_midtown": {
-   "effective_date": "2026-04-26",
-   "expiry_date": "2027-04-26",
+   "effective_date": "2026-04-28",
+   "expiry_date": "2027-04-28",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 240000,
@@ -291,9 +291,9 @@
    "processes_personal_data": true,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2026-04-16",
+   "customer_signed_date": "2026-04-18",
    "supplier_signatory": "Grace Mbeki",
-   "supplier_signed_date": "2026-04-19",
+   "supplier_signed_date": "2026-04-21",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30
@@ -312,8 +312,8 @@
    }
   },
   "halcyon_msa": {
-   "effective_date": "2024-12-12",
-   "expiry_date": "2027-12-12",
+   "effective_date": "2024-12-14",
+   "expiry_date": "2027-12-14",
    "notice_period_days": 120,
    "auto_renew": true,
    "annual_value": 180000,
@@ -326,9 +326,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2024-12-02",
+   "customer_signed_date": "2024-12-04",
    "supplier_signatory": "Daniel Okafor",
-   "supplier_signed_date": "2024-12-05",
+   "supplier_signed_date": "2024-12-07",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -352,8 +352,8 @@
    }
   },
   "halcyon_sow_midtown": {
-   "effective_date": "2025-01-01",
-   "expiry_date": "2028-01-01",
+   "effective_date": "2025-01-03",
+   "expiry_date": "2028-01-03",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 96000,
@@ -366,9 +366,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2024-12-22",
+   "customer_signed_date": "2024-12-24",
    "supplier_signatory": "Sofia Marchetti",
-   "supplier_signed_date": "2024-12-25",
+   "supplier_signed_date": "2024-12-27",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30
@@ -387,8 +387,8 @@
    }
   },
   "halcyon_sow_summit": {
-   "effective_date": "2025-01-31",
-   "expiry_date": "2028-01-31",
+   "effective_date": "2025-02-02",
+   "expiry_date": "2028-02-02",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 84000,
@@ -401,9 +401,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-01-21",
+   "customer_signed_date": "2025-01-23",
    "supplier_signatory": "Richard Hale",
-   "supplier_signed_date": "2025-01-24",
+   "supplier_signed_date": "2025-01-26",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30
@@ -422,8 +422,8 @@
    }
   },
   "verdant_msa": {
-   "effective_date": "2026-03-07",
-   "expiry_date": "2027-03-07",
+   "effective_date": "2026-03-09",
+   "expiry_date": "2027-03-09",
    "notice_period_days": 30,
    "auto_renew": true,
    "annual_value": 36000,
@@ -436,9 +436,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2026-02-25",
+   "customer_signed_date": "2026-02-27",
    "supplier_signatory": "Daniel Okafor",
-   "supplier_signed_date": "2026-02-28",
+   "supplier_signed_date": "2026-03-02",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -461,8 +461,8 @@
    }
   },
   "northgate_msa": {
-   "effective_date": "2025-10-28",
-   "expiry_date": "2028-10-28",
+   "effective_date": "2025-10-30",
+   "expiry_date": "2028-10-30",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": null,
@@ -475,9 +475,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-10-18",
+   "customer_signed_date": "2025-10-20",
    "supplier_signatory": "Daniel Okafor",
-   "supplier_signed_date": "2025-10-21",
+   "supplier_signed_date": "2025-10-23",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 45,
@@ -500,8 +500,8 @@
    }
   },
   "northgate_sow_harbour": {
-   "effective_date": "2025-11-07",
-   "expiry_date": "2027-11-07",
+   "effective_date": "2025-11-09",
+   "expiry_date": "2027-11-09",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 540000,
@@ -514,9 +514,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-10-28",
+   "customer_signed_date": "2025-10-30",
    "supplier_signatory": "Richard Hale",
-   "supplier_signed_date": "2025-10-31",
+   "supplier_signed_date": "2025-11-02",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 45
@@ -524,11 +524,11 @@
    "milestones": [
     {
      "title": "Planned-maintenance schedule agreed",
-     "date": "2025-11-27"
+     "date": "2025-11-29"
     },
     {
      "title": "Chiller replacement complete",
-     "date": "2026-12-22"
+     "date": "2026-12-24"
     }
    ],
    "deviations": [],
@@ -544,8 +544,8 @@
    }
   },
   "evergreen_msa": {
-   "effective_date": "2025-12-12",
-   "expiry_date": "2026-12-12",
+   "effective_date": "2025-12-14",
+   "expiry_date": "2026-12-14",
    "notice_period_days": 60,
    "auto_renew": true,
    "annual_value": 54000,
@@ -558,9 +558,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2025-12-02",
+   "customer_signed_date": "2025-12-04",
    "supplier_signatory": "Grace Mbeki",
-   "supplier_signed_date": "2025-12-05",
+   "supplier_signed_date": "2025-12-07",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -582,8 +582,8 @@
    }
   },
   "hearth_msa": {
-   "effective_date": "2026-01-06",
-   "expiry_date": "2028-01-06",
+   "effective_date": "2026-01-08",
+   "expiry_date": "2028-01-08",
    "notice_period_days": 45,
    "auto_renew": true,
    "annual_value": 1250000,
@@ -596,9 +596,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-12-27",
+   "customer_signed_date": "2025-12-29",
    "supplier_signatory": "Daniel Okafor",
-   "supplier_signed_date": "2025-12-30",
+   "supplier_signed_date": "2026-01-01",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 15,
@@ -620,8 +620,8 @@
    }
   },
   "staffwell_msa": {
-   "effective_date": "2025-09-18",
-   "expiry_date": "2027-09-18",
+   "effective_date": "2025-09-20",
+   "expiry_date": "2027-09-20",
    "notice_period_days": 60,
    "auto_renew": true,
    "annual_value": null,
@@ -634,9 +634,9 @@
    "processes_personal_data": true,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-09-08",
+   "customer_signed_date": "2025-09-10",
    "supplier_signatory": "Kenji Watanabe",
-   "supplier_signed_date": "2025-09-11",
+   "supplier_signed_date": "2025-09-13",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 14,
@@ -659,8 +659,8 @@
    }
   },
   "staffwell_sow_airport": {
-   "effective_date": "2025-10-08",
-   "expiry_date": "2027-10-08",
+   "effective_date": "2025-10-10",
+   "expiry_date": "2027-10-10",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 610000,
@@ -673,9 +673,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2025-09-28",
+   "customer_signed_date": "2025-09-30",
    "supplier_signatory": "Kenji Watanabe",
-   "supplier_signed_date": "2025-10-01",
+   "supplier_signed_date": "2025-10-03",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 14
@@ -694,8 +694,8 @@
    }
   },
   "staffwell_sow_harbour": {
-   "effective_date": "2026-10-18",
-   "expiry_date": "2027-10-18",
+   "effective_date": "2026-10-20",
+   "expiry_date": "2027-10-20",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 450000,
@@ -710,7 +710,7 @@
    "customer_signatory": null,
    "customer_signed_date": null,
    "supplier_signatory": "Daniel Okafor",
-   "supplier_signed_date": "2026-10-11",
+   "supplier_signed_date": "2026-10-13",
    "fully_executed": false,
    "values": {
     "payment_terms_days": 14
@@ -729,8 +729,8 @@
    }
   },
   "stayflow_saas": {
-   "effective_date": "2026-02-25",
-   "expiry_date": "2029-02-25",
+   "effective_date": "2026-02-27",
+   "expiry_date": "2029-02-27",
    "notice_period_days": 90,
    "auto_renew": true,
    "annual_value": 348000,
@@ -743,9 +743,9 @@
    "processes_personal_data": true,
    "has_dpa": true,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2026-02-15",
+   "customer_signed_date": "2026-02-17",
    "supplier_signatory": "Kenji Watanabe",
-   "supplier_signed_date": "2026-02-18",
+   "supplier_signed_date": "2026-02-20",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -769,8 +769,8 @@
    }
   },
   "stayflow_dpa": {
-   "effective_date": "2026-03-02",
-   "expiry_date": "2029-03-02",
+   "effective_date": "2026-03-04",
+   "expiry_date": "2029-03-04",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": null,
@@ -783,9 +783,9 @@
    "processes_personal_data": true,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2026-02-20",
+   "customer_signed_date": "2026-02-22",
    "supplier_signatory": "Sofia Marchetti",
-   "supplier_signed_date": "2026-02-23",
+   "supplier_signed_date": "2026-02-25",
    "fully_executed": true,
    "values": {},
    "milestones": [],
@@ -802,8 +802,8 @@
    }
   },
   "stayflow_nda": {
-   "effective_date": "2026-01-26",
-   "expiry_date": "2028-01-26",
+   "effective_date": "2026-01-28",
+   "expiry_date": "2028-01-28",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": null,
@@ -816,9 +816,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2026-01-16",
+   "customer_signed_date": "2026-01-18",
    "supplier_signatory": "Anika Rao",
-   "supplier_signed_date": "2026-01-19",
+   "supplier_signed_date": "2026-01-21",
    "fully_executed": true,
    "values": {
     "confidentiality_years": 3
@@ -837,8 +837,8 @@
    }
   },
   "bookwave_saas": {
-   "effective_date": "2025-12-07",
-   "expiry_date": "2026-12-07",
+   "effective_date": "2025-12-09",
+   "expiry_date": "2026-12-09",
    "notice_period_days": 60,
    "auto_renew": true,
    "annual_value": 420000,
@@ -851,9 +851,9 @@
    "processes_personal_data": true,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2025-11-27",
+   "customer_signed_date": "2025-11-29",
    "supplier_signatory": "Anika Rao",
-   "supplier_signed_date": "2025-11-30",
+   "supplier_signed_date": "2025-12-02",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -876,8 +876,8 @@
    }
   },
   "payguard_saas": {
-   "effective_date": "2026-05-16",
-   "expiry_date": "2029-05-16",
+   "effective_date": "2026-05-18",
+   "expiry_date": "2029-05-18",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 190000,
@@ -890,9 +890,9 @@
    "processes_personal_data": true,
    "has_dpa": true,
    "customer_signatory": "Michael Brennan",
-   "customer_signed_date": "2026-05-06",
+   "customer_signed_date": "2026-05-08",
    "supplier_signatory": "Richard Hale",
-   "supplier_signed_date": "2026-05-09",
+   "supplier_signed_date": "2026-05-11",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 30,
@@ -916,8 +916,8 @@
    }
   },
   "payguard_dpa": {
-   "effective_date": "2026-05-21",
-   "expiry_date": "2029-05-21",
+   "effective_date": "2026-05-23",
+   "expiry_date": "2029-05-23",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": null,
@@ -930,9 +930,9 @@
    "processes_personal_data": true,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2026-05-11",
+   "customer_signed_date": "2026-05-13",
    "supplier_signatory": "Grace Mbeki",
-   "supplier_signed_date": "2026-05-14",
+   "supplier_signed_date": "2026-05-16",
    "fully_executed": true,
    "values": {},
    "milestones": [],
@@ -949,8 +949,8 @@
    }
   },
   "lumen_msa": {
-   "effective_date": "2024-01-17",
-   "expiry_date": "2027-01-17",
+   "effective_date": "2024-01-19",
+   "expiry_date": "2027-01-19",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": 2100000,
@@ -963,9 +963,9 @@
    "processes_personal_data": false,
    "has_dpa": false,
    "customer_signatory": "Helena Cruz",
-   "customer_signed_date": "2024-01-07",
+   "customer_signed_date": "2024-01-09",
    "supplier_signatory": "Anika Rao",
-   "supplier_signed_date": "2024-01-10",
+   "supplier_signed_date": "2024-01-12",
    "fully_executed": true,
    "values": {
     "payment_terms_days": 21,
@@ -987,8 +987,8 @@
  },
  "drafts": {
   "draft_crestline_renewal": {
-   "effective_date": "2026-12-02",
-   "expiry_date": "2028-12-02",
+   "effective_date": "2026-12-04",
+   "expiry_date": "2028-12-04",
    "notice_period_days": 180,
    "auto_renew": true,
    "annual_value": 348000,
@@ -1028,8 +1028,8 @@
    }
   },
   "draft_halcyon_renewal": {
-   "effective_date": "2026-12-07",
-   "expiry_date": "2029-12-07",
+   "effective_date": "2026-12-09",
+   "expiry_date": "2029-12-09",
    "notice_period_days": 180,
    "auto_renew": true,
    "annual_value": null,
@@ -1072,8 +1072,8 @@
    }
   },
   "draft_pristine_msa": {
-   "effective_date": "2026-11-27",
-   "expiry_date": "2028-11-27",
+   "effective_date": "2026-11-29",
+   "expiry_date": "2028-11-29",
    "notice_period_days": 90,
    "auto_renew": true,
    "annual_value": 330000,
@@ -1114,8 +1114,8 @@
    }
   },
   "draft_bookwave_renewal": {
-   "effective_date": "2026-12-12",
-   "expiry_date": "2028-12-12",
+   "effective_date": "2026-12-14",
+   "expiry_date": "2028-12-14",
    "notice_period_days": 180,
    "auto_renew": true,
    "annual_value": 480000,
@@ -1159,8 +1159,8 @@
    }
   },
   "draft_nda_clean": {
-   "effective_date": "2026-11-22",
-   "expiry_date": "2028-11-22",
+   "effective_date": "2026-11-24",
+   "expiry_date": "2028-11-24",
    "notice_period_days": null,
    "auto_renew": false,
    "annual_value": null,

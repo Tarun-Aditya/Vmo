@@ -1,10 +1,10 @@
 # Mutual Non-Disclosure Agreement
 
-This Agreement is made on 01 May 2025 (the "Effective Date") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Crestline Laundry & Linen Services Ltd** (the "Supplier"). Each is a "Party" and together the "Parties".
+This Agreement is made on 03 May 2025 (the "Effective Date") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Crestline Laundry & Linen Services Ltd** (the "Supplier"). Each is a "Party" and together the "Parties".
 
 ## Term and Fees
 
-1. **Term.** This Agreement commences on the Effective Date and continues until 01 May 2028 (the "Initial Term", being 36 months), unless terminated earlier under clause 14.
+1. **Term.** This Agreement commences on the Effective Date and continues until 03 May 2028 (the "Initial Term", being 36 months), unless terminated earlier under clause 14.
 2. **Fees.** No fees are payable by either Party under this Agreement. Each Party bears its own costs of performing it. Any fees for laundry and linen services shall be set out in a separate written agreement, and nothing in this Agreement obliges either Party to enter into one.
 
 ## Purpose and Definitions
@@ -48,4 +48,4 @@ This Agreement is made on 01 May 2025 (the "Effective Date") between **Seabright
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Sofia Marchetti |
 | Title: VP Technology Sourcing | Title: Authorised Signatory |
-| Date: 21 April 2025 | Date: 24 April 2025 |
+| Date: 23 April 2025 | Date: 26 April 2025 |

@@ -275,9 +275,13 @@ def classify(heading: str, body: str, kcc: list[dict]) -> str:
         if h in {_norm(a) for a in (k["heading_aliases"] or [])} or h == _norm(k["name"]):
             return k["key"]
     best, score = "other", 0
+    inside: tuple[int, str] | None = None          # 'Data Protection and Payment-Card Security' is a data-protection heading, not a payment one: the longest alias wins
     for k in kcc:
-        if any(re.search(rf"\b{re.escape(_norm(a))}\b", h) for a in (k["heading_aliases"] or []) if len(a) > 4) and _confirmed(k["key"], body):
-            return k["key"]
+        n = max((len(_norm(a)) for a in (k["heading_aliases"] or []) if len(a) > 4 and re.search(rf"\b{re.escape(_norm(a))}\b", h)), default=0)
+        if n and (inside is None or n > inside[0]) and _confirmed(k["key"], body):
+            inside = (n, k["key"])
+    if inside:
+        return inside[1]
     b = _norm(body)
     for k in kcc:
         sc = sum(1 for kw in (k["keywords"] or []) if kw and re.search(kw, b, re.I) if _safe_re(kw))
@@ -461,9 +465,18 @@ def detect_in_text(clauses: list[dict], md: str, have_types: set[str], enabled: 
     for key, custom in patterns.items():
         if key in have_types or (enabled is not None and key not in enabled):
             continue
+        best: tuple[int, dict] | None = None
         for text_, page, head in pools:
             hit = sentence_hits(key, text_) if custom is None else [s for s in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text_)) if custom.search(s)]
             if hit:
-                out.append({"clause_type": key, "heading": f"{head[:60]} (found in text)", "text": " ".join(hit[:2])[:900], "page": page, "idx": 0})
-                break
+                rec = {"clause_type": key, "heading": f"{head[:60]} (found in text)", "text": " ".join(hit[:2])[:900], "page": page, "idx": 0}
+                if custom is None:
+                    best = (1, rec)
+                    break
+                # an admin's clause: the passage matching most of its keywords, not the first mention (a definition that names 'payment-card data' is not the PCI clause)
+                score = sum(1 for kw in (extra or {}).get(key, []) if _safe_re(kw) and re.search(kw, rec["text"], re.I))
+                if best is None or score > best[0]:
+                    best = (score, rec)
+        if best:
+            out.append(best[1])
     return out

@@ -28,11 +28,11 @@ CLAUSES = [
        "The Supplier shall perform the services to the brand and operating standards notified by the Customer from time to time.", "medium", ["MSA", "SOW"]),
     _k("seasonal_pricing", "Seasonal pricing", "Price changes by season or quarter are capped and notified", ["seasonal", "price adjustment", "price review"], ["Seasonal Pricing", "Price Adjustment"],
        "Prices may change only once per calendar quarter, by no more than 5 percent, on 30 days' written notice.", "medium", ["MSA", "SaaS"]),
-    _k("payment_card_data", "Payment-card data security", "PCI DSS compliance where the supplier handles card data", ["pci[- ]dss", "payment[- ]card"], ["Payment Card Security", "PCI DSS"],
+    _k("payment_card_data", "Payment-card data security", "PCI DSS compliance where the supplier handles card data", ["pci[- ]dss", "payment[- ]card", "attestation of compliance"], ["Payment Card Security", "PCI DSS"],
        "The Supplier shall comply with PCI DSS wherever it stores, processes or transmits payment-card data and shall provide its annual attestation of compliance.", "critical", ["SaaS", "MSA"]),
     _k("service_response", "Response and turnaround times", "Time to respond to faults and to turn around work", [r"within \d+ hours?", "response time", "turnaround"], ["Response Times", "Service Levels", "Turnaround"],
        "The Supplier shall respond to a fault report within 4 hours and complete urgent repairs within 24 hours.", "medium", ["MSA", "SOW"]),
-    _k("inspection_certificates", "Inspection and compliance certificates", "Supplier delivers statutory inspection and compliance certificates", ["inspection certificate", "statutory (?:thorough )?examination", r"certificate[s]? of (?:compliance|inspection)", "attestation of compliance"], ["Certificates", "Statutory Inspections"],
+    _k("inspection_certificates", "Inspection and compliance certificates", "Supplier delivers statutory inspection and compliance certificates", ["inspection certificate", "statutory (?:thorough )?examination", r"certificate[s]? of (?:compliance|inspection)"], ["Certificates", "Statutory Inspections"],
        "The Supplier shall deliver copies of every statutory inspection and compliance certificate to the Customer when issued and before the previous one expires.", "medium", ["MSA", "SOW"]),
     _k("distribution_commission", "Distribution commission", "Commission payable on bookings through a distribution channel", [r"commission of \d", "commission rate", r"commission[^.]{0,40}room revenue"], ["Commission", "Distribution Fees"],
        "The commission payable on each booking shall not exceed 15 percent of the room revenue of that booking.", "high", ["SaaS"], matrix=False),
@@ -92,6 +92,8 @@ def ensure(s) -> dict:
     for r in rules:           # pack rules are admin rows: bring their scope up to date on re-seed without touching a rule an admin created
         s.execute(text("UPDATE checklist_rules SET categories = :c WHERE key = :k AND NOT builtin AND categories = '{}'"), {"c": r["categories"], "k": r["key"]})
     s.execute(text("UPDATE checklist_rules SET enabled=false WHERE key='governing_law_ny'"))     # a hotel group is not tied to one state's law: Legal decides per vendor
+    for c in CLAUSES:         # pack clauses likewise: their keywords follow the code on re-seed
+        s.execute(text("UPDATE kcc_library SET keywords = :kw WHERE key = :k AND NOT builtin"), {"kw": c["keywords"], "k": c["key"]})
     for m in METRICS:         # pack metrics are admin rows: bring their patterns up to date on re-seed, without touching a metric an admin created
         s.execute(text("UPDATE metrics SET pattern=:p WHERE key=:k AND NOT builtin"), {"p": m["pattern"], "k": m["key"]})
     kcc.rebuild_key_clauses_view(s)

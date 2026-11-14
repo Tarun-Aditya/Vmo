@@ -6,9 +6,9 @@
 
 **Milestone:** Planned-maintenance schedule agreed
 
-**Due date:** 27 November 2025
+**Due date:** 29 November 2025
 
-**Accepted on:** 24 November 2025
+**Accepted on:** 26 November 2025
 
 **Comments:** Accepted by the business
 

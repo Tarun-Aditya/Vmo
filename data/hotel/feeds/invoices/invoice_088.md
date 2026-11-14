@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Invoice number | HAL-2509-088 |
-| Date | 2025-09-04 |
+| Date | 2025-09-06 |
 | Agreement | Statement of Work No. 1 -- Lift Maintenance Services at Seabright Summit Lodge |
-| Description | Services 31 Jul – 30 Aug 2025 |
-| Period | 2025-07-31 to 2025-08-30 |
+| Description | Services 02 Aug – 01 Sep 2025 |
+| Period | 2025-08-02 to 2025-09-01 |
 | Total | USD 7,000.00 |
-| Due date | 2025-10-04 |
-| Date paid | 2025-09-30 |
+| Due date | 2025-10-06 |
+| Date paid | 2025-10-02 |
 
 Billed to Seabright Hotels & Resorts Ltd
