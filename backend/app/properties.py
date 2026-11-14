@@ -6,6 +6,7 @@ includes its share of the energy contract or the booking system, not only the sc
 from __future__ import annotations
 
 import json
+from datetime import date
 
 from sqlalchemy import text
 
@@ -56,7 +57,40 @@ def detail(s, pid: int) -> dict | None:
     items = _rows(s, """SELECT contract_id, title, vendor, category, type, expiry_date, basis, contract_annual_value, share,
                                contract_annual_value * share AS attributed_value FROM v_property_contracts WHERE property_id = :i
                         ORDER BY contract_annual_value * share DESC NULLS LAST, vendor""", i=pid)
-    return {**p[0], "contracts": items}
+    exits = exit_terms(s)
+    for it in items:
+        it.update(exits.get(it["contract_id"], {}))
+        locked = it.get("exit") == "locked" and it["expiry_date"] and it["attributed_value"]
+        it["locked_value"] = round(float(it["attributed_value"]) * max((it["expiry_date"] - date.today()).days, 0) / 365, 0) if locked else 0
+    locked = [it for it in items if it.get("exit") == "locked"]
+    return {**p[0], "contracts": items, "sale": {"locked_contracts": len(locked), "locked_value": sum(it["locked_value"] for it in locked),
+                                                 "exit_on_sale": sum(1 for it in items if it.get("exit") == "sale"), "on_notice": sum(1 for it in items if it.get("exit") == "notice")}}
+
+
+def exit_terms(s) -> dict[int, dict]:
+    """How the owner gets out of each contract if a property is sold. A schedule follows its master agreement where it is silent.
+    'sale' = the contract lets the owner end it on a sale; 'notice' = it can be ended for convenience on notice; 'locked' = neither: a buyer inherits it until it ends."""
+    rows = _rows(s, """
+        SELECT c.id, c.parent_id, COALESCE(e.termination_for_convenience, c.termination_for_convenience) AS tfc, COALESCE(e.auto_renew, c.auto_renew) AS auto_renew,
+               (SELECT ev.value_num FROM extracted_values ev WHERE ev.contract_id = c.id AND ev.metric_key = 'tfc_notice_days') AS tfc_days,
+               EXISTS (SELECT 1 FROM clauses cl WHERE cl.contract_id = c.id AND cl.clause_type = 'property_sale_termination') AS sale_clause,
+               (SELECT cl.page FROM clauses cl WHERE cl.contract_id = c.id AND cl.clause_type = 'property_sale_termination' LIMIT 1) AS sale_page
+        FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id WHERE c.status <> 'draft'""")
+    by = {r["id"]: r for r in rows}
+    out: dict[int, dict] = {}
+    for r in rows:
+        par = by.get(r["parent_id"]) or {}
+        own_sale, own_tfc = r["sale_clause"], r["tfc"]
+        sale = own_sale or bool(par.get("sale_clause"))
+        tfc = own_tfc if own_tfc is not None else par.get("tfc")
+        days = r["tfc_days"] if r["tfc_days"] is not None else par.get("tfc_days")
+        if sale:
+            out[r["id"]] = dict(exit="sale", exit_text="Can be ended if the property is sold", exit_from="this contract" if own_sale else "its master agreement")
+        elif tfc:
+            out[r["id"]] = dict(exit="notice", exit_text=f"Can be ended on {int(days)} days' notice" if days else "Can be ended on notice", exit_from="this contract" if own_tfc else "its master agreement")
+        else:
+            out[r["id"]] = dict(exit="locked", exit_text="No exit before it ends" + (" (and it renews automatically)" if r["auto_renew"] else ""), exit_from=None)
+    return out
 
 
 # Values where a lower number is the better deal for the buyer, and those where higher is better. Everything else is shown without a verdict.

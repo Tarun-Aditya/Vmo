@@ -1,6 +1,6 @@
 # Master Services Agreement
 
-This Master Services Agreement (the "Agreement") is entered into with effect from {{EFFECTIVE}} (the "Effective Date") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Hearth & Table Foods Inc** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties".
+This Master Services Agreement (the "Agreement") is entered into with effect from {{EFFECTIVE}} (the "Effective Date") between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer"), and **Hearth & Table Foods Inc** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties".
 
 ## 1. DEFINITIONS AND INTERPRETATION
 
@@ -74,9 +74,9 @@ This Master Services Agreement (the "Agreement") is entered into with effect fro
 
 7.1 Each Party retains all rights in its pre-existing intellectual property. The Supplier retains all right, title and interest in its recipes, specifications, product formulations, packaging, trade names, trade marks, processes and know-how, and in any improvements to them, whether or not developed for the Customer.
 
-7.2 The Supplier grants the Customer a non-exclusive, non-transferable, royalty-free licence during the term to use the Supplier's marks and materials solely as necessary to receive and use the Products at the Properties. The Customer shall not use the Supplier's marks otherwise without prior written consent.
+7.2 The Supplier grants the Customer a non-exclusive, non-transferable, royalty-free license during the term to use the Supplier's marks and materials solely as necessary to receive and use the Products at the Properties. The Customer shall not use the Supplier's marks otherwise without prior written consent.
 
-7.3 The Customer grants the Supplier a non-exclusive licence to use the Customer's name and marks solely to perform the Services.
+7.3 The Customer grants the Supplier a non-exclusive license to use the Customer's name and marks solely to perform the Services.
 
 ## 8. DATA PROTECTION
 
@@ -90,7 +90,7 @@ This Master Services Agreement (the "Agreement") is entered into with effect fro
 
 9.2 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, AND EXCEPT AS EXPRESSLY STATED IN CLAUSES 5 AND 9.1, THE SUPPLIER GIVES NO WARRANTIES, CONDITIONS OR REPRESENTATIONS OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, AND EXPRESSLY DISCLAIMS ALL IMPLIED WARRANTIES, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, AND ANY WARRANTY ARISING FROM COURSE OF DEALING OR USAGE OF TRADE.
 
-9.3 Without limiting clause 9.2, the Supplier does not warrant that Products will be available at all times, that supply will be uninterrupted, or that natural products will be uniform in size, colour, flavour or appearance.
+9.3 Without limiting clause 9.2, the Supplier does not warrant that Products will be available at all times, that supply will be uninterrupted, or that natural products will be uniform in size, color, flavour or appearance.
 
 9.4 The Supplier is not liable for any non-conformity or loss arising from storage, handling, preparation, cooking, service or use of the Products by or on behalf of the Customer after delivery, from the Customer's failure to follow storage, handling or use-by instructions, or from any specification, menu or allergen information supplied by the Customer.
 
@@ -106,9 +106,9 @@ This Master Services Agreement (the "Agreement") is entered into with effect fro
 
 11.1 The Supplier shall indemnify the Customer against third-party claims to the extent arising from (a) bodily injury or illness caused by Products that were contaminated or unsafe when delivered by reason of the Supplier's breach of clause 5, or (b) the Supplier's infringement of a third party's intellectual property by the Products as supplied, in each case subject to clauses 11.3 and 11.4.
 
-11.2 The Customer shall indemnify the Supplier against third-party claims to the extent arising from (a) the Customer's storage, handling, preparation, service or use of the Products after delivery, (b) specifications, menus, allergen information or instructions supplied by the Customer, or (c) the Customer's breach of this Agreement or negligence or wilful misconduct, including that of the Properties' personnel.
+11.2 The Customer shall indemnify the Supplier against third-party claims to the extent arising from (a) the Customer's storage, handling, preparation, service or use of the Products after delivery, (b) specifications, menus, allergen information or instructions supplied by the Customer, or (c) the Customer's breach of this Agreement or negligence or willful misconduct, including that of the Properties' personnel.
 
-11.3 The indemnified Party shall give prompt written notice of the claim, allow the indemnifying Party sole control of its defence and settlement, and provide reasonable assistance at the indemnifying Party's cost. Failure to do so relieves the indemnifying Party of its obligations to the extent it is prejudiced.
+11.3 The indemnified Party shall give prompt written notice of the claim, allow the indemnifying Party sole control of its defense and settlement, and provide reasonable assistance at the indemnifying Party's cost. Failure to do so relieves the indemnifying Party of its obligations to the extent it is prejudiced.
 
 11.4 The Supplier has no obligation under clause 11.1 to the extent a claim arises from the matters in clause 11.2 or from modification, combination or misuse of the Products by anyone other than the Supplier.
 
@@ -148,7 +148,7 @@ This Master Services Agreement (the "Agreement") is entered into with effect fro
 
 ## 15. FORCE MAJEURE
 
-15.1 The Supplier is not in breach of this Agreement and has no liability for any failure or delay in performance caused by events beyond its reasonable control, including crop failure, adverse weather, disease, epidemic, contamination of supply, supplier failure, shortage of materials or transport, labour disputes, fire, flood, governmental action, cyber-attack, and failure of utilities or telecommunications.
+15.1 The Supplier is not in breach of this Agreement and has no liability for any failure or delay in performance caused by events beyond its reasonable control, including crop failure, adverse weather, disease, epidemic, contamination of supply, supplier failure, shortage of materials or transport, labor disputes, fire, flood, governmental action, cyber-attack, and failure of utilities or telecommunications.
 
 15.2 The Supplier shall use reasonable efforts to resume performance, and the Customer may source substitute supplies for the affected Products during the period of delay.
 
@@ -160,7 +160,7 @@ This Master Services Agreement (the "Agreement") is entered into with effect fro
 
 ## 17. GENERAL
 
-17.1 NOTICES. Notices under this Agreement must be in writing and delivered by hand, by recognised courier or by registered mail to the addresses last notified by each Party in writing, or by email to the address so notified, and are deemed received on delivery (or, if sent by email, on the next business day after transmission absent a delivery-failure message).
+17.1 NOTICES. Notices under this Agreement must be in writing and delivered by hand, by recognized courier or by registered mail to the addresses last notified by each Party in writing, or by email to the address so notified, and are deemed received on delivery (or, if sent by email, on the next business day after transmission absent a delivery-failure message).
 
 17.2 ENTIRE AGREEMENT. This Agreement constitutes the entire agreement between the Parties on its subject matter and supersedes all prior negotiations, representations, understandings and agreements. Each Party acknowledges that it has not relied on any statement not set out in this Agreement. The Customer's purchase-order terms and any other standard terms of the Customer are excluded and have no effect.
 
@@ -174,12 +174,12 @@ This Master Services Agreement (the "Agreement") is entered into with effect fro
 
 ## 18. EXECUTION
 
-This Agreement has been executed by the Parties' authorised representatives.
+This Agreement has been executed by the Parties' authorized representatives.
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd** | **Signed for and on behalf of Hearth & Table Foods Inc** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc** | **Signed for and on behalf of Hearth & Table Foods Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Michael Brennan | Name: Daniel Okafor |
-| Title: Chief Procurement Officer | Title: Authorised Signatory |
+| Title: Chief Procurement Officer | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

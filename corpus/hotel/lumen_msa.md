@@ -2,9 +2,9 @@
 
 This Master Services Agreement (the "**Agreement**") is made with effect from {{EFFECTIVE}} (the "**Effective Date**") between:
 
-(1) **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "**Customer**"); and
+(1) **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "**Customer**"); and
 
-(2) **Lumen Energy Supply Ltd** (the "**Supplier**").
+(2) **Lumen Energy Supply Inc** (the "**Supplier**").
 
 The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
 
@@ -42,7 +42,7 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 3.3 The fixed price ends on expiry of the Initial Term. The Customer must arrange a new supply for the Properties before then, and the Supplier has no obligation to supply the Properties at the fixed price after expiry.
 
-3.4 The Customer shall give the Supplier such access to the Properties, meter information and cooperation as the Supplier reasonably requires to perform the Services, and shall act through its authorised representatives at each Property.
+3.4 The Customer shall give the Supplier such access to the Properties, meter information and cooperation as the Supplier reasonably requires to perform the Services, and shall act through its authorized representatives at each Property.
 
 3.5 Services are delivered at the individual Properties, but the Customer is the contracting Party and is responsible for the payment of the Fees and for the Properties' compliance with this Agreement.
 
@@ -56,7 +56,7 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 4.4 If the Customer disputes an invoice in good faith, it shall notify the Supplier promptly, pay the undisputed part by the due date, and the Parties shall seek to resolve the dispute promptly. Late payment of undisputed sums carries interest at the rate provided by applicable law for late payment of commercial debts.
 
-4.5 Amounts stated are exclusive of any applicable sales taxes or value added tax, which shall be payable in addition on receipt of a valid tax invoice.
+4.5 Amounts stated are exclusive of any applicable sales taxes or sales tax, which shall be payable in addition on receipt of a valid tax invoice.
 
 ## 5. Confidentiality
 
@@ -70,7 +70,7 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 6.1 Each Party retains ownership of its pre-existing intellectual property rights. Nothing in this Agreement transfers ownership of any intellectual property right from one Party to the other.
 
-6.2 The Customer grants the Supplier a non-exclusive, non-transferable licence during the term to use Customer materials solely to perform the Services. The Supplier grants the Customer a non-exclusive licence during the term to use any reports or documents delivered under this Agreement for its internal business purposes.
+6.2 The Customer grants the Supplier a non-exclusive, non-transferable license during the term to use Customer materials solely to perform the Services. The Supplier grants the Customer a non-exclusive license during the term to use any reports or documents delivered under this Agreement for its internal business purposes.
 
 ## 7. Data Protection
 
@@ -90,7 +90,7 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 9.1 Each Party (the "**Indemnifying Party**") shall indemnify the other against losses, damages and reasonable costs arising from third-party claims for death, personal injury or damage to tangible property to the extent caused by the negligence or breach of this Agreement of the Indemnifying Party.
 
-9.2 The indemnified Party shall promptly notify the Indemnifying Party of the claim, allow it to control the defence and settlement, and give reasonable assistance at the Indemnifying Party's cost. No settlement requiring admission of liability by the indemnified Party may be made without its consent, not to be unreasonably withheld.
+9.2 The indemnified Party shall promptly notify the Indemnifying Party of the claim, allow it to control the defense and settlement, and give reasonable assistance at the Indemnifying Party's cost. No settlement requiring admission of liability by the indemnified Party may be made without its consent, not to be unreasonably withheld.
 
 ## 10. Limitation of Liability
 
@@ -114,9 +114,9 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 ## 12. Governing Law and Disputes
 
-12.1 This Agreement and any non-contractual obligations arising from it are governed by the laws of England and Wales.
+12.1 This Agreement and any non-contractual obligations arising from it are governed by the laws of the State of New York.
 
-12.2 The Parties shall first attempt to resolve any dispute through good-faith discussion between senior representatives. If it is not resolved, the courts of England and Wales have exclusive jurisdiction.
+12.2 The Parties shall first attempt to resolve any dispute through good-faith discussion between senior representatives. If it is not resolved, the state and federal courts located in New York County, New York have exclusive jurisdiction.
 
 ## 13. General
 
@@ -140,8 +140,8 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 | Item | Term |
 |---|---|
-| Customer | Seabright Hotels & Resorts Ltd |
-| Supplier | Lumen Energy Supply Ltd |
+| Customer | Seabright Hotels & Resorts Inc |
+| Supplier | Lumen Energy Supply Inc |
 | Effective Date | {{EFFECTIVE}} |
 | Initial Term | Until {{EXPIRY}} (36 months) |
 | Renewal | No automatic renewal; extension only by written agreement |
@@ -152,7 +152,7 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 | Payment terms | Undisputed invoices payable within 21 days of receipt of a valid invoice |
 | Liability cap | One (1) times the Fees paid or payable in the twelve (12) months preceding the claim |
 | Termination for convenience | Not permitted for either Party; termination for cause only |
-| Governing law | Laws of England and Wales |
+| Governing law | Laws of the State of New York |
 | Personal data | Not processed under the Services |
 | Notices | To the registered office of each Party, or the email address each Party notifies in writing |
 
@@ -174,10 +174,10 @@ The six Properties are the hotels owned and operated by the Customer, as identif
 
 ## Execution
 
-Signed for and on behalf of **Seabright Hotels & Resorts Ltd** by Helena Cruz, VP Technology Sourcing, on {{SIGNED_CUSTOMER}}.
+Signed for and on behalf of **Seabright Hotels & Resorts Inc** by Helena Cruz, VP Technology Sourcing, on {{SIGNED_CUSTOMER}}.
 
 Signature: ______________________
 
-Signed for and on behalf of **Lumen Energy Supply Ltd** by Anika Rao, Authorised Signatory, on {{SIGNED_SUPPLIER}}.
+Signed for and on behalf of **Lumen Energy Supply Inc** by Anika Rao, Authorized Signatory, on {{SIGNED_SUPPLIER}}.
 
 Signature: ______________________

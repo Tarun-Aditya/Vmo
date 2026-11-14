@@ -7,7 +7,7 @@
 | **Period** | Effective Date {{EFFECTIVE}} until {{EXPIRY}} (initial term of 24 months) |
 | **Fees** | USD 610,000 per year; total contract value USD 1,220,000 |
 
-This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Staffwell Hospitality Staffing Ltd** (the "**Supplier**"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). The Customer's hotels are each a "**Property**"; the Property at which the Services under this SOW are delivered is **Seabright Airport Inn** (the "**Property**" for the purposes of this SOW).
+This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Staffwell Hospitality Staffing Inc** (the "**Supplier**"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). The Customer's hotels are each a "**Property**"; the Property at which the Services under this SOW are delivered is **Seabright Airport Inn** (the "**Property**" for the purposes of this SOW).
 
 ## 1. Background
 
@@ -70,13 +70,13 @@ This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels 
 
 6.1 The Customer shall pay the Supplier annual fees of USD 610,000 for each year of the initial term, giving a total contract value of USD 1,220,000 over the initial term.
 
-6.2 The Supplier shall invoice the fees in accordance with the invoicing schedule in the Parent Agreement or, if none, in equal instalments agreed between the parties. Each invoice must be valid, addressed to the Customer, identify this SOW and the Property, and contain reasonable supporting detail.
+6.2 The Supplier shall invoice the fees in accordance with the invoicing schedule in the Parent Agreement or, if none, in equal installments agreed between the parties. Each invoice must be valid, addressed to the Customer, identify this SOW and the Property, and contain reasonable supporting detail.
 
 6.3 The Customer shall pay each undisputed invoice within 14 days of receipt of a valid invoice.
 
 6.4 The Customer may withhold any amount disputed in good faith, shall notify the Supplier of the dispute and its grounds promptly, and shall pay any amount later agreed or determined to be due within 14 days of resolution. The parties shall seek to resolve disputes under the Parent Agreement's dispute resolution provisions.
 
-6.5 Fees are exclusive of applicable VAT, which shall be added at the prevailing rate on receipt of a valid VAT invoice. Unless the parties agree otherwise in writing, no expenses are payable.
+6.5 Fees are exclusive of applicable sales tax, which shall be added at the prevailing rate on receipt of a valid invoice. Unless the parties agree otherwise in writing, no expenses are payable.
 
 ## 7. Acceptance
 
@@ -100,7 +100,7 @@ This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels 
 
 ## 9. Change Control
 
-9.1 Either party may propose a change to the scope, Deliverables, numbers of Personnel or fees. No change is effective unless recorded in a written variation signed by authorised representatives of both parties.
+9.1 Either party may propose a change to the scope, Deliverables, numbers of Personnel or fees. No change is effective unless recorded in a written variation signed by authorized representatives of both parties.
 
 ## 10. Confidentiality
 
@@ -108,17 +108,17 @@ This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels 
 
 ## 11. Intellectual Property
 
-11.1 Each party retains ownership of its pre-existing intellectual property. The Customer's brand, policies, training materials and guest data remain the Customer's property, and the Supplier is granted a limited, non-exclusive licence to use them solely to provide the Services.
+11.1 Each party retains ownership of its pre-existing intellectual property. The Customer's brand, policies, training materials and guest data remain the Customer's property, and the Supplier is granted a limited, non-exclusive license to use them solely to provide the Services.
 
 11.2 Reports and materials created specifically for the Customer under this SOW shall be owned by the Customer, save that the Supplier retains its general methods, tools and know-how.
 
 ## 12. Data Protection
 
-12.1 Each party shall comply with applicable data protection law in connection with this SOW. To the extent the Supplier processes personal data on behalf of the Customer (including guest data to which Personnel have access), it shall do so only on the Customer's documented instructions, apply appropriate technical and organisational security measures, ensure persons processing the data are bound by confidentiality, assist the Customer with data subject requests, and notify the Customer without undue delay on becoming aware of a personal data breach. The data protection terms of the Parent Agreement also apply.
+12.1 Each party shall comply with applicable data protection law in connection with this SOW. To the extent the Supplier processes personal data on behalf of the Customer (including guest data to which Personnel have access), it shall do so only on the Customer's documented instructions, apply appropriate technical and organizational security measures, ensure persons processing the data are bound by confidentiality, assist the Customer with data subject requests, and notify the Customer without undue delay on becoming aware of a personal data breach. The data protection terms of the Parent Agreement also apply.
 
 ## 13. Warranties
 
-13.1 The Supplier warrants that it shall perform the Services with reasonable skill and care, using suitably qualified and experienced Personnel, and in compliance with applicable law, including laws on agency workers, working time, minimum wage, anti-slavery and right to work.
+13.1 The Supplier warrants that it shall perform the Services with reasonable skill and care, using suitably qualified and experienced Personnel, and in compliance with applicable law, including laws on agency workers, wage and hour, minimum wage, anti-slavery and right to work.
 
 13.2 Each party warrants that it has the authority to enter into this SOW.
 
@@ -140,14 +140,14 @@ This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels 
 
 15.5 **Counterparts.** This SOW may be executed in counterparts, each of which is an original and which together constitute one instrument.
 
-15.6 **Governing law.** This SOW and any non-contractual obligations arising from it are governed by the laws of England and Wales, and the parties submit to the jurisdiction specified in the Parent Agreement.
+15.6 **Governing law.** This SOW and any non-contractual obligations arising from it are governed by the laws of the State of New York, and the parties submit to the jurisdiction specified in the Parent Agreement.
 
 ## 16. Signatures
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd** | **Signed for and on behalf of Staffwell Hospitality Staffing Ltd** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc** | **Signed for and on behalf of Staffwell Hospitality Staffing Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Michael Brennan | Name: Kenji Watanabe |
-| Title: Chief Procurement Officer | Title: Authorised Signatory |
+| Title: Chief Procurement Officer | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

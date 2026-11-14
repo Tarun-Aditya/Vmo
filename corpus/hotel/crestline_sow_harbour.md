@@ -1,20 +1,20 @@
-# Statement of Work No. 1 – Laundry and Linen Services at Seabright Harbour Hotel
+# Statement of Work No. 1 – Laundry and Linen Services at Seabright Harbor Hotel
 
 | | |
 |---|---|
-| **Project** | Laundry and linen services at Seabright Harbour Hotel |
+| **Project** | Laundry and linen services at Seabright Harbor Hotel |
 | **Parent Agreement** | Master Services Agreement dated {{PARENT_DATE}} |
-| **Customer** | Seabright Hotels & Resorts Ltd |
-| **Supplier** | Crestline Laundry & Linen Services Ltd |
+| **Customer** | Seabright Hotels & Resorts Inc |
+| **Supplier** | Crestline Laundry & Linen Services Inc |
 | **Effective Date** | {{EFFECTIVE}} |
 | **Period** | From the Effective Date until {{EXPIRY}} (24 months) |
 | **Fees** | USD 310,000 per year; total contract value USD 620,000 |
 
-This Statement of Work No. 1 (the "**SOW**") is entered into between Seabright Hotels & Resorts Ltd (the "**Customer**"), a hotel group that owns and operates six hotels, and Crestline Laundry & Linen Services Ltd (the "**Supplier**"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement. If this SOW conflicts with the Parent Agreement, the Parent Agreement prevails unless this SOW expressly states otherwise for a specified provision.
+This Statement of Work No. 1 (the "**SOW**") is entered into between Seabright Hotels & Resorts Inc (the "**Customer**"), a hotel group that owns and operates six hotels, and Crestline Laundry & Linen Services Inc (the "**Supplier**"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement. If this SOW conflicts with the Parent Agreement, the Parent Agreement prevails unless this SOW expressly states otherwise for a specified provision.
 
 ## 1. Background
 
-1.1 The Customer owns and operates six hotels (each a "**Property**"). The Customer requires professional laundry and linen services, and the services under this SOW are delivered at Seabright Harbour Hotel (the "**Property**" for the purposes of this SOW).
+1.1 The Customer owns and operates six hotels (each a "**Property**"). The Customer requires professional laundry and linen services, and the services under this SOW are delivered at Seabright Harbor Hotel (the "**Property**" for the purposes of this SOW).
 
 1.2 The Supplier operates commercial laundry and linen processing facilities and has agreed to provide the Services to the Customer at the Property on the terms of this SOW and the Parent Agreement.
 
@@ -98,7 +98,7 @@ Each party retains ownership of its pre-existing intellectual property rights. N
 
 ## 11. Warranties
 
-The Supplier warrants that the Services will be performed with reasonable skill and care, by suitably qualified personnel, in compliance with applicable law and in accordance with this SOW and the Parent Agreement. The Supplier further warrants that it holds, and will maintain, all licences and permits needed to provide the Services.
+The Supplier warrants that the Services will be performed with reasonable skill and care, by suitably qualified personnel, in compliance with applicable law and in accordance with this SOW and the Parent Agreement. The Supplier further warrants that it holds, and will maintain, all licenses and permits needed to provide the Services.
 
 ## 12. Liability and Indemnity
 
@@ -114,7 +114,7 @@ The Supplier warrants that the Services will be performed with reasonable skill 
 
 ## 14. Data Protection
 
-Each party shall comply with applicable data protection law in relation to any personal data processed in connection with this SOW. The Supplier shall process any such personal data only on the Customer's documented instructions and as required under the Parent Agreement, and shall implement appropriate technical and organisational security measures. Linen records should not include guest personal data. The Supplier shall promptly notify the Customer of any security incident affecting such data.
+Each party shall comply with applicable data protection law in relation to any personal data processed in connection with this SOW. The Supplier shall process any such personal data only on the Customer's documented instructions and as required under the Parent Agreement, and shall implement appropriate technical and organizational security measures. Linen records should not include guest personal data. The Supplier shall promptly notify the Customer of any security incident affecting such data.
 
 ## 15. Assignment and Subcontracting
 
@@ -130,16 +130,16 @@ This SOW, together with the Parent Agreement, constitutes the entire agreement b
 
 ## 18. Governing Law and Jurisdiction
 
-This SOW and any dispute or claim arising out of or in connection with it are governed by the laws of England and Wales. The courts determined under the Parent Agreement have jurisdiction over any such dispute.
+This SOW and any dispute or claim arising out of or in connection with it are governed by the laws of the State of New York. The courts determined under the Parent Agreement have jurisdiction over any such dispute.
 
 ## 19. Signatures
 
-Signed by the parties' authorised representatives.
+Signed by the parties' authorized representatives.
 
 | | |
 |---|---|
-| **For the Customer: Seabright Hotels & Resorts Ltd** | **For the Supplier: Crestline Laundry & Linen Services Ltd** |
+| **For the Customer: Seabright Hotels & Resorts Inc** | **For the Supplier: Crestline Laundry & Linen Services Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Sofia Marchetti |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

@@ -1,21 +1,21 @@
-# Statement of Work No. 1 – Facilities and HVAC Services at Seabright Harbour Hotel
+# Statement of Work No. 1 – Facilities and HVAC Services at Seabright Harbor Hotel
 
 | | |
 |---|---|
-| **Project** | Planned maintenance and chiller replacement services at Seabright Harbour Hotel |
+| **Project** | Planned maintenance and chiller replacement services at Seabright Harbor Hotel |
 | **Parent Agreement** | Master Services Agreement dated {{PARENT_DATE}} between the Customer and the Supplier (the "**MSA**") |
-| **Customer** | Seabright Hotels & Resorts Ltd |
+| **Customer** | Seabright Hotels & Resorts Inc |
 | **Supplier** | Northgate Facilities & HVAC Inc |
 | **Effective Date** | {{EFFECTIVE}} |
 | **Period** | From the Effective Date until {{EXPIRY}} (24 months) (the "**Initial Term**") |
 | **Annual Fees** | USD 540,000 |
 | **Total Contract Value** | USD 1,080,000 |
 
-This Statement of Work No. 1 (this "**SOW**") is entered into between **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Northgate Facilities & HVAC Inc** (the "**Supplier**"). It is issued under, and forms part of, the MSA. Services under this SOW are delivered at the Customer's hotel known as **Seabright Harbour Hotel** (the "**Property**").
+This Statement of Work No. 1 (this "**SOW**") is entered into between **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Northgate Facilities & HVAC Inc** (the "**Supplier**"). It is issued under, and forms part of, the MSA. Services under this SOW are delivered at the Customer's hotel known as **Seabright Harbor Hotel** (the "**Property**").
 
 ## 1. Background
 
-1.1 The Customer owns and operates a group of six hotels (each a "**Property**" under the MSA). The Customer requires facilities and heating, ventilation and air-conditioning services at Seabright Harbour Hotel.
+1.1 The Customer owns and operates a group of six hotels (each a "**Property**" under the MSA). The Customer requires facilities and heating, ventilation and air-conditioning services at Seabright Harbor Hotel.
 
 1.2 The Supplier is engaged in the provision of facilities maintenance and HVAC services and has agreed to provide the Services at the Property on the terms of this SOW and the MSA.
 
@@ -35,7 +35,7 @@ This Statement of Work No. 1 (this "**SOW**") is entered into between **Seabrigh
 
 2.2 The Supplier shall perform the Services with reasonable skill and care, in accordance with good industry practice, applicable law, manufacturer requirements and the Customer's site, safety and security rules as notified to the Supplier.
 
-2.3 The Supplier shall schedule works so as to minimise disruption to guests and hotel operations, and shall carry out noisy, disruptive or access-restricted works only at times agreed in advance with the Customer's Property representative.
+2.3 The Supplier shall schedule works so as to minimize disruption to guests and hotel operations, and shall carry out noisy, disruptive or access-restricted works only at times agreed in advance with the Customer's Property representative.
 
 2.4 Services outside this scope require a written change request signed by both parties. Neither party is bound by a change until so signed.
 
@@ -76,7 +76,7 @@ This Statement of Work No. 1 (this "**SOW**") is entered into between **Seabrigh
 
 6.1 The Customer shall pay the Supplier annual fees of USD 540,000 for each year of the Initial Term, giving a total contract value of USD 1,080,000 for the Initial Term (the "**Fees**"). The Fees are the entire charge for the Services unless a change request provides otherwise.
 
-6.2 The Supplier shall invoice the Fees in the instalments and at the intervals agreed between the parties' representatives and recorded in writing. Each invoice shall be valid only if it identifies this SOW, the Property and the Services covered, and otherwise complies with the MSA.
+6.2 The Supplier shall invoice the Fees in the installments and at the intervals agreed between the parties' representatives and recorded in writing. Each invoice shall be valid only if it identifies this SOW, the Property and the Services covered, and otherwise complies with the MSA.
 
 6.3 The Customer shall pay each undisputed invoice within 45 days of receipt of a valid invoice. The Customer shall notify the Supplier promptly of any disputed amount and the reasons, and the parties shall work in good faith to resolve it. The Customer may withhold only the disputed portion.
 
@@ -110,7 +110,7 @@ Each party shall keep confidential all non-public information of the other recei
 
 ## 11. Intellectual Property
 
-11.1 Each party retains its pre-existing intellectual property. The Supplier grants the Customer a non-exclusive, perpetual licence to use the Supplier's pre-existing materials incorporated in the deliverables to the extent necessary to use and maintain the Property's plant.
+11.1 Each party retains its pre-existing intellectual property. The Supplier grants the Customer a non-exclusive, perpetual license to use the Supplier's pre-existing materials incorporated in the deliverables to the extent necessary to use and maintain the Property's plant.
 
 11.2 Ownership of schedules, records, logs and reports prepared specifically for the Customer under this SOW is as provided in the MSA.
 
@@ -140,8 +140,8 @@ Each party shall comply with applicable data protection law. The Supplier shall 
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd** | **Signed for and on behalf of Northgate Facilities & HVAC Inc** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc** | **Signed for and on behalf of Northgate Facilities & HVAC Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Michael Brennan | Name: Richard Hale |
-| Title: Chief Procurement Officer | Title: Authorised Signatory |
+| Title: Chief Procurement Officer | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

@@ -1,6 +1,6 @@
 # Master Services Agreement
 
-This Master Services Agreement (this **"Agreement"**) is entered into as of {{EFFECTIVE}} (the **"Effective Date"**) by and between Seabright Hotels & Resorts Ltd, a hotel group that owns and operates six hotels (**"Seabright"**), and Brightstar Security Services Inc (**"Brightstar"**). Seabright and Brightstar are each a **"Party"** and together the **"Parties"**.
+This Master Services Agreement (this **"Agreement"**) is entered into as of {{EFFECTIVE}} (the **"Effective Date"**) by and between Seabright Hotels & Resorts Inc, a hotel group that owns and operates six hotels (**"Seabright"**), and Brightstar Security Services Inc (**"Brightstar"**). Seabright and Brightstar are each a **"Party"** and together the **"Parties"**.
 
 ## ARTICLE 1 – DEFINITIONS
 
@@ -30,9 +30,9 @@ This Master Services Agreement (this **"Agreement"**) is entered into as of {{EF
 
 3.3 **Alarm Response.** Brightstar shall respond to an alarm activation at a Property within fifteen (15) minutes.
 
-3.4 **Guard Licensing and Vetting.** Brightstar shall ensure that all Guards hold current licences required by applicable law for the Services and have completed background checks before being assigned to any Property.
+3.4 **Guard Licensing and Vetting.** Brightstar shall ensure that all Guards hold current licenses required by applicable law for the Services and have completed background checks before being assigned to any Property.
 
-3.5 **Employment Compliance.** Brightstar shall comply with all applicable minimum-wage and working-time laws in respect of the Guards.
+3.5 **Employment Compliance.** Brightstar shall comply with all applicable minimum-wage and wage-and-hour lawss in respect of the Guards.
 
 3.6 **Site Conduct.** Guards shall comply with the reasonable health, safety, conduct and guest-service policies of each Property that are notified to Brightstar. Brightstar shall promptly replace any Guard whom Seabright reasonably requests be removed from a Property.
 
@@ -60,7 +60,7 @@ This Master Services Agreement (this **"Agreement"**) is entered into as of {{EF
 
 6.1 **Ownership.** Each Party retains all right, title and interest in its pre-existing intellectual property. Seabright retains all rights in its names, marks, Property plans and data, and Brightstar retains all rights in its proprietary methods, tools and training materials.
 
-6.2 **Reports.** Brightstar grants Seabright a perpetual, non-exclusive licence to use incident reports and other deliverables produced for Seabright under this Agreement for Seabright's business purposes.
+6.2 **Reports.** Brightstar grants Seabright a perpetual, non-exclusive license to use incident reports and other deliverables produced for Seabright under this Agreement for Seabright's business purposes.
 
 ## ARTICLE 7 – DATA PROTECTION
 
@@ -84,13 +84,13 @@ This Master Services Agreement (this **"Agreement"**) is entered into as of {{EF
 
 ## ARTICLE 10 – INDEMNITY AND LIMITATION OF LIABILITY
 
-10.1 **Indemnity.** Brightstar shall defend, indemnify and hold harmless Seabright and its affiliates, officers and employees from third-party claims, and resulting losses, damages and reasonable costs, arising from (a) bodily injury, death or damage to tangible property caused by the negligence or wilful misconduct of Brightstar or the Guards, or (b) Brightstar's breach of Sections 3.4 or 3.5.
+10.1 **Indemnity.** Brightstar shall defend, indemnify and hold harmless Seabright and its affiliates, officers and employees from third-party claims, and resulting losses, damages and reasonable costs, arising from (a) bodily injury, death or damage to tangible property caused by the negligence or willful misconduct of Brightstar or the Guards, or (b) Brightstar's breach of Sections 3.4 or 3.5.
 
-10.2 **Procedure.** The indemnified Party shall give prompt notice of the claim, allow the indemnifying Party to control the defence and settlement (provided no settlement imposes liability on the indemnified Party without its consent, not to be unreasonably withheld), and provide reasonable cooperation.
+10.2 **Procedure.** The indemnified Party shall give prompt notice of the claim, allow the indemnifying Party to control the defense and settlement (provided no settlement imposes liability on the indemnified Party without its consent, not to be unreasonably withheld), and provide reasonable cooperation.
 
 10.3 **Liability Cap.** Subject to Section 10.4, each Party's aggregate liability arising out of or in connection with this Agreement shall not exceed one (1) times the Fees paid or payable in the twelve (12) months preceding the claim.
 
-10.4 **Exclusions.** Nothing in this Agreement limits or excludes liability for fraud, gross negligence or wilful misconduct, or any liability that cannot be limited under applicable law. Seabright's obligation to pay undisputed Fees is not limited by Section 10.3.
+10.4 **Exclusions.** Nothing in this Agreement limits or excludes liability for fraud, gross negligence or willful misconduct, or any liability that cannot be limited under applicable law. Seabright's obligation to pay undisputed Fees is not limited by Section 10.3.
 
 10.5 **Consequential Loss.** Subject to Section 10.4, neither Party is liable for indirect, special or consequential damages, or loss of profit, arising out of this Agreement.
 
@@ -108,7 +108,7 @@ This Master Services Agreement (this **"Agreement"**) is entered into as of {{EF
 
 12.2 **Assignment.** Neither Party may assign or transfer this Agreement, in whole or in part, without the other Party's prior written consent, not to be unreasonably withheld, except that either Party may assign it to a successor to all or substantially all of its relevant business.
 
-12.3 **Notices.** Notices under this Agreement must be in writing and delivered by hand, nationally recognised courier or registered mail to the address a Party designates in writing, with a copy by email where an email address has been provided. Notices are effective on receipt.
+12.3 **Notices.** Notices under this Agreement must be in writing and delivered by hand, nationally recognized courier or registered mail to the address a Party designates in writing, with a copy by email where an email address has been provided. Notices are effective on receipt.
 
 12.4 **Independent Contractor.** Brightstar is an independent contractor. Nothing in this Agreement creates a partnership, joint venture, agency or employment relationship, and the Guards are not employees of Seabright.
 
@@ -124,9 +124,9 @@ This Master Services Agreement (this **"Agreement"**) is entered into as of {{EF
 
 ## SIGNATURES
 
-| | **Seabright Hotels & Resorts Ltd** | **Brightstar Security Services Inc** |
+| | **Seabright Hotels & Resorts Inc** | **Brightstar Security Services Inc** |
 |---|---|---|
 | Signature | | |
 | Name | Michael Brennan | Kenji Watanabe |
-| Title | Chief Procurement Officer | Authorised Signatory |
+| Title | Chief Procurement Officer | Authorized Signatory |
 | Date | {{SIGNED_CUSTOMER}} | {{SIGNED_SUPPLIER}} |

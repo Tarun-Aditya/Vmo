@@ -1,6 +1,6 @@
 # Amendment No. 1 to Master Services Agreement
 
-This Amendment No. 1 (the "**Amendment**") is made with effect from {{EFFECTIVE}} (the "**Amendment Effective Date**") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "**Customer**"), and **Crestline Laundry & Linen Services Ltd** (the "**Supplier**"). The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
+This Amendment No. 1 (the "**Amendment**") is made with effect from {{EFFECTIVE}} (the "**Amendment Effective Date**") between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "**Customer**"), and **Crestline Laundry & Linen Services Inc** (the "**Supplier**"). The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
 
 ## Background
 
@@ -48,9 +48,9 @@ B. The Parties wish to amend the MSA on the terms of this Amendment.
 
 ## Execution
 
-Signed by the duly authorised representatives of the Parties.
+Signed by the duly authorized representatives of the Parties.
 
-| | **Seabright Hotels & Resorts Ltd** | **Crestline Laundry & Linen Services Ltd** |
+| | **Seabright Hotels & Resorts Inc** | **Crestline Laundry & Linen Services Inc** |
 |---|---|---|
 | Signature | | |
 | Name | | |

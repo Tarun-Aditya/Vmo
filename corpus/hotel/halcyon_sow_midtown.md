@@ -2,18 +2,18 @@
 
 | | |
 |---|---|
-| **Project** | Elevator and lift maintenance services at Seabright Midtown Suites |
+| **Project** | Elevator and elevator maintenance services at Seabright Midtown Suites |
 | **Parent Agreement** | Master Services Agreement dated {{PARENT_DATE}} |
 | **Period** | From {{EFFECTIVE}} until {{EXPIRY}} (36 months) |
 | **Fees** | USD 96,000 per year; total contract value USD 288,000 |
 
-This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECTIVE}} (the "**Effective Date**") between **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Halcyon Elevator & Lift Maintenance Ltd** (the "**Supplier**"). It is issued under, and forms part of, the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement.
+This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECTIVE}} (the "**Effective Date**") between **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Halcyon Elevator & Lift Maintenance Inc** (the "**Supplier**"). It is issued under, and forms part of, the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement.
 
 ## 1. Background
 
 1.1 The Customer owns and operates hotels (each a "**Property**"). The Customer contracts for services on behalf of the group, and the services are delivered at individual Properties.
 
-1.2 The Customer requires planned and reactive maintenance of the passenger and service lifts at Seabright Midtown Suites (the "**Site**"). The Supplier has agreed to provide those services on the terms of this SOW and the Parent Agreement.
+1.2 The Customer requires planned and reactive maintenance of the passenger and service elevators at Seabright Midtown Suites (the "**Site**"). The Supplier has agreed to provide those services on the terms of this SOW and the Parent Agreement.
 
 1.3 In the event of conflict, the Parent Agreement prevails over this SOW unless this SOW expressly states that it overrides a specific provision of the Parent Agreement.
 
@@ -21,11 +21,11 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 2.1 The Supplier shall provide the following services at the Site (the "**Services**"):
 
-(a) planned preventive maintenance, inspection, lubrication, adjustment and testing of all lifts, escalators and associated equipment listed in the equipment schedule agreed between the parties (the "**Equipment**");
+(a) planned preventive maintenance, inspection, lubrication, adjustment and testing of all elevators, escalators and associated equipment listed in the equipment schedule agreed between the parties (the "**Equipment**");
 
 (b) reactive call-out and repair services, including attendance to entrapments, breakdowns and safety-critical faults, with a 24-hour emergency line;
 
-(c) arrangement and attendance at statutory thorough examinations by the Customer's insurer or competent person, and remedial works identified as necessary for compliance;
+(c) arrangement and attendance at state-mandated annual inspections by the Customer's insurer or competent person, and remedial works identified as necessary for compliance;
 
 (d) supply and fitting of routine wear parts and consumables; and
 
@@ -33,7 +33,7 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 2.2 Major component replacement, modernisation and upgrade works are outside the Services and shall be agreed through a written change under clause 8 of this SOW.
 
-2.3 The Supplier shall perform the Services with reasonable skill and care, using suitably qualified and competent personnel, in accordance with applicable law, recognised industry standards, manufacturers' recommendations and the Customer's site, safety and security rules as notified.
+2.3 The Supplier shall perform the Services with reasonable skill and care, using suitably qualified and competent personnel, in accordance with applicable law, recognized industry standards, manufacturers' recommendations and the Customer's site, safety and security rules as notified.
 
 ## 3. Deliverables and Milestones
 
@@ -42,9 +42,9 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 | No. | Deliverable / Milestone | Description | Target Date |
 |---|---|---|---|
 | 1 | Mobilisation and baseline survey | Site survey, condition report and agreed equipment schedule | {{MS1}} |
-| 2 | Maintenance programme | Planned preventive maintenance schedule for the Term | Within the mobilisation period |
+| 2 | Maintenance program | Planned preventive maintenance schedule for the Term | Within the mobilisation period |
 | 3 | Emergency response procedure | Call-out protocol, escalation contacts and Site access arrangements | Before the start of routine service |
-| 4 | Periodic service reports | Report on visits, faults, repairs and recommendations | As set out in the maintenance programme |
+| 4 | Periodic service reports | Report on visits, faults, repairs and recommendations | As set out in the maintenance program |
 | 5 | Annual compliance review | Review of statutory examinations and outstanding remedial actions | Annually during the Term |
 
 3.2 Target dates are extended to the extent that delay is caused by the Customer, by a failure of a Customer dependency under clause 5, or by an event of force majeure as defined in the Parent Agreement.
@@ -53,13 +53,13 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 4.1 **Supplier.** The Supplier shall appoint a named account manager responsible for performance of the Services and a deputy, and shall notify the Customer of any change. The Supplier is responsible for the acts and omissions of its personnel and subcontractors. It shall not subcontract any material part of the Services without the Customer's prior written consent, and shall remain liable for any approved subcontractor.
 
-4.2 **Customer.** The Customer shall nominate a contract manager, being the Customer's representative for day-to-day matters, who is authorised to give instructions and approvals under this SOW. The Customer's VP Technology Sourcing is the escalation point for unresolved issues.
+4.2 **Customer.** The Customer shall nominate a contract manager, being the Customer's representative for day-to-day matters, who is authorized to give instructions and approvals under this SOW. The Customer's VP Technology Sourcing is the escalation point for unresolved issues.
 
 4.3 **Governance.** The parties' representatives shall meet at reasonable intervals to review performance, and any dispute shall be handled through the dispute resolution procedure in the Parent Agreement.
 
 ## 5. Assumptions
 
-5.1 The Customer shall provide safe and timely access to the Site, machine rooms, lift shafts and pits, together with relevant information, drawings and permits, and reasonable on-site facilities.
+5.1 The Customer shall provide safe and timely access to the Site, machine rooms, elevator shafts and pits, together with relevant information, drawings and permits, and reasonable on-site facilities.
 
 5.2 The Equipment is in a condition consistent with the baseline survey. Defects or non-compliances identified in the baseline survey that predate the Effective Date are to be dealt with by agreed remedial works under clause 8.
 
@@ -69,13 +69,13 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 ## 6. Fees and Invoicing
 
-6.1 The annual fee for the Services is USD 96,000 (the "**Annual Fee**"). Over the initial term of 36 months the total contract value is USD 288,000. The Annual Fee covers all Services described in clause 2.1, including labour, travel and routine consumables, and no other charges are payable unless agreed in writing under clause 8.
+6.1 The annual fee for the Services is USD 96,000 (the "**Annual Fee**"). Over the initial term of 36 months the total contract value is USD 288,000. The Annual Fee covers all Services described in clause 2.1, including labor, travel and routine consumables, and no other charges are payable unless agreed in writing under clause 8.
 
-6.2 The Supplier shall invoice the Annual Fee in the instalments agreed between the parties' representatives, addressing each invoice to the Customer and referencing this SOW and the Site. Invoices must be valid, accurate and itemised, and must comply with applicable tax requirements.
+6.2 The Supplier shall invoice the Annual Fee in the installments agreed between the parties' representatives, addressing each invoice to the Customer and referencing this SOW and the Site. Invoices must be valid, accurate and itemised, and must comply with applicable tax requirements.
 
 6.3 The Customer shall pay undisputed invoices within 30 days of receipt of a valid invoice. If the Customer disputes any part of an invoice in good faith, it shall notify the Supplier promptly, pay the undisputed portion, and the parties shall resolve the dispute under the Parent Agreement.
 
-6.4 Fees are exclusive of applicable sales taxes or value added tax, which shall be added at the prevailing rate where properly chargeable and shown on a valid tax invoice.
+6.4 Fees are exclusive of applicable sales taxes or sales tax, which shall be added at the prevailing rate where properly chargeable and shown on a valid tax invoice.
 
 ## 7. Acceptance
 
@@ -87,7 +87,7 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 ## 8. Change Control
 
-8.1 Either party may propose a change to the Services, the Equipment schedule or the Deliverables. No change is effective unless recorded in a written change request signed by authorised representatives of both parties, stating its effect on scope, timetable and fees.
+8.1 Either party may propose a change to the Services, the Equipment schedule or the Deliverables. No change is effective unless recorded in a written change request signed by authorized representatives of both parties, stating its effect on scope, timetable and fees.
 
 ## 9. Term, Renewal and Termination
 
@@ -105,7 +105,7 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 ## 11. Intellectual Property
 
-11.1 Each party retains ownership of its pre-existing intellectual property rights. The Supplier grants the Customer a non-exclusive, perpetual, royalty-free licence to use the reports, records and documentation delivered under this SOW for the Customer's internal business purposes at its Properties.
+11.1 Each party retains ownership of its pre-existing intellectual property rights. The Supplier grants the Customer a non-exclusive, perpetual, royalty-free license to use the reports, records and documentation delivered under this SOW for the Customer's internal business purposes at its Properties.
 
 11.2 Title to parts supplied and fitted at the Site passes to the Customer on installation or on payment, whichever is earlier.
 
@@ -125,7 +125,7 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 ## 14. Data Protection
 
-14.1 To the extent the Supplier processes personal data on behalf of the Customer, including data captured through access control, CCTV or contact records at the Site, it shall do so only on the Customer's documented instructions, apply appropriate technical and organisational security measures, ensure that personnel are bound by confidentiality, assist the Customer in meeting its obligations to data subjects, notify the Customer without undue delay of any personal data breach, and comply with the data protection terms of the Parent Agreement and applicable data protection law.
+14.1 To the extent the Supplier processes personal data on behalf of the Customer, including data captured through access control, CCTV or contact records at the Site, it shall do so only on the Customer's documented instructions, apply appropriate technical and organizational security measures, ensure that personnel are bound by confidentiality, assist the Customer in meeting its obligations to data subjects, notify the Customer without undue delay of any personal data breach, and comply with the data protection terms of the Parent Agreement and applicable data protection law.
 
 ## 15. Assignment and Subcontracting
 
@@ -133,7 +133,7 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 ## 16. Notices
 
-16.1 Notices under this SOW must be in writing and delivered by hand, by recorded or courier delivery, or by email to the address notified for that purpose by the receiving party, and take effect on receipt. Notices of breach or termination must also be copied to the Customer's VP Technology Sourcing or the Supplier's Authorised Signatory, respectively.
+16.1 Notices under this SOW must be in writing and delivered by hand, by recorded or courier delivery, or by email to the address notified for that purpose by the receiving party, and take effect on receipt. Notices of breach or termination must also be copied to the Customer's VP Technology Sourcing or the Supplier's Authorized Signatory, respectively.
 
 ## 17. General
 
@@ -145,15 +145,15 @@ This Statement of Work (the "**SOW**") is entered into with effect from {{EFFECT
 
 17.4 **Counterparts.** This SOW may be signed in counterparts, including by electronic signature, each of which is an original.
 
-17.5 **Governing law and jurisdiction.** This SOW and any non-contractual obligations arising from it are governed by the laws of England and Wales, and the parties submit to the jurisdiction specified in the Parent Agreement.
+17.5 **Governing law and jurisdiction.** This SOW and any non-contractual obligations arising from it are governed by the laws of the State of New York, and the parties submit to the jurisdiction specified in the Parent Agreement.
 
 ## 18. Signatures
 
-Signed by the parties' authorised representatives.
+Signed by the parties' authorized representatives.
 
-| **For and on behalf of Seabright Hotels & Resorts Ltd (Customer)** | **For and on behalf of Halcyon Elevator & Lift Maintenance Ltd (Supplier)** |
+| **For and on behalf of Seabright Hotels & Resorts Inc (Customer)** | **For and on behalf of Halcyon Elevator & Lift Maintenance Inc (Supplier)** |
 |---|---|
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Sofia Marchetti |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

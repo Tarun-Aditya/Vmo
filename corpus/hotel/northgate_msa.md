@@ -1,6 +1,6 @@
 # Master Services Agreement
 
-This Master Services Agreement (this "Agreement") is entered into as of {{EFFECTIVE}} (the "Effective Date") by and between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Northgate Facilities & HVAC Inc** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties."
+This Master Services Agreement (this "Agreement") is entered into as of {{EFFECTIVE}} (the "Effective Date") by and between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer"), and **Northgate Facilities & HVAC Inc** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties."
 
 WHEREAS, the Customer owns and operates six hotels and requires heating, ventilation, air-conditioning and related facilities maintenance services at those hotels;
 
@@ -102,6 +102,8 @@ The Supplier shall maintain throughout the Term, with reputable insurers, liabil
 
 11.3 On termination or expiry, the Supplier shall return Customer property and Confidential Information, and the Customer shall pay undisputed Fees for Services properly performed up to the termination date. Sections 5, 7, 9, 10, 12 and 14 and any other provisions intended to survive shall survive.
 
+11.4 **Sale of a Property.** If a Property is sold, or ceases to be owned or operated by the Customer, the Customer may terminate the Services at that Property on thirty (30) days' written notice, without penalty or early-termination charge.
+
 ## Section 12. Data Protection
 
 The Parties acknowledge that the Services do not involve the processing of personal data. If the Parties later agree to Services that involve personal data, they shall first agree in writing appropriate data protection terms. The Supplier shall not access guest or employee personal data except incidentally and shall keep any such data confidential, and shall not use it.
@@ -130,11 +132,11 @@ The Parties acknowledge that the Services do not involve the processing of perso
 
 14.8 Counterparts. This Agreement may be executed in counterparts, including by electronic signature, each of which is an original.
 
-IN WITNESS WHEREOF, the Parties have caused this Agreement to be executed by their authorised representatives.
+IN WITNESS WHEREOF, the Parties have caused this Agreement to be executed by their authorized representatives.
 
-| **SEABRIGHT HOTELS & RESORTS LTD** | **NORTHGATE FACILITIES & HVAC INC** |
+| **SEABRIGHT HOTELS & RESORTS INC** | **NORTHGATE FACILITIES & HVAC INC** |
 |---|---|
 | By: ______________________________ | By: ______________________________ |
 | Name: Michael Brennan | Name: Daniel Okafor |
-| Title: Chief Procurement Officer | Title: Authorised Signatory |
+| Title: Chief Procurement Officer | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

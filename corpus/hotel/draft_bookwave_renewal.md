@@ -1,6 +1,6 @@
 # SOFTWARE-AS-A-SERVICE SUBSCRIPTION AGREEMENT
 
-This Software-as-a-Service Subscription Agreement (the "**Agreement**") is made as of {{EFFECTIVE}} (the "**Effective Date**") between **BookWave Distribution Inc** (the "**Supplier**") and **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six (6) hotels (each a "**Property**" and together the "**Properties**"). This Agreement is a Supplier draft that has not been signed and is not binding until executed by both parties.
+This Software-as-a-Service Subscription Agreement (the "**Agreement**") is made as of {{EFFECTIVE}} (the "**Effective Date**") between **BookWave Distribution Inc** (the "**Supplier**") and **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six (6) hotels (each a "**Property**" and together the "**Properties**"). This Agreement is a Supplier draft that has not been signed and is not binding until executed by both parties.
 
 ## 1. DEFINITIONS
 
@@ -46,7 +46,7 @@ This Software-as-a-Service Subscription Agreement (the "**Agreement**") is made 
 
 6.1 The Services involve the processing of Personal Data of the Customer's customers and employees. The Customer is responsible for ensuring it has all necessary notices, consents and lawful bases for the Supplier to process Personal Data for the purpose of providing the Services.
 
-6.2 The Supplier shall process Personal Data only to provide, secure and support the Services and as otherwise permitted by this Agreement, and shall maintain reasonable technical and organisational security measures appropriate to the nature of the Personal Data.
+6.2 The Supplier shall process Personal Data only to provide, secure and support the Services and as otherwise permitted by this Agreement, and shall maintain reasonable technical and organizational security measures appropriate to the nature of the Personal Data.
 
 6.3 The Supplier may use sub-contractors and hosting providers in providing the Services and remains responsible for their performance of its obligations to the extent required by law. The Supplier may use aggregated and de-identified data derived from the Services for analytics and service improvement.
 
@@ -56,7 +56,7 @@ This Software-as-a-Service Subscription Agreement (the "**Agreement**") is made 
 
 7.1 The Supplier and its licensors own all right, title and interest in the Services, the software, documentation, and any improvements, feedback-based modifications and derivative works, and no rights are granted except as expressly set out in this Agreement.
 
-7.2 The Customer retains ownership of Customer Data and grants the Supplier a non-exclusive licence during the Term to host, copy, process and use Customer Data to provide the Services and exercise its rights under this Agreement.
+7.2 The Customer retains ownership of Customer Data and grants the Supplier a non-exclusive license during the Term to host, copy, process and use Customer Data to provide the Services and exercise its rights under this Agreement.
 
 ## 8. CONFIDENTIALITY
 
@@ -76,7 +76,7 @@ This Software-as-a-Service Subscription Agreement (the "**Agreement**") is made 
 
 ## 10. INDEMNITY
 
-10.1 The Supplier shall defend the Customer against any third-party claim alleging that the Customer's authorised use of the Services infringes that third party's intellectual property rights, and shall pay damages finally awarded or settlements agreed by the Supplier, provided the Customer promptly notifies the Supplier, allows it sole control of the defence and settlement, and cooperates reasonably. The Supplier has no obligation for claims arising from Customer Data, modifications not made by the Supplier, combinations with other products, or use in breach of this Agreement. If a claim arises, the Supplier may procure the right to continue use, modify the Services, or terminate the affected Services. This Section 10.1 states the Supplier's entire liability for infringement claims.
+10.1 The Supplier shall defend the Customer against any third-party claim alleging that the Customer's authorized use of the Services infringes that third party's intellectual property rights, and shall pay damages finally awarded or settlements agreed by the Supplier, provided the Customer promptly notifies the Supplier, allows it sole control of the defense and settlement, and cooperates reasonably. The Supplier has no obligation for claims arising from Customer Data, modifications not made by the Supplier, combinations with other products, or use in breach of this Agreement. If a claim arises, the Supplier may procure the right to continue use, modify the Services, or terminate the affected Services. This Section 10.1 states the Supplier's entire liability for infringement claims.
 
 10.2 The Customer shall defend and indemnify the Supplier against third-party claims, and resulting losses, damages and costs, arising from Customer Data, the Customer's or the Properties' use of the Services in breach of this Agreement or applicable law, or the Customer's failure to obtain required notices or consents for Personal Data.
 
@@ -104,7 +104,7 @@ This Software-as-a-Service Subscription Agreement (the "**Agreement**") is made 
 
 13.2 **Assignment.** The Customer may not assign or transfer this Agreement or any rights under it without the Supplier's prior written consent. The Supplier may assign this Agreement to an affiliate or to a successor to all or substantially all of its relevant business on notice to the Customer.
 
-13.3 **Notices.** Notices must be in writing and delivered by hand, recognised courier or email to the address a party has notified to the other for this purpose, and are deemed received on delivery or, for email, on transmission absent a delivery-failure message.
+13.3 **Notices.** Notices must be in writing and delivered by hand, recognized courier or email to the address a party has notified to the other for this purpose, and are deemed received on delivery or, for email, on transmission absent a delivery-failure message.
 
 13.4 **Force Majeure.** Neither party is liable for delay or failure to perform (other than payment obligations) caused by events beyond its reasonable control.
 
@@ -120,7 +120,7 @@ This Agreement is a draft and has not been executed.
 
 | | |
 |---|---|
-| **BookWave Distribution Inc** | **Seabright Hotels & Resorts Ltd** |
+| **BookWave Distribution Inc** | **Seabright Hotels & Resorts Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: ______________________ | Name: ______________________ |
 | Title: ______________________ | Title: ______________________ |

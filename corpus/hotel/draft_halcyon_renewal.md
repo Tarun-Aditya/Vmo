@@ -1,6 +1,6 @@
 # Master Services Agreement
 
-This Master Services Agreement (this "**Agreement**") is entered into as of {{EFFECTIVE}} (the "**Effective Date**") by and between Seabright Hotels & Resorts Ltd, a hotel group that owns and operates six hotels ("**Seabright**" or the "**Customer**"), and Halcyon Elevator & Lift Maintenance Ltd ("**Halcyon**" or the "**Supplier**"). Seabright and Halcyon are each a "**Party**" and together the "**Parties**".
+This Master Services Agreement (this "**Agreement**") is entered into as of {{EFFECTIVE}} (the "**Effective Date**") by and between Seabright Hotels & Resorts Inc, a hotel group that owns and operates six hotels ("**Seabright**" or the "**Customer**"), and Halcyon Elevator & Lift Maintenance Inc ("**Halcyon**" or the "**Supplier**"). Seabright and Halcyon are each a "**Party**" and together the "**Parties**".
 
 **DRAFT – VENDOR DRAFT NOT YET SIGNED – SUBJECT TO CONTRACT**
 
@@ -8,11 +8,11 @@ This Master Services Agreement (this "**Agreement**") is entered into as of {{EF
 
 1.1 "**Properties**" means the six hotels owned and operated by Seabright at which the Services are to be delivered, as listed in the applicable Service Schedule, and "**Property**" means any one of them.
 
-1.2 "**Services**" means the elevator and lift maintenance, inspection, repair and related services described in Article 2 and in any Service Schedule.
+1.2 "**Services**" means the elevator and elevator maintenance, inspection, repair and related services described in Article 2 and in any Service Schedule.
 
 1.3 "**Service Schedule**" means a written schedule agreed and signed by both Parties that identifies the Properties, equipment, scope and any specific requirements for the Services.
 
-1.4 "**Lift Fault**" means any malfunction, breakdown, entrapment or failure of a lift, elevator or associated equipment at a Property that impairs its safe or normal operation.
+1.4 "**Elevator Fault**" means any malfunction, breakdown, entrapment or failure of an elevator, elevator or associated equipment at a Property that impairs its safe or normal operation.
 
 1.5 "**Confidential Information**" means all non-public information, in any form, disclosed by or on behalf of a Party to the other in connection with this Agreement that is marked confidential or that a reasonable person would understand to be confidential, including technical, operational, commercial and security information relating to the Properties.
 
@@ -22,7 +22,7 @@ This Master Services Agreement (this "**Agreement**") is entered into as of {{EF
 
 2.1 **Scope.** Halcyon shall provide the Services to Seabright at each Property in accordance with this Agreement and each Service Schedule.
 
-2.2 **Fault Attendance.** Halcyon shall attend any Lift Fault at a Property within 24 hours of being notified of that Lift Fault by Seabright or Property personnel.
+2.2 **Fault Attendance.** Halcyon shall attend any Elevator Fault at a Property within 24 hours of being notified of that Elevator Fault by Seabright or Property personnel.
 
 2.3 **Standard of Performance.** Halcyon shall perform the Services with reasonable skill, care and diligence, using suitably qualified and trained personnel, and in compliance with applicable laws, regulations, safety standards and statutory inspection requirements.
 
@@ -60,7 +60,7 @@ This Master Services Agreement (this "**Agreement**") is entered into as of {{EF
 
 6.1 **Pre-Existing Rights.** Each Party retains all rights in its pre-existing intellectual property and that which it develops independently of this Agreement.
 
-6.2 **Deliverables.** Reports, inspection records, logs and other materials prepared by Halcyon specifically for Seabright in the course of the Services are owned by Seabright upon creation, and Halcyon assigns to Seabright all rights therein. Halcyon retains ownership of its general know-how, tools and methodologies and grants Seabright a non-exclusive, perpetual, royalty-free licence to use any Halcyon materials embedded in such deliverables for Seabright's internal business purposes.
+6.2 **Deliverables.** Reports, inspection records, logs and other materials prepared by Halcyon specifically for Seabright in the course of the Services are owned by Seabright upon creation, and Halcyon assigns to Seabright all rights therein. Halcyon retains ownership of its general know-how, tools and methodologies and grants Seabright a non-exclusive, perpetual, royalty-free license to use any Halcyon materials embedded in such deliverables for Seabright's internal business purposes.
 
 ## ARTICLE 7 – WARRANTIES
 
@@ -80,11 +80,11 @@ This Master Services Agreement (this "**Agreement**") is entered into as of {{EF
 
 ## ARTICLE 9 – INDEMNITY
 
-9.1 **By Halcyon.** Halcyon shall indemnify, defend and hold harmless Seabright and its affiliates, officers and employees from and against all losses, damages, liabilities, costs and expenses (including reasonable legal fees) arising out of any third-party claim relating to (a) death or personal injury or damage to property caused by the negligence or wilful misconduct of Halcyon or its personnel or subcontractors, or (b) Halcyon's breach of applicable law in performing the Services.
+9.1 **By Halcyon.** Halcyon shall indemnify, defend and hold harmless Seabright and its affiliates, officers and employees from and against all losses, damages, liabilities, costs and expenses (including reasonable legal fees) arising out of any third-party claim relating to (a) death or personal injury or damage to property caused by the negligence or willful misconduct of Halcyon or its personnel or subcontractors, or (b) Halcyon's breach of applicable law in performing the Services.
 
-9.2 **By Seabright.** Seabright shall indemnify, defend and hold harmless Halcyon and its officers and employees from and against all losses, damages, liabilities, costs and expenses (including reasonable legal fees) arising out of any third-party claim to the extent caused by the negligence or wilful misconduct of Seabright or its personnel.
+9.2 **By Seabright.** Seabright shall indemnify, defend and hold harmless Halcyon and its officers and employees from and against all losses, damages, liabilities, costs and expenses (including reasonable legal fees) arising out of any third-party claim to the extent caused by the negligence or willful misconduct of Seabright or its personnel.
 
-9.3 **Procedure.** The indemnified Party shall promptly notify the indemnifying Party of any claim, allow it to control the defence and settlement (provided no settlement admits fault on the indemnified Party's behalf without consent), and give reasonable assistance at the indemnifying Party's cost.
+9.3 **Procedure.** The indemnified Party shall promptly notify the indemnifying Party of any claim, allow it to control the defense and settlement (provided no settlement admits fault on the indemnified Party's behalf without consent), and give reasonable assistance at the indemnifying Party's cost.
 
 ## ARTICLE 10 – LIABILITY
 
@@ -110,9 +110,9 @@ This Master Services Agreement (this "**Agreement**") is entered into as of {{EF
 
 ## ARTICLE 13 – GENERAL
 
-13.1 **Governing Law.** This Agreement, and any dispute or claim arising out of or in connection with it (including non-contractual disputes), is governed by the laws of England and Wales.
+13.1 **Governing Law.** This Agreement, and any dispute or claim arising out of or in connection with it (including non-contractual disputes), is governed by the laws of the State of New York.
 
-13.2 **Jurisdiction.** The courts of England and Wales have exclusive jurisdiction over any such dispute.
+13.2 **Jurisdiction.** the state and federal courts located in New York County, New York have exclusive jurisdiction over any such dispute.
 
 13.3 **Assignment.** Neither Party may assign, transfer or subcontract any of its rights or obligations under this Agreement without the prior written consent of the other, such consent not to be unreasonably withheld, except as provided in Section 2.5.
 
@@ -134,7 +134,7 @@ This Master Services Agreement (this "**Agreement**") is entered into as of {{EF
 
 *This document is an unsigned draft and does not bind either Party until executed by both.*
 
-| **SEABRIGHT HOTELS & RESORTS LTD** | **HALCYON ELEVATOR & LIFT MAINTENANCE LTD** |
+| **SEABRIGHT HOTELS & RESORTS INC** | **HALCYON ELEVATOR & LIFT MAINTENANCE INC** |
 |---|---|
 | Signature: ______________________ | Signature: ______________________ |
 | Name: ______________________ | Name: ______________________ |

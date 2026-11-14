@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-CUSTOMER = "Seabright Hotels & Resorts Ltd" if __import__("os").environ.get("STANDARDS", "").lower() == "hotel" else "Arcadia Retail Inc."
+CUSTOMER = "Seabright Hotels & Resorts Inc" if __import__("os").environ.get("STANDARDS", "").lower() == "hotel" else "Arcadia Retail Inc."
 
 # Standard (template) values for every placeholder used in clause text.
 STD: dict[str, str | int] = dict(
@@ -33,7 +33,7 @@ STD: dict[str, str | int] = dict(
 
 
 if __import__("os").environ.get("STANDARDS", "").lower() == "hotel":      # the hotel group's house standards (STANDARDS=hotel): the same templates, with its own values
-    STD.update(governing_law="England and Wales", venue="London", tfc_notice_days=60, cap="1", sec_hours=24, breach_hours=24, insurance_cover="USD 5,000,000", audit_freq="once per year")
+    STD.update(governing_law="New York", venue="New York County", tfc_notice_days=60, cap="1", sec_hours=24, breach_hours=24, insurance_cover="USD 5,000,000", audit_freq="once per year")
 
 
 @dataclass(frozen=True)

@@ -4,12 +4,12 @@
 |---|---|
 | **Project** | Security Services at Seabright Midtown Suites |
 | **Parent Agreement** | Master Services Agreement dated {{PARENT_DATE}} (the "MSA") |
-| **Customer** | Seabright Hotels & Resorts Ltd |
+| **Customer** | Seabright Hotels & Resorts Inc |
 | **Supplier** | Brightstar Security Services Inc |
 | **Period** | Effective Date {{EFFECTIVE}} until {{EXPIRY}} (initial term of 12 months) |
 | **Fees** | USD 240,000 per year; total contract value USD 240,000 |
 
-This Statement of Work No. 1 (the "SOW") is made as of {{EFFECTIVE}} (the "Effective Date") between Seabright Hotels & Resorts Ltd, a hotel group that owns and operates six hotels (the "Customer"), and Brightstar Security Services Inc (the "Supplier"). It is issued under, and forms part of, the Master Services Agreement dated {{PARENT_DATE}} between the same parties. Capitalised terms not defined in this SOW have the meanings given in the MSA.
+This Statement of Work No. 1 (the "SOW") is made as of {{EFFECTIVE}} (the "Effective Date") between Seabright Hotels & Resorts Inc, a hotel group that owns and operates six hotels (the "Customer"), and Brightstar Security Services Inc (the "Supplier"). It is issued under, and forms part of, the Master Services Agreement dated {{PARENT_DATE}} between the same parties. Capitalised terms not defined in this SOW have the meanings given in the MSA.
 
 ## 1. Background
 
@@ -94,18 +94,18 @@ Each party shall keep confidential all non-public information of the other recei
 
 10.1 Each party retains ownership of its pre-existing intellectual property.
 10.2 Reports and records prepared for the Customer specifically under this SOW belong to the Customer on creation, and the Supplier assigns all rights in them to the Customer.
-10.3 The Supplier grants the Customer a non-exclusive, perpetual licence to use any Supplier materials embedded in those reports and records to the extent needed to use them.
+10.3 The Supplier grants the Customer a non-exclusive, perpetual license to use any Supplier materials embedded in those reports and records to the extent needed to use them.
 
 ## 11. Data Protection
 
 11.1 Each party shall comply with applicable data protection laws in connection with this SOW.
 11.2 The Supplier shall process personal data of guests, staff and visitors, including any CCTV footage and access logs, only on the Customer's documented instructions and for the purpose of providing the Services.
-11.3 The Supplier shall maintain appropriate technical and organisational security measures, notify the Customer without undue delay on becoming aware of any personal data breach, and assist the Customer in meeting its legal obligations.
+11.3 The Supplier shall maintain appropriate technical and organizational security measures, notify the Customer without undue delay on becoming aware of any personal data breach, and assist the Customer in meeting its legal obligations.
 11.4 On expiry or termination, the Supplier shall return or securely delete personal data as the Customer directs, subject to legal retention requirements.
 
 ## 12. Warranties
 
-The Supplier warrants that: (a) it has the authority, licences and permits required to provide the Services; (b) the Services will be performed in accordance with clause 2.3; (c) its personnel are suitably vetted, trained and licensed; and (d) the Services will not infringe the rights of any third party. The warranties in the MSA also apply.
+The Supplier warrants that: (a) it has the authority, licenses and permits required to provide the Services; (b) the Services will be performed in accordance with clause 2.3; (c) its personnel are suitably vetted, trained and licensed; and (d) the Services will not infringe the rights of any third party. The warranties in the MSA also apply.
 
 ## 13. Liability and Indemnity
 
@@ -140,8 +140,8 @@ This SOW may be executed in counterparts, including electronically.
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd** | **Signed for and on behalf of Brightstar Security Services Inc** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc** | **Signed for and on behalf of Brightstar Security Services Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Grace Mbeki |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

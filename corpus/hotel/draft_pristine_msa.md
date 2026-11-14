@@ -2,7 +2,7 @@
 
 **DRAFT – NOT EXECUTED – FOR DISCUSSION PURPOSES ONLY**
 
-This Master Services Agreement (the "**Agreement**") is made with effect from {{EFFECTIVE}} (the "**Effective Date**") between **Pristine Spa & Amenity Supplies Inc** (the "**Supplier**") and **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six (6) hotels (each a "**Property**" and together the "**Properties**").
+This Master Services Agreement (the "**Agreement**") is made with effect from {{EFFECTIVE}} (the "**Effective Date**") between **Pristine Spa & Amenity Supplies Inc** (the "**Supplier**") and **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six (6) hotels (each a "**Property**" and together the "**Properties**").
 
 ## 1. DEFINITIONS AND INTERPRETATION
 
@@ -28,7 +28,7 @@ This Master Services Agreement (the "**Agreement**") is made with effect from {{
 
 ## 4. CHANGES
 
-4.1 No change to the Services or this Agreement is binding unless recorded in writing and signed by authorised representatives of both parties. The Supplier may decline any requested change and may charge reasonable additional fees for any change it agrees to implement.
+4.1 No change to the Services or this Agreement is binding unless recorded in writing and signed by authorized representatives of both parties. The Supplier may decline any requested change and may charge reasonable additional fees for any change it agrees to implement.
 
 ## 5. FEES AND INVOICING
 
@@ -54,9 +54,9 @@ This Master Services Agreement (the "**Agreement**") is made with effect from {{
 
 7.1 All intellectual property rights in the Services, the Supplier's products, formulations, packaging, branding, designs, know-how and any materials created by the Supplier (together, "**Supplier IP**") remain the exclusive property of the Supplier. Nothing in this Agreement assigns any Supplier IP to the Customer.
 
-7.2 The Supplier grants the Customer a non-exclusive, non-transferable, royalty-free licence during the Term to use Supplier IP solely as necessary to receive and use the Services at the Properties.
+7.2 The Supplier grants the Customer a non-exclusive, non-transferable, royalty-free license during the Term to use Supplier IP solely as necessary to receive and use the Services at the Properties.
 
-7.3 The Customer retains ownership of its names, marks and logos. The Customer grants the Supplier a limited licence to use them solely to perform the Services, including for any co-branded packaging requested by the Customer.
+7.3 The Customer retains ownership of its names, marks and logos. The Customer grants the Supplier a limited license to use them solely to perform the Services, including for any co-branded packaging requested by the Customer.
 
 ## 8. WARRANTIES AND DISCLAIMERS
 
@@ -82,7 +82,7 @@ This Master Services Agreement (the "**Agreement**") is made with effect from {{
 
 10.1 The Customer shall indemnify, defend and hold harmless the Supplier and its officers, employees and affiliates against all third-party claims, and resulting losses, damages, costs and expenses (including reasonable legal fees), arising from (a) the Customer's or any Property's use, storage, handling or presentation of products other than in accordance with the Supplier's written instructions; (b) any modification of products by or for the Customer; or (c) the Customer's materials, names or marks infringing third-party rights.
 
-10.2 The Supplier shall indemnify the Customer against third-party claims alleging that the Supplier IP, as supplied and used in accordance with this Agreement, infringes that third party's intellectual property rights, subject to the Customer giving prompt notice, sole control of the defence to the Supplier and reasonable cooperation. The Supplier has no obligation under this Section 10.2 for claims arising from the matters in Section 10.1. This Section 10.2 states the Supplier's entire liability for infringement claims.
+10.2 The Supplier shall indemnify the Customer against third-party claims alleging that the Supplier IP, as supplied and used in accordance with this Agreement, infringes that third party's intellectual property rights, subject to the Customer giving prompt notice, sole control of the defense to the Supplier and reasonable cooperation. The Supplier has no obligation under this Section 10.2 for claims arising from the matters in Section 10.1. This Section 10.2 states the Supplier's entire liability for infringement claims.
 
 10.3 The indemnities in this Section 10 are subject to Section 9 only to the extent the Supplier's indemnity under Section 10.2 is concerned.
 
@@ -108,7 +108,7 @@ This Master Services Agreement (the "**Agreement**") is made with effect from {{
 
 ## 14. FORCE MAJEURE
 
-14.1 The Supplier shall not be liable for any failure or delay in performance caused by events beyond its reasonable control, including acts of God, fire, flood, epidemic, governmental action, labour disputes, supply chain disruption, shortage of raw materials, transportation failure or failure of third-party suppliers. The Supplier's time for performance shall be extended accordingly, and the Customer's payment obligations for Services already delivered shall not be affected.
+14.1 The Supplier shall not be liable for any failure or delay in performance caused by events beyond its reasonable control, including acts of God, fire, flood, epidemic, governmental action, labor disputes, supply chain disruption, shortage of raw materials, transportation failure or failure of third-party suppliers. The Supplier's time for performance shall be extended accordingly, and the Customer's payment obligations for Services already delivered shall not be affected.
 
 ## 15. GOVERNING LAW AND DISPUTES
 
@@ -120,7 +120,7 @@ This Master Services Agreement (the "**Agreement**") is made with effect from {{
 
 16.1 **Assignment.** The Customer shall not assign, novate, subcontract or otherwise transfer any right or obligation under this Agreement without the Supplier's prior written consent. The Supplier may assign this Agreement to an affiliate or to a successor to all or substantially all of its relevant business, and may use subcontractors to perform the Services, remaining responsible for them as for itself.
 
-16.2 **Notices.** Notices must be in writing and delivered by hand, by recognised courier or by registered mail to the address of the receiving party stated in the most recent Order or otherwise notified in writing, marked for the attention of its General Counsel or equivalent. Notices are deemed received on delivery, or if delivery is refused, on the date of refusal.
+16.2 **Notices.** Notices must be in writing and delivered by hand, by recognized courier or by registered mail to the address of the receiving party stated in the most recent Order or otherwise notified in writing, marked for the attention of its General Counsel or equivalent. Notices are deemed received on delivery, or if delivery is refused, on the date of refusal.
 
 16.3 **Entire Agreement.** This Agreement, together with accepted Orders, is the entire agreement between the parties concerning its subject matter and supersedes all prior proposals, negotiations, representations and understandings. Each party acknowledges that it has not relied on any statement not expressly set out in this Agreement. In the event of conflict, the body of this Agreement prevails over any Order, and no terms on any Customer purchase order or other document shall apply.
 
@@ -132,11 +132,11 @@ This Master Services Agreement (the "**Agreement**") is made with effect from {{
 
 ## 17. EXECUTION
 
-This Agreement is a draft and has not been executed. It shall become binding only when signed by authorised representatives of both parties.
+This Agreement is a draft and has not been executed. It shall become binding only when signed by authorized representatives of both parties.
 
 | | |
 |---|---|
-| **For and on behalf of Pristine Spa & Amenity Supplies Inc (Supplier)** | **For and on behalf of Seabright Hotels & Resorts Ltd (Customer)** |
+| **For and on behalf of Pristine Spa & Amenity Supplies Inc (Supplier)** | **For and on behalf of Seabright Hotels & Resorts Inc (Customer)** |
 | Signature: ______________________________ | Signature: ______________________________ |
 | Name: ______________________________ | Name: ______________________________ |
 | Title: ______________________________ | Title: ______________________________ |

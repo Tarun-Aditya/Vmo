@@ -2,9 +2,9 @@
 
 This Master Services Agreement (the "**Agreement**") is made with effect from {{EFFECTIVE}} (the "**Effective Date**") between:
 
-(1) **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six hotels; and
+(1) **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six hotels; and
 
-(2) **Halcyon Elevator & Lift Maintenance Ltd** (the "**Supplier**").
+(2) **Halcyon Elevator & Lift Maintenance Inc** (the "**Supplier**").
 
 The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
 
@@ -24,17 +24,17 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 ## 3. The Services
 
-3.1 The Supplier shall provide the lift and elevator maintenance services described in Schedule 1 and the Order Form (the "**Services**") at each Property with the skill, care and diligence to be expected of a competent and experienced provider of such services, in accordance with applicable law, manufacturer guidance and recognised industry standards.
+3.1 The Supplier shall provide the elevator and elevator maintenance services described in Schedule 1 and the Order Form (the "**Services**") at each Property with the skill, care and diligence to be expected of a competent and experienced provider of such services, in accordance with applicable law, manufacturer guidance and recognized industry standards.
 
 3.2 Without limiting clause 3.1, the Supplier shall:
 
-(a) attend a passenger entrapment within 1 hour, and any other lift fault within 4 hours, in each case of being notified by the Customer or the relevant Property; and
+(a) attend a passenger entrapment within 1 hour, and any other elevator fault within 4 hours, in each case of being notified by the Customer or the relevant Property; and
 
-(b) perform the statutory thorough examinations of every lift at the Properties and deliver the resulting inspection certificates to the Customer.
+(b) perform the state-mandated annual inspections of every elevator at the Properties and deliver the resulting inspection certificates to the Customer.
 
 3.3 The Supplier shall use suitably qualified, trained and competent personnel, and shall comply with the reasonable site, health and safety, and security rules of each Property notified to it.
 
-3.4 The Customer shall give the Supplier reasonable access to each Property and the lifts, and such information as the Supplier reasonably requires to perform the Services.
+3.4 The Customer shall give the Supplier reasonable access to each Property and the elevators, and such information as the Supplier reasonably requires to perform the Services.
 
 3.5 Service levels and any remedies for failure to meet them are set out in the Order Form.
 
@@ -48,31 +48,31 @@ The Customer and the Supplier are each a "**Party**" and together the "**Parties
 
 4.4 If the Customer disputes an invoice in good faith, it shall notify the Supplier promptly, pay the undisputed portion, and the Parties shall seek to resolve the dispute promptly. The Supplier shall continue to perform the Services pending resolution.
 
-4.5 Unless stated otherwise in the Order Form, the Fees are exclusive of value added tax, which shall be payable in addition on receipt of a valid VAT invoice. The Fees are the Supplier's entire remuneration for the Services.
+4.5 Unless stated otherwise in the Order Form, the Fees are exclusive of sales tax, which shall be payable in addition on receipt of a valid invoice. The Fees are the Supplier's entire remuneration for the Services.
 
 ## 5. Order Form Commercial Terms
 
 | Item | Term |
 |---|---|
-| Customer | Seabright Hotels & Resorts Ltd |
-| Supplier | Halcyon Elevator & Lift Maintenance Ltd |
+| Customer | Seabright Hotels & Resorts Inc |
+| Supplier | Halcyon Elevator & Lift Maintenance Inc |
 | Initial Term | 36 months from the Effective Date until {{EXPIRY}} |
 | Renewal | Automatic, successive 12-month periods; 120 days' written notice of non-renewal |
 | Annual Fees | USD 180,000 |
 | Total contract value (Initial Term) | USD 540,000 |
 | Payment terms | Undisputed invoices payable within 30 days of receipt of a valid invoice |
 | Entrapment response | Attendance within 1 hour |
-| Other lift fault response | Attendance within 4 hours |
-| Statutory examinations | Every lift, with inspection certificates delivered to the Customer |
+| Other elevator fault response | Attendance within 4 hours |
+| Statutory examinations | Every elevator, with inspection certificates delivered to the Customer |
 | Warranty period | 90 days |
 | Minimum insurance | USD 5,000,000 per claim |
 | Liability cap | Two (2) times the fees paid or payable in the preceding 12 months |
 | Termination for convenience | Customer, on 90 days' written notice |
-| Governing law | Laws of England and Wales |
+| Governing law | Laws of the State of New York |
 
 ## 6. Warranties
 
-6.1 The Supplier warrants that: (a) it has full power and authority to enter into and perform this Agreement; (b) the Services will be performed in accordance with clause 3 and Schedule 1; and (c) it holds, and will maintain throughout the Term, all licences, accreditations and consents required to perform the Services.
+6.1 The Supplier warrants that: (a) it has full power and authority to enter into and perform this Agreement; (b) the Services will be performed in accordance with clause 3 and Schedule 1; and (c) it holds, and will maintain throughout the Term, all licenses, accreditations and consents required to perform the Services.
 
 6.2 The Supplier warrants that all Services, and all parts, materials and workmanship supplied or carried out under this Agreement, will be free from defects for 90 days from performance or supply (the "**Warranty Period**"). During the Warranty Period the Supplier shall, at its own cost and promptly, re-perform the Services or repair or replace the defective items.
 
@@ -86,7 +86,7 @@ The Supplier shall maintain throughout the Term, with reputable insurers, public
 
 8.1 Each Party retains ownership of its pre-existing intellectual property rights. Nothing in this Agreement transfers ownership of those rights.
 
-8.2 Reports, records, certificates and other deliverables created by the Supplier specifically for the Customer under this Agreement shall belong to the Customer, and the Supplier grants the Customer a perpetual, royalty-free licence to use any Supplier materials incorporated in them for the Customer's business purposes.
+8.2 Reports, records, certificates and other deliverables created by the Supplier specifically for the Customer under this Agreement shall belong to the Customer, and the Supplier grants the Customer a perpetual, royalty-free license to use any Supplier materials incorporated in them for the Customer's business purposes.
 
 ## 9. Confidentiality
 
@@ -112,7 +112,7 @@ The Parties acknowledge that the Services do not involve the processing of perso
 
 12.1 The Supplier shall indemnify the Customer against all losses, damages, costs and expenses arising from third-party claims for personal injury, death or damage to property to the extent caused by the negligence or breach of this Agreement by the Supplier, its personnel or subcontractors.
 
-12.2 The indemnified Party shall promptly notify the indemnifying Party of any claim, allow it to conduct the defence and settlement (provided that it does not settle on terms imposing liability on the indemnified Party without consent, not to be unreasonably withheld), and give reasonable assistance at the indemnifying Party's cost.
+12.2 The indemnified Party shall promptly notify the indemnifying Party of any claim, allow it to conduct the defense and settlement (provided that it does not settle on terms imposing liability on the indemnified Party without consent, not to be unreasonably withheld), and give reasonable assistance at the indemnifying Party's cost.
 
 ## 13. Termination
 
@@ -120,9 +120,9 @@ The Parties acknowledge that the Services do not involve the processing of perso
 
 13.2 Either Party may terminate this Agreement immediately by written notice if the other Party: (a) commits a material breach that is incapable of remedy, or that it fails to remedy within 30 days of written notice requiring remedy; or (b) becomes insolvent, enters administration, liquidation or any arrangement with its creditors, or ceases to carry on business.
 
-13.3 The Customer may terminate immediately by written notice if the Supplier loses any licence or accreditation required to perform the Services or repeatedly fails to meet the response times in clause 3.2(a).
+13.3 The Customer may terminate immediately by written notice if the Supplier loses any license or accreditation required to perform the Services or repeatedly fails to meet the response times in clause 3.2(a).
 
-13.4 On termination or expiry, the Customer shall pay undisputed Fees for Services properly performed up to the termination date, the Supplier shall promptly deliver all outstanding inspection certificates and records relating to the lifts, and the Supplier shall co-operate in an orderly handover to the Customer or its replacement supplier.
+13.4 On termination or expiry, the Customer shall pay undisputed Fees for Services properly performed up to the termination date, the Supplier shall promptly deliver all outstanding inspection certificates and records relating to the elevators, and the Supplier shall co-operate in an orderly handover to the Customer or its replacement supplier.
 
 13.5 Clauses 6.2, 8, 9, 11, 12, 13.4, 16 and 17, and any other provision intended to survive, survive termination or expiry, subject to the periods stated in them.
 
@@ -152,18 +152,18 @@ Notices under this Agreement must be in writing and delivered by hand, by record
 
 ## 17. Governing Law and Jurisdiction
 
-17.1 This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes) are governed by the laws of England and Wales.
+17.1 This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes) are governed by the laws of the State of New York.
 
-17.2 The courts of England and Wales have exclusive jurisdiction to settle any such dispute or claim.
+17.2 the state and federal courts located in New York County, New York have exclusive jurisdiction to settle any such dispute or claim.
 
 ## Schedule 1 – Services and Service Levels
 
 | Item | Requirement |
 |---|---|
-| Scope | Planned preventive maintenance, breakdown repair and call-out for all passenger and service lifts at the Properties |
+| Scope | Planned preventive maintenance, breakdown repair and call-out for all passenger and service elevators at the Properties |
 | Passenger entrapment | Attendance within 1 hour of notification |
-| Other lift fault | Attendance within 4 hours of notification |
-| Statutory thorough examinations | Performed on every lift at the required statutory intervals; inspection certificates delivered to the Customer |
+| Other elevator fault | Attendance within 4 hours of notification |
+| State-mandated annual inspections | Performed on every elevator at the required statutory intervals; inspection certificates delivered to the Customer |
 | Reporting | Service report after each visit, recording work done, faults found and recommended works |
 | Warranty | 90 days, per clause 6.2 |
 
@@ -171,16 +171,16 @@ The Supplier shall maintain a 24-hour emergency contact line for each Property t
 
 ## Signatures
 
-Signed for and on behalf of **Seabright Hotels & Resorts Ltd**
+Signed for and on behalf of **Seabright Hotels & Resorts Inc**
 
 Name: Michael Brennan
 Title: Chief Procurement Officer
 Signature: ______________________
 Date: {{SIGNED_CUSTOMER}}
 
-Signed for and on behalf of **Halcyon Elevator & Lift Maintenance Ltd**
+Signed for and on behalf of **Halcyon Elevator & Lift Maintenance Inc**
 
 Name: Daniel Okafor
-Title: Authorised Signatory
+Title: Authorized Signatory
 Signature: ______________________
 Date: {{SIGNED_SUPPLIER}}

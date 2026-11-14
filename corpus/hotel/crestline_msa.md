@@ -4,9 +4,9 @@ This Master Services Agreement (the "Agreement") is made with effect from {{EFFE
 
 BETWEEN:
 
-(1) **Seabright Hotels & Resorts Ltd**, a company incorporated in England and Wales, being a hotel group that owns and operates six hotels (the "Client"); and
+(1) **Seabright Hotels & Resorts Inc**, a Delaware corporation, being a hotel group that owns and operates six hotels (the "Client"); and
 
-(2) **Crestline Laundry & Linen Services Ltd**, a company incorporated in England and Wales (the "Supplier").
+(2) **Crestline Laundry & Linen Services Inc**, a Delaware corporation (the "Supplier").
 
 ## 1. Definitions and Interpretation
 
@@ -54,7 +54,7 @@ BETWEEN:
 
 4.3 If the Client disputes any invoice in good faith, it shall notify the Supplier promptly, pay any undisputed portion in accordance with clause 4.2, and the parties shall seek to resolve the dispute promptly and in good faith.
 
-4.4 Unless otherwise stated in Schedule 2 – Charges, the Charges are exclusive of value added tax, which shall be payable in addition on receipt of a valid VAT invoice.
+4.4 Unless otherwise stated in Schedule 2 – Charges, the Charges are exclusive of sales tax, which shall be payable in addition on receipt of a valid invoice.
 
 ## 5. Confidentiality
 
@@ -80,7 +80,7 @@ BETWEEN:
 
 7.1 Each party retains ownership of its pre-existing intellectual property rights.
 
-7.2 The Client's brand names, logos, and any branded or marked linen remain the property of the Client or its licensors. The Client grants the Supplier a non-exclusive, non-transferable licence during the Term to use them solely to provide the Services.
+7.2 The Client's brand names, logos, and any branded or marked linen remain the property of the Client or its licensors. The Client grants the Supplier a non-exclusive, non-transferable license during the Term to use them solely to provide the Services.
 
 7.3 The Supplier shall not use the Client's names or marks for any publicity or marketing purpose without the Client's prior written consent.
 
@@ -102,7 +102,7 @@ BETWEEN:
 
 10.1 The Supplier shall indemnify the Client against all losses, damages, costs and expenses (including reasonable legal fees) arising from any third-party claim that the Services, or the Client's receipt of them in accordance with this Agreement, infringe that third party's intellectual property rights, or arising from the Supplier's negligence causing death, personal injury or damage to tangible property.
 
-10.2 The Client shall give the Supplier prompt notice of any claim, allow the Supplier to conduct its defence and settlement (provided that no settlement imposes liability on the Client without its consent, not to be unreasonably withheld), and give reasonable assistance at the Supplier's cost.
+10.2 The Client shall give the Supplier prompt notice of any claim, allow the Supplier to conduct its defense and settlement (provided that no settlement imposes liability on the Client without its consent, not to be unreasonably withheld), and give reasonable assistance at the Supplier's cost.
 
 ## 11. Limitation of Liability
 
@@ -126,6 +126,8 @@ BETWEEN:
 
 12.4 Termination or expiry does not affect accrued rights and remedies. Clauses 5, 11, 14 and this clause 12.4 survive termination or expiry, together with any other provision intended to do so.
 
+12.5 If a Property is sold or the Client ceases to own or operate it, the Client may terminate the Services at that Property on 30 days' written notice without liability for any early-termination charge.
+
 ## 13. Assignment and Subcontracting
 
 13.1 Neither party may assign, transfer or subcontract any of its rights or obligations under this Agreement without the other's prior written consent, not to be unreasonably withheld.
@@ -134,13 +136,13 @@ BETWEEN:
 
 ## 14. Governing Law and Jurisdiction
 
-14.1 This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes or claims) are governed by the laws of England and Wales.
+14.1 This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes or claims) are governed by the laws of the State of New York.
 
-14.2 The courts of England and Wales have exclusive jurisdiction to settle any such dispute or claim.
+14.2 the state and federal courts located in New York County, New York have exclusive jurisdiction to settle any such dispute or claim.
 
 ## 15. Notices
 
-15.1 Notices under this Agreement must be in writing and delivered by hand, by pre-paid first-class post or by recognised courier to the registered office of the receiving party (or another address notified in writing), marked for the attention of its company secretary.
+15.1 Notices under this Agreement must be in writing and delivered by hand, by pre-paid first-class post or by recognized courier to the registered office of the receiving party (or another address notified in writing), marked for the attention of its company secretary.
 
 15.2 A notice is deemed received on delivery if delivered by hand or courier, and on the second business day after posting if sent by first-class post.
 
@@ -148,7 +150,7 @@ BETWEEN:
 
 16.1 Entire agreement: This Agreement, with its Schedules, constitutes the entire agreement between the parties relating to its subject matter and supersedes all prior agreements, understandings and representations. Each party acknowledges that it has not relied on any statement not set out in this Agreement.
 
-16.2 Variation: No variation of this Agreement is effective unless in writing and signed by authorised representatives of both parties.
+16.2 Variation: No variation of this Agreement is effective unless in writing and signed by authorized representatives of both parties.
 
 16.3 Waiver: A failure or delay in exercising a right is not a waiver of it.
 
@@ -175,20 +177,20 @@ BETWEEN:
 
 | Item | Basis of Charge |
 |---|---|
-| Laundry and linen services | Charged per item processed, or per kilogramme, as set out in the rate card agreed in writing between the parties and signed by both parties. |
+| Laundry and linen services | Charged per item processed, or per kilogram, as set out in the rate card agreed in writing between the parties and signed by both parties. |
 | Invoicing | Issued after delivery of the Services and itemised by Property. |
 | Payment | Undisputed invoices payable within 45 days of receipt of a valid invoice, in accordance with clause 4.2. |
-| Taxes | Exclusive of VAT, which is payable in addition where applicable. |
+| Taxes | Exclusive of sales tax, which is payable in addition where applicable. |
 
 ## Signatures
 
-Signed for and on behalf of **Seabright Hotels & Resorts Ltd** by Helena Cruz, VP Technology Sourcing
+Signed for and on behalf of **Seabright Hotels & Resorts Inc** by Helena Cruz, VP Technology Sourcing
 
 Signature: ______________________
 
 Date: {{SIGNED_CUSTOMER}}
 
-Signed for and on behalf of **Crestline Laundry & Linen Services Ltd** by Grace Mbeki, Authorised Signatory
+Signed for and on behalf of **Crestline Laundry & Linen Services Inc** by Grace Mbeki, Authorized Signatory
 
 Signature: ______________________
 

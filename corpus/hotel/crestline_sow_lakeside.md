@@ -3,15 +3,15 @@
 | | |
 |---|---|
 | **Project** | Laundry and linen services at Seabright Lakeside Resort |
-| **Customer** | Seabright Hotels & Resorts Ltd |
-| **Supplier** | Crestline Laundry & Linen Services Ltd |
+| **Customer** | Seabright Hotels & Resorts Inc |
+| **Supplier** | Crestline Laundry & Linen Services Inc |
 | **Parent Agreement** | Master Services Agreement dated {{PARENT_DATE}} between the Customer and the Supplier |
 | **Effective Date** | {{EFFECTIVE}} |
 | **Period** | From the Effective Date until {{EXPIRY}} (24 months) (the "Initial Term") |
 | **Annual Fees** | USD 265,000 |
 | **Total Contract Value** | USD 530,000 |
 
-This Statement of Work ("SOW") is entered into between **Seabright Hotels & Resorts Ltd** (the "Customer"), a hotel group that owns and operates six hotels, and **Crestline Laundry & Linen Services Ltd** (the "Supplier"). It is issued under, and forms part of, the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "Parent Agreement"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement. If this SOW conflicts with the Parent Agreement, the Parent Agreement prevails unless this SOW expressly states that it overrides a specified provision.
+This Statement of Work ("SOW") is entered into between **Seabright Hotels & Resorts Inc** (the "Customer"), a hotel group that owns and operates six hotels, and **Crestline Laundry & Linen Services Inc** (the "Supplier"). It is issued under, and forms part of, the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "Parent Agreement"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement. If this SOW conflicts with the Parent Agreement, the Parent Agreement prevails unless this SOW expressly states that it overrides a specified provision.
 
 ## 1. Background
 
@@ -74,7 +74,7 @@ This Statement of Work ("SOW") is entered into between **Seabright Hotels & Reso
 
 6.5 **Disputes.** The Customer shall notify the Supplier of any disputed amount with reasons and pay the undisputed balance on time. The parties shall seek to resolve disputes under the Parent Agreement.
 
-6.6 All sums are exclusive of VAT, which shall be added where applicable at the prevailing rate on receipt of a valid VAT invoice.
+6.6 All sums are exclusive of sales tax, which shall be added where applicable at the prevailing rate on receipt of a valid invoice.
 
 ## 7. Acceptance
 
@@ -130,16 +130,16 @@ This SOW and the Parent Agreement constitute the entire agreement between the pa
 
 ## 18. Governing Law and Jurisdiction
 
-This SOW and any non-contractual obligations arising out of it are governed by the laws of England and Wales. The courts specified in the Parent Agreement shall have jurisdiction over any dispute, subject to any dispute resolution procedure in the Parent Agreement.
+This SOW and any non-contractual obligations arising out of it are governed by the laws of the State of New York. The courts specified in the Parent Agreement shall have jurisdiction over any dispute, subject to any dispute resolution procedure in the Parent Agreement.
 
 ## 19. Signatures
 
-Signed by the authorised representatives of the parties.
+Signed by the authorized representatives of the parties.
 
 | | **Customer** | **Supplier** |
 |---|---|---|
-| **Party** | Seabright Hotels & Resorts Ltd | Crestline Laundry & Linen Services Ltd |
+| **Party** | Seabright Hotels & Resorts Inc | Crestline Laundry & Linen Services Inc |
 | **Name** | Michael Brennan | Kenji Watanabe |
-| **Title** | Chief Procurement Officer | Authorised Signatory |
+| **Title** | Chief Procurement Officer | Authorized Signatory |
 | **Signature** | | |
 | **Date** | {{SIGNED_CUSTOMER}} | {{SIGNED_SUPPLIER}} |

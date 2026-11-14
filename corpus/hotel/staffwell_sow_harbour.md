@@ -1,6 +1,6 @@
 # Statement of Work No. 1
 
-This Statement of Work ("SOW") is made between **Seabright Hotels & Resorts Ltd** (the "Customer"), a hotel group that owns and operates six hotels, and **Staffwell Hospitality Staffing Ltd** (the "Supplier"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "MSA"). Capitalised terms not defined here have the meaning given in the MSA.
+This Statement of Work ("SOW") is made between **Seabright Hotels & Resorts Inc** (the "Customer"), a hotel group that owns and operates six hotels, and **Staffwell Hospitality Staffing Inc** (the "Supplier"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "MSA"). Capitalised terms not defined here have the meaning given in the MSA.
 
 1. **Effective Date and Term.** This SOW takes effect on {{EFFECTIVE}} (the "Effective Date") and continues for an initial term of 12 months, expiring on {{EXPIRY}}, unless terminated earlier in accordance with this SOW or the MSA.
 
@@ -12,11 +12,11 @@ This Statement of Work ("SOW") is made between **Seabright Hotels & Resorts Ltd*
 
 ## Services
 
-5. **Property.** The Services are delivered at Seabright Harbour Hotel (the "Property"), one of the Customer's hotels. The Customer contracts on behalf of the group, and the Services are performed at the Property.
+5. **Property.** The Services are delivered at Seabright Harbor Hotel (the "Property"), one of the Customer's hotels. The Customer contracts on behalf of the group, and the Services are performed at the Property.
 
 6. **Scope.** The Supplier shall provide hospitality staffing services to the Property, comprising the supply of suitably qualified and experienced temporary and agency personnel (the "Personnel") for the roles and shifts reasonably requested by the Property's management from time to time (the "Services").
 
-7. **Standard of Performance.** The Supplier shall perform the Services with reasonable skill and care, in accordance with good industry practice and applicable law, and shall ensure that Personnel are properly vetted, hold the right to work in the United Kingdom where applicable, are adequately trained, and are paid in accordance with applicable law.
+7. **Standard of Performance.** The Supplier shall perform the Services with reasonable skill and care, in accordance with good industry practice and applicable law, and shall ensure that Personnel are properly vetted, hold the right to work in the United States where applicable, are adequately trained, and are paid in accordance with applicable law.
 
 8. **Site Rules.** While at the Property, Personnel shall comply with the Customer's reasonable health, safety, security, uniform and conduct policies notified to the Supplier. The Customer may require the removal of any individual from the Property on reasonable grounds, and the Supplier shall promptly provide a suitable replacement.
 
@@ -28,11 +28,11 @@ This Statement of Work ("SOW") is made between **Seabright Hotels & Resorts Ltd*
 
 11. **Confidentiality.** Each party shall keep confidential all non-public information of the other party received in connection with this SOW, use it only to perform or receive the Services, and disclose it only to those of its personnel and advisers who need to know it and are bound by equivalent obligations, or as required by law or a competent authority. This clause survives termination.
 
-12. **Intellectual Property.** Each party retains ownership of its pre-existing intellectual property rights. Any materials created by the Supplier specifically for the Customer under this SOW belong to the Customer, and the Supplier assigns all rights in them to the Customer on creation. The Supplier grants the Customer a non-exclusive, royalty-free licence to use any Supplier materials incorporated in them to the extent necessary to use them.
+12. **Intellectual Property.** Each party retains ownership of its pre-existing intellectual property rights. Any materials created by the Supplier specifically for the Customer under this SOW belong to the Customer, and the Supplier assigns all rights in them to the Customer on creation. The Supplier grants the Customer a non-exclusive, royalty-free license to use any Supplier materials incorporated in them to the extent necessary to use them.
 
 13. **Warranties.** The Supplier warrants that it has the right and authority to enter into this SOW, that the Services will be performed in accordance with clause 7, and that the Services and Personnel will not infringe the rights of any third party. Each party warrants that it has full corporate authority to enter into this SOW.
 
-14. **Data Protection.** Each party shall comply with applicable data protection laws in connection with this SOW. Where the Supplier processes personal data on the Customer's behalf, it shall do so only on the Customer's documented instructions, implement appropriate technical and organisational security measures, ensure persons authorised to process such data are bound by confidentiality, assist the Customer in meeting its obligations to data subjects, notify the Customer without undue delay on becoming aware of a personal data breach, and delete or return the data at the end of the Services, in each case in accordance with the data protection terms of the MSA.
+14. **Data Protection.** Each party shall comply with applicable data protection laws in connection with this SOW. Where the Supplier processes personal data on the Customer's behalf, it shall do so only on the Customer's documented instructions, implement appropriate technical and organizational security measures, ensure persons authorized to process such data are bound by confidentiality, assist the Customer in meeting its obligations to data subjects, notify the Customer without undue delay on becoming aware of a personal data breach, and delete or return the data at the end of the Services, in each case in accordance with the data protection terms of the MSA.
 
 15. **Liability.** Each party's liability under or in connection with this SOW is governed by the liability provisions of the MSA, which apply to this SOW as if set out in full. Nothing in this SOW limits or excludes liability that cannot lawfully be limited or excluded.
 
@@ -48,7 +48,7 @@ This Statement of Work ("SOW") is made between **Seabright Hotels & Resorts Ltd*
 
 21. **Entire Agreement and Variation.** This SOW and the MSA constitute the entire agreement between the parties regarding the Services and supersede all prior discussions and understandings. No variation is effective unless in writing and signed by both parties.
 
-22. **Governing Law and Jurisdiction.** This SOW and any non-contractual obligations arising from it are governed by the laws of England and Wales. The courts of England and Wales have exclusive jurisdiction over any dispute arising from it.
+22. **Governing Law and Jurisdiction.** This SOW and any non-contractual obligations arising from it are governed by the laws of the State of New York. the state and federal courts located in New York County, New York have exclusive jurisdiction over any dispute arising from it.
 
 23. **Counterparts.** This SOW may be executed in counterparts, each of which is an original and which together constitute one agreement.
 
@@ -56,8 +56,8 @@ This Statement of Work ("SOW") is made between **Seabright Hotels & Resorts Ltd*
 
 | | |
 |---|---|
-| **Signed for and on behalf of Staffwell Hospitality Staffing Ltd (Supplier)** | **Signed for and on behalf of Seabright Hotels & Resorts Ltd (Customer)** |
+| **Signed for and on behalf of Staffwell Hospitality Staffing Inc (Supplier)** | **Signed for and on behalf of Seabright Hotels & Resorts Inc (Customer)** |
 | Signature: _(signed)_ | Signature: ______________________ |
 | Name: Daniel Okafor | Name: ______________________ |
-| Title: Authorised Signatory | Title: ______________________ |
+| Title: Authorized Signatory | Title: ______________________ |
 | Date: {{SIGNED_SUPPLIER}} | Date: ______________________ |

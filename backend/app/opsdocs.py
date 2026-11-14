@@ -16,7 +16,7 @@ from app.config import settings
 from app.db import SessionLocal
 from app.extract_rules import COMPANY_RX, customer_markers
 
-PARSER_VERSION = "6"        # bump when the readers change: parsed results are cached by content hash + this
+PARSER_VERSION = "7"        # bump when the readers change: parsed results are cached by content hash + this
 DOC_EXT = {".pdf", ".docx", ".md", ".txt"}
 AMT = r"(?:USD|US\$|\$)\s*([\d]{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)"
 DATE_RX = r"(?:\d{1,2}[ \-/][A-Za-z]{3,9}[ \-/,]*\d{4}|[A-Za-z]{3,9}\.? \d{1,2},? \d{4}|\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4})"
@@ -30,6 +30,9 @@ def kind_of(t: str) -> str | None:
         return "sla_report"
     if re.search(r"\binvoice\b|tax invoice|credit note", head):
         return "invoice"
+    if re.search(r"certificate of (?:liability )?insurance|insurance certificate|evidence of insurance|haccp|food[- ]safety certificat|attestation of compliance|"
+                 r"certificate of (?:\w+ )?inspection|inspection certificate|certificate of compliance", head):
+        return "certificate"
     return None
 
 
@@ -157,6 +160,25 @@ def parse_acceptance(t: str) -> dict:
     return r
 
 
+CERT_KIND = [("payment_card_data", r"pci[- ]dss|attestation of compliance|payment[- ]card"), ("food_safety", r"haccp|food[- ]safety"),
+             ("inspection_certificates", r"certificate of (?:\w+ )?inspection|inspection certificate|elevator|boiler|state[- ]mandated"), ("insurance", r"insurance|insured|policy")]
+
+
+def parse_certificate(t: str) -> dict:
+    """A vendor's compliance certificate: who holds it, what kind it is, when it runs out. The holder is the insured / certified company, never us."""
+    cm = customer_markers()
+    vendor = None
+    m = re.search(r"(?:insured|named insured|issued to|certified (?:company|entity|organi[sz]ation)|merchant|service provider|contractor|supplier|holder of this certificate)\s*[:|]\s*([^\n|]{3,90})", t, re.I)
+    if m:
+        c = _company(m.group(1))
+        vendor = c if c and not any(k in c.lower() for k in cm) else None
+    head = t[:700].lower()
+    kind = next((k for k, rx in CERT_KIND if re.search(rx, head)), None)
+    ref = re.search(r"(?:certificate|policy|reference|report|attestation)\s*(?:no\.?|number|#|id|ref(?:erence)?)\s*[:|]?\s*([A-Z0-9][A-Z0-9\-/]{3,30})", t, re.I)
+    return {"vendor": vendor or _vendor(t), "kind": kind, "expiry_date": _date(r"expir(?:y|es|ation)(?: date)?|valid (?:until|through|to)|policy period[^\n]{0,40}?\bto\b|next inspection due|good through", t),
+            "received_on": _date(r"issued(?: on)?|date of issue|issue date|effective(?: date)?|inspection date|dated", t), "reference": ref.group(1) if ref else None}
+
+
 # ------------------------------------------------------------------ Claude gap filler
 def _tool(kind: str) -> dict:
     props = {"invoice": {"vendor": "string", "contract_title": "string (the agreement / SOW / work order the invoice refers to, as written)", "invoice_no": "string", "invoice_date": "YYYY-MM-DD",
@@ -188,7 +210,7 @@ def read(path: Path) -> tuple[str | None, list[dict]]:
     t = _clean(docstruct.load_document(path))
     kind = kind_of(t)
     if not kind:
-        raise ValueError("not recognised as an invoice, service-level report or acceptance certificate")
+        raise ValueError("not recognised as an invoice, service-level report, acceptance certificate or compliance certificate")
     if kind == "invoice":
         row = _fill("invoice", t, parse_invoice(t))
         if not (row.get("amount") and row.get("invoice_date")):
@@ -202,6 +224,11 @@ def read(path: Path) -> tuple[str | None, list[dict]]:
         if not r["period"] or not r["rows"]:
             raise ValueError("service-level report without a period or recognised service levels")
         return kind, [dict(contract_title=r["contract_title"], vendor=r["vendor"], period=r["period"], **x) for x in r["rows"]]
+    if kind == "certificate":
+        row = parse_certificate(t)
+        if not (row.get("vendor") and row.get("kind") and row.get("expiry_date")):
+            raise ValueError("certificate without a readable holder, kind or expiry date")
+        return kind, [row]
     row = _fill("acceptance", t, parse_acceptance(t))
     if not (row.get("completed_on") and row.get("milestone")):
         raise ValueError("acceptance certificate without a milestone or date")

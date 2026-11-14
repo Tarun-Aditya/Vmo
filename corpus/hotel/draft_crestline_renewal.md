@@ -1,14 +1,14 @@
-# Statement of Work No. 1 – Laundry and Linen Services at Seabright Harbour Hotel
+# Statement of Work No. 1 – Laundry and Linen Services at Seabright Harbor Hotel
 
 | | |
 |---|---|
-| **Project** | Laundry and linen processing services at Seabright Harbour Hotel |
+| **Project** | Laundry and linen processing services at Seabright Harbor Hotel |
 | **Parent Agreement** | Master Services Agreement between the Parties dated {{PARENT_DATE}} (the "Parent Agreement") |
 | **Period** | Effective Date {{EFFECTIVE}} until {{EXPIRY}} (24 months), subject to renewal under this SOW |
 | **Fees** | USD 348,000 per year; total contract value USD 696,000 for the initial term |
 | **Status** | Vendor draft – not yet signed |
 
-This Statement of Work No. 1 (the "SOW") is made between **Seabright Hotels & Resorts Ltd** (the "Customer"), a hotel group that owns and operates six hotels, and **Crestline Laundry & Linen Services Ltd** (the "Supplier"). The Customer enters into this SOW on its own behalf and for the benefit of the hotel at which the Services are delivered, namely **Seabright Harbour Hotel** (the "Property"). Where the Customer's other hotels later receive Services, they are also "Properties" only by written agreement of the Parties.
+This Statement of Work No. 1 (the "SOW") is made between **Seabright Hotels & Resorts Inc** (the "Customer"), a hotel group that owns and operates six hotels, and **Crestline Laundry & Linen Services Inc** (the "Supplier"). The Customer enters into this SOW on its own behalf and for the benefit of the hotel at which the Services are delivered, namely **Seabright Harbor Hotel** (the "Property"). Where the Customer's other hotels later receive Services, they are also "Properties" only by written agreement of the Parties.
 
 This SOW is issued under, and forms part of, the Parent Agreement. If this SOW conflicts with the Parent Agreement, this SOW prevails solely as to the Services described here and only to the extent of the conflict.
 
@@ -124,11 +124,11 @@ Each Party shall comply with applicable data protection law. To the extent the S
 
 ## 14. Indemnity
 
-14.1 The Supplier shall indemnify the Customer against third-party claims arising from the Supplier's negligence or wilful misconduct, its breach of applicable law in performing the Services, or personal injury or property damage caused by its personnel.
+14.1 The Supplier shall indemnify the Customer against third-party claims arising from the Supplier's negligence or willful misconduct, its breach of applicable law in performing the Services, or personal injury or property damage caused by its personnel.
 
-14.2 The Customer shall indemnify the Supplier against third-party claims arising from the Customer's breach of applicable law in connection with the linen or the Property, or the Customer's negligence or wilful misconduct.
+14.2 The Customer shall indemnify the Supplier against third-party claims arising from the Customer's breach of applicable law in connection with the linen or the Property, or the Customer's negligence or willful misconduct.
 
-14.3 The indemnified Party shall give prompt notice of the claim, allow the indemnifying Party to control the defence, and provide reasonable cooperation at the indemnifying Party's cost.
+14.3 The indemnified Party shall give prompt notice of the claim, allow the indemnifying Party to control the defense, and provide reasonable cooperation at the indemnifying Party's cost.
 
 ## 15. Limitation of Liability
 
@@ -154,7 +154,7 @@ Each Party shall comply with applicable data protection law. To the extent the S
 
 This SOW is a draft and is unsigned.
 
-| **Seabright Hotels & Resorts Ltd** | **Crestline Laundry & Linen Services Ltd** |
+| **Seabright Hotels & Resorts Inc** | **Crestline Laundry & Linen Services Inc** |
 |---|---|
 | Signature: ______________________ | Signature: ______________________ |
 | Name: ______________________ | Name: ______________________ |

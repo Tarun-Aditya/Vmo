@@ -3,7 +3,6 @@ The seeded data therefore takes exactly the path a document dropped into the fol
 Idempotent: content tables are rebuilt; admin configuration (KCC / metrics / checklist) is kept."""
 from __future__ import annotations
 
-import csv
 import json
 import os
 import shutil
@@ -60,15 +59,13 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
         from app.docgen import ops_fixtures
 
         log(f"fixture documents written: {ops_fixtures.generate(seed_date)}")
-        if corpus == "hotel":           # the certificates received so far, as a CSV export (written after the fixtures, which rebuild the feeds folder)
+        if corpus == "hotel":           # the certificates received so far, as documents (written after the fixtures, which rebuild the feeds folder)
             from app.docgen import hotel_spec
 
-            (root / "feeds").mkdir(parents=True, exist_ok=True)
-            with (root / "feeds" / "certificates.csv").open("w", newline="") as fh:
-                w = csv.writer(fh)
-                w.writerow(["vendor", "kind", "expiry_date", "received_on", "reference"])
-                for vendor, kind, days, ref in hotel_spec.CERTIFICATES:
-                    w.writerow([vendor, kind, seed_date + timedelta(days=days), seed_date + timedelta(days=days - 365), ref])
+            cdir = root / "feeds" / "certificates"
+            cdir.mkdir(parents=True, exist_ok=True)
+            for n, (vendor, kind, days, ref) in enumerate(hotel_spec.CERTIFICATES, 1):          # each certificate as the document the vendor would send
+                (cdir / f"certificate_{n:02d}.md").write_text(hotel_spec.certificate_md(vendor, kind, seed_date + timedelta(days=days), seed_date + timedelta(days=days - 365), ref))
 
         log(f"feeds loaded: {feeds.run_feeds('seed')}")
     except Exception as e:

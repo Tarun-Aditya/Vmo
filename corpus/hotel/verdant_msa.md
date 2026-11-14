@@ -2,9 +2,9 @@
 
 This Master Services Agreement (the "Agreement") is made on {{EFFECTIVE}} (the "Effective Date") between:
 
-**Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels ("we", "us" or the "Customer"); and
+**Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels ("we", "us" or the "Customer"); and
 
-**Verdant Pest Control Ltd** ("you" or the "Supplier").
+**Verdant Pest Control Inc** ("you" or the "Supplier").
 
 In this Agreement, "we" and "us" mean the Customer, and "you" means the Supplier. The services are delivered at individual hotels (each a "Property"). At the Effective Date, the Property covered by this Agreement is Seabright Lakeside Resort.
 
@@ -39,19 +39,19 @@ After the Initial Term, this Agreement renews automatically for successive perio
 
 The annual fee for the Services is USD 36,000 (the "Fees"). The total contract value for the Initial Term is USD 36,000.
 
-The Fees cover everything needed to perform the Services, including labour, materials, equipment and travel, unless we agree otherwise in writing.
+The Fees cover everything needed to perform the Services, including labor, materials, equipment and travel, unless we agree otherwise in writing.
 
 You will send us valid invoices for the Fees. A valid invoice must identify the Property, the period covered and the amount due, and must be addressed to the Customer.
 
 We will pay undisputed invoices within 30 days of receiving a valid invoice. If we dispute part of an invoice in good faith, we will tell you promptly, pay the undisputed part on time, and work with you to resolve the rest quickly.
 
-Fees are stated exclusive of any applicable VAT or similar tax, which we will pay in addition against a valid tax invoice.
+Fees are stated exclusive of any applicable sales tax or similar tax, which we will pay in addition against a valid tax invoice.
 
 ## Our promises to each other
 
 You promise that the Services will be performed with reasonable skill and care and in accordance with this Agreement. This is a services warranty only. No express warranty period applies, and nothing in this Agreement limits any right we have to require you to re-perform defective Services.
 
-You also promise that you hold, and will keep, all licences, certifications and approvals needed to perform the Services and to use the products you apply.
+You also promise that you hold, and will keep, all licenses, certifications and approvals needed to perform the Services and to use the products you apply.
 
 Each of us promises that we have authority to enter into this Agreement.
 
@@ -77,7 +77,7 @@ The Services do not involve processing personal data on our behalf. If that chan
 
 Each of us keeps ownership of the intellectual property we owned before this Agreement or develop independently of it.
 
-We own the reports and records you produce specifically for the Property under this Agreement. You grant us a non-exclusive, perpetual licence to use any of your materials embedded in them for our own business purposes.
+We own the reports and records you produce specifically for the Property under this Agreement. You grant us a non-exclusive, perpetual license to use any of your materials embedded in them for our own business purposes.
 
 ## If something goes wrong
 
@@ -85,7 +85,7 @@ We own the reports and records you produce specifically for the Property under t
 
 **What the cap does not cover.** Nothing in this Agreement limits or excludes liability for death or personal injury caused by negligence, for fraud or fraudulent misrepresentation, or for anything else that cannot lawfully be limited or excluded.
 
-**Indemnity.** You will indemnify us against losses, fines, and third-party claims arising from your breach of applicable law, or from damage to property or injury to people caused by your negligence or that of your staff or subcontractors in performing the Services. We will tell you promptly of any claim, let you control its defence with our reasonable cooperation, and not settle it without your consent (not to be unreasonably withheld). The indemnity is subject to the liability cap above to the extent the law allows.
+**Indemnity.** You will indemnify us against losses, fines, and third-party claims arising from your breach of applicable law, or from damage to property or injury to people caused by your negligence or that of your staff or subcontractors in performing the Services. We will tell you promptly of any claim, let you control its defense with our reasonable cooperation, and not settle it without your consent (not to be unreasonably withheld). The indemnity is subject to the liability cap above to the extent the law allows.
 
 Each of us will take reasonable steps to limit our losses.
 
@@ -130,20 +130,20 @@ Notices under this Agreement must be in writing and sent by hand, by courier, or
 
 **Counterparts.** This Agreement may be signed in counterparts, including electronically, each of which is an original.
 
-**Governing law and courts.** This Agreement and any dispute arising from it are governed by the laws of England and Wales. The courts of England and Wales have exclusive jurisdiction.
+**Governing law and courts.** This Agreement and any dispute arising from it are governed by the laws of the State of New York. the state and federal courts located in New York County, New York have exclusive jurisdiction.
 
 ## Signatures
 
-Signed for and on behalf of **Seabright Hotels & Resorts Ltd** (the Customer):
+Signed for and on behalf of **Seabright Hotels & Resorts Inc** (the Customer):
 
 Name: Michael Brennan
 Title: Chief Procurement Officer
 Signature: ______________________
 Date: {{SIGNED_CUSTOMER}}
 
-Signed for and on behalf of **Verdant Pest Control Ltd** (the Supplier):
+Signed for and on behalf of **Verdant Pest Control Inc** (the Supplier):
 
 Name: Daniel Okafor
-Title: Authorised Signatory
+Title: Authorized Signatory
 Signature: ______________________
 Date: {{SIGNED_SUPPLIER}}

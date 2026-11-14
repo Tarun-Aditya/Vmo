@@ -1,6 +1,6 @@
 # Master Services Agreement
 
-This Master Services Agreement (the "Agreement") is made with effect from {{EFFECTIVE}} (the "Effective Date") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Evergreen Waste & Recycling Ltd** (the "Supplier"). The Supplier will deliver the Services at the Customer's hotel known as Seabright Old Town Boutique (the "Property"). Where the Customer later designates another hotel for the Services by written agreement, that hotel is also a "Property".
+This Master Services Agreement (the "Agreement") is made with effect from {{EFFECTIVE}} (the "Effective Date") between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer"), and **Evergreen Waste & Recycling Inc** (the "Supplier"). The Supplier will deliver the Services at the Customer's hotel known as Seabright Old Town Boutique (the "Property"). Where the Customer later designates another hotel for the Services by written agreement, that hotel is also a "Property".
 
 ## 1. Term and Renewal
 
@@ -10,13 +10,13 @@ This Master Services Agreement (the "Agreement") is made with effect from {{EFFE
 
 ## 2. Fees and Payment
 
-2.1 The annual fees for the Services are USD 54,000 (the "Fees"). The total contract value for the Initial Term is USD 54,000. The Fees are the Supplier's entire remuneration for the Services, including all labour, equipment, vehicles, transport and disposal costs, unless the parties agree otherwise in writing.
+2.1 The annual fees for the Services are USD 54,000 (the "Fees"). The total contract value for the Initial Term is USD 54,000. The Fees are the Supplier's entire remuneration for the Services, including all labor, equipment, vehicles, transport and disposal costs, unless the parties agree otherwise in writing.
 
 2.2 The Supplier shall invoice the Customer for the Fees in the manner and at the intervals agreed in writing between the parties. Each invoice must be valid, itemised and addressed to the Customer, and must identify the Property.
 
 2.3 The Customer shall pay each undisputed invoice within 30 days of receipt of a valid invoice. The Customer may withhold any amount disputed in good faith, shall notify the Supplier of the dispute promptly with reasons, and shall pay any amount later agreed or determined to be due within 30 days of that agreement or determination. The parties shall work together in good faith to resolve disputes.
 
-2.4 Fees are stated exclusive of applicable value added tax or similar sales tax, which the Customer shall pay in addition against a valid tax invoice.
+2.4 Fees are stated exclusive of applicable sales tax or similar sales tax, which the Customer shall pay in addition against a valid tax invoice.
 
 ## 3. Services
 
@@ -24,9 +24,9 @@ This Master Services Agreement (the "Agreement") is made with effect from {{EFFE
 
 3.2 The Supplier shall perform the Services with reasonable skill and care, using suitably qualified and experienced personnel, in accordance with applicable law and the Customer's reasonable site, safety and security rules notified to the Supplier.
 
-3.3 The Supplier shall hold and maintain all permits, licences and registrations required by law to carry, treat and dispose of waste, and shall provide waste transfer documentation on request.
+3.3 The Supplier shall hold and maintain all permits, licenses and registrations required by law to carry, treat and dispose of waste, and shall provide waste transfer documentation on request.
 
-3.4 The Supplier shall perform the Services so as to minimise disruption to guests and hotel operations. The Customer shall give the Supplier reasonable access to the Property and the information reasonably needed to perform the Services.
+3.4 The Supplier shall perform the Services so as to minimize disruption to guests and hotel operations. The Customer shall give the Supplier reasonable access to the Property and the information reasonably needed to perform the Services.
 
 ## 4. Confidentiality
 
@@ -40,7 +40,7 @@ This Master Services Agreement (the "Agreement") is made with effect from {{EFFE
 
 5.1 Each party retains ownership of its pre-existing intellectual property rights. Nothing in this Agreement transfers ownership of any such rights.
 
-5.2 The Customer grants the Supplier a non-exclusive, non-transferable licence during the term to use the Customer's name and materials solely as necessary to perform the Services. The Supplier shall not use the Customer's name or marks for publicity without prior written consent.
+5.2 The Customer grants the Supplier a non-exclusive, non-transferable license during the term to use the Customer's name and materials solely as necessary to perform the Services. The Supplier shall not use the Customer's name or marks for publicity without prior written consent.
 
 5.3 Any reports, data or documentation created by the Supplier specifically for the Customer under this Agreement are owned by the Customer, and the Supplier assigns all rights in them to the Customer, save that the Supplier retains its general methods and know-how.
 
@@ -58,7 +58,7 @@ This Master Services Agreement (the "Agreement") is made with effect from {{EFFE
 
 8.1 The Supplier shall indemnify the Customer against losses, damages, fines and reasonable costs arising from third-party claims relating to (a) death or personal injury or damage to property caused by the negligence of the Supplier or its personnel, (b) the Supplier's breach of applicable environmental or waste laws, or (c) infringement of third-party intellectual property rights by the Services.
 
-8.2 The indemnified party shall give prompt notice of any claim, allow the indemnifying party to conduct the defence and settlement (not to settle in a way that imposes liability on the indemnified party without its consent, such consent not to be unreasonably withheld), and give reasonable assistance at the indemnifying party's cost.
+8.2 The indemnified party shall give prompt notice of any claim, allow the indemnifying party to conduct the defense and settlement (not to settle in a way that imposes liability on the indemnified party without its consent, such consent not to be unreasonably withheld), and give reasonable assistance at the indemnifying party's cost.
 
 ## 9. Limitation of Liability
 
@@ -100,16 +100,16 @@ This Master Services Agreement (the "Agreement") is made with effect from {{EFFE
 
 ## 13. Governing Law and Jurisdiction
 
-13.1 This Agreement and any dispute or claim arising out of or in connection with it, including non-contractual disputes or claims, are governed by the laws of England and Wales.
+13.1 This Agreement and any dispute or claim arising out of or in connection with it, including non-contractual disputes or claims, are governed by the laws of the State of New York.
 
-13.2 The courts of England and Wales have exclusive jurisdiction to settle any such dispute or claim.
+13.2 the state and federal courts located in New York County, New York have exclusive jurisdiction to settle any such dispute or claim.
 
 ## Signatures
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd (Customer)** | **Signed for and on behalf of Evergreen Waste & Recycling Ltd (Supplier)** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc (Customer)** | **Signed for and on behalf of Evergreen Waste & Recycling Inc (Supplier)** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Grace Mbeki |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

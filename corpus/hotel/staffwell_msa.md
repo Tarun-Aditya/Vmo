@@ -2,9 +2,9 @@
 
 This Agreement is made on {{EFFECTIVE}} between:
 
-(1) **Seabright Hotels & Resorts Ltd**, a company incorporated in England and Wales, which owns and operates six hotels (the **Client**); and
+(1) **Seabright Hotels & Resorts Inc**, a Delaware corporation, which owns and operates six hotels (the **Client**); and
 
-(2) **Staffwell Hospitality Staffing Ltd**, a company incorporated in England and Wales (the **Supplier**).
+(2) **Staffwell Hospitality Staffing Inc**, a Delaware corporation (the **Supplier**).
 
 ## 1. Definitions and Interpretation
 
@@ -18,7 +18,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 1.1.4 **Confidential Information** means all information of a confidential nature disclosed by or on behalf of one party to the other in connection with this Agreement, including the Client's guest, employee and commercial information;
 
-1.1.5 **Personal Data** has the meaning given in the UK GDPR;
+1.1.5 **Personal Data** has the meaning given in the applicable United States privacy laws;
 
 1.1.6 **Properties** means the six hotels owned and operated by the Client at which the Services are delivered; and
 
@@ -40,7 +40,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 3.3 Where an Agency Worker engaged in housekeeping is absent, the Supplier shall supply a replacement housekeeping worker within 4 hours of the absence being notified or becoming known to the Supplier.
 
-3.4 The Supplier shall pay all Agency Workers at least the applicable minimum wage and shall comply with all applicable working-time rules, and shall on request provide the Client with reasonable evidence of such compliance.
+3.4 The Supplier shall pay all Agency Workers at least the applicable minimum wage and shall comply with all applicable wage-and-hour laws, and shall on request provide the Client with reasonable evidence of such compliance.
 
 3.5 The Supplier remains the employer or engager of the Agency Workers and is solely responsible for their pay, tax, national insurance, holiday entitlement and other statutory obligations. Nothing in this Agreement creates an employment relationship between the Client and any Agency Worker.
 
@@ -54,7 +54,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 4.3 If the Client disputes any invoice in good faith, it shall notify the Supplier promptly, pay any undisputed part, and the parties shall seek to resolve the dispute in good faith. Payment of an invoice does not waive the Client's right to dispute it later.
 
-4.4 Charges are exclusive of VAT, which shall be payable by the Client at the applicable rate on receipt of a valid VAT invoice.
+4.4 Charges are exclusive of sales tax, which shall be payable by the Client at the applicable rate on receipt of a valid invoice.
 
 ## 5. Warranties
 
@@ -68,15 +68,15 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 6.1 The parties acknowledge that the Services involve the processing of Personal Data of the Client's customers and employees.
 
-6.2 Each party shall comply with its obligations under applicable data protection law, including the UK GDPR and the Data Protection Act 2018.
+6.2 Each party shall comply with its obligations under applicable data protection law, including the California Consumer Privacy Act and other applicable United States federal and state privacy laws.
 
 6.3 The Supplier shall process such Personal Data only to the extent necessary to perform the Services and in accordance with the Client's lawful written instructions, and shall:
 
-6.3.1 keep the Personal Data confidential and ensure that persons authorised to process it are bound by appropriate confidentiality obligations;
+6.3.1 keep the Personal Data confidential and ensure that persons authorized to process it are bound by appropriate confidentiality obligations;
 
-6.3.2 implement appropriate technical and organisational measures to protect it against unauthorised or unlawful processing and accidental loss, destruction or damage;
+6.3.2 implement appropriate technical and organizational measures to protect it against unauthorised or unlawful processing and accidental loss, destruction or damage;
 
-6.3.3 not transfer it outside the United Kingdom except in compliance with applicable data protection law;
+6.3.3 not transfer it outside the United States except in compliance with applicable data protection law;
 
 6.3.4 notify the Client without undue delay on becoming aware of any personal data breach affecting it; and
 
@@ -94,7 +94,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 8.1 Each party retains ownership of its pre-existing intellectual property rights.
 
-8.2 The Client grants the Supplier a non-exclusive, non-transferable, royalty-free licence during the term to use the Client's materials, procedures and trade marks solely to perform the Services.
+8.2 The Client grants the Supplier a non-exclusive, non-transferable, royalty-free license during the term to use the Client's materials, procedures and trade marks solely to perform the Services.
 
 8.3 Any intellectual property rights in materials created specifically for the Client in the course of the Services vest in the Client, and the Supplier assigns them to the Client with full title guarantee.
 
@@ -112,7 +112,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 10.1 The Supplier shall indemnify the Client against all losses, liabilities, costs and expenses (including reasonable legal fees) arising from any third-party claim, including any claim by an Agency Worker or a taxing or regulatory authority, relating to the Supplier's failure to comply with clause 3.4 or clause 3.5 or its breach of applicable employment law.
 
-10.2 The indemnified party shall notify the indemnifying party promptly of any claim, allow it to conduct the defence and settlement, and give reasonable assistance at the indemnifying party's cost. This clause is subject to clause 9.
+10.2 The indemnified party shall notify the indemnifying party promptly of any claim, allow it to conduct the defense and settlement, and give reasonable assistance at the indemnifying party's cost. This clause is subject to clause 9.
 
 ## 11. Insurance
 
@@ -162,7 +162,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 15.7 **Counterparts.** This Agreement may be executed in counterparts, each of which is an original and which together constitute one agreement.
 
-15.8 **Governing law and jurisdiction.** This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes) are governed by the laws of England and Wales, and the courts of England and Wales have exclusive jurisdiction.
+15.8 **Governing law and jurisdiction.** This Agreement and any dispute or claim arising out of or in connection with it (including non-contractual disputes) are governed by the laws of the State of New York, and the state and federal courts located in New York County, New York have exclusive jurisdiction.
 
 ## Schedule 1 – Services
 
@@ -172,7 +172,7 @@ This Agreement is made on {{EFFECTIVE}} between:
 
 3. The Supplier shall supply replacement housekeeping staff within 4 hours when a worker is absent, in accordance with clause 3.3.
 
-4. The Supplier shall pay all Agency Workers at least the applicable minimum wage and comply with working-time rules, in accordance with clause 3.4.
+4. The Supplier shall pay all Agency Workers at least the applicable minimum wage and comply with wage-and-hour laws, in accordance with clause 3.4.
 
 5. The Supplier shall nominate an account manager who shall act as the Client's point of contact for the Services and shall attend service review meetings reasonably requested by the Client.
 
@@ -193,8 +193,8 @@ This Agreement has been entered into on the date stated at its beginning.
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd** | **Signed for and on behalf of Staffwell Hospitality Staffing Ltd** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc** | **Signed for and on behalf of Staffwell Hospitality Staffing Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Michael Brennan | Name: Kenji Watanabe |
-| Title: Chief Procurement Officer | Title: Authorised Signatory |
+| Title: Chief Procurement Officer | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

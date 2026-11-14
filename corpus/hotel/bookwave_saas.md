@@ -1,6 +1,6 @@
 # SOFTWARE AS A SERVICE AGREEMENT
 
-This Software as a Service Agreement (the "**Agreement**") is entered into with effect from {{EFFECTIVE}} (the "**Effective Date**") between **BookWave Distribution Inc** ("**BookWave**" or the "**Supplier**") and **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "**Customer**"). The Services are delivered for use at the Customer's individual hotels (each a "**Property**" and together the "**Properties**").
+This Software as a Service Agreement (the "**Agreement**") is entered into with effect from {{EFFECTIVE}} (the "**Effective Date**") between **BookWave Distribution Inc** ("**BookWave**" or the "**Supplier**") and **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "**Customer**"). The Services are delivered for use at the Customer's individual hotels (each a "**Property**" and together the "**Properties**").
 
 ## 1. DEFINITIONS AND INTERPRETATION
 
@@ -50,11 +50,11 @@ This Software as a Service Agreement (the "**Agreement**") is entered into with 
 
 ## 6. DATA PROTECTION
 
-6.1 The Services involve the processing of personal data of the Customer's customers and employees. BookWave receives guest names, contact details and payment references for each Booking and may use them to provide the Services, process and fulfil Bookings, calculate commission, prevent fraud, and comply with law.
+6.1 The Services involve the processing of personal data of the Customer's customers and employees. BookWave receives guest names, contact details and payment references for each Booking and may use them to provide the Services, process and fulfill Bookings, calculate commission, prevent fraud, and comply with law.
 
 6.2 The Customer is responsible for the accuracy and lawfulness of Customer Personal Data supplied to BookWave and warrants that it has all notices, consents and legal bases necessary for BookWave to process it as contemplated by this Agreement.
 
-6.3 BookWave shall maintain administrative, technical and organisational measures that it considers appropriate to protect Customer Personal Data against unauthorised access, loss or disclosure, and may engage subcontractors and affiliates for the Services.
+6.3 BookWave shall maintain administrative, technical and organizational measures that it considers appropriate to protect Customer Personal Data against unauthorised access, loss or disclosure, and may engage subcontractors and affiliates for the Services.
 
 6.4 Each party shall comply with data protection laws applicable to it. The Customer acknowledges that BookWave may retain and use Customer Personal Data to the extent required for legal, accounting, audit, dispute-resolution and fraud-prevention purposes.
 
@@ -70,7 +70,7 @@ This Software as a Service Agreement (the "**Agreement**") is entered into with 
 
 8.1 BookWave and its licensors retain all right, title and interest in the Services, the BookWave Channel, and all software, documentation, data models, improvements and derivative works, and all related intellectual property rights. No rights are granted except as expressly stated.
 
-8.2 The Customer retains ownership of its pre-existing content, trademarks, rates and Property descriptions ("**Customer Content**") and grants BookWave a non-exclusive, worldwide licence during the Term to host, display, distribute and use Customer Content to provide, market and promote the Services and the Properties through the BookWave Channel.
+8.2 The Customer retains ownership of its pre-existing content, trademarks, rates and Property descriptions ("**Customer Content**") and grants BookWave a non-exclusive, worldwide license during the Term to host, display, distribute and use Customer Content to provide, market and promote the Services and the Properties through the BookWave Channel.
 
 8.3 BookWave may use aggregated and de-identified data derived from the use of the Services for analytics, benchmarking and product improvement. Any feedback provided by the Customer may be used by BookWave without restriction or obligation.
 
@@ -86,7 +86,7 @@ This Software as a Service Agreement (the "**Agreement**") is entered into with 
 
 10.1 The Customer shall defend, indemnify and hold harmless BookWave and its affiliates, officers and personnel from all claims, losses, liabilities, damages, costs and expenses (including reasonable legal fees) arising from: (a) Customer Content or Customer Personal Data supplied by the Customer; (b) the Customer's breach of Clauses 2.3 or 6.2; (c) any Property's services, facilities, rates, cancellations, overbookings, guest injury or guest complaints; or (d) the Customer's breach of applicable law.
 
-10.2 BookWave shall defend the Customer against a third-party claim alleging that the Services, as provided by BookWave, infringe that third party's intellectual property rights, and pay damages finally awarded or settlements agreed by BookWave, provided that the Customer promptly notifies BookWave, gives it sole control of the defence and cooperates. BookWave has no liability to the extent a claim arises from Customer Content, modifications, combinations with other products, or use contrary to this Agreement. If a claim arises, BookWave may procure the right to continue use, modify the Services, or terminate the affected Services. This Clause 10.2 states BookWave's entire liability for infringement claims.
+10.2 BookWave shall defend the Customer against a third-party claim alleging that the Services, as provided by BookWave, infringe that third party's intellectual property rights, and pay damages finally awarded or settlements agreed by BookWave, provided that the Customer promptly notifies BookWave, gives it sole control of the defense and cooperates. BookWave has no liability to the extent a claim arises from Customer Content, modifications, combinations with other products, or use contrary to this Agreement. If a claim arises, BookWave may procure the right to continue use, modify the Services, or terminate the affected Services. This Clause 10.2 states BookWave's entire liability for infringement claims.
 
 ## 11. LIMITATION OF LIABILITY
 
@@ -100,7 +100,7 @@ This Software as a Service Agreement (the "**Agreement**") is entered into with 
 
 ## 12. FORCE MAJEURE
 
-Neither party is liable for delay or failure in performance (other than payment) caused by events beyond its reasonable control, including natural disaster, epidemic, war, terrorism, governmental action, labour disputes, utility, telecommunications or hosting failures, or cyber-attack not caused by its negligence.
+Neither party is liable for delay or failure in performance (other than payment) caused by events beyond its reasonable control, including natural disaster, epidemic, war, terrorism, governmental action, labor disputes, utility, telecommunications or hosting failures, or cyber-attack not caused by its negligence.
 
 ## 13. INSURANCE AND COMPLIANCE
 
@@ -132,8 +132,8 @@ This Agreement and any dispute arising out of or in connection with it are gover
 
 | | **For the Customer** | **For the Supplier** |
 |---|---|---|
-| Party | Seabright Hotels & Resorts Ltd | BookWave Distribution Inc |
+| Party | Seabright Hotels & Resorts Inc | BookWave Distribution Inc |
 | Name | Helena Cruz | Anika Rao |
-| Title | VP Technology Sourcing | Authorised Signatory |
+| Title | VP Technology Sourcing | Authorized Signatory |
 | Signature | | |
 | Date | {{SIGNED_CUSTOMER}} | {{SIGNED_SUPPLIER}} |

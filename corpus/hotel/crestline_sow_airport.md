@@ -4,14 +4,14 @@
 |---|---|
 | **Project** | Laundry and linen services at Seabright Airport Inn |
 | **Parent Agreement** | Master Services Agreement dated {{PARENT_DATE}} between the parties |
-| **Customer** | Seabright Hotels & Resorts Ltd |
-| **Supplier** | Crestline Laundry & Linen Services Ltd |
+| **Customer** | Seabright Hotels & Resorts Inc |
+| **Supplier** | Crestline Laundry & Linen Services Inc |
 | **Effective Date** | {{EFFECTIVE}} |
 | **Period** | From the Effective Date until {{EXPIRY}} (18 months) |
 | **Annual Fees** | USD 198,000 |
 | **Total Contract Value** | USD 297,000 |
 
-This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels & Resorts Ltd** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Crestline Laundry & Linen Services Ltd** (the "**Supplier**"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement. If this SOW conflicts with the Parent Agreement, the Parent Agreement prevails unless this SOW expressly states that it overrides a specified provision.
+This Statement of Work No. 1 (the "**SOW**") is made between **Seabright Hotels & Resorts Inc** (the "**Customer**"), a hotel group that owns and operates six hotels, and **Crestline Laundry & Linen Services Inc** (the "**Supplier**"). It is issued under the Master Services Agreement dated {{PARENT_DATE}} between the same parties (the "**Parent Agreement**"). Capitalised terms not defined in this SOW have the meanings given in the Parent Agreement. If this SOW conflicts with the Parent Agreement, the Parent Agreement prevails unless this SOW expressly states that it overrides a specified provision.
 
 ## 1. Background
 
@@ -92,7 +92,7 @@ Each party shall keep confidential all non-public information of the other party
 
 ## 10. Intellectual Property
 
-Each party retains ownership of its pre-existing intellectual property. The Customer retains all rights in its brands, logos, and any marking on linen. The Supplier grants the Customer a non-exclusive licence to use any reports and materials delivered under this SOW for its internal business purposes.
+Each party retains ownership of its pre-existing intellectual property. The Customer retains all rights in its brands, logos, and any marking on linen. The Supplier grants the Customer a non-exclusive license to use any reports and materials delivered under this SOW for its internal business purposes.
 
 ## 11. Warranties
 
@@ -106,7 +106,7 @@ The Supplier warrants that it shall perform the Services with reasonable skill a
 
 ## 13. Data Protection
 
-Where the Supplier processes personal data on behalf of the Customer in connection with the Services (for example, where guest or staff names appear on items or records), it shall do so only on the Customer's documented instructions, shall implement appropriate technical and organisational security measures, shall assist the Customer in meeting its data protection obligations, and shall comply with the data protection provisions of the Parent Agreement and applicable data protection law.
+Where the Supplier processes personal data on behalf of the Customer in connection with the Services (for example, where guest or staff names appear on items or records), it shall do so only on the Customer's documented instructions, shall implement appropriate technical and organizational security measures, shall assist the Customer in meeting its data protection obligations, and shall comply with the data protection provisions of the Parent Agreement and applicable data protection law.
 
 ## 14. Termination
 
@@ -122,7 +122,7 @@ Neither party may assign, transfer or subcontract any rights or obligations unde
 
 ## 16. Notices
 
-Notices under this SOW shall be in writing and delivered by hand, by recognised courier, or by email to the addresses notified by each party for the purposes of the Parent Agreement, and are deemed received in accordance with the notice provisions of the Parent Agreement.
+Notices under this SOW shall be in writing and delivered by hand, by recognized courier, or by email to the addresses notified by each party for the purposes of the Parent Agreement, and are deemed received in accordance with the notice provisions of the Parent Agreement.
 
 ## 17. Entire Agreement
 
@@ -130,14 +130,14 @@ This SOW, together with the Parent Agreement, constitutes the entire agreement b
 
 ## 18. Governing Law
 
-This SOW and any non-contractual obligations arising from it are governed by the laws of England and Wales, and the parties submit to the jurisdiction specified in the Parent Agreement.
+This SOW and any non-contractual obligations arising from it are governed by the laws of the State of New York, and the parties submit to the jurisdiction specified in the Parent Agreement.
 
 ## Signatures
 
 | | |
 |---|---|
-| **Signed for and on behalf of Seabright Hotels & Resorts Ltd** | **Signed for and on behalf of Crestline Laundry & Linen Services Ltd** |
+| **Signed for and on behalf of Seabright Hotels & Resorts Inc** | **Signed for and on behalf of Crestline Laundry & Linen Services Inc** |
 | Signature: ______________________ | Signature: ______________________ |
 | Name: Helena Cruz | Name: Grace Mbeki |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

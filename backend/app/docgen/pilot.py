@@ -225,7 +225,7 @@ def labels(seed: date) -> dict:
 
 # ------------------------------------------------------------------ rendering into the inbox
 def fill(md: str, spec: dict, seed: date) -> str:
-    fmt = DATE_FMT[spec["style"]]
+    fmt = "%B %d, %Y" if PACK["name"] == "hotel" else DATE_FMT[spec["style"]]          # the hotel group is a United States business: month-first dates throughout
     for k, v in dates(spec, seed).items():
         s = v.strftime(fmt)
         md = md.replace("{{" + k + "}}", s.replace(" 0", " ") if fmt.startswith("%d") else re.sub(r" 0(\d),", r" \1,", s))

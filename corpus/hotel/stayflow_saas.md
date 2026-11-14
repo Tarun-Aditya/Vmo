@@ -1,6 +1,6 @@
 # Software as a Service Agreement
 
-This Software as a Service Agreement (the "Agreement") is entered into as of {{EFFECTIVE}} (the "Effective Date") by and between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Stayflow Property Systems Inc** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties."
+This Software as a Service Agreement (the "Agreement") is entered into as of {{EFFECTIVE}} (the "Effective Date") by and between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer"), and **Stayflow Property Systems Inc** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties."
 
 ## Recitals
 
@@ -152,9 +152,9 @@ Neither Party may assign or transfer this Agreement without the other Party's pr
 
 IN WITNESS WHEREOF, the Parties have caused this Agreement to be executed by their duly authorized representatives.
 
-| **SEABRIGHT HOTELS & RESORTS LTD** | **STAYFLOW PROPERTY SYSTEMS INC** |
+| **SEABRIGHT HOTELS & RESORTS INC** | **STAYFLOW PROPERTY SYSTEMS INC** |
 |---|---|
 | By: ______________________________ | By: ______________________________ |
 | Name: Michael Brennan | Name: Kenji Watanabe |
-| Title: Chief Procurement Officer | Title: Authorised Signatory |
+| Title: Chief Procurement Officer | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |

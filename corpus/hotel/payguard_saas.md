@@ -1,6 +1,6 @@
 # SaaS Subscription Agreement
 
-This SaaS Subscription Agreement (the "**Agreement**") is made with effect from {{EFFECTIVE}} (the "**Effective Date**") between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "**Customer**"), and **PayGuard Payments Pte Ltd** (the "**Supplier**"). The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
+This SaaS Subscription Agreement (the "**Agreement**") is made with effect from {{EFFECTIVE}} (the "**Effective Date**") between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "**Customer**"), and **PayGuard Payments Inc** (the "**Supplier**"). The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
 
 The Agreement consists of these master terms, Schedule 1 (Service Levels and Security), and Order Form No. 1 (the "**Order Form**"). If there is a conflict, the master terms prevail over the Schedules, except that the Order Form prevails on commercial terms (fees, term and service level targets).
 
@@ -18,7 +18,7 @@ In this Agreement:
 
 "**Security Incident**" means any actual or reasonably suspected unauthorised access to, or loss, disclosure or alteration of, Customer Data.
 
-## 2. Services and Licence
+## 2. Services and License
 
 2.1 The Supplier shall provide the Services to the Customer at each Property in accordance with this Agreement, the Order Form and Schedule 1.
 
@@ -54,7 +54,7 @@ In this Agreement:
 
 6.1 The Services involve the processing of Personal Data of the Customer's customers and employees. The Parties have executed, or will execute alongside this Agreement, a Data Processing Agreement (the "**DPA**"), which forms part of this Agreement. The Supplier shall process Personal Data only on the Customer's documented instructions and in accordance with the DPA and applicable data protection law.
 
-6.2 The Supplier shall maintain appropriate technical and organisational measures to protect Customer Data.
+6.2 The Supplier shall maintain appropriate technical and organizational measures to protect Customer Data.
 
 6.3 The Supplier shall maintain compliance with the Payment Card Industry Data Security Standard (PCI DSS) throughout the Term and shall provide its annual attestation of compliance to the Customer.
 
@@ -72,7 +72,7 @@ In this Agreement:
 
 8.1 The Supplier retains all intellectual property rights in the Services and its underlying software and materials. No rights are transferred except the right of use in clause 2.2.
 
-8.2 The Customer retains all rights in Customer Data and grants the Supplier a limited licence to use it solely to provide the Services.
+8.2 The Customer retains all rights in Customer Data and grants the Supplier a limited license to use it solely to provide the Services.
 
 ## 9. Warranties
 
@@ -88,7 +88,7 @@ In this Agreement:
 
 10.1 The Supplier shall indemnify the Customer against losses, damages and reasonable costs arising from a third-party claim that the Customer's use of the Services in accordance with this Agreement infringes intellectual property rights, or from the Supplier's breach of clause 6 or clause 7.
 
-10.2 The indemnified Party shall give prompt notice of the claim, allow the indemnifying Party to control its defence and settlement, and provide reasonable assistance at the indemnifying Party's cost.
+10.2 The indemnified Party shall give prompt notice of the claim, allow the indemnifying Party to control its defense and settlement, and provide reasonable assistance at the indemnifying Party's cost.
 
 ## 11. Limitation of Liability
 
@@ -112,7 +112,7 @@ Neither Party may assign or transfer this Agreement without the other's prior wr
 
 ## 14. Governing Law and Disputes
 
-This Agreement and any dispute arising out of or in connection with it are governed by the laws of Singapore. The Parties submit to the courts of Singapore.
+This Agreement and any dispute arising out of or in connection with it are governed by the laws of the State of California. The Parties submit to the state and federal courts located in San Francisco County, California.
 
 ## 15. General
 
@@ -139,8 +139,8 @@ Availability excludes scheduled maintenance notified to the Customer in advance.
 
 | Term | Detail |
 |---|---|
-| Customer | Seabright Hotels & Resorts Ltd |
-| Supplier | PayGuard Payments Pte Ltd |
+| Customer | Seabright Hotels & Resorts Inc |
+| Supplier | PayGuard Payments Inc |
 | Properties | The six hotels owned and operated by the Customer, as notified in writing by the Customer to the Supplier |
 | Services | Hosted payment processing and related SaaS functionality, with support and updates |
 | Effective Date | {{EFFECTIVE}} |
@@ -154,15 +154,15 @@ Availability excludes scheduled maintenance notified to the Customer in advance.
 | Warranty Period | 30 days |
 | Liability cap | Two (2) times the fees paid or payable in the twelve (12) months preceding the claim |
 | Termination for convenience | Customer, on 90 days' written notice |
-| Governing law | Laws of Singapore |
+| Governing law | Laws of the State of California |
 | Data Processing Agreement | Executed, or to be executed, alongside this Agreement |
 
 ## Execution
 
 | | Customer | Supplier |
 |---|---|---|
-| Party | Seabright Hotels & Resorts Ltd | PayGuard Payments Pte Ltd |
+| Party | Seabright Hotels & Resorts Inc | PayGuard Payments Inc |
 | Signed by | Michael Brennan | Richard Hale |
-| Title | Chief Procurement Officer | Authorised Signatory |
+| Title | Chief Procurement Officer | Authorized Signatory |
 | Signature | | |
 | Date | {{SIGNED_CUSTOMER}} | {{SIGNED_SUPPLIER}} |

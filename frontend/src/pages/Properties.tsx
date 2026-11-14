@@ -6,28 +6,38 @@ import { Loading } from "../ui";
 
 type P = { id: number; property: string; city: string | null; country: string | null; kind: string | null; rooms: number | null; contracts: number; named_contracts: number; vendors: number;
   annual_value: number; direct_value: number; shared_value: number; value_per_room: number | null; ending_90: number; categories: string[] };
-type Item = { contract_id: number; title: string; vendor: string; category: string; type: string; basis: string; contract_annual_value: number | null; share: number; attributed_value: number | null };
+type Item = { contract_id: number; title: string; vendor: string; category: string; type: string; basis: string; contract_annual_value: number | null; share: number; attributed_value: number | null;
+  exit?: "sale" | "notice" | "locked"; exit_text?: string; exit_from?: string | null; locked_value: number; expiry_date: string | null };
+type Sale = { locked_contracts: number; locked_value: number; exit_on_sale: number; on_notice: number };
+const EXIT: Record<string, { glyph: string; cls: string }> = { sale: { glyph: "✓", cls: "text-emerald-700 dark:text-emerald-300" }, notice: { glyph: "●", cls: "text-amber-700 dark:text-amber-300" }, locked: { glyph: "▲", cls: "font-semibold text-red-700 dark:text-red-300" } };
 const BASIS: Record<string, string> = { named: "names this property", children: "group agreement · its schedules name this property", group: "group agreement · covers every property", stated: "group agreement · coverage recorded" };
 const btn = "inline-flex min-h-[44px] items-center rounded-lg border border-slate-300 px-4 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700";
 
 function Detail({ id }: { id: number }) {
-  const q = useQuery({ queryKey: ["property", id], queryFn: () => api<{ contracts: Item[] }>(`/api/properties/${id}`) });
+  const q = useQuery({ queryKey: ["property", id], queryFn: () => api<{ contracts: Item[]; sale: Sale }>(`/api/properties/${id}`) });
   if (!q.data) return <Loading q={q} />;
+  const sale = q.data.sale;
   return (
     <div className="mt-3 overflow-x-auto">
+      <p className="mb-2 rounded-lg bg-paper p-3 text-[13px] dark:bg-slate-900"><b>If this property were sold:</b> {sale.exit_on_sale} contract{sale.exit_on_sale !== 1 ? "s" : ""} can be ended on the sale, {sale.on_notice} on notice, and{" "}
+        <span className={sale.locked_contracts ? "font-semibold text-red-700 dark:text-red-300" : ""}>{sale.locked_contracts} cannot be ended early</span>
+        {sale.locked_contracts ? <>: a buyer inherits about {usd(Math.round(sale.locked_value))} of commitments until they run out.</> : "."}</p>
       <table className="w-full text-[13px]">
-        <thead><tr className="text-left text-xs uppercase text-ink-mute"><th className="py-1.5 pr-2 font-semibold">Contract</th><th className="py-1.5 pr-2 font-semibold">Why it counts here</th><th className="py-1.5 text-right font-semibold">Per year</th></tr></thead>
+        <thead><tr className="text-left text-xs uppercase text-ink-mute"><th className="py-1.5 pr-2 font-semibold">Contract</th><th className="py-1.5 pr-2 font-semibold">Why it counts here</th><th className="py-1.5 pr-2 font-semibold">On a sale</th><th className="py-1.5 text-right font-semibold">Per year</th></tr></thead>
         <tbody>{q.data.contracts.map((c) => (
           <tr key={c.contract_id} className="border-t border-slate-100 dark:border-slate-700">
             <td className="py-1.5 pr-2"><Link className="text-indigo-600 hover:underline dark:text-indigo-300" to={`/contracts/${c.contract_id}`}>{c.vendor}</Link><div className="text-xs text-ink-mute">{c.type} · {c.category}</div></td>
             <td className="py-1.5 pr-2 text-xs text-ink-mute">{BASIS[c.basis]}{c.basis !== "named" && c.contract_annual_value ? ` · ${Math.round(Number(c.share) * 100)}% of ${usd(c.contract_annual_value)}` : ""}</td>
+            <td className={`py-1.5 pr-2 text-xs ${EXIT[c.exit ?? "notice"].cls}`}><span aria-hidden>{EXIT[c.exit ?? "notice"].glyph}</span> {c.exit_text}{c.exit_from && c.exit_from !== "this contract" ? <span className="font-normal text-ink-mute"> (from {c.exit_from})</span> : null}
+              {c.exit === "locked" && c.locked_value > 0 ? <div className="font-normal text-ink-mute">about {usd(Math.round(c.locked_value))} left to run</div> : null}</td>
             <td className="py-1.5 text-right tabular-nums">{c.attributed_value ? usd(Math.round(Number(c.attributed_value))) : "—"}</td>
           </tr>))}</tbody>
       </table>
     </div>);
 }
 
-/** One card per hotel: what it costs to run under contract (its own schedules plus its share of group agreements), with whom, and what ends soon. */
+/** The owner's view of each property: what it costs under contract (its own schedules plus its share of group agreements), with whom, what ends soon,
+ *  and what a buyer would inherit if it were sold. */
 export default function Properties() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["properties"], queryFn: () => api<{ properties: P[]; group_level: number; rooms_known: boolean }>("/api/properties") });

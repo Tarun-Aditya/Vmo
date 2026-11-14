@@ -36,7 +36,7 @@ def feed_files() -> list[Path]:
     return sorted(f for f in d.rglob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXT | {".csv"} and f.name != "certificates.csv")       # certificates.csv is read by app.certificates
 
 
-FEED_OF = {"invoice": "invoices", "sla_report": "sla", "acceptance": "obligation_status"}
+FEED_OF = {"invoice": "invoices", "sla_report": "sla", "acceptance": "obligation_status", "certificate": "certificates"}
 
 
 def _read_document(f: Path) -> tuple[str, list[dict]]:
@@ -301,6 +301,21 @@ def apply_rows(name: str, rows: list[dict]) -> dict:
                     else:
                         cnt["skipped"] += 1
                     continue
+                elif name.startswith("certificate"):
+                    from app import certificates
+
+                    v = ids._n(r.get("vendor") or "")
+                    vendor = next((x["vendor"] for x in ids.rows if v and (ids._n(x["vendor"]) == v or ids._n(x["vendor"]).split()[:2] == v.split()[:2])), None)
+                    if not vendor or r.get("kind") not in certificates.REQUIRED:
+                        cnt["unmatched"] += 1
+                        continue
+                    ex = s.execute(text("SELECT source FROM certificates WHERE vendor=:v AND kind=:k"), {"v": vendor, "k": r["kind"]}).first()
+                    if ex and ex[0] == "person":            # a date a person recorded is not overwritten by an older file
+                        cnt["skipped"] += 1
+                        continue
+                    s.execute(text("""INSERT INTO certificates (vendor, kind, name, expiry_date, received_on, reference, source) VALUES (:v,:k,:n,:e,:r,:ref,'file')
+                                      ON CONFLICT (vendor, kind) DO UPDATE SET expiry_date=EXCLUDED.expiry_date, received_on=EXCLUDED.received_on, reference=EXCLUDED.reference, source='file', updated_at=now()"""),
+                              {"v": vendor, "k": r["kind"], "n": certificates.REQUIRED[r["kind"]], "e": _d(r["expiry_date"]), "r": _d(r.get("received_on")), "ref": r.get("reference")})
                 else:
                     cnt["skipped"] += 1
                     continue

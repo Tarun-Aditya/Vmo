@@ -20,8 +20,8 @@ CLAUSES = [
        "The Supplier shall maintain food-safety certification (HACCP) throughout the term and shall notify the Customer of any product recall within 24 hours.", "high", ["MSA", "SOW"]),
     _k("guest_injury_indemnity", "Guest injury indemnity", "Supplier indemnifies the hotel for guest or staff injury caused by its work", [r"guest[s]?\b[^.]{0,80}\b(?:injur|harm|death)", r"injur[^.]{0,80}\bguest", "bodily injury"], ["Guest Injury", "Personal Injury"],
        "The Supplier shall indemnify the Customer against claims by guests or staff for injury, illness or death caused by the Supplier's acts, omissions or equipment.", "high", ["MSA"]),
-    _k("labour_compliance", "Labour and wage compliance", "Supplier pays at least the minimum wage and follows working-time law for staff at the property", ["minimum[- ]wage", "working[- ]time", "modern slavery", "labour (?:law|standards)"], ["Labour Compliance", "Employment Compliance"],
-       "The Supplier shall pay all personnel at least the applicable minimum wage, comply with working-time rules and shall not use forced or underage labour.", "high", ["MSA", "SOW"]),
+    _k("labour_compliance", "Labor and wage compliance", "Supplier pays at least the minimum wage and follows wage-and-hour law for staff at the property", ["minimum[- ]wage", "wage[- ]and[- ]hour", "working[- ]time", "forced labou?r", "labou?r (?:law|standards)"], ["Labor Compliance", "Labour Compliance", "Employment Compliance"],
+       "The Supplier shall pay all personnel at least the applicable minimum wage, comply with wage-and-hour laws and shall not use forced or underage labor.", "high", ["MSA", "SOW"]),
     _k("property_sale_termination", "Termination on sale of property", "The hotel can end the services if the property is sold or the operator changes", [r"sale of (?:the|a|any) (?:property|hotel)", "change of (?:ownership|control)", r"disposal of the (?:property|hotel)"], ["Sale of Property", "Change of Ownership"],
        "The Customer may terminate the services at a Property on 30 days' notice, without penalty, if the Property is sold or ceases to be operated by the Customer.", "medium", ["MSA", "SOW"]),
     _k("brand_standards", "Brand and operating standards", "Supplier meets the hotel brand's operating and quality standards", ["brand standards?", "operating standards?", "quality standards?"], ["Brand Standards", "Operating Standards"],
@@ -32,8 +32,8 @@ CLAUSES = [
        "The Supplier shall comply with PCI DSS wherever it stores, processes or transmits payment-card data and shall provide its annual attestation of compliance.", "critical", ["SaaS", "MSA"]),
     _k("service_response", "Response and turnaround times", "Time to respond to faults and to turn around work", [r"within \d+ hours?", "response time", "turnaround"], ["Response Times", "Service Levels", "Turnaround"],
        "The Supplier shall respond to a fault report within 4 hours and complete urgent repairs within 24 hours.", "medium", ["MSA", "SOW"]),
-    _k("inspection_certificates", "Inspection and compliance certificates", "Supplier delivers statutory inspection and compliance certificates", ["inspection certificate", "statutory (?:thorough )?examination", r"certificate[s]? of (?:compliance|inspection)"], ["Certificates", "Statutory Inspections"],
-       "The Supplier shall deliver copies of every statutory inspection and compliance certificate to the Customer when issued and before the previous one expires.", "medium", ["MSA", "SOW"]),
+    _k("inspection_certificates", "Inspection and compliance certificates", "Supplier delivers state inspection and compliance certificates", ["inspection certificate", "state[- ]mandated (?:annual )?inspection", "statutory (?:thorough )?examination", r"certificate[s]? of (?:compliance|inspection)"], ["Certificates", "Statutory Inspections"],
+       "The Supplier shall deliver copies of every state-mandated inspection and compliance certificate to the Customer when issued and before the previous one expires.", "medium", ["MSA", "SOW"]),
     _k("distribution_commission", "Distribution commission", "Commission payable on bookings through a distribution channel", [r"commission of \d", "commission rate", r"commission[^.]{0,40}room revenue"], ["Commission", "Distribution Fees"],
        "The commission payable on each booking shall not exceed 15 percent of the room revenue of that booking.", "high", ["SaaS"], matrix=False),
 ]
@@ -73,12 +73,12 @@ RULES = [
     # asked only of the kind of supplier they concern
     _r("hotel_food_safety", "Food-safety certification (food suppliers)", "A supplier of food or drink must hold food-safety certification and report recalls.", "clause_required", "critical", ["MSA", "SOW"],
        kcc="food_safety", cats=["Food & Beverage Supply"], fix=CLAUSES[0]["standard_text"]),
-    _r("hotel_inspections", "Statutory inspection certificates (lifts, plant)", "Lift and plant contractors must deliver the statutory inspection certificates.", "clause_required", "high", ["MSA"],
-       kcc="inspection_certificates", cats=["Lifts & Engineering", "Facilities & HVAC"], fix=CLAUSES[8]["standard_text"]),
+    _r("hotel_inspections", "State inspection certificates (elevators, plant)", "Elevator and plant contractors must deliver the state-mandated inspection certificates.", "clause_required", "high", ["MSA"],
+       kcc="inspection_certificates", cats=["Elevators & Engineering", "Facilities & HVAC"], fix=CLAUSES[8]["standard_text"]),
     _r("hotel_guest_injury", "Guest-injury indemnity (suppliers working on site)", "A supplier whose people or equipment are in the hotel indemnifies it for injury to guests and staff.", "clause_required", "high", ["MSA"],
-       kcc="guest_injury_indemnity", cats=["Security", "Lifts & Engineering", "Facilities & HVAC", "Pest Control", "Staffing", "Food & Beverage Supply", "Laundry & Linen"], fix=CLAUSES[1]["standard_text"]),
+       kcc="guest_injury_indemnity", cats=["Security", "Elevators & Engineering", "Facilities & HVAC", "Pest Control", "Staffing", "Food & Beverage Supply", "Laundry & Linen"], fix=CLAUSES[1]["standard_text"]),
     _r("hotel_sale_termination", "Exit on sale of property", "Hotel groups buy and sell hotels: every property contract needs an exit on sale.", "clause_required", "medium", ["MSA"], kcc="property_sale_termination", fix=CLAUSES[3]["standard_text"]),
-    _r("hotel_labour_compliance", "Labour and wage compliance clause present", "Staffing and security suppliers must commit to wage and working-time law.", "clause_required", "medium", ["MSA"], kcc="labour_compliance", cats=["Staffing", "Security", "Laundry & Linen", "Facilities & HVAC", "Waste & Sustainability"], fix=CLAUSES[2]["standard_text"]),
+    _r("hotel_labour_compliance", "Labor and wage compliance clause present", "Staffing and security suppliers must commit to wage-and-hour law.", "clause_required", "medium", ["MSA"], kcc="labour_compliance", cats=["Staffing", "Security", "Laundry & Linen", "Facilities & HVAC", "Waste & Sustainability"], fix=CLAUSES[2]["standard_text"]),
 ]
 
 
@@ -91,7 +91,7 @@ def ensure(s) -> dict:
     out["rules"] = kcc._insert_missing(s, "checklist_rules", kcc.RULE_COLS + ["categories", "sort_order"], rules)
     for r in rules:           # pack rules are admin rows: bring their scope up to date on re-seed without touching a rule an admin created
         s.execute(text("UPDATE checklist_rules SET categories = :c WHERE key = :k AND NOT builtin AND categories = '{}'"), {"c": r["categories"], "k": r["key"]})
-    s.execute(text("UPDATE checklist_rules SET enabled=false WHERE key='governing_law_ny'"))     # a hotel group is not tied to one state's law: Legal decides per vendor
+    s.execute(text("UPDATE checklist_rules SET enabled=false WHERE key='governing_law_ny'"))     # the group's suppliers sit in many states: Legal decides the governing law per vendor
     for c in CLAUSES:         # pack clauses likewise: their keywords follow the code on re-seed
         s.execute(text("UPDATE kcc_library SET keywords = :kw WHERE key = :k AND NOT builtin"), {"kw": c["keywords"], "k": c["key"]})
     for m in METRICS:         # pack metrics are admin rows: bring their patterns up to date on re-seed, without touching a metric an admin created

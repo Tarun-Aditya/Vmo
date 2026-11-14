@@ -1,6 +1,6 @@
 # Mutual Non-Disclosure Agreement
 
-This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of {{EFFECTIVE}} (the "Effective Date") by and between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "Customer"), and **Marlowe Hospitality Consulting LLP** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties."
+This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of {{EFFECTIVE}} (the "Effective Date") by and between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "Customer"), and **Marlowe Hospitality Consulting LLP** (the "Supplier"). The Customer and the Supplier are each a "Party" and together the "Parties."
 
 **WHEREAS**, the Customer owns and operates six hotels (each a "Property" and together the "Properties") and purchases consulting services, supplies and related support for the Properties;
 
@@ -120,7 +120,7 @@ This Mutual Non-Disclosure Agreement (this "Agreement") is entered into as of {{
 
 **IN WITNESS WHEREOF**, the Parties have caused this Agreement to be executed by their duly authorized representatives.
 
-| **SEABRIGHT HOTELS & RESORTS LTD** | **MARLOWE HOSPITALITY CONSULTING LLP** |
+| **SEABRIGHT HOTELS & RESORTS INC** | **MARLOWE HOSPITALITY CONSULTING LLP** |
 |---|---|
 | By: ______________________________ | By: ______________________________ |
 | Name: ____________________________ | Name: ____________________________ |

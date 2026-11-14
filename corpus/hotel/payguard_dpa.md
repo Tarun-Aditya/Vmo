@@ -1,6 +1,6 @@
 # Data Processing Agreement
 
-This Data Processing Agreement (this "**DPA**") is entered into as of {{EFFECTIVE}} (the "**Effective Date**") by and between **Seabright Hotels & Resorts Ltd**, a hotel group that owns and operates six hotels (the "**Customer**"), and **PayGuard Payments Pte Ltd** (the "**Supplier**"). The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
+This Data Processing Agreement (this "**DPA**") is entered into as of {{EFFECTIVE}} (the "**Effective Date**") by and between **Seabright Hotels & Resorts Inc**, a hotel group that owns and operates six hotels (the "**Customer**"), and **PayGuard Payments Inc** (the "**Supplier**"). The Customer and the Supplier are each a "**Party**" and together the "**Parties**".
 
 **WHEREAS**, the Customer and the Supplier are parties to a Software-as-a-Service Agreement dated {{PARENT_DATE}} (the "**Parent Agreement**"), under which the Supplier provides payment services and related software to the Customer for use at the Customer's hotels;
 
@@ -12,7 +12,7 @@ This Data Processing Agreement (this "**DPA**") is entered into as of {{EFFECTIV
 
 ## Section 1. Definitions
 
-1.1 "**Applicable Data Protection Law**" means all laws and regulations relating to the privacy, security or processing of Personal Data that apply to a Party in connection with this DPA, including the laws of Singapore.
+1.1 "**Applicable Data Protection Law**" means all laws and regulations relating to the privacy, security or processing of Personal Data that apply to a Party in connection with this DPA, including the laws of the State of California.
 
 1.2 "**Personal Data**" means any information relating to an identified or identifiable individual that the Supplier processes on behalf of the Customer in connection with the Services, including data of the Customer's customers and employees.
 
@@ -46,19 +46,19 @@ This Data Processing Agreement (this "**DPA**") is entered into as of {{EFFECTIV
 
 4.1 The Supplier shall process Personal Data only on the Customer's documented instructions, including those in the Parent Agreement and this DPA, unless otherwise required by law, in which case the Supplier shall inform the Customer before processing unless prohibited from doing so.
 
-4.2 The Supplier shall ensure that personnel authorised to process Personal Data are bound by appropriate duties of confidentiality and receive suitable training.
+4.2 The Supplier shall ensure that personnel authorized to process Personal Data are bound by appropriate duties of confidentiality and receive suitable training.
 
 4.3 The Supplier shall not sell Personal Data or use it for its own purposes, including marketing or profiling, and shall promptly notify the Customer if it believes an instruction infringes Applicable Data Protection Law.
 
 ## Section 5. Security
 
-5.1 The Supplier shall implement and maintain appropriate technical and organisational measures to protect Personal Data against Security Incidents, having regard to the state of the art, the cost of implementation and the nature of the data, including the measures described in Schedule 2.
+5.1 The Supplier shall implement and maintain appropriate technical and organizational measures to protect Personal Data against Security Incidents, having regard to the state of the art, the cost of implementation and the nature of the data, including the measures described in Schedule 2.
 
 5.2 Such measures shall include, as appropriate, encryption of Personal Data in transit and at rest, access controls based on least privilege, logging and monitoring, regular testing of security controls, and compliance with applicable payment card industry standards.
 
 ## Section 6. Subprocessors
 
-6.1 The Customer grants general authorisation for the Supplier to engage Subprocessors, subject to this Section.
+6.1 The Customer grants general authorization for the Supplier to engage Subprocessors, subject to this Section.
 
 6.2 The Supplier shall maintain a current list of Subprocessors, give the Customer reasonable prior written notice of any intended addition or replacement, and allow the Customer a reasonable opportunity to object on reasonable data protection grounds. If the Parties cannot resolve an objection in good faith, the Customer may terminate the affected Services without penalty.
 
@@ -114,11 +114,11 @@ This Data Processing Agreement (this "**DPA**") is entered into as of {{EFFECTIV
 
 ## Section 14. Miscellaneous
 
-14.1 **Governing Law and Jurisdiction.** This DPA is governed by the laws of Singapore, and the courts of Singapore have exclusive jurisdiction over any dispute arising out of or in connection with it.
+14.1 **Governing Law and Jurisdiction.** This DPA is governed by the laws of the State of California, and the state and federal courts located in San Francisco County, California have exclusive jurisdiction over any dispute arising out of or in connection with it.
 
 14.2 **Assignment.** Neither Party may assign or transfer this DPA without the prior written consent of the other Party, not to be unreasonably withheld, except that the Customer may assign it to an affiliate or a successor to its hotel business on written notice.
 
-14.3 **Notices.** Notices under this DPA must be in writing and delivered by hand, by recognised courier or by email to the address most recently notified by the receiving Party, and are deemed received on delivery or, for email, on the next business day after transmission without error notice.
+14.3 **Notices.** Notices under this DPA must be in writing and delivered by hand, by recognized courier or by email to the address most recently notified by the receiving Party, and are deemed received on delivery or, for email, on the next business day after transmission without error notice.
 
 14.4 **Entire Agreement.** This DPA, together with the Parent Agreement and its Schedules, is the entire agreement of the Parties concerning its subject matter and supersedes all prior understandings on that subject. Amendments must be in writing and signed by both Parties.
 
@@ -126,13 +126,13 @@ This Data Processing Agreement (this "**DPA**") is entered into as of {{EFFECTIV
 
 14.6 **Counterparts.** This DPA may be executed in counterparts, including by electronic signature, each of which is an original and all of which together constitute one instrument.
 
-**IN WITNESS WHEREOF**, the Parties have caused this DPA to be executed by their duly authorised representatives.
+**IN WITNESS WHEREOF**, the Parties have caused this DPA to be executed by their duly authorized representatives.
 
-| **Seabright Hotels & Resorts Ltd** | **PayGuard Payments Pte Ltd** |
+| **Seabright Hotels & Resorts Inc** | **PayGuard Payments Inc** |
 |---|---|
 | By: ______________________________ | By: ______________________________ |
 | Name: Helena Cruz | Name: Grace Mbeki |
-| Title: VP Technology Sourcing | Title: Authorised Signatory |
+| Title: VP Technology Sourcing | Title: Authorized Signatory |
 | Date: {{SIGNED_CUSTOMER}} | Date: {{SIGNED_SUPPLIER}} |
 
 ## Schedule 1. Description of Processing

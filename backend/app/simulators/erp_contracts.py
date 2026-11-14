@@ -8,7 +8,7 @@ from datetime import date, timedelta
 import os
 
 _HOTEL = os.environ.get("STANDARDS", "").lower() == "hotel"
-CUSTOMER = "Seabright Hotels & Resorts Ltd" if _HOTEL else "Arcadia Retail Inc."
+CUSTOMER = "Seabright Hotels & Resorts Inc" if _HOTEL else "Arcadia Retail Inc."
 
 
 def add_months(d: date, n: int) -> date:

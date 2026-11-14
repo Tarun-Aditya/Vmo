@@ -1,4 +1,4 @@
-"""Compliance certificates: what each vendor's contract obliges it to hold (insurance, food safety, statutory inspections, payment-card attestation) and when
+"""Compliance certificates: what each vendor's contract obliges it to hold (insurance, food safety, state inspections, payment-card attestation) and when
 the copy on file runs out. A clause only says a certificate is required; the expiry date lives on the certificate itself, so it is recorded by a person
 (PATCH /api/certificates/{id}) or loaded from `feeds/certificates.csv` (vendor, kind, expiry_date, received_on, reference), never guessed from the contract."""
 from __future__ import annotations
@@ -15,10 +15,10 @@ from app.config import data_path
 REQUIRED = {
     "insurance": "Insurance certificate",
     "food_safety": "Food-safety certification (HACCP)",
-    "inspection_certificates": "Statutory inspection certificate",
+    "inspection_certificates": "State inspection certificate",
     "payment_card_data": "PCI DSS attestation of compliance",
 }
-# a clause can carry the tag without obliging a certificate ('treatments comply with food-safety standards'; a PCI 'attestation of compliance' is not a statutory
+# a clause can carry the tag without obliging a certificate ('treatments comply with food-safety standards'; a PCI 'attestation of compliance' is not a state
 # inspection): the clause text must also say this before a certificate is asked of the vendor
 MUST_SAY = {"food_safety": r"haccp|certif", "inspection_certificates": r"inspection|examination", "payment_card_data": r"pci|attestation"}
 SOON_DAYS = 60
