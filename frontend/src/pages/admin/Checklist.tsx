@@ -6,13 +6,13 @@ import { Card, Loading, Sev, SeverityChip, Td, Th } from "../../ui";
 
 type R = {
   key: string; name: string; description: string | null; rule_type: string; kcc_key: string | null; metric_key: string | null; operator: string | null;
-  threshold: number | null; threshold_text: string | null; phrase: string | null; severity: Sev; applies_to: string[]; stage: string; suggested_text: string | null;
+  threshold: number | null; threshold_text: string | null; phrase: string | null; severity: Sev; applies_to: string[]; categories: string[]; stage: string; suggested_text: string | null;
   enabled: boolean; builtin: boolean; results: { pass?: number; fail?: number; na?: number };
 };
 type K = { key: string; name: string };
 type M = { key: string; name: string; unit: string | null; kind: string };
 const TYPES: [string, string][] = [["clause_required", "A clause must be present"], ["clause_forbidden", "A clause must be absent"], ["metric_threshold", "A value must meet a limit"], ["text_forbidden", "Forbidden wording"]];
-const BLANK = { key: "", name: "", description: "", rule_type: "metric_threshold", kcc_key: "", metric_key: "", operator: "<=", threshold: "", threshold_text: "", phrase: "", severity: "medium" as Sev, applies_to: [] as string[], stage: "any", suggested_text: "", enabled: true };
+const BLANK = { key: "", name: "", description: "", rule_type: "metric_threshold", kcc_key: "", metric_key: "", operator: "<=", threshold: "", threshold_text: "", phrase: "", severity: "medium" as Sev, applies_to: [] as string[], categories: "", stage: "any", suggested_text: "", enabled: true };
 
 export default function Checklist() {
   const qc = useQueryClient();
@@ -22,14 +22,15 @@ export default function Checklist() {
   const [edit, setEdit] = useState<string | "new" | null>(null);
   const [f, setF] = useState(BLANK);
   const body = () => ({ ...f, key: f.key || undefined, kcc_key: f.kcc_key || null, metric_key: f.metric_key || null, operator: f.rule_type === "metric_threshold" ? f.operator : null,
-    threshold: f.threshold === "" ? null : Number(f.threshold), threshold_text: f.threshold_text || null, phrase: f.phrase || null, suggested_text: f.suggested_text || null });
+    threshold: f.threshold === "" ? null : Number(f.threshold), threshold_text: f.threshold_text || null, phrase: f.phrase || null, suggested_text: f.suggested_text || null,
+    categories: f.categories.split(",").map((x) => x.trim()).filter(Boolean) });
   const done = () => { qc.invalidateQueries(); setEdit(null); };
   const save = useMutation({ mutationFn: () => edit === "new" ? api("/api/admin/rules", { method: "POST", body: JSON.stringify(body()) }) : api(`/api/admin/rules/${edit}`, { method: "PUT", body: JSON.stringify(body()) }), onSuccess: done });
   const del = useMutation({ mutationFn: (k: string) => api(`/api/admin/rules/${k}`, { method: "DELETE" }), onSuccess: done });
   const toggle = useMutation({ mutationFn: (r: R) => api(`/api/admin/rules/${r.key}`, { method: "PUT", body: JSON.stringify({ ...r, enabled: !r.enabled }) }), onSuccess: () => qc.invalidateQueries() });
   const open = (r: R | null) => {
     if (!r) { setF(BLANK); setEdit("new"); return; }
-    setF({ key: r.key, name: r.name, description: r.description ?? "", rule_type: r.rule_type, kcc_key: r.kcc_key ?? "", metric_key: r.metric_key ?? "", operator: r.operator ?? "<=", threshold: r.threshold === null ? "" : String(r.threshold), threshold_text: r.threshold_text ?? "", phrase: r.phrase ?? "", severity: r.severity, applies_to: r.applies_to, stage: r.stage, suggested_text: r.suggested_text ?? "", enabled: r.enabled });
+    setF({ key: r.key, name: r.name, description: r.description ?? "", rule_type: r.rule_type, kcc_key: r.kcc_key ?? "", metric_key: r.metric_key ?? "", operator: r.operator ?? "<=", threshold: r.threshold === null ? "" : String(r.threshold), threshold_text: r.threshold_text ?? "", phrase: r.phrase ?? "", severity: r.severity, applies_to: r.applies_to, categories: (r.categories ?? []).join(", "), stage: r.stage, suggested_text: r.suggested_text ?? "", enabled: r.enabled });
     setEdit(r.key);
   };
   if (!rules.data) return <Loading q={rules} />;
@@ -62,6 +63,7 @@ export default function Checklist() {
                 {metric?.kind === "text" ? <input className={`${inputCls} flex-1`} placeholder="text" value={f.threshold_text} onChange={(e) => setF({ ...f, threshold_text: e.target.value })} /> : <input className={`${inputCls} flex-1`} type="number" step="any" placeholder={metric?.unit ?? "limit"} value={f.threshold} onChange={(e) => setF({ ...f, threshold: e.target.value })} />}</div></Field></>)}
             {f.rule_type === "text_forbidden" && <Field label="Forbidden wording" hint="Text or regular expression, case-insensitive."><input className={`${inputCls} font-mono`} value={f.phrase} onChange={(e) => setF({ ...f, phrase: e.target.value })} placeholder="unlimited|uncapped" /></Field>}
             <Field label="Applies to" className="md:col-span-2"><div className="flex flex-wrap gap-2">{DOC_TYPES.map((t) => <label key={t} className="flex items-center gap-1 text-sm"><input type="checkbox" checked={f.applies_to.includes(t)} onChange={(e) => setF({ ...f, applies_to: e.target.checked ? [...f.applies_to, t] : f.applies_to.filter((x) => x !== t) })} />{t}</label>)}<span className="text-xs text-slate-500">(none ticked = all)</span></div></Field>
+            <Field label="Only for vendor categories" hint="Comma-separated, e.g. Food & Beverage Supply. Empty = every category."><input className={inputCls} value={f.categories} onChange={(e) => setF({ ...f, categories: e.target.value })} /></Field>
             <Field label="Runs"><select className={inputCls} value={f.stage} onChange={(e) => setF({ ...f, stage: e.target.value })}><option value="any">Before and after signing</option><option value="pre_sign">Before signing only</option><option value="post_sign">After signing only</option></select></Field>
             <Field label="Suggested replacement wording (shown when it fails)" className="md:col-span-3"><textarea className={`${inputCls} h-16`} value={f.suggested_text} onChange={(e) => setF({ ...f, suggested_text: e.target.value })} /></Field>
           </div>
@@ -73,7 +75,7 @@ export default function Checklist() {
             <tr key={r.key} className={`border-t border-slate-100 dark:border-slate-700 ${r.enabled ? "" : "opacity-50"}`}>
               <Td><SeverityChip sev={r.severity} /></Td>
               <Td><div className="font-medium">{r.name}</div><div className="font-mono text-[11px] text-slate-500">{r.key}{r.builtin ? "" : " · custom"}</div></Td>
-              <Td className="max-w-xs text-xs">{cond(r)}</Td><Td className="max-w-[9rem] text-xs">{r.applies_to.join(", ") || "all"}</Td>
+              <Td className="max-w-xs text-xs">{cond(r)}</Td><Td className="max-w-[9rem] text-xs">{r.applies_to.join(", ") || "all"}{r.categories?.length ? <div className="text-ink-mute">only {r.categories.join(", ")}</div> : null}</Td>
               <Td className="text-xs">{r.stage === "pre_sign" ? "pre-sign" : r.stage === "post_sign" ? "post-sign" : "any time"}</Td>
               <Td className="text-right tabular-nums text-emerald-700 dark:text-emerald-400">{r.results.pass ?? 0}</Td><Td className={`text-right tabular-nums ${r.results.fail ? "font-bold text-red-600" : ""}`}>{r.results.fail ?? 0}</Td>
               <Td><Toggle checked={r.enabled} label={`${r.name} enabled`} onChange={() => toggle.mutate(r)} /></Td>

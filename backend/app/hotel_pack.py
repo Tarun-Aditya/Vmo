@@ -57,7 +57,7 @@ METRICS = [
 
 def _r(key, name, desc, rtype, sev, applies, **kw):
     return dict(key=key, name=name, description=desc, rule_type=rtype, kcc_key=kw.get("kcc"), metric_key=kw.get("metric"), operator=kw.get("op"), threshold=kw.get("num"), threshold_text=None,
-                phrase=kw.get("phrase"), severity=sev, applies_to=applies, stage="any", suggested_text=kw.get("fix"), enabled=True, builtin=False)
+                phrase=kw.get("phrase"), severity=sev, applies_to=applies, categories=kw.get("cats") or [], stage="any", suggested_text=kw.get("fix"), enabled=True, builtin=False)
 
 
 RULES = [
@@ -69,9 +69,16 @@ RULES = [
        metric="renewal_notice_days", op="<=", num=90, fix="The agreement renews automatically unless a party gives at least 60 days' written notice of non-renewal."),
     _r("hotel_liability_cap_min", "Supplier liability cap at least 1x annual fees", "A supplier whose staff or systems can harm guests must stand behind at least a year's fees.", "metric_threshold", "high", ["MSA", "SaaS", "SOW"],
        metric="liability_cap_multiple", op=">=", num=1, fix="The Supplier's aggregate liability is limited to one (1) times the fees paid or payable in the twelve months preceding the claim."),
-    _r("hotel_pci_required", "Payment-card security present", "Required where a supplier handles card data.", "clause_required", "critical", ["SaaS"], kcc="payment_card_data", fix=CLAUSES[6]["standard_text"]),
+    _r("hotel_pci_required", "Payment-card security present", "Required where a supplier handles card data.", "clause_required", "critical", ["SaaS"], kcc="payment_card_data", cats=["Hotel Technology", "Distribution & Booking"], fix=CLAUSES[6]["standard_text"]),
+    # asked only of the kind of supplier they concern
+    _r("hotel_food_safety", "Food-safety certification (food suppliers)", "A supplier of food or drink must hold food-safety certification and report recalls.", "clause_required", "critical", ["MSA", "SOW"],
+       kcc="food_safety", cats=["Food & Beverage Supply"], fix=CLAUSES[0]["standard_text"]),
+    _r("hotel_inspections", "Statutory inspection certificates (lifts, plant)", "Lift and plant contractors must deliver the statutory inspection certificates.", "clause_required", "high", ["MSA"],
+       kcc="inspection_certificates", cats=["Lifts & Engineering", "Facilities & HVAC"], fix=CLAUSES[8]["standard_text"]),
+    _r("hotel_guest_injury", "Guest-injury indemnity (suppliers working on site)", "A supplier whose people or equipment are in the hotel indemnifies it for injury to guests and staff.", "clause_required", "high", ["MSA"],
+       kcc="guest_injury_indemnity", cats=["Security", "Lifts & Engineering", "Facilities & HVAC", "Pest Control", "Staffing", "Food & Beverage Supply", "Laundry & Linen"], fix=CLAUSES[1]["standard_text"]),
     _r("hotel_sale_termination", "Exit on sale of property", "Hotel groups buy and sell hotels: every property contract needs an exit on sale.", "clause_required", "medium", ["MSA"], kcc="property_sale_termination", fix=CLAUSES[3]["standard_text"]),
-    _r("hotel_labour_compliance", "Labour and wage compliance clause present", "Staffing and security suppliers must commit to wage and working-time law.", "clause_required", "medium", ["MSA"], kcc="labour_compliance", fix=CLAUSES[2]["standard_text"]),
+    _r("hotel_labour_compliance", "Labour and wage compliance clause present", "Staffing and security suppliers must commit to wage and working-time law.", "clause_required", "medium", ["MSA"], kcc="labour_compliance", cats=["Staffing", "Security", "Laundry & Linen", "Facilities & HVAC", "Waste & Sustainability"], fix=CLAUSES[2]["standard_text"]),
 ]
 
 
@@ -81,7 +88,9 @@ def ensure(s) -> dict:
     out = {"kcc": kcc._insert_missing(s, "kcc_library", kcc.KCC_COLS, CLAUSES),
            "metrics": kcc._insert_missing(s, "metrics", kcc.MET_COLS, METRICS)}
     rules = [dict(r, sort_order=900 + i) for i, r in enumerate(RULES)]
-    out["rules"] = kcc._insert_missing(s, "checklist_rules", kcc.RULE_COLS + ["sort_order"], rules)
+    out["rules"] = kcc._insert_missing(s, "checklist_rules", kcc.RULE_COLS + ["categories", "sort_order"], rules)
+    for r in rules:           # pack rules are admin rows: bring their scope up to date on re-seed without touching a rule an admin created
+        s.execute(text("UPDATE checklist_rules SET categories = :c WHERE key = :k AND NOT builtin AND categories = '{}'"), {"c": r["categories"], "k": r["key"]})
     s.execute(text("UPDATE checklist_rules SET enabled=false WHERE key='governing_law_ny'"))     # a hotel group is not tied to one state's law: Legal decides per vendor
     for m in METRICS:         # pack metrics are admin rows: bring their patterns up to date on re-seed, without touching a metric an admin created
         s.execute(text("UPDATE metrics SET pattern=:p WHERE key=:k AND NOT builtin"), {"p": m["pattern"], "k": m["key"]})

@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Status, ago, api, inFuture, setToken, useSetting } from "./lib";
 
@@ -63,7 +63,9 @@ const ICON: Record<string, string> = {
   "/obligations": "M5 12l4 4 10-10M3 3h18v18H3z", "/spend": "M4 20V10M10 20V4M16 20v-7M22 20H2", "/risk": "M12 3l8 4v5c0 4-3 7-8 9-5-2-8-5-8-9V7z", "/new": "M12 5v14M5 12h14",
   "/alerts": "M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4", "/admin": "M12 15a3 3 0 100-6 3 3 0 000 6zM12 2v3M12 19v3M2 12h3M19 12h3",
 };
-const NAV = [["/", "Portfolio"], ["/renewals", "Renewals"], ["/map", "Portfolio map"], ["/properties", "Properties"], ["/compare", "Compare"], ["/contracts", "Contracts"], ["/vendors", "Vendors"], ["/clauses", "Key clauses"], ["/ask", "Ask"], ["/redline", "Redline"], ["/templates", "Templates"], ["/obligations", "Obligations"], ["/certificates", "Certificates"], ["/spend", "Spend"], ["/risk", "Risk"], ["/new", "New contract"]];
+// The seven screens a property-operations lead uses every week stay in view; the rest fold under "More", which opens by itself when you are on one of them.
+const NAV = [["/", "Portfolio"], ["/properties", "Properties"], ["/compare", "Compare"], ["/renewals", "Renewals"], ["/contracts", "Contracts"], ["/ask", "Ask"], ["/redline", "Redline"]];
+const MORE = [["/vendors", "Vendors"], ["/map", "Portfolio map"], ["/certificates", "Certificates"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/risk", "Risk"], ["/clauses", "Key clauses"], ["/templates", "Templates"], ["/new", "New contract"]];
 
 function RailLink({ to, label, onClick }: { to: string; label: string; onClick?: () => void }) {
   return (
@@ -91,6 +93,9 @@ export function Layout() {
     lastRun.current = id;
   }, [st.data?.last_run?.id, qc]);
   const [open, setOpen] = useState(false);
+  const [more, setMore] = useSetting("rail-more", false);
+  const loc = useLocation();
+  const moreOpen = more || MORE.some(([to]) => loc.pathname.startsWith(to));
   const modeBlock = (
     <div className="rounded-xl bg-ink-soft p-3 text-xs text-slate-300">
       <label className="flex cursor-pointer items-center gap-2" title="ON: demo mode, no Claude anywhere (offline engine, cached results, simulated external systems). OFF: live, every module is LLM-based.">
@@ -106,7 +111,12 @@ export function Layout() {
       <div className="flex items-center gap-2.5 px-3 pb-4 pt-1 text-base font-semibold text-white">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5FD3C0" strokeWidth="2" aria-hidden><path d="M5 4h10l4 4v12H5z" /><path d="M9 13l2 2 4-4" /></svg>ContractIQ
       </div>
-      <nav aria-label="Main" className="flex flex-col gap-1">{NAV.map(([to, label]) => <RailLink key={to} to={to} label={label} onClick={close} />)}</nav>
+      <nav aria-label="Main" className="flex flex-col gap-1">{NAV.map(([to, label]) => <RailLink key={to} to={to} label={label} onClick={close} />)}
+        <button type="button" aria-expanded={moreOpen} aria-controls="rail-more" onClick={() => setMore(!more)}
+          className="mt-2 flex min-h-[44px] items-center justify-between rounded-lg px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 hover:bg-ink-soft hover:text-white">
+          More <span aria-hidden className={`transition-transform ${moreOpen ? "rotate-90" : ""}`}>›</span></button>
+        {moreOpen && <div id="rail-more" className="flex flex-col gap-1">{MORE.map(([to, label]) => <RailLink key={to} to={to} label={label} onClick={close} />)}</div>}
+      </nav>
       <div className="flex-1" />
       <RailLink to="/admin" label="Admin" onClick={close} />
       {modeBlock}

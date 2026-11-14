@@ -156,7 +156,7 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
         s.execute(text("INSERT INTO extracted_values (contract_id, metric_key, value_num, value_text, clause_id, page, confidence) "
                        "VALUES (:c,:k,:n,:t,:cl,:p,:cf)"),
                   {"c": cid, "k": v["metric_key"], "n": v["value_num"], "t": v["value_text"], "cl": v["clause_id"], "p": v["page"], "cf": v["confidence"]})
-    results = kcc.evaluate_rules(contract.type, contract.status, clauses_db, vals, cfg["metrics"], cfg["rules"], bool(contract.fully_executed))
+    results = kcc.evaluate_rules(contract.type, contract.status, clauses_db, vals, cfg["metrics"], cfg["rules"], bool(contract.fully_executed), category=contract.category)
     for r in results:
         s.execute(text("INSERT INTO check_results (contract_id, rule_key, status, actual, expected, severity, clause_id, page, excerpt) "
                        "VALUES (:c,:k,:st,:a,:e,:sv,:cl,:p,:x)"),

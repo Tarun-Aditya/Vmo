@@ -29,6 +29,7 @@ DEFAULT_RULES = [
     ("vendor_risk_tier", "Vendor risk tier high or critical", "A vendor's risk score reached the 'high' or 'critical' tier.", "vendor_tier", "high", {"min_tier": "high"}, ["in_app", "chat"]),
     ("review_waiting", "Draft waiting for review", "A vendor draft has been in the review queue longer than this.", "review_waiting", "medium", {"days": 5}, ["in_app"]),
     ("approval_waiting", "Approval step stalled", "An approver has not decided a step for longer than the rule's reminder period.", "approval_waiting", "medium", {}, ["in_app", "email"]),
+    ("certificate_expiry", "Vendor certificate expired or about to", "A certificate a vendor must hold under its contract (insurance, food safety, inspection, payment-card) has run out or is about to.", "certificate", "high", {"days": 30}, ["in_app", "email", "chat"]),
     ("connector_error", "Connector sync failed", "A cloud-storage connector could not sync.", "connector_error", "high", {}, ["in_app", "email"]),
 ]
 
@@ -66,10 +67,27 @@ def _candidates(s, r: dict, today: date) -> list[dict]:
                             contract_id=x["contract_id"], vendor=x["vendor"], link="/obligations"))
     elif kind == "spend_exception":
         mn = SEV_RANK[p.get("min_severity", "high")]
-        for x in s.execute(text("SELECT exception_id, kind, severity, detail, vendor, contract_id, amount_at_risk FROM v_spend_exceptions")).mappings():
+        # one alert per vendor and kind of problem, however many invoices show it: five duplicate invoices from one supplier are one thing to chase, not five
+        groups: dict[tuple, list[dict]] = {}
+        for x in s.execute(text("SELECT exception_id, kind, severity, detail, vendor, contract_id, amount_at_risk FROM v_spend_exceptions ORDER BY amount_at_risk DESC")).mappings():
             if SEV_RANK[x["severity"]] >= mn:
-                out.append(dict(dedupe=f"{r['key']}:{x['kind']}:{x['vendor']}:{x['contract_id']}:{round(float(x['amount_at_risk']))}", title=f"Spend exception ({x['severity']}): {x['kind'].replace('_', ' ')} — {x['vendor']}", body=x["detail"], contract_id=x["contract_id"],
-                                vendor=x["vendor"], link="/spend", severity=x["severity"]))
+                groups.setdefault((x["vendor"], x["kind"]), []).append(dict(x))
+        for (vendor, k), xs in groups.items():
+            total = sum(float(x["amount_at_risk"]) for x in xs)
+            sev = max((x["severity"] for x in xs), key=lambda v: SEV_RANK[v])
+            what = k.replace("_", " ")
+            title = f"Spend exception ({sev}): {what} — {vendor}" if len(xs) == 1 else f"{len(xs)} spend exceptions ({sev}): {what} — {vendor}, ${total:,.0f}"
+            body = xs[0]["detail"] if len(xs) == 1 else xs[0]["detail"] + f" And {len(xs) - 1} more of the same kind."
+            cids = {x["contract_id"] for x in xs}
+            out.append(dict(dedupe=f"{r['key']}:{k}:{vendor}:{len(xs)}:{round(total)}", title=title, body=body, contract_id=cids.pop() if len(cids) == 1 else None, vendor=vendor, link="/spend", severity=sev))
+    elif kind == "certificate":
+        from app import certificates
+
+        for x in certificates.listing(s, today)["certificates"]:
+            if x["status"] == "expired" or (x["status"] == "expiring" and x["days_left"] <= int(p.get("days", 30))):
+                when = f"expired {-x['days_left']} days ago" if x["status"] == "expired" else f"expires in {x['days_left']} days"
+                out.append(dict(dedupe=f"{r['key']}:{x['id']}:{x['expiry_date']}", title=f"{x['name']} {when}: {x['vendor']}", body=f"Required by {x['contract_title'] or 'the contract'}. Ask the vendor for the renewed certificate.",
+                                contract_id=x["contract_id"], vendor=x["vendor"], link="/certificates", severity="critical" if x["status"] == "expired" else "high"))
     elif kind == "vendor_tier":
         order = ["low", "medium", "high", "critical"]
         for x in s.execute(text("SELECT vendor, score, tier FROM vendor_scores")).mappings():

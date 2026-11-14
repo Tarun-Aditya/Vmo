@@ -369,7 +369,7 @@ def _fmt(v: float | None) -> str:
 
 
 def evaluate_rules(doc_type: str, status: str, clauses: list[dict], values: list[dict], metrics: list[dict],
-                   rules: list[dict], fully_executed: bool) -> list[dict]:
+                   rules: list[dict], fully_executed: bool, category: str | None = None) -> list[dict]:
     """Run the enabled checklist rules. Returns a result per applicable rule:
     {rule_key, status: pass|fail|na, actual, expected, severity, clause_id, page, excerpt}."""
     by_type: dict[str, list[dict]] = {}
@@ -380,6 +380,8 @@ def evaluate_rules(doc_type: str, status: str, clauses: list[dict], values: list
     out = []
     for r in rules:
         if r["applies_to"] and doc_type not in r["applies_to"]:
+            continue
+        if r.get("categories") and category not in r["categories"]:        # a rule for one kind of supplier says nothing about the others
             continue
         if r["stage"] == "post_sign" and status == "draft":
             continue

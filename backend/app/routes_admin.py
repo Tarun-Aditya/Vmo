@@ -359,6 +359,7 @@ class RuleIn(BaseModel):
     phrase: str | None = None
     severity: str = "medium"
     applies_to: list[str] = []
+    categories: list[str] = []
     stage: str = "any"
     suggested_text: str | None = None
     enabled: bool = True
@@ -399,10 +400,10 @@ def rule_create(r: RuleIn):
         raise HTTPException(409, "a rule with that key exists")
     n = rows("SELECT coalesce(max(sort_order),0)+1 AS n FROM checklist_rules")[0]["n"]
     run_sql("""INSERT INTO checklist_rules (key,name,description,rule_type,kcc_key,metric_key,operator,threshold,threshold_text,phrase,severity,
-                 applies_to,stage,suggested_text,enabled,sort_order,builtin)
-               VALUES (:k,:n,:d,:t,:kc,:mk,:op,:th,:tt,:ph,:sv,:ap,:st,:sx,:en,:so,false)""",
+                 applies_to,categories,stage,suggested_text,enabled,sort_order,builtin)
+               VALUES (:k,:n,:d,:t,:kc,:mk,:op,:th,:tt,:ph,:sv,:ap,:cat,:st,:sx,:en,:so,false)""",
             k=key, n=r.name, d=r.description, t=r.rule_type, kc=r.kcc_key, mk=r.metric_key, op=r.operator, th=r.threshold, tt=r.threshold_text,
-            ph=r.phrase, sv=r.severity, ap=r.applies_to, st=r.stage, sx=r.suggested_text, en=r.enabled, so=n)
+            ph=r.phrase, sv=r.severity, ap=r.applies_to, cat=r.categories, st=r.stage, sx=r.suggested_text, en=r.enabled, so=n)
     return {"key": key, **_reprocess()}
 
 
@@ -410,9 +411,9 @@ def rule_create(r: RuleIn):
 def rule_update(key: str, r: RuleIn):
     _check_rule(r)
     run_sql("""UPDATE checklist_rules SET name=:n, description=:d, rule_type=:t, kcc_key=:kc, metric_key=:mk, operator=:op, threshold=:th,
-                 threshold_text=:tt, phrase=:ph, severity=:sv, applies_to=:ap, stage=:st, suggested_text=:sx, enabled=:en WHERE key=:k""",
+                 threshold_text=:tt, phrase=:ph, severity=:sv, applies_to=:ap, categories=:cat, stage=:st, suggested_text=:sx, enabled=:en WHERE key=:k""",
             k=key, n=r.name, d=r.description, t=r.rule_type, kc=r.kcc_key, mk=r.metric_key, op=r.operator, th=r.threshold, tt=r.threshold_text,
-            ph=r.phrase, sv=r.severity, ap=r.applies_to, st=r.stage, sx=r.suggested_text, en=r.enabled)
+            ph=r.phrase, sv=r.severity, ap=r.applies_to, cat=r.categories, st=r.stage, sx=r.suggested_text, en=r.enabled)
     return {"key": key, **_reprocess()}
 
 
