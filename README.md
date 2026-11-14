@@ -12,8 +12,8 @@ which vendor certificates have lapsed, which drafts depart from the house standa
 > real tenants. See [Known limits](#known-limits). The fictional customer is **Seabright Hotels & Resorts** (six properties); every vendor,
 > person and document in the demo data is fictional.
 
-**Navigation.** Seven screens are always visible: Overview · Properties · Compare · Renewals · Contracts · Ask · Review. Everything else (vendors, portfolio map,
-certificates, obligations, spend, risk, key clauses, templates, admin) is under **More**.
+**Navigation.** A left rail lists every screen: Portfolio, Renewals, Portfolio map, Properties, Compare, Contracts, Vendors, Key clauses, Ask, Redline, Templates,
+Obligations, Certificates, Spend, Risk and New contract, with Admin and the Demo switch at the foot.
 
 ## What it does
 
@@ -192,7 +192,7 @@ Set in `.env` (see `.env.example`):
 ```
 backend/app/         FastAPI app: pipeline, extraction, kcc (clause library), kcc_ai, deviations, ask*, routes_*,
                      connectors/, simulators/, collab, mode (Demo/Live), llm, embeddings
-backend/alembic/     migrations (0001 to 0029; below 0005 cannot be downgraded)
+backend/alembic/     migrations (0001 to 0031; below 0005 cannot be downgraded)
 backend/tests/       pytest suite
 frontend/src/        React + Vite + TypeScript + Tailwind + TanStack Query
 evals/               extraction, redline, Ask, module, OCR, retrieval, CUAD and pilot evals
@@ -213,7 +213,7 @@ all names are fictional.
 
 * Sources: `backend/app/docgen/hotel_spec.py` (spec, ground truth, the properties' attributes, the certificates on file), `corpus/hotel/*.md` (contract text written by Claude
   from the spec), seeded files in `data/hotel/`.
-* **Properties are records** (migration 0029): `properties` (rooms, city, kind) is filled from the documents and from `properties.json` in the data folder, and edited with
+* **Properties are records** (migration 0031): `properties` (rooms, city, kind) is filled from the documents and from `properties.json` in the data folder, and edited with
   `PATCH /api/properties/{id}`. View `v_property_contracts` attributes every contract to the properties it covers: a contract that names a property counts there in full; a
   group agreement with schedules counts at the properties its schedules name; a group agreement without schedules counts at every property; `PUT /api/contracts/{id}/coverage`
   records an exception. The share is by rooms. The six properties' costs add up to the portfolio's yearly value exactly.
@@ -238,7 +238,7 @@ all names are fictional.
   given to Claude now describes `properties`, `v_property_contracts` and `certificates` (it previously promised a `property` column that the view did not have).
 * **Portfolio map** (`/map`): every contract family on one timeline with the last day to act, plus hierarchy problems.
 * **End-to-end walkthrough** (`node scripts/demo_e2e.js`): all 22 steps pass on this build with no page errors. The committed video in `reports/e2e_hotel/` was recorded before
-  the seven-screen navigation and the Properties, Compare and Certificates screens; re-record with `make video` after a fresh seed.
+  the Compare and Certificates screens and the richer Properties screen; re-record with `make video` after a fresh seed.
 * Not yet done: the walkthrough does not visit Compare or Certificates; certificates are not yet read from uploaded certificate documents or raised as alerts; Claude-mode
   measurement has not been repeated since these changes; the new layout on Ask, Review and the Admin pages.
 

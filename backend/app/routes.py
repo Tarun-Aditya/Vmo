@@ -701,6 +701,7 @@ def portfolio_map(property: str | None = None, vendor: str | None = None):
                     "problems": len(issues), "no_end_date": sum(1 for i in issues if i["kind"] == "no_end_date"), "notice_passed": sum(1 for r in rows if r["notice_deadline"] and r["notice_deadline"] < today)},
     }
 
+
 # ------------------------------------------------------------------ renewal decisions
 class DecisionIn(BaseModel):
     contract_id: int
