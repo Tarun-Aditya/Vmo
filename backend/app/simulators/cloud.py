@@ -266,7 +266,18 @@ def build_demo(base: str):
     from cryptography.hazmat.primitives import serialization
     from cryptography.hazmat.primitives.asymmetric import rsa
 
-    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    # the simulated Google service account keeps one key across restarts (a saved demo connector holds the private half; a fresh key on every
+    # start made it fail sign-in after any restart). Stored next to the app's own secret key, never committed.
+    from app.config import data_path
+
+    kf = data_path() / ".sim_gdrive_key.pem"
+    if kf.exists():
+        key = serialization.load_pem_private_key(kf.read_bytes(), password=None)
+    else:
+        key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        kf.parent.mkdir(parents=True, exist_ok=True)
+        kf.write_bytes(key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+        kf.chmod(0o600)
     priv = key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()).decode()
     pub = key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo).decode()
     gs = DriveState(pub, "demo-svc@contractiq-demo.iam.gserviceaccount.com")

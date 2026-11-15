@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Status, api, inFuture, when } from "../../lib";
 import { Btn, Field, Toggle, inputCls } from "../../forms";
@@ -10,15 +10,15 @@ type Run = { id: number; pipeline: string; started_at: string; finished_at: stri
 type Ev = { id: number; path: string; contract_id: number | null; action: string; detail: string; content_hash: string | null; size_bytes: number | null; reason: string | null; created_at: string };
 
 const FREQ: [number, string][] = [[15, "Every 15 minutes"], [30, "Every 30 minutes"], [60, "Every hour"], [120, "Every 2 hours (default)"], [360, "Every 6 hours"], [720, "Every 12 hours"], [1440, "Daily"]];
-const inDays = (n: number) => { const d = new Date(Date.now() + n * 864e5); return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }); };
-const SAMPLE = () => `# NDA – Example Supplier
+const inDays = (n: number) => { const d = new Date(Date.now() + n * 864e5); return d.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" }); };
+const SAMPLE = (customer: string) => `# NDA – Example Supplier
 
-**Parties:** Arcadia Retail Inc. (the "Customer") and Example Supplier Inc (the "Supplier")
+**Parties:** ${customer} (the "Customer") and Example Supplier Inc (the "Supplier")
 **Effective Date:** ${inDays(30)}
 **Document Type:** NDA
 
 ## 1. Term
-This NDA commences on ${inDays(30)} and, unless terminated earlier in accordance with its terms, expires on 1 December 2028.
+This NDA commences on ${inDays(30)} and, unless terminated earlier in accordance with its terms, expires on December 1, 2028.
 
 ## 2. Confidentiality
 Each party shall keep the other party's Confidential Information confidential, use it only for the purposes of this NDA, and continue to do so for 3 years after the NDA ends.
@@ -82,19 +82,22 @@ export default function Pipeline() {
   const runs = useQuery({ queryKey: ["runs"], queryFn: () => api<Run[]>("/api/admin/pipeline/runs"), refetchInterval: 4000 });
   const [open, setOpen] = useState<number | null>(null);
   const events = useQuery({ queryKey: ["events", open], enabled: open !== null, queryFn: () => api<Ev[]>(`/api/admin/pipeline/runs/${open}/events`) });
-  const [doc, setDoc] = useState({ filename: "new-nda.md", content: SAMPLE(), category: "", owner: "", status: "active" });
+  const who = useQuery({ queryKey: ["meta"], queryFn: () => api<{ customer?: string }>("/api/meta") });
+  const [doc, setDoc] = useState({ filename: "new-nda.md", content: "", category: "", owner: "", status: "active" });
+  useEffect(() => { if (who.data && !doc.content) setDoc((d) => ({ ...d, content: SAMPLE(who.data!.customer ?? "Our Company") })); }, [who.data, doc.content]);      // the sample names this installation's own company
   const refresh = () => { qc.invalidateQueries(); };
   const upload = useMutation({ mutationFn: () => api<{ run: { new_docs?: number; updated?: number } }>("/api/admin/pipeline/upload", { method: "POST", body: JSON.stringify(doc) }), onSuccess: refresh });
   if (!q.data) return <Loading q={q} />;
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid items-start gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-1" aria-label="Pipelines">
           {pls.data?.pipelines.map((pl) => <PipelineCard key={pl.key} pl={pl} running={pls.data!.running} />)}
           <p className="text-xs text-slate-500">Inbox folder: <span className="break-all font-mono">{q.data.inbox}</span> · {q.data.inbox_files} files · {(q.data.documents.active ?? 0)} executed · {(q.data.documents.draft ?? 0)} draft</p>
         </div>
 
-        <Card title="Sources" className="lg:col-span-2">
+        <div className="space-y-4 lg:col-span-2">{/* sources and the paste-a-document box share the right-hand column */}
+        <Card title="Sources">
           {!srcs.data && <p className="text-sm text-slate-500">Loading…</p>}
           {srcs.data && srcs.data.connectors.length === 0 && <p className="text-sm text-slate-500">No external sources yet. Add one under <Link className="text-indigo-600 hover:underline" to="/admin/connectors">Connectors</Link>.</p>}
           <ul className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -107,7 +110,7 @@ export default function Pipeline() {
           <p className="mt-2 text-xs text-slate-500">{meta.data?.simulators ? "Violet “Simulated” badges mark stand-ins that speak the real APIs; in production each is replaced by the customer’s own tenant. " : ""}Manage sources in <Link className="text-indigo-600 hover:underline" to="/admin/connectors">Connectors</Link>.</p>
         </Card>
 
-        <Card title="Add a document to the folder" className="lg:col-span-2">
+        <Card title="Add a document to the folder">
           <p className="mb-2 text-sm text-slate-500">Anything placed in the inbox folder is picked up on the next run. Paste a document here to drop it in and process it immediately (Markdown or plain text; vendor, type and parent are read from the document).</p>
           <div className="grid gap-3 sm:grid-cols-4">
             <Field label="File name"><input className={inputCls} value={doc.filename} onChange={(e) => setDoc({ ...doc, filename: e.target.value })} /></Field>
@@ -122,6 +125,7 @@ export default function Pipeline() {
             {upload.error && <span className="text-sm text-red-600">{String(upload.error)}</span>}
           </div>
         </Card>
+        </div>
       </div>
 
       <Card title="Run history">

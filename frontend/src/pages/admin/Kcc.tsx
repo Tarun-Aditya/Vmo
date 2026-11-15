@@ -20,6 +20,7 @@ export default function Kcc() {
   const [f, setF] = useState(BLANK);
   const [test, setTest] = useState<Test | null>(null);
   const [filter, setFilter] = useState("");
+  const [cat, setCat] = useState<string | null>(null);
   const body = () => ({ ...f, keywords: csv(f.keywords), heading_aliases: csv(f.aliases), key: f.key || undefined });
   const done = () => { qc.invalidateQueries(); setEdit(null); setTest(null); };
   const save = useMutation({
@@ -39,7 +40,10 @@ export default function Kcc() {
     setEdit(k.key);
   };
   if (!list.data) return <Loading q={list} />;
-  const rows = list.data.filter((k) => !filter || (k.name + k.key + (k.category ?? "")).toLowerCase().includes(filter.toLowerCase()));
+  // one tab per category (Key clause, the industry pack, Document element...), the busiest first; document elements last since they rarely need attention
+  const cats = Array.from(new Set(list.data.map((k) => k.category || "Other"))).sort((a, b) => (a === "Document element" ? 1 : 0) - (b === "Document element" ? 1 : 0) || list.data.filter((k) => (k.category || "Other") === b).length - list.data.filter((k) => (k.category || "Other") === a).length);
+  const tab = cat ?? cats[0];
+  const rows = list.data.filter((k) => (filter ? true : (k.category || "Other") === tab) && (!filter || (k.name + k.key + (k.category ?? "")).toLowerCase().includes(filter.toLowerCase())));
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -81,6 +85,14 @@ export default function Kcc() {
         </Card>
       )}
 
+      <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Clause categories">
+        {cats.map((c) => {
+          const n = list.data.filter((k) => (k.category || "Other") === c).length, on = !filter && c === tab;
+          return <button key={c} type="button" role="tab" aria-selected={on} onClick={() => { setCat(c); setFilter(""); }}
+            className={`min-h-[36px] rounded-full border px-3.5 text-sm font-medium ${on ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-300 bg-white hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800"}`}>{c} <span className={on ? "text-indigo-100" : "text-slate-500"}>{n}</span></button>;
+        })}
+        {filter && <span className="text-sm text-slate-500">{rows.length} match{rows.length !== 1 ? "es" : ""} for “{filter}” in every category</span>}
+      </div>
       <Card>
         <div className="overflow-x-auto"><table className="w-full text-sm">
           <thead><tr><Th>Clause</Th><Th>Type</Th><Th>Identified by</Th><Th className="text-right">Found in</Th><Th>If missing</Th><Th>Expected in</Th><Th>Matrix</Th><Th>On</Th><Th /></tr></thead>

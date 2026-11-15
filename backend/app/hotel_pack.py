@@ -82,8 +82,32 @@ RULES = [
 ]
 
 
+# Bump when the pack's own wording, scope or patterns change. A database written by an older pack gets the pack-owned fields of the pack's rows refreshed once
+# (name, description, scope, suggested wording, keywords); after that, an admin's edits to those rows are kept until the next bump.
+PACK_VERSION = 2
+
+
+def _refresh_pack_rows(s) -> bool:
+    have = s.execute(text("SELECT value FROM app_settings WHERE key = 'hotel_pack_version'")).scalar()
+    if have is not None and int(have) >= PACK_VERSION:
+        return False
+    for r in RULES:
+        s.execute(text("""UPDATE checklist_rules SET name=:n, description=:d, categories=:c, suggested_text=:x, applies_to=:a, severity=:sv
+                          WHERE key=:k AND NOT builtin"""), {"n": r["name"], "d": r["description"], "c": r.get("categories") or [], "x": r["suggested_text"],
+                                                            "a": r["applies_to"], "sv": r["severity"], "k": r["key"]})
+    for c in CLAUSES:
+        s.execute(text("""UPDATE kcc_library SET name=:n, description=:d, keywords=:kw, heading_aliases=:ha, standard_text=:st, playbook_position=:pp
+                          WHERE key=:k AND NOT builtin"""), {"n": c["name"], "d": c["description"], "kw": c["keywords"], "ha": c["heading_aliases"],
+                                                            "st": c["standard_text"], "pp": c["playbook_position"], "k": c["key"]})
+    for m in METRICS:
+        s.execute(text("UPDATE metrics SET name=:n, description=:d, unit=:u WHERE key=:k AND NOT builtin"), {"n": m["name"], "d": m["description"], "u": m["unit"], "k": m["key"]})
+    s.execute(text("""INSERT INTO app_settings (key, value, updated_by) VALUES ('hotel_pack_version', CAST(:v AS jsonb), 'hotel pack')
+                      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_by = EXCLUDED.updated_by"""), {"v": str(PACK_VERSION)})
+    return True
+
+
 def ensure(s) -> dict:
-    """Idempotently add the hospitality clauses, values and rules (never overwrites an admin's edits)."""
+    """Idempotently add the hospitality clauses, values and rules (never overwrites an admin's edits, except once per pack version: see PACK_VERSION)."""
     kcc.ensure_defaults(s)
     out = {"kcc": kcc._insert_missing(s, "kcc_library", kcc.KCC_COLS, CLAUSES),
            "metrics": kcc._insert_missing(s, "metrics", kcc.MET_COLS, METRICS)}
@@ -96,5 +120,6 @@ def ensure(s) -> dict:
         s.execute(text("UPDATE kcc_library SET keywords = :kw WHERE key = :k AND NOT builtin"), {"kw": c["keywords"], "k": c["key"]})
     for m in METRICS:         # pack metrics are admin rows: bring their patterns up to date on re-seed, without touching a metric an admin created
         s.execute(text("UPDATE metrics SET pattern=:p WHERE key=:k AND NOT builtin"), {"p": m["pattern"], "k": m["key"]})
+    out["refreshed"] = _refresh_pack_rows(s)
     kcc.rebuild_key_clauses_view(s)
     return out

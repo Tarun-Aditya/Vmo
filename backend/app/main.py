@@ -116,7 +116,8 @@ async def access_control(request: Request, call_next):
         request.state.user = user
     resp = await call_next(request)
     if method not in ("GET", "HEAD", "OPTIONS") or "/export" in path:
-        if not path.startswith("/api/auth/login") and not (path.startswith("/api/chat") and resp.status_code < 400):
+        # the simulated external systems (/sim/...) stand in for other companies' servers: their traffic is not a change to this application
+        if not path.startswith(("/api/auth/login", "/sim/")) and not (path.startswith("/api/chat") and resp.status_code < 400):
             await run_in_threadpool(auth.audit, user, method, path, resp.status_code, request.client.host if request.client else None)
     return resp
 

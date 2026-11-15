@@ -56,9 +56,9 @@ export default function Connectors() {
   const f = edit ? FIELDS[edit.type] : null;
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <p className="max-w-3xl text-sm text-slate-500">Connect a Google Drive folder, a OneDrive folder or a SharePoint library. New and changed contracts (PDF, Word, Markdown, text) are copied into the inbox on a schedule and run through the pipeline; the original link is kept on each contract. Credentials are stored encrypted and never shown again.</p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {meta.data?.simulators && <Btn kind="ghost" onClick={() => cloud.mutate("demo-cloud")} disabled={cloud.isPending} title="Simulated Google Drive, OneDrive and SharePoint with demo contracts">{cloud.isPending && cloud.variables === "demo-cloud" ? "Connecting…" : "Connect demo cloud drives"}</Btn>}
           {meta.data?.simulators && <Btn kind="ghost" onClick={() => cloud.mutate("demo-mailbox")} disabled={cloud.isPending} title="A simulated IMAP mailbox with two contract e-mails">{cloud.isPending && cloud.variables === "demo-mailbox" ? "Connecting…" : "Connect demo mailbox"}</Btn>}
           {meta.data?.simulators && <Btn kind="ghost" onClick={() => demo.mutate()} disabled={demo.isPending} title="Registers a simulated Coupa and a simulated SAP S/4HANA (built into this app) and syncs them: the real connectors run against them over HTTP">{demo.isPending ? "Connecting…" : "Connect demo ERP (simulated Coupa + SAP)"}</Btn>}

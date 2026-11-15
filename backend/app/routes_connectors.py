@@ -137,13 +137,14 @@ def connect_demo_erp():
     out = []
     for name, kind, cfg, sec, target in spec:
         ex = rows("SELECT id FROM connectors WHERE name=:n", n=name)
-        if ex:
-            cid = ex[0]["id"]
-        else:
-            with SessionLocal() as s:
+        with SessionLocal() as s:
+            if ex:              # reconnecting repairs a demo connector: the simulator's current address and credentials replace the saved ones
+                cid = ex[0]["id"]
+                s.execute(text("UPDATE connectors SET config = CAST(:c AS jsonb), secrets_enc = :s WHERE id = :i"), {"c": json.dumps(cfg), "s": crypto.encrypt(sec), "i": cid})
+            else:
                 cid = s.execute(text("""INSERT INTO connectors (name, type, config, secrets_enc, target, enabled, trigger_mode, interval_minutes, next_sync_at)
                                         VALUES (:n,:t,CAST(:c AS jsonb),:s,:tg,true,'manual',60, now()) RETURNING id"""), {"n": name, "t": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec), "tg": target}).scalar()
-                s.commit()
+            s.commit()
         out.append({"name": name, "id": cid, **service.sync(cid, "demo")})
     return {"connectors": out}
 
@@ -170,13 +171,14 @@ def connect_demo_cloud(request: Request):
     out = []
     for name, kind, target, cfg, sec in spec:
         ex = rows("SELECT id FROM connectors WHERE name=:n", n=name)
-        if ex:
-            cid = ex[0]["id"]
-        else:
-            with SessionLocal() as s:
+        with SessionLocal() as s:
+            if ex:              # reconnecting repairs a demo connector: the simulator's current address and credentials replace the saved ones
+                cid = ex[0]["id"]
+                s.execute(text("UPDATE connectors SET config = CAST(:c AS jsonb), secrets_enc = :s WHERE id = :i"), {"c": json.dumps(cfg), "s": crypto.encrypt(sec), "i": cid})
+            else:
                 cid = s.execute(text("""INSERT INTO connectors (name, type, config, secrets_enc, target, enabled, trigger_mode, interval_minutes, next_sync_at)
                                         VALUES (:n,:t,CAST(:c AS jsonb),:s,:tg,true,'manual',60, now()) RETURNING id"""), {"n": name, "t": kind, "c": json.dumps(cfg), "s": crypto.encrypt(sec), "tg": target}).scalar()
-                s.commit()
+            s.commit()
         out.append({"name": name, "id": cid, **service.sync(cid, "demo")})
     return {"connectors": out}
 
