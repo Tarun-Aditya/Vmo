@@ -158,6 +158,16 @@ term clause beats the date on the cover, "effective for 36 months starting ..." 
 the supplier's name (used only when it appears in the document word for word); its prompt says how to treat blanks, conditional personal-data wording, and option years.
 CUAD hold-out after these changes: governing law 91.6% (was 89.1%), everything else unchanged.
 
+**2026-11-15: continuous intake, repository, Ask scope.** Ingestion stays in the pipeline (Admin → Pipeline), not on a separate page: every run, whatever
+started it (schedule, folder watch, connector, mailbox, upload, Run now) and for any number of documents, reports each document's steps (read, clauses,
+terms, vectors, checks) and outcome (new, re-read, duplicate, already read, linked under its parent, the terms an amendment changes) in a **live run** panel
+(`pipeline.LIVE`, `GET /api/admin/pipeline/live`). **Add documents** takes any number of PDF / Word files (`POST /api/admin/pipeline/files`); the demo
+**sample folder** (11 documents) loads and is removed there. **Contracts** is one hierarchical repository table (agreement → schedules, amendments, NDAs, DPAs)
+with the key terms after amendments and the last day to act. **Ask** has a document checklist, all ticked by default (= whole portfolio); untick to ask
+about one or several documents, and lists, groupings and totals come back as tables from those documents only. Fixes: 'no liability cap' is the uncapped
+flag; clause questions over ticked documents ('the insurance requirements') return those clauses, or the closest clauses by meaning when no clause type is
+named; a contract term named in a question ('payment terms') is shown after amendments, not the clause measure.
+
 **2026-11-15: five realistic contracts.** `data/realistic_hotel`: fictional but written as real US hotel supplier paper (food distribution, HVAC maintenance,
 revenue-management software with a data processing addendum, valet parking, a waste hauler's evergreen form). Offline rules read 72% of their labelled fields at
 first; 100% (60/60 with signatories) after the fixes: an end date stated in a "Term and Renewal" clause or an order-form row; an order form's subscription start

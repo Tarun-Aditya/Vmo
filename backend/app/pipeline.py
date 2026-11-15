@@ -186,8 +186,27 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
     return {"values": len(vals), "checks": len(results), "deviations": len(items), "obligations": n_obl}
 
 
-# Intake screen: a callback that hears each step of reading one document (read, structure, metadata, extract, index, check). None outside that screen.
+# Each step of reading one document (read, structure, extract, index, check) is reported to a callback set for the thread that reads it; run_pipeline
+# points it at LIVE, the run in progress (or the last one), which Admin -> Pipeline shows document by document whatever started the run.
 PROGRESS: ContextVar = ContextVar("pipeline_progress", default=None)
+LIVE: dict = {}
+_live_lock = threading.Lock()
+
+
+def live_snapshot() -> dict:
+    with _live_lock:
+        return json.loads(json.dumps(LIVE, default=str)) if LIVE else {}
+
+
+def _live_step(rel: str, step: str, data: dict) -> None:
+    with _live_lock:
+        d = (LIVE.get("docs") or {}).get(rel)
+        if d is None:
+            return
+        if step == "start":
+            d.update(status="running", started=time.time())
+        else:
+            d[step] = data
 KEY_FIELDS = [("effective_date", "Start date"), ("expiry_date", "End date"), ("auto_renew", "Renews automatically"), ("notice_period_days", "Notice to stop renewal (days)"),
               ("annual_value", "Annual value"), ("total_value", "Total value"), ("payment_terms_days", "Payment terms (days)"), ("liability_cap_multiple", "Liability cap (x annual fees)"),
               ("termination_for_convenience", "Can exit for convenience"), ("governing_law", "Governing law"), ("processes_personal_data", "Handles personal data"),
@@ -405,10 +424,19 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
             s.commit()
         files = only if only is not None else scan(root, folders)
         counts = dict(scanned=len(files), new_docs=0, updated=0, unchanged=0, failed=0)
+        with _live_lock:
+            previous = dict(LIVE)
+            LIVE.clear()
+            LIVE.update(run_id=run_id, trigger=trigger, started=time.time(), finished=None, status="running", engine=("Claude" if llm.available() and extractor != "offline" else "offline rules"),
+                        order=[str(f.relative_to(root)) for f in files],
+                        docs={str(f.relative_to(root)): {"path": str(f.relative_to(root)), "name": f.name, "format": f.suffix.lstrip(".").upper(), "size": f.stat().st_size if f.exists() else 0,
+                                                         "status": "queued"} for f in files})
         pending: dict[int, str | None] = {}
         lk = threading.Lock()
 
         def work(f: Path) -> None:
+            rel_ = str(f.relative_to(root))
+            tok = PROGRESS.set(lambda step, data: _live_step(rel_, step, data))
             try:
                 with SessionLocal() as s:
                     r = ingest_file(s, f, root, cfg, extractor, force=force)
@@ -422,13 +450,25 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
                     s.commit()
                 with lk:
                     counts[{"new": "new_docs", "updated": "updated", "unchanged": "unchanged", "moved": "unchanged"}[r["action"]]] += 1
+                with _live_lock:
+                    d = (LIVE.get("docs") or {}).get(rel_)
+                    if d is not None:
+                        d.update(status="done", finished=time.time(), contract_id=r["contract_id"], reason=r.get("reason"),
+                                 action="duplicate" if r["action"] == "unchanged" and str(r.get("reason", "")).startswith("duplicate") else r["action"])
+                        d.setdefault("started", d["finished"])
             except Exception as e:  # one bad document must not stop the run
                 with lk:
                     counts["failed"] += 1
+                with _live_lock:
+                    d = (LIVE.get("docs") or {}).get(rel_)
+                    if d is not None:
+                        d.update(status="error", finished=time.time(), error=f"{type(e).__name__}: {e}"[:300])
                 with SessionLocal() as s:
                     s.execute(text("INSERT INTO pipeline_events (run_id, path, action, detail, reason) VALUES (:r,:p,'failed',:d,'will be retried on the next run')"),
                               {"r": run_id, "p": str(f.name), "d": f"{type(e).__name__}: {e}"[:300]})
                     s.commit()
+            finally:
+                PROGRESS.reset(tok)
 
         workers = 4 if llm.available() and extractor != "offline" and len(files) > 1 else 1     # LLM calls dominate: overlap them
         if workers > 1:
@@ -457,8 +497,20 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
                     fp = fingerprint(scan(root, [x for x in fl.split(",") if x]))
                     s.execute(text("UPDATE pipeline_config SET last_run_at=:n, next_run_at=:n + make_interval(mins => interval_minutes), last_fingerprint=:f WHERE key=:k"),
                               {"n": now, "k": k, "f": fp})
+            ids = [d.get("contract_id") for d in (LIVE.get("docs") or {}).values() if d.get("contract_id")]
+            rel_rows = {r_[0]: r_ for r_ in s.execute(text("""SELECT c.id, c.title, c.type, c.vendor, p.id, p.title, c.overrides FROM contracts c LEFT JOIN contracts p ON p.id = c.parent_id
+                                                              WHERE c.id = ANY(:ids)"""), {"ids": ids})} if ids else {}
+            with _live_lock:
+                for d in (LIVE.get("docs") or {}).values():
+                    r_ = rel_rows.get(d.get("contract_id"))
+                    if r_:
+                        d.update(title=r_[1], type=r_[2], vendor=r_[3], parent_id=r_[4], parent=r_[5], overrides=list(r_[6] or []))
+                LIVE.update(status="completed", finished=time.time(), counts=dict(counts), linked=linked)
             if trigger == "watch" and not (counts["new_docs"] or counts["updated"] or counts["failed"]):
                 s.execute(text("DELETE FROM pipeline_runs WHERE id=:i"), {"i": run_id})   # nothing changed: keep the history quiet
+                with _live_lock:                                                             # ... and the live view on the last run that did something
+                    LIVE.clear()
+                    LIVE.update(previous)
             s.commit()
         try:    # contracts changed: refresh spend exceptions and vendor risk scores
             from app import feeds
@@ -470,6 +522,9 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
         log(out)
         return out
     finally:
+        with _live_lock:
+            if LIVE.get("status") == "running" and LIVE.get("run_id") == run_id:
+                LIVE.update(status="failed", finished=time.time())
         _lock.release()
 
 

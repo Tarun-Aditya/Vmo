@@ -133,6 +133,7 @@ def _clause_rx(k: dict) -> str:
 
 def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope=None, cfg=None) -> dict | None:
     q = question.lower().replace("’", "'")
+    q = re.sub(r"\b(?:no|without (?:a|any)|lack(?:s|ing)? (?:a|any)?)\s*(?:liability cap|cap on (?:their |its )?liability|limit on (?:their |its )?liability)\b", "uncapped liability", q)     # 'no liability cap' is the uncapped flag, not a missing clause
     today = today or dt.date.today()
     cats = _distinct("category") if cats is None else cats
     vendors = _distinct("vendor") if vendors is None else vendors
@@ -214,12 +215,14 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
 
     want_cols: list[str] = []
     has_filter_clauses: list[str] = []
+    # on ticked documents, 'the insurance requirements', 'the termination terms', 'what do they say about audits' ask for the clauses themselves
+    clause_q = "clause" in q or bool(scope and re.search(r"(?<!payment )\b(?:terms|requirements|provisions|conditions|obligations|wording|say|says|said)\b", q))
     for k in kccs:
         rx = _clause_rx(k)
         for m in re.finditer(rx, q) if rx else []:
             pre = q[max(0, m.start() - 28): m.start()]
             neg = re.search(r"(?:without|no|missing|lack(?:ing|s)?|absent|don't have|do not have|doesn't have|does not have|not have)\s+(?:an?\s+|any\s+|the\s+)?(?:\w+\s+)?$", pre)
-            pos = re.search(r"(?:with|have|has|having|contain(?:s|ing)?|includ(?:e|es|ing))\s+(?:an?\s+|any\s+|the\s+)?(?:\w+\s+)?$", pre) and "clause" in q
+            pos = re.search(r"(?:with|have|has|having|contain(?:s|ing)?|includ(?:e|es|ing))\s+(?:an?\s+|any\s+|the\s+)?(?:\w+\s+)?$", pre) and clause_q
             if neg:
                 where.append(f"NOT has_{k['key']}")
                 suffix.append(f"without {_a(k['name'])} clause")
@@ -228,7 +231,7 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
                 where.append(f"has_{k['key']}")
                 suffix.append(f"with {_a(k['name'])} clause")
                 has_filter_clauses.append(k["key"])
-            if neg or pos or "clause" in q or re.search(r"key clauses|all clauses", q):
+            if neg or pos or clause_q or re.search(r"key clauses|all clauses", q):
                 want_cols.append(f"has_{k['key']}")
             break
     for rx, cols in ATTRS:
@@ -253,7 +256,9 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         if mt_:
             hit_metrics.append((mt_.start(), m))
     hit_metrics = [m for _, m in sorted(hit_metrics, key=lambda x: x[0])]        # columns follow the order of the question
-    want_cols.extend("mv:" + m["key"] for m in hit_metrics)
+    TERM_COLS = {"payment_terms_days", "notice_period_days", "liability_cap_multiple", "annual_value", "total_value", "governing_law"}
+    # a value that is also a contract term ('payment terms') is shown as the term, which carries amendments; the clause measure is the original wording
+    want_cols.extend(m["key"] if m["key"] in TERM_COLS else "mv:" + m["key"] for m in hit_metrics if (m["key"] if m["key"] in TERM_COLS else "mv:" + m["key"]) not in want_cols)
     cmp_ = re.search(rf"({LT}|{GT})\s*{NUM}", q)
     if hit_metrics and not cmp_ and not scope and _distinct("property"):         # hotel groups: 'the laundry rate per kilogram (across properties)': only contracts that state it, with vendor and property beside the value
         where.append(f"EXISTS (SELECT 1 FROM extracted_values ev WHERE ev.contract_id = {bname}.contract_id AND ev.metric_key = '{hit_metrics[0]['key']}')")
@@ -301,7 +306,7 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     all_clauses = bool(re.search(r"key clauses|all clauses|which clauses|clause (?:presence|checklist|coverage)", q))
     overview = bool(re.search(r"summar|overview|key terms|tell me about|describe|details|what is this|about this", q))
 
-    doc_clauses = bool(re.search(r"\bclauses?\b|what does .* say|terms of|wording|says?\b", q) and (vendor_hit or types or scope) and not has_filter_clauses
+    doc_clauses = bool((re.search(r"\bclauses?\b|what does .* say|terms of|wording|says?\b", q) or (scope and clause_q)) and (vendor_hit or types or scope) and not has_filter_clauses
                        and metric == "list" and not group and not (checks and not scope)) or (all_clauses and (vendor_hit or types or where) and metric == "list")
     if scope and want_cols and any(c.startswith("has_") for c in want_cols) and not has_filter_clauses and not cmp_ and not overview:
         doc_clauses = True  # "what does the indemnity clause say" on selected documents
@@ -311,6 +316,9 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         # 'what happens if we end it early?', 'can we exit?', 'how fast must they respond?': a question about what the document says, answered from its clauses
         if intent == "card" and not overview and re.search(r"^(?:what happens|what if|what do we|what must|can (?:we|they|the)|could we|how (?:do|does|can|long|fast|quickly|soon|much)|is there|are (?:we|they)|do (?:we|they)|who (?:pays|is responsible))\b", q.strip()):
             intent = "search"
+    if intent in ("table", "doc_clauses") and scope and clause_q and metric == "list" and not group and not has_filter_clauses and not any(c.startswith("has_") for c in want_cols) \
+            and not re.search(r"key clauses|all clauses", q):
+        intent = "search"            # a question about what the ticked documents say, with no clause type named: search their clauses by meaning
     if intent == "table" and metric == "list" and not (where or group or want_cols or all_clauses):
         if not scope:
             return None
@@ -444,8 +452,9 @@ def answer(question: str, today: dt.date | None = None, scope: list[int] | None 
     if plan["intent"] == "checks":
         return _answer_checks(plan, steps)
     if plan["intent"] == "search":
-        res = execute_tool("search_clauses", {"query": question, "contract_ids": plan["scope"], "top_k": 5})
-        calls.append({"name": "search_clauses", "input": {"query": question, "top_k": 5}, "output": res})
+        k = min(5 + 2 * (len(plan["scope"]) - 1), 15)          # several ticked documents: room for each to contribute
+        res = execute_tool("search_clauses", {"query": question, "contract_ids": plan["scope"], "top_k": k})
+        calls.append({"name": "search_clauses", "input": {"query": question, "top_k": k}, "output": res})
         hits = res.get("hits", [])
         return {"answer": f"The {len(hits)} closest clauses in the selected document{'s' if len(plan['scope']) != 1 else ''} for your question.",
                 "tool_calls": calls, "plan_steps": steps}

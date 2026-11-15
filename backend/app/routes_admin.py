@@ -2,9 +2,14 @@
 redline checklist, New Contract generator, document list for the Ask scope."""
 from __future__ import annotations
 
+import base64
+import json
 import re
+import shutil
 import threading
+import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
@@ -174,6 +179,114 @@ def pipeline_upload(u: UploadIn):
                              subdir="drafts" if u.status == "draft" else "uploads")
     res = pipeline.run_pipeline("upload", only=[p])
     return {"saved_as": str(p.name), "run": res}
+
+
+# ------------------------------------------------------------------ live view, many files at once, and the demo sample folder
+SAMPLES = Path(__file__).resolve().parents[2] / "data" / "realistic_hotel"
+SAMPLE_DIR = "uploads/samples"
+MAX_BYTES = 15 * 1024 * 1024
+
+
+def _run_when_free(trigger: str, files: list[Path]) -> None:
+    """Read these files as soon as no other run holds the pipeline (a scheduled run may be going); the live view follows it."""
+    def go() -> None:
+        for _ in range(600):
+            if pipeline.run_pipeline(trigger, only=files).get("status") != "busy":
+                return
+            time.sleep(1)
+    threading.Thread(target=go, daemon=True).start()
+
+
+@router.get("/admin/pipeline/live")
+def pipeline_live():
+    """The run in progress, or the last one: every document with its steps (read, structure, extract, index, check) and outcome."""
+    return pipeline.live_snapshot()
+
+
+class FileIn(BaseModel):
+    filename: str
+    content_b64: str
+
+
+class FilesIn(BaseModel):
+    files: list[FileIn]
+    category: str | None = None
+    owner: str | None = None
+    status: str = "active"
+
+
+@router.post("/admin/pipeline/files")
+def pipeline_files(body: FilesIn):
+    """Any number of PDF / Word / text files: saved into the inbox and read straight away (identical files already read are recognised and skipped)."""
+    if not body.files:
+        raise HTTPException(400, "choose at least one file")
+    with SessionLocal() as s:
+        root = pipeline.inbox_path(s)
+    d = root / ("drafts" if body.status == "draft" else "uploads")
+    d.mkdir(parents=True, exist_ok=True)
+    saved: list[Path] = []
+    for u in body.files:
+        safe = re.sub(r"[^A-Za-z0-9._-]+", "_", Path(u.filename).name) or "document"
+        if Path(safe).suffix.lower() not in pipeline.SUPPORTED:
+            raise HTTPException(400, f"{u.filename}: only {', '.join(sorted(pipeline.SUPPORTED))} files can be read")
+        try:
+            raw = base64.b64decode(u.content_b64, validate=True)
+        except Exception:
+            raise HTTPException(400, f"{u.filename}: the file could not be decoded") from None
+        if len(raw) > MAX_BYTES:
+            raise HTTPException(413, f"{u.filename}: larger than {MAX_BYTES // 1024 // 1024} MB")
+        f = d / safe
+        if not (f.exists() and f.read_bytes() == raw):          # the same file again keeps its timestamp, so the run sees it unchanged
+            f.write_bytes(raw)
+        meta = {k: v for k, v in {"category": body.category, "owner": body.owner, "status": body.status if body.status == "draft" else None, "origin": "upload"}.items() if v}
+        f.with_suffix(".meta.json").write_text(json.dumps(meta))
+        saved.append(f)
+    _run_when_free("upload", saved)
+    return {"saved": [f.name for f in saved], "started": True}
+
+
+def _sample_folder() -> list[dict]:
+    src = SAMPLES / "folder.json"
+    if not src.exists():
+        return []
+    by = {d["file"]: d for d in json.loads((SAMPLES / "sources.json").read_text())}
+    return [{**by[x["file"]], **x} for x in json.loads(src.read_text())["files"] if x["file"] in by and (SAMPLES / "docs" / x["file"]).exists()]
+
+
+@router.get("/admin/pipeline/samples")
+def pipeline_samples():
+    with SessionLocal() as s:
+        n = s.execute(text("SELECT count(*) FROM contracts WHERE source_path LIKE :p"), {"p": SAMPLE_DIR + "/%"}).scalar()
+    return {"files": [{"name": x.get("as") or x["file"], "what": "Exact copy of another file" if x.get("duplicate") else x["what"]} for x in _sample_folder()], "loaded": n}
+
+
+@router.post("/admin/pipeline/samples")
+def pipeline_samples_load():
+    """Copy the demo sample folder into the inbox (uploads/samples) and read it; a second time, nothing has changed and every file is skipped."""
+    with SessionLocal() as s:
+        d = pipeline.inbox_path(s) / SAMPLE_DIR
+    d.mkdir(parents=True, exist_ok=True)
+    files = []
+    for x in _sample_folder():
+        f = d / re.sub(r"[^A-Za-z0-9._-]+", "_", x.get("as") or x["file"])
+        if not f.exists():
+            shutil.copy2(SAMPLES / "docs" / x["file"], f)
+        meta = {"category": x.get("category"), "owner": "Andrea Whitfield", "origin": "upload", **({"property": x["property"]} if x.get("property") else {})}
+        f.with_suffix(".meta.json").write_text(json.dumps(meta))
+        files.append(f)
+    _run_when_free("samples", files)
+    return {"files": len(files), "started": True}
+
+
+@router.delete("/admin/pipeline/samples")
+def pipeline_samples_remove():
+    """Remove the demo sample folder and everything read from it, so the demo can start again."""
+    with SessionLocal() as s:
+        n = s.execute(text("DELETE FROM contracts WHERE source_path LIKE :p"), {"p": SAMPLE_DIR + "/%"}).rowcount
+        s.commit()
+        d = pipeline.inbox_path(s) / SAMPLE_DIR
+    shutil.rmtree(d, ignore_errors=True)
+    return {"removed": n}
 
 
 # ------------------------------------------------------------------ KCC library

@@ -13,7 +13,7 @@ contracts in `data/real_hotel`.
 | `docs/keystone_valet_parking.docx` | Valet parking and garage management | Harbor Hotel | Management fee + reimbursed payroll + incentive, vehicle damage, garage-keepers insurance, **no liability cap**, **ends 31 Dec 2026, does not renew** |
 | `docs/prairie_waste_services.pdf` | Waste hauling and recycling (the hauler's own form) | Airport Inn | 36-month evergreen renewal with a 180-to-90-day cancellation window, **window already missed (1 Sep 2026)**, liquidated damages, unilateral price increases |
 
-**The folder** (`folder.json`, read on Add contracts → *A folder of documents*) adds a cleaning contractor's paper so linking and change detection show:
+**The folder** (`folder.json`, read with Admin → Pipeline → *Demo sample folder*) adds a cleaning contractor's paper so linking and change detection show:
 
 | File | What it is | What it shows |
 |---|---|---|

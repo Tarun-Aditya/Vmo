@@ -291,8 +291,7 @@ all names are fictional.
 
 ## Demo script (about 8 minutes)
 
-**For a demo that starts from the contracts themselves** (show the paper, read five contracts live on **Add contracts** with each step visible:
-read, structure, extract, index, check; then what the data does), follow [`DEMO.md`](DEMO.md) (about 12 minutes). The tour below starts from the loaded portfolio.
+**For a demo that starts from the contracts themselves** (show the paper; read a folder of contracts live in **Admin → Pipeline**, where every run shows each document being read, structured, extracted, indexed and checked; then the repository and Ask), follow [`DEMO.md`](DEMO.md) (about 14 minutes). The tour below starts from the loaded portfolio.
 
 1. **Portfolio (1 min).** "Three notice deadlines need a decision; this much renews unless someone acts." The last day to act, not the expiry date.
 2. **Properties (1.5 min).** What each hotel costs under contract and per room, including its share of the energy contract and the hotel systems. Open one property:

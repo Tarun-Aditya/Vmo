@@ -98,6 +98,14 @@ def list_contracts(
              c.fully_executed, c.customer_signatory, c.supplier_signatory,
              COALESCE(e.auto_renew, c.auto_renew) AS auto_renew,
              COALESCE(e.liability_uncapped, false) AS liability_uncapped,
+             COALESCE(e.notice_period_days, c.notice_period_days) AS notice_period_days,
+             COALESCE(e.payment_terms_days, c.payment_terms_days) AS payment_terms_days,
+             COALESCE(e.liability_cap_multiple, c.liability_cap_multiple) AS liability_cap_multiple,
+             COALESCE(e.liability_cap_text, c.liability_cap_text) AS liability_cap_text,
+             COALESCE(e.termination_for_convenience, c.termination_for_convenience) AS termination_for_convenience,
+             COALESCE(e.governing_law, c.governing_law) AS governing_law, c.processes_personal_data, c.has_dpa,
+             CASE WHEN COALESCE(e.auto_renew, c.auto_renew) AND COALESCE(e.notice_period_days, c.notice_period_days) IS NOT NULL
+                  THEN COALESCE(e.expiry_date, c.expiry_date) - COALESCE(e.notice_period_days, c.notice_period_days) ELSE COALESCE(e.expiry_date, c.expiry_date) END AS act_by,
              (SELECT count(*) FROM clause_deviations d WHERE d.contract_id = c.id) AS deviation_count
       FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
       {"WHERE " + " AND ".join(where) if where else ""}

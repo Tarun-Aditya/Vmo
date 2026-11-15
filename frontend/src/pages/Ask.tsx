@@ -139,9 +139,7 @@ export default function Ask() {
   const [params] = useSearchParams();
   const [question, setQuestion] = useState("");
   const [showAll, setShowAll] = useState(false);
-  const [mode, setMode] = useState<"all" | "selected">("all");
-  const [pick, setPick] = useState(false);
-  const [sel, setSel] = useState<number[]>([]);
+  const [chosen, setChosen] = useState<number[] | null>(null);      // the ticked documents; null = every document (the default)
   const [find, setFind] = useState("");
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [convId, setConvId] = useState<number | null>(null);
@@ -152,14 +150,18 @@ export default function Ask() {
   const sugg = useQuery({ queryKey: ["sugg"], queryFn: () => api<string[]>("/api/ask/suggestions") });
   const docs = useQuery({ queryKey: ["documents"], queryFn: () => api<Doc[]>("/api/documents") });
   const hist = useQuery({ queryKey: ["conversations", histQ], queryFn: () => api<Conv[]>(`/api/conversations${histQ ? `?q=${encodeURIComponent(histQ)}` : ""}`) });
-  const scope = mode === "selected" ? sel : [];
+  const allIds = useMemo(() => (docs.data ?? []).map((d) => d.id), [docs.data]);
+  const sel = chosen ?? allIds;
+  const narrowed = chosen !== null;
+  const setSel = (ids: number[]) => setChosen(allIds.length > 0 && ids.length === allIds.length ? null : ids);
+  const scope = narrowed ? sel : [];
   useEffect(() => { endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" }); }, [msgs]);
 
   const patchLast = (f: (m: Extract<Msg, { role: "assistant" }>) => Partial<Extract<Msg, { role: "assistant" }>>) =>
     setMsgs((all) => all.map((m, i) => (i === all.length - 1 && m.role === "assistant" ? { ...m, ...f(m) } : m)));
 
   const send = async (qn: string) => {
-    if (!qn.trim() || busy || (mode === "selected" && sel.length === 0)) return;
+    if (!qn.trim() || busy || (narrowed && sel.length === 0)) return;
     setQuestion("");
     setBusy(true);
     setMsgs((all) => [...all, { role: "user", text: qn, scope: scope.length }, { role: "assistant", steps: [], reasoning: "", answer: "", running: true }]);
@@ -210,7 +212,7 @@ export default function Ask() {
       ? { role: "user", text: m.content, scope: m.payload?.scope?.length ?? 0 }
       : { role: "assistant", steps: m.payload?.thinking ?? [], reasoning: "", answer: m.content, result: m.payload ?? undefined, running: false }));
     const last = [...c.messages].reverse().find((m) => m.role === "user")?.payload?.scope;
-    if (last?.length) { setSel(last); setMode("selected"); } else setMode("all");
+    setChosen(last?.length ? last : null);
   };
   const fresh = () => { if (busy) return; setConvId(null); setMsgs([]); setQuestion(""); };
   const rename = async (c: Conv) => { const t = window.prompt("Rename conversation", c.title); if (t && t.trim()) { await api(`/api/conversations/${c.id}`, { method: "PATCH", body: JSON.stringify({ title: t }) }); qc.invalidateQueries({ queryKey: ["conversations"] }); } };
@@ -218,17 +220,17 @@ export default function Ask() {
 
   useEffect(() => {
     const ids = params.getAll("doc").map(Number).filter(Boolean);
-    if (ids.length) { setSel(ids); setMode("selected"); }
+    if (ids.length) setChosen(ids);
     const qp = params.get("q");
     if (qp) { if (!ids.length) void send(qp); else setQuestion(qp); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
-  useEffect(() => { const qp = params.get("q"); if (qp && sel.length && mode === "selected" && msgs.length === 0 && !busy) void send(qp); /* eslint-disable-next-line */ }, [sel, mode]);
+  useEffect(() => { const qp = params.get("q"); if (qp && narrowed && sel.length && msgs.length === 0 && !busy) void send(qp); /* eslint-disable-next-line */ }, [chosen]);
   const shown = useMemo(() => (docs.data ?? []).filter((d) => !find || (d.title + d.vendor + d.type + d.status).toLowerCase().includes(find.toLowerCase())), [docs.data, find]);
-  const toggle = (id: number) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-  const chips = mode === "selected" ? DOC_SUGGESTIONS : (showAll ? sugg.data : sugg.data?.slice(0, 8));
+  const toggle = (id: number) => setSel(sel.includes(id) ? sel.filter((x) => x !== id) : [...sel, id]);
+  const chips = narrowed ? DOC_SUGGESTIONS : (showAll ? sugg.data : sugg.data?.slice(0, 8));
   return (
-    <div className="grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <div className="grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_19rem]">
       <aside className="space-y-2 lg:sticky lg:top-16 lg:max-h-[calc(100vh-5rem)] lg:self-start lg:overflow-auto" aria-label="Conversation history">
         <button onClick={fresh} disabled={busy} className="w-full rounded bg-indigo-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50">+ New chat</button>
         <input className="w-full rounded border bg-white px-2 py-1.5 text-sm dark:bg-slate-800" placeholder="Search conversations…" aria-label="Search conversations" value={histQ} onChange={(e) => setHistQ(e.target.value)} />
@@ -250,29 +252,57 @@ export default function Ask() {
         <div className="mb-3 space-y-3">
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-sm dark:border-slate-700 dark:bg-slate-800" aria-label="Question scope bar">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Question scope</span>
-            <span className="font-medium">{mode === "all" ? `Whole portfolio${docs.data ? ` · ${docs.data.length} documents` : ""}` : `${sel.length} selected`}</span>
-            {mode === "selected" && (docs.data ?? []).filter((d) => sel.includes(d.id)).slice(0, 4).map((d) => <span key={d.id} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs dark:bg-slate-700">{d.title.slice(0, 28)}<button aria-label={`Remove ${d.title}`} onClick={() => toggle(d.id)}>×</button></span>)}
-            <button className="ml-auto text-xs font-semibold text-indigo-600 hover:underline" aria-expanded={pick} onClick={() => setPick(!pick)}>{pick ? "Hide documents" : "Narrow to a contract"}</button>
+            <span className="font-medium">{narrowed ? `${sel.length} of ${allIds.length} documents` : `All ${allIds.length} documents`}</span>
+            {narrowed && (docs.data ?? []).filter((d) => sel.includes(d.id)).slice(0, 4).map((d) => <span key={d.id} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs dark:bg-slate-700">{d.title.slice(0, 28)}<button aria-label={`Remove ${d.title}`} onClick={() => toggle(d.id)}>×</button></span>)}
+            {narrowed && sel.length > 4 && <span className="text-xs text-slate-500">+{sel.length - 4} more</span>}
+            {narrowed && <button className="ml-auto text-xs font-semibold text-indigo-600 hover:underline" onClick={() => setChosen(null)}>Use all documents</button>}
           </div>
-          {pick && (      <div aria-label="Question scope">
-        <Card title="Scope of the question">
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-1 rounded border border-slate-300 p-0.5 text-sm dark:border-slate-600" role="radiogroup" aria-label="Scope mode">
-              {([["all", "All documents"], ["selected", "Selected documents"]] as const).map(([v, l]) => (
-                <button key={v} role="radio" aria-checked={mode === v} onClick={() => setMode(v)} className={`rounded px-2 py-1.5 ${mode === v ? "bg-indigo-600 font-medium text-white" : "hover:bg-slate-100 dark:hover:bg-slate-700"}`}>{l}</button>
-              ))}
-            </div>
-            <p className="text-xs text-slate-500">{mode === "all" ? "Analytical: counts, totals, dates, risks across the whole portfolio." : "Specific: answers come only from the documents ticked below."}</p>
+        </div>
+          <h1>Ask your vendor portfolio</h1>
+          <p className="-mt-2 text-sm text-slate-500">Every document is ticked, so questions cover the whole portfolio. Untick documents on the right to ask about one or several: lists, groupings and totals then come from those documents only, in a table. Follow-ups stay in the same conversation.</p>
+          {msgs.length === 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {chips?.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full border border-slate-300 px-3 py-1 text-xs hover:bg-indigo-50 dark:border-slate-600 dark:hover:bg-slate-700">{s}</button>)}
+              {!narrowed && (sugg.data?.length ?? 0) > 8 && <button onClick={() => setShowAll(!showAll)} className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">{showAll ? "Show fewer" : `More examples (${(sugg.data?.length ?? 8) - 8})`}</button>}
+            </div>)}
+          {msgs.map((m, i) => m.role === "user"
+            ? <div key={i} className="flex justify-end" data-msg="user"><div className="max-w-[85%] rounded-2xl rounded-br-sm bg-indigo-600 px-4 py-2 text-white">{m.text}{m.scope > 0 && <div className="text-[11px] opacity-80">{m.scope} selected document{m.scope > 1 ? "s" : ""}</div>}</div></div>
+            : <Answer key={i} m={m} />)}
+          <div ref={endRef} />
+        </div>
+        <div className="sticky bottom-0 space-y-2 bg-slate-50 pb-2 pt-2 dark:bg-slate-900">
+          {narrowed && sel.length === 0 && <p className="text-sm text-amber-700 dark:text-amber-400">Tick at least one document to ask about it.</p>}
+          {msgs.length > 0 && narrowed && <div className="flex flex-wrap gap-2">{DOC_SUGGESTIONS.slice(0, 4).map((s) => <button key={s} onClick={() => send(s)} disabled={busy} className="rounded-full border border-slate-300 px-3 py-1 text-xs hover:bg-indigo-50 disabled:opacity-50 dark:border-slate-600 dark:hover:bg-slate-700">{s}</button>)}</div>}
+          <form onSubmit={(e) => { e.preventDefault(); void send(question); }} className="flex gap-2">
+            <input className="flex-1 rounded border bg-white px-3 py-2 dark:bg-slate-800" aria-label="Your question" value={question} onChange={(e) => setQuestion(e.target.value)}
+              placeholder={msgs.length ? "Ask a follow-up…" : narrowed ? `Ask about the ${sel.length} ticked document${sel.length === 1 ? "" : "s"}…` : "e.g. Show start date, end date and signatures for all contracts"} />
+            {busy
+              ? <button type="button" onClick={() => abort.current?.abort()} className="rounded border border-red-500 px-4 py-2 font-medium text-red-600">■ Stop</button>
+              : <button className="rounded bg-indigo-600 px-4 py-2 font-medium text-white disabled:opacity-50" disabled={narrowed && sel.length === 0}>Ask</button>}
+          </form>
+        </div>
+      </div>
+
+      <aside className="lg:col-span-2 xl:sticky xl:top-16 xl:col-span-1 xl:max-h-[calc(100vh-5rem)] xl:self-start xl:overflow-auto" aria-label="Question scope">
+        <Card title="Documents">
+          <div className="space-y-2">
+            <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700/50">
+              <input type="checkbox" aria-label="All documents" checked={!narrowed} ref={(el) => { if (el) el.indeterminate = narrowed && sel.length > 0; }} onChange={() => setChosen(narrowed ? null : [])} />
+              All documents ({allIds.length})
+            </label>
             <input className="w-full rounded border bg-white px-2 py-1.5 text-sm dark:bg-slate-800" placeholder="Search documents…" aria-label="Search documents" value={find} onChange={(e) => setFind(e.target.value)} />
             <div className="flex items-center justify-between text-xs text-slate-500">
-              <span>{sel.length} selected · {shown.length} shown</span>
-              <span className="space-x-2"><button className="text-indigo-600 hover:underline" onClick={() => { setMode("selected"); setSel(Array.from(new Set([...sel, ...shown.map((d) => d.id)]))); }}>Select shown</button><button className="text-indigo-600 hover:underline" onClick={() => setSel([])}>Clear</button></span>
+              <span>{narrowed ? `${sel.length} ticked` : "All ticked: whole portfolio"}{find ? ` · ${shown.length} shown` : ""}</span>
+              <span className="space-x-2">
+                <button className="text-indigo-600 hover:underline" onClick={() => setSel(Array.from(new Set([...sel, ...shown.map((d) => d.id)])))}>Tick shown</button>
+                <button className="text-indigo-600 hover:underline" onClick={() => setSel(sel.filter((id) => !shown.some((d) => d.id === id)))}>Untick shown</button>
+              </span>
             </div>
-            <ul className="max-h-[26rem] space-y-0.5 overflow-auto pr-1" aria-label="Documents">
+            <ul className="max-h-[60vh] space-y-0.5 overflow-auto pr-1" aria-label="Documents">
               {shown.map((d) => (
                 <li key={d.id}>
-                  <label className={`flex cursor-pointer items-start gap-2 rounded px-2 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 ${sel.includes(d.id) ? "bg-indigo-50 dark:bg-indigo-950/40" : ""}`}>
-                    <input type="checkbox" className="mt-1" checked={sel.includes(d.id)} onChange={() => { setMode("selected"); toggle(d.id); }} />
+                  <label className={`flex cursor-pointer items-start gap-2 rounded px-2 py-1.5 text-sm hover:bg-slate-50 dark:hover:bg-slate-700/50 ${narrowed && sel.includes(d.id) ? "bg-indigo-50 dark:bg-indigo-950/40" : ""}`}>
+                    <input type="checkbox" className="mt-1" checked={sel.includes(d.id)} onChange={() => toggle(d.id)} />
                     <span className="min-w-0"><span className="block leading-snug">{d.title}</span>
                       <span className="text-[11px] text-slate-500"><span className="mr-1 rounded bg-slate-200 px-1 font-semibold uppercase dark:bg-slate-700">{d.type}</span>{d.vendor}{d.status === "draft" && <span className="ml-1 rounded border border-amber-500 px-1 text-amber-700 dark:text-amber-300">draft</span>}</span></span>
                   </label>
@@ -281,33 +311,7 @@ export default function Ask() {
             </ul>
           </div>
         </Card>
-      </div>)}
-        </div>
-          <h1>Ask your vendor portfolio</h1>
-          <p className="-mt-2 text-sm text-slate-500">Analytical questions across all documents, or questions about the specific documents you pick with “Narrow to a contract”. Follow-ups stay in the same conversation.</p>
-          {msgs.length === 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {chips?.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full border border-slate-300 px-3 py-1 text-xs hover:bg-indigo-50 dark:border-slate-600 dark:hover:bg-slate-700">{s}</button>)}
-              {mode === "all" && (sugg.data?.length ?? 0) > 8 && <button onClick={() => setShowAll(!showAll)} className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">{showAll ? "Show fewer" : `More examples (${(sugg.data?.length ?? 8) - 8})`}</button>}
-            </div>)}
-          {msgs.map((m, i) => m.role === "user"
-            ? <div key={i} className="flex justify-end" data-msg="user"><div className="max-w-[85%] rounded-2xl rounded-br-sm bg-indigo-600 px-4 py-2 text-white">{m.text}{m.scope > 0 && <div className="text-[11px] opacity-80">{m.scope} selected document{m.scope > 1 ? "s" : ""}</div>}</div></div>
-            : <Answer key={i} m={m} />)}
-          <div ref={endRef} />
-        </div>
-        <div className="sticky bottom-0 space-y-2 bg-slate-50 pb-2 pt-2 dark:bg-slate-900">
-          {mode === "selected" && sel.length === 0 && <p className="text-sm text-amber-700 dark:text-amber-400">Choose at least one document (Narrow to a contract) to ask about it.</p>}
-          {msgs.length > 0 && mode === "selected" && <div className="flex flex-wrap gap-2">{DOC_SUGGESTIONS.slice(0, 4).map((s) => <button key={s} onClick={() => send(s)} disabled={busy} className="rounded-full border border-slate-300 px-3 py-1 text-xs hover:bg-indigo-50 disabled:opacity-50 dark:border-slate-600 dark:hover:bg-slate-700">{s}</button>)}</div>}
-          <form onSubmit={(e) => { e.preventDefault(); void send(question); }} className="flex gap-2">
-            <input className="flex-1 rounded border bg-white px-3 py-2 dark:bg-slate-800" aria-label="Your question" value={question} onChange={(e) => setQuestion(e.target.value)}
-              placeholder={msgs.length ? "Ask a follow-up…" : mode === "selected" ? "Ask about the selected documents…" : "e.g. Show start date, end date and signatures for all contracts"} />
-            {busy
-              ? <button type="button" onClick={() => abort.current?.abort()} className="rounded border border-red-500 px-4 py-2 font-medium text-red-600">■ Stop</button>
-              : <button className="rounded bg-indigo-600 px-4 py-2 font-medium text-white disabled:opacity-50" disabled={mode === "selected" && sel.length === 0}>Ask</button>}
-          </form>
-        </div>
-      </div>
-
+      </aside>
     </div>
   );
 }
