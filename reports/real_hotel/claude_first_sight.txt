@@ -1,0 +1,21 @@
+engine: Claude (claude_code)   documents read: 12   could not be opened: 0
+  vendor                        6/11   54.5%
+  governing_law                 6/ 7   85.7%
+  effective_date                7/ 9   77.8%
+  expiry_date                   9/10   90.0%
+  auto_renew                    7/ 8   87.5%
+  notice_period_days            1/ 1  100.0%
+  termination_for_convenience   5/ 6   83.3%
+  payment_terms_days            3/ 3  100.0%
+  MISS ('hotel_mgmt_mdanderson.pdf', 'vendor', 'Management Company', None)
+  MISS ('housekeeping_lucas_county.pdf', 'effective_date', '2020-12-31', None)
+  MISS ('linen_michigan_fortcuster.pdf', 'vendor', None, 'Valley City Linen, Inc')
+  MISS ('linen_michigan_fortcuster.pdf', 'expiry_date', '2016-10-31', '2016-10-30')
+  MISS ('elevator_berkeley_mo.pdf', 'vendor', None, 'TK Elevator')
+  MISS ('elevator_berkeley_mo.pdf', 'governing_law', 'Missouri', None)
+  MISS ('elevator_nixa.pdf', 'termination_for_convenience', None, False)
+  MISS ('hilton_colostate.pdf', 'effective_date', '2025-08-20', None)
+  MISS ('pest_ocala.pdf', 'vendor', None, 'Atkinson Pest Control, Inc.')
+  MISS ('pest_vendorregistry.pdf', 'vendor', 'Florida Corporation', 'Massey Services, Inc')
+  MISS ('pest_vendorregistry.pdf', 'auto_renew', None, False)
+OVERALL 44/55 = 80.0% of labelled fields

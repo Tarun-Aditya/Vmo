@@ -88,19 +88,48 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             eff = tu.first_date(head)
             if eff:
                 break
-    if not eff and not amend:     # the first sentence of the form 'This ... Agreement ... <date>' (not a redaction notice or a date elsewhere)
+    head3 = re.sub(r"\s+", " ", d.flat[:3500])
+    # a date left to be filled in ('as of the ___ day of April 2020 (“Effective Date”)', '[Insert Date]', 'effective on the date the last party signs'): there is no effective date to read
+    blank_eff = bool(re.search(r"(?:_{2,}|\[\s*insert|the\s+day of)[^.]{0,60}[\(\[]\s*(?:the\s+)?[\"“”']?Effective Date|[\[\(]\s*insert date|Effective Date[^.]{0,80}(?:is|shall be|means) the (?:later of the )?date[^.]{0,60}(?:sign|execut)", head3, re.I))
+    guessed = False
+    if not eff and not amend and not blank_eff:     # the first sentence of the form 'This ... Agreement ... <date>' (not a redaction notice or a date elsewhere)
+        guessed = True
         for s_ in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", d.flat[:4000])):
             if re.search(r"\b(?:this|the)\b[^.]{0,100}\bagreement\b", s_, re.I) and (eff := tu.first_date(s_)):
                 break
-    if not eff:
-        eff = tu.first_date(re.sub(r"\s+", " ", d.flat[:3500]))
+    if not eff and not blank_eff:
+        eff, guessed = tu.first_date(head3), True
+    # the start the term clause itself states wins over a date in the heading (a proposal date, a resolution date)
+    tm = re.search(r"(?:become effective and commence on|effective for \d+ months starting|term of this (?:agreement|contract)[^.]{0,80}?shall be from|shall commence on|commences on)\s+([A-Za-z0-9,/ .\-]{6,30})", re.sub(r"\s+", " ", d.flat), re.I)
+    stated = tu.first_date(tm.group(1)) if tm else None
+    if stated:
+        eff, guessed = stated, False
+    elif blank_eff:
+        eff = None               # whatever date an earlier pattern caught on the way ('commence on the Effective Date and terminate on June 30, 2030') is not the start
     put("effective_date", _iso(eff), 0.95 if eff else 0.3)
 
     # ---- expiry
     expiry, ec = None, "term"
-    m, ec = d.search(r"(?:now expires? on|extended to|until|expires? on|expiring on|ends? on|ending on|end date[:\s|]*|continues? (?:in (?:full )?(?:force|effect) )?until|through|terminat\w+ on)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", ("term",))
+    m, ec = d.search(r"(?:now expires? on|extended to|until|expires? on|expiring on|ends? on|ending on|end date[:\s|]*|continues? (?:in (?:full )?(?:force|effect) )?until|through(?: and including)?|terminat\w+ on|continu\w+ to(?: and including)?|to and including)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", ("term",))
     if m:
         expiry = tu.first_date(m.group(1))
+    if not expiry:
+        for t_ in [tu.normalize(c["text"]) for c in d.by.get("term", [])] + [d.flat[:6000]]:
+            for mm_ in re.finditer(r"(?:until|expires? on|expiring on|ends? on|ending on|through(?: and including)?|terminat\w+ on|continu\w+ to(?: and including)?|to and including)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", t_, re.I):
+                if (expiry := tu.first_date(mm_.group(1))) and not re.search(r"insurance|certificate|polic(?:y|ies)|warrant", t_[max(0, mm_.start() - 120):mm_.start()], re.I):
+                    break
+                expiry = None
+            if expiry:
+                break
+    if not expiry:          # 'effective for 36 months starting November 01, 2022': the term runs to the day before the anniversary
+        m2 = re.search(r"effective for (\d+) (months?|years?) starting", re.sub(r"\s+", " ", d.flat), re.I)
+        if m2 and eff:
+            from datetime import timedelta
+
+            expiry = _add_months(eff, int(m2.group(1)) * (12 if m2.group(2).lower().startswith("y") else 1)) - timedelta(days=1)
+    if guessed and eff and expiry and eff == expiry:        # the only date in sight was the end date: it is not also the start
+        out["effective_date"] = dict(out["effective_date"], value=None, confidence=0.3)
+        eff = None
     if not expiry:
         m, ec = d.search(r"(?:initial term|term of|initial period of|period of|for a term of|for an initial (?:term|period) of)\s+(?:this agreement\s+)?(?:is\s+)?(?:of\s+)?(\d+(?:\.\d+)?)\s+(months?|years?)", ("term",))
         if m and eff:
@@ -123,7 +152,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             put("auto_renew", auto, 0.93, "renewal" if "renewal" in d.by else "term")
             n = None
             if auto:
-                mm = re.search(r"(?:at least|not less than|no later than|not (?:fewer|less) than|prior to the end[^.]{0,40}?by giving)\s*(\d+)\s*days", rtxt, re.I) or re.search(r"(\d+)\s*days[’']?\s*(?:prior |advance )?(?:written )?notice[^.]{0,60}(?:non-?renewal|not to renew|renew)", rtxt, re.I) or re.search(r"(?:non-?renewal|not to renew)[^.]{0,80}?(\d+)\s*days", rtxt, re.I)
+                mm = re.search(r"(?:at least|not less than|no later than|not (?:fewer|less) than|prior to the end[^.]{0,40}?by giving)\s*(\d+)[\s\-]*days", rtxt, re.I) or re.search(r"(\d+)\s*days[’']?\s*(?:prior |advance )?(?:written )?notice[^.]{0,60}(?:non-?renewal|not to renew|renew)", rtxt, re.I) or re.search(r"(?:non-?renewal|not to renew)[^.]{0,80}?(\d+)\s*days", rtxt, re.I)
                 n = int(mm.group(1)) if mm else None
             put("notice_period_days", n, 0.9 if n else 0.4, "renewal" if "renewal" in d.by else "term")
     # ---- fees
@@ -389,16 +418,19 @@ def _governing_law(flat: str) -> str | None:
     """The jurisdiction named in the sentence that says what law governs the agreement. Sentence first (a stray 'construed' elsewhere is not a governing-law clause), then the name in it:
     'State of X', 'laws of the People's Republic of China', 'internal laws of New York', or a known state / country."""
     sents = re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", flat))
-    pri = [s for s in sents if re.search(r"\bgovern\w*\b[^.;]{0,160}\blaws?\b|\blaws?\b[^.;]{0,120}\bgovern\w*|governing law|(?:construed|interpreted|enforced)[^.;]{0,80}(?:in accordance with|under|pursuant to)[^.;]{0,40}\blaws?\b|\bapplicable law:|choice of law|laws? of (?:the )?state of", s, re.I)]
+    pri = [s for s in sents if re.search(r"\bgovern(?:ed|s|ing)?\b[^.;]{0,160}\blaws?\b|\blaws?\b[^.;]{0,120}\bgovern(?:ed|s|ing)?\b|governing law|(?:construed|interpreted|enforced)[^.;]{0,80}(?:in accordance with|under|pursuant to)[^.;]{0,40}\blaws?\b|\bapplicable law:|choice of law|laws? of (?:the )?state of", s, re.I)]
     # 'a corporation organized under the laws of the State of Delaware' says where a party was formed, not what law governs: such a sentence counts only if it also
     # speaks of governing / construing, and then the jurisdiction is read after that word. Sentences that speak of governing come before the weaker 'laws of the State of'.
     formed = r"(?:organi[sz]ed|incorporated|existing|formed|chartered|established|qualified)\b[^.;]{0,80}\blaws? of"
-    strong = r"\bgovern\w*|\bconstrued\b|\binterpreted\b|\benforced\b|applicable law|choice of law"
+    strong = r"\bgovern(?:ed|s|ing)?\b|\bconstrued\b|\binterpreted\b|\benforced\b|applicable law|choice of law"
     pri = [s for s in pri if re.search(strong, s, re.I) or not re.search(formed, s, re.I)]
     pri.sort(key=lambda s: 0 if re.search(strong, s, re.I) else 1)
     for s in pri:
-        k = re.search(r"govern\w*|construed|interpreted|applicable law", s, re.I) or re.search(r"laws? of", s, re.I)
-        tail = s[k.start():] if k else s
+        k = re.search(r"\bgovern(?:ed|s|ing)?\b|construed|interpreted|applicable law", s, re.I) or re.search(r"laws? of", s, re.I)
+        tail = s[k.start():k.start() + 400] if k else s[:400]
+        tail = re.sub(formed + r"[^,;)]{0,60}", " ", tail, flags=re.I)          # 'organized and existing under the laws of the State of Missouri' inside the same run of text
+        if len(s) > 700 and not re.search(r"\blaws?\b", tail, re.I):             # a document without sentence breaks: a governing word with no law near it is not a governing-law clause
+            continue
         best = None
         for name in US_STATES + PLACES + list(ALIASES) + ["People's Republic of China", "People’s Republic of China"]:
             mm = re.search(rf"(?<![A-Za-z]){re.escape(name)}(?![A-Za-z])", tail)

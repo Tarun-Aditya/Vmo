@@ -138,7 +138,7 @@ an admin-defined clause is located at the passage matching most of its keywords,
 expiry is an alert rule. Seeded hotel data: 24 open alerts (46 before).
 
 **Known limits specific to this edition**
-1. No real hotel contract has been read. The corpus is set in the United States (decided 2026-11-14) and written from the property owner's side.
+1. No hotel group's own contract has been read. Twelve real public-record hotel-world contracts have (`data/real_hotel/`): first-sight accuracy 67% offline, 80% Claude; 91% and 96% after fixes made from those same documents. The corpus is set in the United States (decided 2026-11-14) and written from the property owner's side.
 2. A property's share of a group agreement is an attribution by rooms, not a contract term; the Compare saving assumes unchanged volumes.
 3. Certificate expiry dates come from a CSV or a person; certificate documents themselves are not read.
 4. The exit-on-sale rule fails on every seeded master agreement because none of the fictional contracts contains that clause: a true finding on this data, but check it against real paper.
@@ -149,3 +149,11 @@ expiry is an alert rule. Seeded hotel data: 24 open alerts (46 before).
 (exit on sale / on notice / inherited by a buyer), certificates read from certificate documents in `feeds/`, three property steps in the recorded walkthrough. Reading fix: a party's legal form
 ('a Delaware corporation') is no longer taken as the vendor name. Services-type subset of the real-contract hold-out (42 agreements, offline): governing law 91.9%, liability cap F1 0.91.
 Not done because it needs you: a real invoice export or sandbox credentials for one live integration; redacted real contracts for `evals/real_eval.py`.
+
+**2026-11-15: real contracts and Claude.** Found twelve real hotel-world contracts in public records (hotel management agreement, hotel housekeeping, linen and laundry,
+elevator maintenance, pest control, a university-hotel services contract, hotel lodging, convention-hotel shared technology). `scripts/fetch_real_hotel.sh` downloads them
+(not committed: they belong to the public bodies that published them), `data/real_hotel/labels.json` holds values read from each, `evals/real_hotel_eval.py` scores the engine.
+Fixes they prompted: the supplier is the party introduced before a role term ("Contractor", "TBS"), a blank in a template gives no name and no start date, the start date in the
+term clause beats the date on the cover, "effective for 36 months starting ..." gives both dates, a city's state named in its title is not the governing law. Claude now also returns
+the supplier's name (used only when it appears in the document word for word); its prompt says how to treat blanks, conditional personal-data wording, and option years.
+CUAD hold-out after these changes: governing law 91.6% (was 89.1%), everything else unchanged.

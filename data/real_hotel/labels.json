@@ -1,0 +1,79 @@
+{
+ "_about": "Correct values written down by reading each document (by Claude Code, 2026-11-14; not expert labels). null = the document does not state it (a blank in a template, a date left to be filled in). A field that is missing here was not labelled, usually because the document is ambiguous on it, and is not scored. The Michigan contract gives two end dates (10/30/16 on its cover form, 'expires on October 31 2016' in its terms), so its end date is not scored.",
+ "hotel_mgmt_mdanderson.pdf": {
+  "vendor": null,
+  "governing_law": "Texas",
+  "effective_date": null,
+  "expiry_date": null,
+  "auto_renew": false
+ },
+ "housekeeping_lucas_county.pdf": {
+  "vendor": "Toledo Building Services Co.",
+  "governing_law": "Ohio",
+  "effective_date": null,
+  "expiry_date": "2020-12-31",
+  "auto_renew": false,
+  "termination_for_convenience": true,
+  "payment_terms_days": 30
+ },
+ "linen_michigan_fortcuster.pdf": {
+  "vendor": "Valley City Linen, Inc",
+  "governing_law": "Michigan",
+  "effective_date": "2015-11-02",
+  "auto_renew": false,
+  "termination_for_convenience": true,
+  "payment_terms_days": 45
+ },
+ "elevator_hialeah_schindler.pdf": {
+  "vendor": "Schindler Elevator Corporation",
+  "effective_date": "2014-12-17",
+  "expiry_date": "2016-09-30"
+ },
+ "elevator_miami_ok.pdf": {
+  "vendor": null,
+  "governing_law": "Oklahoma",
+  "effective_date": "2014-07-01",
+  "expiry_date": "2015-06-30",
+  "auto_renew": false
+ },
+ "elevator_berkeley_mo.pdf": {
+  "vendor": "TK Elevator",
+  "governing_law": null
+ },
+ "elevator_nixa.pdf": {
+  "vendor": "TK Elevator Corporation",
+  "effective_date": "2022-11-01",
+  "expiry_date": "2025-10-31",
+  "auto_renew": true,
+  "notice_period_days": 30,
+  "termination_for_convenience": false
+ },
+ "hilton_colostate.pdf": {
+  "vendor": "Atrium Hospitality LP",
+  "governing_law": "Colorado",
+  "effective_date": null,
+  "expiry_date": "2030-06-30",
+  "auto_renew": true,
+  "termination_for_convenience": true,
+  "payment_terms_days": 30
+ },
+ "pest_ocala.pdf": {
+  "vendor": "Atkinson Pest Control, Inc.",
+  "governing_law": "Florida",
+  "effective_date": "2023-01-27",
+  "expiry_date": "2025-01-26",
+  "auto_renew": false,
+  "termination_for_convenience": true
+ },
+ "pest_vendorregistry.pdf": {
+  "vendor": "Massey Services, Inc",
+  "effective_date": null,
+  "expiry_date": null,
+  "auto_renew": false,
+  "termination_for_convenience": true
+ },
+ "hotel_lodging_sandiego.pdf": {
+  "vendor": "Interstate Management Company, LLC",
+  "expiry_date": "2021-02-25"
+ }
+}

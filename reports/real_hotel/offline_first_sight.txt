@@ -1,0 +1,28 @@
+engine: offline rules   documents read: 12   could not be opened: 0
+  vendor                        6/11   54.5%
+  governing_law                 6/ 7   85.7%
+  effective_date                4/ 9   44.4%
+  expiry_date                   5/10   50.0%
+  auto_renew                    8/ 8  100.0%
+  notice_period_days            0/ 1    0.0%
+  termination_for_convenience   5/ 6   83.3%
+  payment_terms_days            3/ 3  100.0%
+  MISS ('hotel_mgmt_mdanderson.pdf', 'vendor', 'Management Company', None)
+  MISS ('housekeeping_lucas_county.pdf', 'effective_date', '2020-12-31', None)
+  MISS ('housekeeping_lucas_county.pdf', 'expiry_date', None, '2020-12-31')
+  MISS ('linen_michigan_fortcuster.pdf', 'vendor', None, 'Valley City Linen, Inc')
+  MISS ('linen_michigan_fortcuster.pdf', 'effective_date', None, '2015-11-02')
+  MISS ('linen_michigan_fortcuster.pdf', 'expiry_date', None, '2016-10-30')
+  MISS ('elevator_miami_ok.pdf', 'expiry_date', None, '2015-06-30')
+  MISS ('elevator_berkeley_mo.pdf', 'vendor', None, 'TK Elevator')
+  MISS ('elevator_berkeley_mo.pdf', 'governing_law', 'Missouri', None)
+  MISS ('elevator_nixa.pdf', 'effective_date', '2022-09-29', '2022-11-01')
+  MISS ('elevator_nixa.pdf', 'expiry_date', None, '2025-10-31')
+  MISS ('elevator_nixa.pdf', 'notice_period_days', None, 30)
+  MISS ('elevator_nixa.pdf', 'termination_for_convenience', True, False)
+  MISS ('hilton_colostate.pdf', 'effective_date', '2030-06-30', None)
+  MISS ('hilton_colostate.pdf', 'expiry_date', None, '2030-06-30')
+  MISS ('pest_ocala.pdf', 'vendor', None, 'Atkinson Pest Control, Inc.')
+  MISS ('pest_ocala.pdf', 'effective_date', '2022-11-21', '2023-01-27')
+  MISS ('pest_vendorregistry.pdf', 'vendor', 'Florida Corporation', 'Massey Services, Inc')
+OVERALL 37/55 = 67.3% of labelled fields

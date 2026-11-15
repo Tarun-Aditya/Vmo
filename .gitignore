@@ -21,3 +21,4 @@ data/**/*-simulated/
 data/**/inbox/uploads/
 backend/*.egg-info/
 data/hotel/.cache/
+data/real_hotel/docs/

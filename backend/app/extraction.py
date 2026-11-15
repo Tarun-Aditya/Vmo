@@ -172,6 +172,7 @@ def llm_tool() -> dict:
         supplier_signatory="string",
         supplier_signed_date="string",
         fully_executed="boolean",
+        supplier_name="string",
     )
     return {
         "name": "record_fields",

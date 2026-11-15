@@ -11,7 +11,39 @@ from app import textutil as tu
 from app.extract_rules import customer_markers
 
 SUFFIX = r"(?i:Inc\.?|LLC|L\.L\.C\.|LLP|Ltd\.?|Limited|Corp\.?|Corporation|Pte\.? Ltd\.?|GmbH|PLC|LP|Co\.|Company|AG|S\.A\.|B\.V\.|Pty Ltd)(?![A-Za-z])"
-COMPANY = re.compile(rf"([A-Z][\w&'\-]*(?:\s+(?:&\s+)?[A-Z][\w&'\-]*){{0,5}}?(?:\s+{SUFFIX}))")
+COMPANY = re.compile(rf"([A-Z][\w&'\-]*(?:\s+(?:&\s+)?[A-Z][\w&'\-]*){{0,5}}?(?:,?\s+{SUFFIX}))")          # 'Massey Services, Inc' as well as 'Massey Services Inc'
+# how a contract names the other side once it has introduced it: ... ("Contractor"), hereinafter called the "CONTRACTOR"
+SUPPLIER_ROLES = r"Contractor|Supplier|Vendor|Provider|Service Provider|Consultant|Company|Seller|Licensor|Manager|Management Company|Operator|Hotel"
+ROLE_DEFINED = re.compile(rf"(?:\(|(?i:hereinafter (?:called|referred to as|known as))\s+)(?i:the\s+)?[\"“”']+(?:(?i:{SUPPLIER_ROLES})|[A-Z]{{2,6}})[\"“”']+")       # a role word, or an acronym ('TBS')
+PLACEHOLDER = re.compile(r"\[\s*insert|_{3,}|\[\s*name|\[\s*•|\bTBD\b", re.I)
+LEGAL_FORM = r",?\s+an?\s+(?:[\w.\-]+\s+){0,3}(?:corporation|limited liability company|limited partnership|limited company|company|partnership|organi[sz]ation)\b(?:\s+(?:duly\s+)?(?:organi[sz]ed|incorporated|existing|authori[sz]ed|formed)[^,(]{0,120})?"
+
+
+def _role_defined_vendor(head: str, cm: list[str]) -> tuple[str | None, bool]:
+    """(name, blank): the party introduced just before a supplier-side defined term. blank = the document leaves that party to be filled in ('[INSERT NAME]', '____')."""
+    for m in ROLE_DEFINED.finditer(head):
+        before = head[max(0, m.start() - 260):m.start()]
+        seg = re.split(r"\band\b(?=[^()]*$)|\bbetween\b|;\s", before)[-1] if re.search(r"\band\b|\bbetween\b", before) else before
+        if any(k in seg.lower() for k in cm) or "the customer" in seg.lower():
+            continue                                   # this defined term belongs to us (the Owner, the City)
+        blank = bool(PLACEHOLDER.search(seg))
+        seg = re.sub(r"\([^)]*\)?", " ", seg)             # '(a corporation organized under the laws of ...)'
+        seg = re.sub(r"\s+or\s*$", "", re.sub(r"[_\[\]]+", " ", seg)).strip(" ,;:")
+        seg = re.sub(LEGAL_FORM, "", seg, flags=re.I)
+        seg = re.sub(r"\s*\(?(?:EIN|FEIN|Tax ID)[^)]*\)?", "", seg).strip(" ,;:(")
+        seg = re.sub(r",?\s+(?:with (?:its )?(?:principal )?(?:offices?|place of business)|whose address|located at|having)\b.*$", "", seg, flags=re.I).strip(" ,;:(")
+        seg = re.sub(r",?\s+(?:as (?:manager|agent|trustee)\b|d/b/a\b|doing business as\b).*$", "", seg, flags=re.I).strip(" ,;:(")
+        c = COMPANY.findall(seg)
+        cand = clean_vendor(c[0]) if c else None        # the party itself comes first; what follows describes it
+        if not cand:                                    # no legal suffix ('TK ELEVATOR'): the capitalised name that ends the segment
+            mm = re.search(r"((?:[A-Z][\w&'.\-]*\s+){0,5}[A-Z][\w&'.\-]*)\s*$", seg)
+            cand = clean_vendor(mm.group(1)) if mm and len(mm.group(1)) > 3 else None
+        if cand and not any(k in cand.lower() for k in cm) and not re.fullmatch(rf"(?:the\s+)?(?:{SUPPLIER_ROLES}|agreement|contract|and|between)", cand, re.I):
+            return cand, False
+        if blank:
+            return None, True
+    return None, False
+
 TYPE_RULES = [(r"amendment", "Amendment"), (r"data (?:processing|protection) (?:agreement|addendum)|data processing", "DPA"), (r"non-?disclosure|confidentiality agreement|\bnda\b", "NDA"), (r"work order", "Work Order"),
               (r"statement of work|\bsow\b", "SOW"), (r"subscription|software as a service|\bsaas\b|order form|license and support|licence and support|master subscription", "SaaS"),
               (r"master services|master agreement|\bmsa\b|services agreement|framework agreement", "MSA")]
@@ -48,8 +80,13 @@ def find_vendor(md: str, header: dict, sidecar: dict) -> str | None:
     head = re.sub(r"[*_`|]", " ", re.sub(r"<!--.*?-->", " ", md))[:2600]
     head = re.sub(r"\s+", " ", head.replace("\\&", "&").replace("&amp;", "&"))        # markdown / HTML escapes of an ampersand in a company name
     head = _mask_customer(head, cm)
+    named, blank = _role_defined_vendor(head, cm)       # '... and Massey Services, Inc, a Florida Corporation ("Contractor")': the surest statement of who the other side is
+    if named:
+        return named
+    if blank:
+        return sidecar.get("vendor")                    # a template: the supplier's name has not been filled in, and a role word is not a name
     # 'Acme Inc, a Delaware corporation' / 'a New York limited liability company': the legal form of a party is a description, not another company
-    head = re.sub(r",?\s+an?\s+(?:[A-Z][\w.]*\s+){1,3}(?:corporation|limited liability company|limited partnership|limited company|company|partnership)\b", "", head)
+    head = re.sub(r",?\s+an?\s+(?:[A-Z][\w.\-]*\s+){1,3}(?i:corporation|limited liability company|limited partnership|limited company|company|partnership)\b", "", head)
     for rx in (r"(?:between|by and between|made between|entered into by and between)\s+(.{5,260}?)\s+(?:and|&)\s+(.{5,200})", r"(?:Supplier|Vendor|Provider|Contractor|Service Provider|Client|Counterparty)\s*[:|]\s*(.{4,120})"):
         m = re.search(rx, head, re.I)
         if not m:
@@ -62,9 +99,17 @@ def find_vendor(md: str, header: dict, sidecar: dict) -> str | None:
             return cands[0]
     for c in COMPANY.findall(head):
         c = clean_vendor(c)
-        if not any(k in c.lower() for k in cm) and c.lower() not in ("inc", "ltd"):
+        if not any(k in c.lower() for k in cm) and c.lower() not in ("inc", "ltd") and not re.fullmatch(rf"(?:the\s+)?(?:{SUPPLIER_ROLES})(?:\s+(?:{SUPPLIER_ROLES}))?", c, re.I):
             return c
     return sidecar.get("vendor")
+
+
+def choose_vendor(rule_vendor: str | None, llm_vendor: str | None, md: str) -> str | None:
+    """With Claude: its reading of the supplier's name, when that name is written in the document word for word (so nothing is invented); otherwise the rules' reading."""
+    v = re.sub(r"\s+", " ", (llm_vendor or "")).strip(" .,;")
+    if len(v) > 2 and not PLACEHOLDER.search(v) and re.sub(r"[^a-z0-9]+", " ", v.lower()).strip() in re.sub(r"[^a-z0-9]+", " ", md.lower()):
+        return clean_vendor(v)
+    return rule_vendor
 
 
 def find_type(title: str, md: str) -> str:

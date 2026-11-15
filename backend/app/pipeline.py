@@ -219,6 +219,15 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     if extractor != "offline":
         clauses += kcc_ai.tag(s, clauses, chash, kcc_ai.definitions(cfg["kcc"], {c["clause_type"] for c in clauses}), meta["type"])
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
+    named = fields.pop("supplier_name", None)          # Claude's reading of who the supplier is: used when the name is in the document word for word, never stored as a field
+    if named and not sidecar.get("vendor") and not (header.get("Parties") and meta["vendor"] != "Unknown vendor"):
+        from app import meta_rules
+
+        v = meta_rules.choose_vendor(None if meta["vendor"] == "Unknown vendor" else meta["vendor"], named.get("value"), md)
+        if v and v != meta["vendor"]:
+            if meta["title"].endswith(f"– {meta_rules.vendor_short(meta['vendor'])}"):
+                meta["title"] = meta["title"][: -len(meta_rules.vendor_short(meta["vendor"]))] + meta_rules.vendor_short(v)
+            meta["vendor"] = v
     corrections = {r[0]: r[1] for r in s.execute(text("SELECT field, corrected_value FROM field_corrections WHERE source_path=:p"), {"p": rel})}
     for f, v in corrections.items():                 # a person's correction survives re-extraction
         fields[f] = {**fields.get(f, {"clause_type": None, "page": 1}), "value": coerce_input(f, v), "confidence": 1.0, "corrected": True}

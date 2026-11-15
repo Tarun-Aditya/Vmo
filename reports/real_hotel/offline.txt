@@ -1,0 +1,15 @@
+engine: offline rules   documents read: 12   could not be opened: 0
+  vendor                        9/11   81.8%
+  governing_law                 6/ 7   85.7%
+  effective_date                8/ 9   88.9%
+  expiry_date                   9/ 9  100.0%
+  auto_renew                    8/ 8  100.0%
+  notice_period_days            1/ 1  100.0%
+  termination_for_convenience   5/ 6   83.3%
+  payment_terms_days            3/ 3  100.0%
+  MISS ('linen_michigan_fortcuster.pdf', 'vendor', None, 'Valley City Linen, Inc')
+  MISS ('linen_michigan_fortcuster.pdf', 'effective_date', None, '2015-11-02')
+  MISS ('elevator_berkeley_mo.pdf', 'vendor', None, 'TK Elevator')
+  MISS ('elevator_berkeley_mo.pdf', 'governing_law', 'Missouri', None)
+  MISS ('elevator_nixa.pdf', 'termination_for_convenience', True, False)
+OVERALL 49/54 = 90.7% of labelled fields

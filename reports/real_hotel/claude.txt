@@ -1,0 +1,12 @@
+engine: Claude (claude_code)   documents read: 12   could not be opened: 0
+  vendor                       11/11  100.0%
+  governing_law                 6/ 7   85.7%
+  effective_date                8/ 9   88.9%
+  expiry_date                   9/ 9  100.0%
+  auto_renew                    8/ 8  100.0%
+  notice_period_days            1/ 1  100.0%
+  termination_for_convenience   6/ 6  100.0%
+  payment_terms_days            3/ 3  100.0%
+  MISS ('elevator_berkeley_mo.pdf', 'governing_law', 'Missouri', None)
+  MISS ('hilton_colostate.pdf', 'effective_date', '2025-08-20', None)
+OVERALL 52/54 = 96.3% of labelled fields

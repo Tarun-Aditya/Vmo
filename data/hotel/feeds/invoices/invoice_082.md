@@ -2,9 +2,9 @@
 
 **Invoice No.:** HAL-2503-082
 
-**Invoice date:** 06 March 2025
+**Invoice date:** 07 March 2025
 
-**Due date:** 05 April 2025
+**Due date:** 06 April 2025
 
 **From:** Halcyon Elevator & Lift Maintenance Inc
 
@@ -12,12 +12,12 @@
 
 **Reference:** Statement of Work No. 1 -- Elevator Maintenance Services at Seabright Summit Lodge
 
-**Service period:** 02 Feb 2025 – 01 Mar 2025
+**Service period:** 03 Feb 2025 – 02 Mar 2025
 
 | Description | Amount (USD) |
 |---|---|
-| Services 02 Feb – 01 Mar 2025 | 7,000.00 |
+| Services 03 Feb – 02 Mar 2025 | 7,000.00 |
 
 **Total due: USD 7,000.00**
 
-Paid on: 02 April 2025
+Paid on: 03 April 2025

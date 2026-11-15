@@ -262,6 +262,68 @@ def test_claude_redline_keeps_its_findings_and_gains_any_failed_rule():
     assert out[0]["deviation"] == "shorter" and "180" in out[1]["deviation"]
 
 
+REAL_OPENINGS = [        # the opening words of real public-record contracts (party names as published), and who the supplier is
+    ('THE PARTIES TO THIS CONTRACT are the City of Daytona Beach, a Florida municipal corporation (the "City"), and Massey Services, Inc, a Florida Corporation ("Contractor").', ["daytona"], "Massey Services, Inc"),
+    ('THIS AGREEMENT is entered into by and between the CITY OF OCALA, a Florida municipal corporation (“City”) and ATKINSON PEST CONTROL, INC., a for-profit corporation duly organized and '
+     'authorized to do business in the state of Florida (EIN: 26-1136852) (“Contractor”).', ["ocala"], "Atkinson Pest Control, Inc."),
+    ('THIS SERVICE AGREEMENT is entered into as of the day of April 2020 (“Effective Date”), by and between The Board of County Commissioner of Lucas County, Ohio (“County”) a government agency '
+     'in the State of Ohio, and Toledo Building Services Co., an Ohio corporation ("TBS") with offices at 2121 Adams Street, Toledo, Ohio 43604.', ["lucas county", "county"], "Toledo Building Services Co."),
+    ('This MASTER INDEPENDENT SERVICES CONTRACT is made between The Board of Governors of the Colorado State University System (hereinafter called the “University”); and Atrium Hospitality LP, as '
+     'manager for Pool IV TRS LLC d/b/a Hilton Fort Collins (hereinafter called “Contractor”), an organization existing under the laws of the state of Colorado.', ["university", "board of governors"], "Atrium Hospitality LP"),
+    ('This HOTEL MANAGEMENT AGREEMENT, effective [Insert Date], is made by and between The Board of Regents of The University of Texas System ("Owner"), and [INSERT NAME] , a _____________________ '
+     '("Management Company").', ["university of texas", "board of regents"], None),
+    ('THIS AGREEMENT made and entered into as of the _______ of ________________ by and between the City of Miami (“Owner”), a municipal corporation, and _____________________________, '
+     '("Contractor") whose address is ___________.', ["city of miami", "city"], None),
+]
+
+
+def test_supplier_names_in_real_contract_openings(monkeypatch):
+    from app import meta_rules
+
+    for text_, markers, want in REAL_OPENINGS:
+        monkeypatch.setattr("app.meta_rules.customer_markers", lambda m=markers: m)
+        got = meta_rules.find_vendor(text_, {}, {})
+        norm = lambda v: (v or "").lower().replace(",", "").replace(".", "")      # noqa: E731
+        assert norm(got) == norm(want), (want, got)                                # a blank in a template gives no name; a role word or a legal form is never the name
+
+
+def test_claudes_supplier_name_is_used_only_if_the_document_says_it():
+    from app import meta_rules
+
+    md = "Agreement between the City and Valley City Linen, Inc for linen exchange."
+    assert meta_rules.choose_vendor(None, "Valley City Linen, Inc", md) == "Valley City Linen, Inc"
+    assert meta_rules.choose_vendor("Rule Co Inc", "Imagined Laundry LLC", md) == "Rule Co Inc"          # not in the text: the rules' reading stands
+    assert meta_rules.choose_vendor("Rule Co Inc", "[INSERT NAME]", md) == "Rule Co Inc"
+
+
+def _rules(md):
+    from app import extract_rules
+
+    return {k: v["value"] for k, v in extract_rules.extract(md, {}, [], "MSA").items()}
+
+
+def test_dates_as_real_contracts_write_them():
+    blank = _rules('# Service Agreement\n\nTHIS SERVICE AGREEMENT is entered into as of the day of April 2020 (“Effective Date”), by and between the County and Toledo Building Services Co.\n\n'
+                   '1. Term. The term of this Agreement shall commence on the Effective Date and, unless terminated earlier as provided herein, continue to and including December 31, 2020.\n')
+    assert blank["effective_date"] is None and blank["expiry_date"] == "2020-12-31"        # the day was never filled in; the end date is not also the start
+    months = _rules('# Gold Service Agreement\n\nSeptember 29, 2022\n\nTerm\nThis Agreement is effective for 36 months starting November 01, 2022. To ensure continuous service, this Agreement will be '
+                    'automatically renewed for successive 1-month periods unless either Party serves written notice of its intention to cancel at least 30-Days before the end of the initial period.\n')
+    assert (months["effective_date"], months["expiry_date"], months["auto_renew"], months["notice_period_days"]) == ("2022-11-01", "2025-10-31", True, 30)
+    ocala = _rules('# Agreement for Pest Control Services\n\nWHEREAS, on November 21, 2022, City issued an Invitation to Bid.\n\n5. TERM OF AGREEMENT. This Agreement shall become effective and commence on '
+                   'JANUARY 27, 2023 and continue in effect for a term of TWO (2) YEARS, through and including JANUARY 26, 2025 (the “Term”).\n')
+    assert (ocala["effective_date"], ocala["expiry_date"]) == ("2023-01-27", "2025-01-26")       # not the bid date
+    later = _rules('# Master Services Contract\n\n1) Effective Date. This Contract shall commence on the Effective Date, which shall be the later of the date that it is signed by the University Controller.\n\n'
+                   '2) Term. The Term of this Contract shall commence on the Effective Date and shall terminate on June 30, 2030, unless sooner terminated.\n')
+    assert later["effective_date"] is None and later["expiry_date"] == "2030-06-30"
+
+
+def test_a_local_government_is_not_a_governing_law_clause():
+    from app.extract_rules import _governing_law
+
+    assert _governing_law("This Agreement is made by the Contractor and the City of Springfield, Illinois, a local government. Payment is monthly.") is None
+    assert _governing_law("This Agreement shall be governed by the laws of the State of Ohio.") == "Ohio"
+
+
 def test_a_partys_legal_form_is_not_the_vendor(monkeypatch):
     from app import meta_rules
 

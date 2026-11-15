@@ -2,7 +2,7 @@
 
 Crestline Laundry & Linen Services Inc
 
-Date of issue: July 06, 2026
+Date of issue: July 07, 2026
 
 Invoice number: CRE-2607-040
 
@@ -10,12 +10,12 @@ Your ref: Statement of Work No. 1 -- Laundry and Linen Services at Seabright Ha
 
 To: Seabright Hotels & Resorts Ltd
 
-For: Services 02 Jun – 01 Jul 2026
+For: Services 03 Jun – 02 Jul 2026
 
-Billing period: 02 June 2026 to 01 July 2026
+Billing period: 03 June 2026 to 02 July 2026
 
 Amount payable: USD 25,833.33
 
-Payment due by 20 August 2026
+Payment due by 21 August 2026
 
-Payment received on 06 September 2026
+Payment received on 07 September 2026

@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Invoice number | HAL-2512-070 |
-| Date | 2025-12-07 |
+| Date | 2025-12-08 |
 | Agreement | Statement of Work No. 1: Elevator and Lift Maintenance Services at Seabright Midtown Suites |
-| Description | Services 03 Nov – 02 Dec 2025 |
-| Period | 2025-11-03 to 2025-12-02 |
+| Description | Services 04 Nov – 03 Dec 2025 |
+| Period | 2025-11-04 to 2025-12-03 |
 | Total | USD 8,000.00 |
-| Due date | 2026-01-06 |
-| Date paid | 2026-01-01 |
+| Due date | 2026-01-07 |
+| Date paid | 2026-01-02 |
 
 Billed to Seabright Hotels & Resorts Ltd

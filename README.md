@@ -152,6 +152,10 @@ One-command paths: `make showcase` (clone to running demo), `make cuad` (real-co
   CUAD is licences, distribution and similar agreements, not hotel supplier contracts, so read these as robustness on messy real text.
 * **Semantic clause search** with the local `fastembed` model (BAAI/bge-small-en-v1.5) retrieves the right clause far more often than the
   hashed fallback (about 85% vs 40% on the retrieval eval).
+* **Real hotel-world contracts** (12 public-record documents: a hotel management agreement, housekeeping at hotels, linen and laundry, four elevator
+  maintenance contracts, two pest control contracts, a university-hotel services contract, hotel lodging and shared-technology agreements; see
+  `data/real_hotel/README.md`). On 54 fields labelled by reading each document: **first sight, offline rules 67%, Claude 80%; after the fixes those
+  documents prompted, offline 91%, Claude 96%.** The second pair is measured on the same twelve documents the fixes came from, so it is optimistic.
 * **Not measured:** accuracy on a hotel group's own supplier contracts. The fictional-corpus figures are scored against the spec the documents were written
   from, so they show the pipeline works end to end, not how it does on unseen wording. Measuring on 10 to 20 redacted real contracts is the first thing to do with a pilot customer.
 
@@ -254,8 +258,9 @@ all names are fictional.
   (video, one screenshot per step, report). Steps 2 to 4 are the owner's screens: Properties with the sale view, Compare, Certificates.
 * **Claude mode on the five drafts** (`reports/e2e_hotel/CLAUDE_MODE.md`): all 17 planted deviations, none on the clean control, about 15 findings per draft
   (about 20 before duplicate and irrelevant missing-clause findings were removed). A failed playbook rule is always in the redline, whichever engine wrote it.
-* Not yet done: extraction has not been re-measured with Claude since these changes; one real integration and real contracts both need you
-  (see "Measure it on your own contracts"); the new layout on the Admin pages.
+* **Claude mode on the whole hotel corpus** (full seed read by Claude, 2026-11-15): see `reports/e2e_hotel/CLAUDE_MODE.md`.
+* Not yet done: one real integration needs a real invoice export or sandbox credentials; your own contracts (see "Measure it on your own contracts");
+  the new layout on the Admin pages.
 
 ## Demo script for a property owner (about 7 minutes)
 
@@ -277,8 +282,13 @@ The figures on fictional documents show the pipeline works; only your own paper 
 3. Run `python evals/real_eval.py`: it re-reads every labelled document with the engine as it is now and prints accuracy per field. Use
    `LLM_PROVIDER=offline` for the rules alone, unset it for Claude.
 
-Until then the closest evidence is the services-type subset of the public real contracts (42 held-out agreements: maintenance, outsourcing, hosting, supply),
-offline: governing law 92%, liability cap F1 0.91, assignment 0.92, insurance 0.87, termination for convenience F1 0.67 (`reports/cuad_offline_holdout_services.txt`).
+Until then there are two pieces of evidence on real paper:
+
+* **Twelve real hotel-world contracts** from public records (`sh scripts/fetch_real_hotel.sh`, then `python ../evals/real_hotel_eval.py` from `backend/`).
+  `data/real_hotel/README.md` lists them and shows what real contracts do that the fictional ones do not: blanks in templates, parties introduced by role,
+  start dates inside the term clause, vendor paper that renews itself, scans with handwritten mark-up.
+* **The services-type subset of the public CUAD contracts** (42 held-out agreements: maintenance, outsourcing, hosting, supply), offline: governing law 92%,
+  liability cap F1 0.91, assignment 0.92, insurance 0.87, termination for convenience F1 0.67 (`reports/cuad_offline_holdout_services.txt`).
 
 ## Roadmap (future scope, not built)
 
