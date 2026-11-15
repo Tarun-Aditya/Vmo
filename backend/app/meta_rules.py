@@ -19,9 +19,16 @@ PLACEHOLDER = re.compile(r"\[\s*insert|_{3,}|\[\s*name|\[\s*•|\bTBD\b", re.I)
 LEGAL_FORM = r",?\s+an?\s+(?:[\w.\-]+\s+){0,3}(?:corporation|limited liability company|limited partnership|limited company|company|partnership|organi[sz]ation)\b(?:\s+(?:duly\s+)?(?:organi[sz]ed|incorporated|existing|authori[sz]ed|formed)[^,(]{0,120})?"
 
 
+DOC_ACRONYMS = {"SOW", "MSA", "NDA", "DPA", "SLA", "SLAS", "EULA", "PO", "RFP", "RFQ", "ITB", "BAA", "SAAS", "TOS", "AUP", "KPI", "KPIS", "LOI", "MOU", "WO"}
+
+
 def _role_defined_vendor(head: str, cm: list[str]) -> tuple[str | None, bool]:
     """(name, blank): the party introduced just before a supplier-side defined term. blank = the document leaves that party to be filled in ('[INSERT NAME]', '____')."""
     for m in ROLE_DEFINED.finditer(head):
+        term = re.sub(r"[^A-Za-z ]", "", m.group(0)).strip().split()[-1]
+        acronym = term.isupper() and not re.fullmatch(SUPPLIER_ROLES, term, re.I)
+        if acronym and term in DOC_ACRONYMS:
+            continue                                   # 'This Statement of Work ("SOW")' names the document, not a party
         before = head[max(0, m.start() - 260):m.start()]
         seg = re.split(r"\band\b(?=[^()]*$)|\bbetween\b|;\s", before)[-1] if re.search(r"\band\b|\bbetween\b", before) else before
         if any(k in seg.lower() for k in cm) or "the customer" in seg.lower():
@@ -35,7 +42,7 @@ def _role_defined_vendor(head: str, cm: list[str]) -> tuple[str | None, bool]:
         seg = re.sub(r",?\s+(?:as (?:manager|agent|trustee)\b|d/b/a\b|doing business as\b).*$", "", seg, flags=re.I).strip(" ,;:(")
         c = COMPANY.findall(seg)
         cand = clean_vendor(c[0]) if c else None        # the party itself comes first; what follows describes it
-        if not cand:                                    # no legal suffix ('TK ELEVATOR'): the capitalised name that ends the segment
+        if not cand and not acronym:                    # no legal suffix ('TK ELEVATOR'), named by a role word: the capitalised name that ends the segment
             mm = re.search(r"((?:[A-Z][\w&'.\-]*\s+){0,5}[A-Z][\w&'.\-]*)\s*$", seg)
             cand = clean_vendor(mm.group(1)) if mm and len(mm.group(1)) > 3 else None
         if cand and not any(k in cand.lower() for k in cm) and not re.fullmatch(rf"(?:the\s+)?(?:{SUPPLIER_ROLES}|agreement|contract|and|between)", cand, re.I):

@@ -73,7 +73,9 @@ field_extractions(contract_id, field, value, confidence, source_clause_id, sourc
 Meaning of flags: termination_for_convenience is true (customer may terminate without cause), false (the contract bars it) or NULL
 (not addressed, e.g. NDAs). "Cannot be terminated for convenience" means = false only. has_dpa is true when a signed DPA covers the
 vendor (a DPA document for the same vendor, or one referenced by the contract). A SaaS vendor "without a DPA" has
-processes_personal_data AND NOT has_dpa. When asked what a clause SAYS, also call search_clauses (use the vendor / clause_type
+processes_personal_data AND NOT has_dpa AND type <> 'DPA' (a DPA document is the cover itself: it is never "without a DPA").
+A property question ("contracts at X", "vendors at X") means the contracts that NAME the property (contracts.property = X) unless the
+question says to include group or shared agreements; then use v_property_contracts (any basis), which adds the group agreements covering X. When asked what a clause SAYS, also call search_clauses (use the vendor / clause_type
 filters) so the wording is cited, in addition to any SQL.
 
 Notes: all money is USD. MSAs carry no annual_value (their SOWs do),

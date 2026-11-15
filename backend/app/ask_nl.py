@@ -183,11 +183,14 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     if re.search(r"auto[- ]?renew", q):
         where.append("auto_renew")
         adj.append("auto-renewing")
+    if re.search(r"(?:notice|deadline)s?\b[^.?]{0,40}\b(?:already |has |have )*(?:passed|missed|gone by|expired|lapsed)|(?:passed|missed|past) (?:the |their |its )?(?:non-?renewal )?(?:notice|deadline)", q):
+        where.append(f"auto_renew AND notice_period_days IS NOT NULL AND {NOTICE} < CURRENT_DATE AND expiry_date >= CURRENT_DATE")      # too late to stop the renewal, not yet renewed
+        suffix.append("whose notice deadline has passed")
     if re.search(r"uncapped|unlimited liability", q):
         where.append("liability_uncapped")
         suffix.append("with uncapped liability")
     if re.search(r"without (?:a )?dpa|no dpa", q):
-        where.append("processes_personal_data AND NOT has_dpa")
+        where.append("processes_personal_data AND NOT has_dpa AND type <> 'DPA'")      # a data processing agreement is the cover, not a contract lacking it
         suffix.append("processing personal data without a DPA")
     elif re.search(r"(?:with|has|have|having|covered by)\s+(?:a\s+|an\s+)?dpa", q):
         where.append("has_dpa")
@@ -238,7 +241,11 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
         def plural(ws):  # "payment terms" also matches "payment term"
             return r"\s+".join(re.escape(w.rstrip("s")) + "s?" for w in ws)
 
-        mt_ = re.search(r"\b" + plural(re.findall(r"[a-z]+", m["name"].lower())) + r"\b", q) or (len(words) >= 2 and re.search(r"\b" + plural(words[:2]) + r"\b", q))
+        prefix = " ".join(words[:2])
+        # the first two words of a value's name stand for it ('payment terms') unless they are a yes/no field the question already filters on
+        # ('personal data' in "Personal data breach notice" is the personal-data flag, not a request for breach-notice hours)
+        loose = len(words) >= 2 and prefix not in ("personal data", "auto renew", "termination for") and re.search(r"\b" + plural(words[:2]) + r"\b", q)
+        mt_ = re.search(r"\b" + plural(re.findall(r"[a-z]+", m["name"].lower())) + r"\b", q) or loose
         if mt_:
             hit_metrics.append((mt_.start(), m))
     hit_metrics = [m for _, m in sorted(hit_metrics, key=lambda x: x[0])]        # columns follow the order of the question
@@ -304,7 +311,7 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     if intent == "table" and metric == "list" and not scope and not re.search(r"contract|vendor|expir|renew|nda|sow|msa|dpa|saas|work order|sign|clause|who|which|show|list|when|what|draft", q):
         return None
 
-    cols = ["title", "type"] + [c for c in want_cols if c not in ("title", "type")]
+    cols = ["title", "vendor", "type"] + [c for c in want_cols if c not in ("title", "vendor", "type")]      # a contract list always says whose contract it is
     if all_clauses:
         cols = ["title", "type"] + ["has_" + k["key"] for k in kccs]
     elif not want_cols:

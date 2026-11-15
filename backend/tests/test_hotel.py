@@ -287,6 +287,15 @@ def test_supplier_names_in_real_contract_openings(monkeypatch):
         assert norm(got) == norm(want), (want, got)                                # a blank in a template gives no name; a role word or a legal form is never the name
 
 
+def test_a_document_abbreviation_is_not_a_party(monkeypatch):
+    from app import meta_rules
+
+    monkeypatch.setattr("app.meta_rules.customer_markers", lambda: ["seabright"])
+    md = ('# Statement of Work No. 1\n\nThis Statement of Work ("SOW") is entered into between **Seabright Hotels & Resorts Inc** (the "Customer") and '
+          '**Crestline Laundry & Linen Services Inc** (the "Supplier").\n')
+    assert meta_rules.find_vendor(md, {}, {}) == "Crestline Laundry & Linen Services Inc"          # not 'Work'
+
+
 def test_claudes_supplier_name_is_used_only_if_the_document_says_it():
     from app import meta_rules
 

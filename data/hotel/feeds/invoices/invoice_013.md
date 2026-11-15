@@ -1,21 +1,20 @@
 # TAX INVOICE
 
-BookWave Distribution Inc
+Brightstar Security Services Inc
 
-Date of issue: November 19, 2025
+Date of issue: October 25, 2026
 
-Invoice number: BOO-2512-013
+Invoice number: BRI-2610-013
 
-Your ref: SOFTWARE AS A SERVICE AGREEMENT – BookWave Distribution
+Your ref: Statement of Work No. 1 – Security Services at Seabright Harbor Hotel
 
 To: Seabright Hotels & Resorts Ltd
 
-For: Subscription Dec 2025 – Dec 2026
+For: Services 21 Sep – 20 Oct 2026
 
-Billing period: 19 November 2025 to 09 December 2026
+Billing period: 21 September 2026 to 20 October 2026
 
-Amount payable: USD 420,000.00
+Amount payable: USD 35,000.00
 
-Payment due by 19 December 2025
+Payment due by 24 November 2026
 
-Payment received on 07 January 2026

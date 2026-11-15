@@ -1,4 +1,4 @@
-"""Ask assistant over the pilot corpus, scored against the spec labels. Run in either engine: LLM_PROVIDER=offline | (unset = Claude)."""
+"""Ask assistant over the pilot corpus (or the hotel corpus: QUESTIONS=questions_hotel.yaml LABELS=labels_hotel.json), scored against the spec labels. Run in either engine: LLM_PROVIDER=offline | (unset = Claude)."""
 import sys
 from pathlib import Path
 
@@ -12,7 +12,9 @@ from app import ask  # noqa: E402
 
 
 def main() -> int:
-    qs = yaml.safe_load((Path(__file__).parent / "questions_pilot.yaml").read_text())
+    import os
+
+    qs = yaml.safe_load((Path(__file__).parent / os.environ.get("QUESTIONS", "questions_pilot.yaml")).read_text())      # QUESTIONS=questions_hotel.yaml LABELS=labels_hotel.json
     ok = 0
     for q in qs:
         try:

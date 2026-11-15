@@ -37,7 +37,8 @@ def test_parse_metric_window_group_and_vendor_level():
 
 def test_filters_do_not_get_dropped_or_confused():
     p = P("How many contracts process personal data without a DPA?")
-    assert "processes_personal_data AND NOT has_dpa" in p["where"] and not any(w.startswith("type IN") for w in p["where"])
+    assert "processes_personal_data AND NOT has_dpa AND type <> 'DPA'" in p["where"] and not any(w.startswith("type IN") for w in p["where"])
+    assert not any("breach_notice" in w for w in P("Which vendors handle personal data without a DPA?")["where"])      # 'personal data' is the flag, not the breach-notice value
     assert "has_dpa" in P("How many contracts have a DPA?")["where"]
     assert "type IN ('DPA')" in P("How many DPAs do we have?")["where"]
     assert ask_nl.subject_of(P("How many contracts are owned by Jordan?"), 4) == "contracts owned by Jordan"
@@ -185,3 +186,9 @@ def test_scope_includes_drafts_and_never_leaks_other_documents(offline):
     assert "outside the selected scope" in execute_tool("get_contract", {"id": 1}, scope=[draft])["error"]
     hits = execute_tool("search_clauses", {"query": "liability", "top_k": 15}, scope=[draft])["hits"]
     assert {h["contract_id"] for h in hits} == {draft}
+
+
+def test_notice_deadline_already_passed():
+    for q in ("Which auto-renewing contracts have already passed their notice deadline?", "Contracts where the notice deadline has passed", "Which renewals missed the notice?"):
+        assert any("CURRENT_DATE AND expiry_date >= CURRENT_DATE" in w for w in P(q)["where"]), q
+    assert not any("< CURRENT_DATE" in w for w in P("Which contracts have a notice deadline in the next 60 days?")["where"])

@@ -1,0 +1,14 @@
+# Ask questions an owner of the hotel portfolio would put; answers computed from data/hotel/labels_hotel.json by evals/pilot_gt.py (LABELS=labels_hotel.json)
+- {id: uncapped, question: "Which vendors have uncapped liability?", type: sql, check: {kind: set, column: vendor, expected: uncapped}}
+- {id: no_tfc, question: "Which vendors can't we terminate for convenience?", type: sql, check: {kind: set, column: vendor, expected: no_tfc}}
+- {id: auto_renewals, question: "Which vendors have auto-renewing contracts?", type: sql, check: {kind: set, column: vendor, expected: auto_renewals}}
+- {id: notice_passed, question: "Which auto-renewing contracts have already passed their notice deadline?", type: sql, check: {kind: set, column: vendor, expected: notice_passed}}
+- {id: expire_90, question: "Which vendors have contracts expiring in the next 90 days?", type: sql, check: {kind: set, column: vendor, expected: expire_90}}
+- {id: total_value, question: "What is the total annual value of all active contracts?", type: sql, check: {kind: number, column: total_annual_value, expected: total_value}}
+- {id: top5_vendors, question: "Who are the top 5 vendors by annual value?", type: sql, check: {kind: set, column: vendor, expected: top5_vendors}}
+- {id: pd_no_dpa, question: "Which vendors handle personal data without a DPA?", type: sql, check: {kind: set, column: vendor, expected: personal_data_no_dpa_vendors}}
+- {id: harbor_vendors, question: "Which vendors have contracts that name Seabright Harbor Hotel as their property?", type: sql, check: {kind: set, column: vendor, expected: harbor_vendors}}
+- {id: harbor_all, question: "Which vendors serve Seabright Harbor Hotel, including group agreements that cover it?", type: sql, check: {kind: set, column: vendor, expected: harbor_vendors_incl_group}}
+- {id: lakeside_count, question: "How many contracts name Lakeside Resort as their property?", type: sql, check: {kind: number, column: contracts, expected: lakeside_count}}
+- {id: per_property, question: "How many contracts does each property have?", type: sql, check: {kind: dict, expected: property_counts}}
+- {id: laundry_rate, question: "What is the laundry rate per kilogram at each property?", type: sql, check: {kind: values, expected: laundry_rate_values}}

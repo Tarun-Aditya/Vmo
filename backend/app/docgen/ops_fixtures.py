@@ -16,6 +16,7 @@ from app import feeds
 from app.config import data_path
 from app.db import SessionLocal
 
+
 def _customer() -> str:
     """The fixtures are addressed to the loaded corpus's customer (hotel group or retailer), not to a fixed name."""
     import os

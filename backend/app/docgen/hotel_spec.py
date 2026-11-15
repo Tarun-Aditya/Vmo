@@ -4,7 +4,7 @@ contract is for; group-level master agreements have no property. Everything is f
 Dates are offsets in days from the seed date."""
 from __future__ import annotations
 
-from app.docgen.pilot_spec import STYLES
+from app.docgen.pilot_spec import STYLES  # noqa: F401  (re-exported: the generator reads hotel_spec.STYLES)
 
 CUSTOMER = "Seabright Hotels & Resorts Inc"
 CUSTOMER_DESC = "a hotel group that owns and operates six hotels; the 'Customer' is the group, services are delivered at individual hotels (the 'Properties')"

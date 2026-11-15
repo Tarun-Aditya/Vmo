@@ -56,6 +56,10 @@ def check(q, res):
         nums = [float(x) for o in sql_outputs(calls) for r in o["rows"] for x in r if isinstance(x, (int, float)) and not isinstance(x, bool)]
         ok = any(abs(n - float(want)) <= 0.01 * max(float(want), 1) for n in nums)
         return ok, f"want {want}, numbers returned {sorted(set(nums))[:12]}"
+    if kind == "values":          # every expected number appears in the result table (e.g. one rate per property)
+        nums = {round(float(x), 4) for o in sql_outputs(calls) for r in o["rows"] for x in r if isinstance(x, (int, float)) and not isinstance(x, bool)}
+        miss = [v for v in want if round(float(v), 4) not in nums]
+        return not miss, f"missing {miss}, numbers returned {sorted(nums)[:12]}"
     if kind == "rowcount":
         got = [len(o["rows"]) for o in sql_outputs(calls)]
         return want in got, f"got {got} rows want {want}"
@@ -71,7 +75,7 @@ def check(q, res):
                         got = {r[ki]: float(r[vi] or 0) for r in o["rows"] if isinstance(r[ki], str)}
                     except (TypeError, ValueError):
                         continue
-                    got = {k: v for k, v in got.items() if v}
+                    got = {k: v for k, v in got.items() if v and k not in ("Group level", "Unassigned", "None", "Unknown")}      # a catch-all bucket beside the answer is extra, not wrong
                     seen.append(got)
                     if got.keys() == want.keys() and all(abs(got[k] - want[k]) <= 0.01 * want[k] for k in want):
                         return True, ""

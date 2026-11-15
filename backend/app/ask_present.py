@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import re
 
-from app.docgen.library import CLAUSES
 from app.config import settings as _settings
+from app.docgen.library import CLAUSES
 
 _CUST = (_settings.customer_names or "Arcadia").split(",")[0].strip() or "Arcadia"
 

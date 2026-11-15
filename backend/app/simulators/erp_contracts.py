@@ -3,9 +3,8 @@ terms the system's own metadata states, so a pull can be cross-checked: the date
 Dates are relative to today, so the demo is always current. Demo / test fixtures only."""
 from __future__ import annotations
 
-from datetime import date, timedelta
-
 import os
+from datetime import date, timedelta
 
 _HOTEL = os.environ.get("STANDARDS", "").lower() == "hotel"
 CUSTOMER = "Seabright Hotels & Resorts Inc" if _HOTEL else "Arcadia Retail Inc."
