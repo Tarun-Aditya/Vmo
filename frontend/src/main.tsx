@@ -8,6 +8,7 @@ import { Layout } from "./ui";
 import Dashboard from "./pages/Dashboard";
 import Contracts from "./pages/Contracts";
 import ContractDetail from "./pages/ContractDetail";
+import Intake from "./pages/Intake";
 import Ask from "./pages/Ask";
 import Redline from "./pages/Redline";
 import Templates from "./pages/Templates";
@@ -84,6 +85,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="vendors" element={<Vendors />} />
             <Route path="vendors/:name" element={<VendorProfile />} />
             <Route path="clauses" element={<Clauses />} />
+            <Route path="intake" element={<Intake />} />
             <Route path="ask" element={<Ask />} />
             <Route path="redline" element={<Redline />} />
             <Route path="redline/:id" element={<Redline />} />

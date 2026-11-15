@@ -174,6 +174,8 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             before, after = d.flat[max(0, m.start() - 90):m.start()].lower(), d.flat[m.end():m.end() + 28].lower()
             if re.search(r"insur|per claim|\bcap\b|liabilit|exceed the greater|aggregate liability|indemn|penalt|credit", before[-70:] + after) and not re.search(r"fees?", before[-50:]):
                 continue
+            if re.search(r"reimburs|unamorti[sz]|refund|repay", d.flat[max(0, m.start() - 200):m.start()], re.I) and not re.search(r"(?:annual|total|contract) (?:fee|price|value)", before[-60:]):      # money paid back on exit is not the contract's value
+                continue
             if re.match(r"\s*(?:\(\s*[^)]{0,20}\)\s*)?(?:per|/|each|an)\s*(?:occurrence|hour|month|delivery|deliveries|lift|haul|ton|pound|night|vehicle|claim|day|property|unit|room|invoice|incident|call|visit|person|accident|location)\b", after) \
                     or re.search(r"(?:up to|exceed|minimum order[^.]{0,30}is|charge of|fee of|rate of|unit price[^.]{0,30})\s*$", before[-40:]):
                 continue
@@ -221,11 +223,13 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             m = re.search(r"(limitation of liability|liability cap|cap on liability)[^.]*\.([^§]{0,900})", d.flat, re.I)
             ltxt = (m.group(0) if m else "")
         lc = "liability_cap" if "liability_cap" in d.by else None
+        if not re.search(r"\d+(?:\.\d+)?\s*(?:x|times)\b|\d+\s*%\s*of|(?:12|twelve)\s+months|annual (?:contract price|fees|charges)|\bunlimited\b|\buncapped\b|\bnot exceed\b", ltxt or "", re.I) and (um := re.search(r"[^.]*\b(?:no limitation of (?:the amount of )?(?:either party[’']s |its |their )?liabilit|liabilit\w*[^.]{0,60}\b(?:is|shall be|are) (?:unlimited|uncapped))[^.]*\.", d.flat, re.I)):
+            ltxt = um.group(0)                 # 'no limitation of liability applies to Operator', stated outside the clause filed as the liability clause (which states no cap)
         if ltxt:
             ltxt = " ".join(x for x in re.split(r"(?<=[.;])\s+", ltxt) if not re.search(r"in place of the cap|instead of the cap|\bsuper[- ]?cap|(?:breach of|for)\s+(?:section\s+[\d.]+\s+)?\(?(?:security|data protection|privacy|confidentiality)\b", x, re.I)) or ltxt
             low = ltxt.lower()
             numeric = re.search(r"(\d+(?:\.\d+)?)\s*(?:x|times)\b|(\d+)\s*%\s*of|(?:fees|charges|amounts?)\s+(?:paid|payable|paid or payable)[^.]{0,80}(?:12|twelve)\s+months|\bone[- ]half\b", low)
-            if not numeric and re.search(r"\bunlimited\b|\bno (?:limit|cap)\b|\bnot be (?:subject to any )?(?:limit|cap)|\buncapped\b|\bwithout (?:any )?limit", low):
+            if not numeric and re.search(r"\bunlimited\b|\bno (?:limit|cap)\b|\bno limitation\b|\bnot be (?:subject to any )?(?:limit|cap)|\buncapped\b|\bwithout (?:any )?limit", low):
                 put("liability_cap_multiple", None, 0.9, lc)
                 put("liability_cap_text", "Unlimited", 0.9, lc)
             else:

@@ -13,13 +13,14 @@ import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date, datetime, timezone
+from contextvars import ContextVar
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from sqlalchemy import text
 
 from app import deviations, docstruct, embeddings, extraction, kcc, kcc_ai, llm, meta_rules, obligations
-from app.config import data_path
+from app.config import data_path, settings
 from app.db import SessionLocal
 from app.docgen.generate import render_template
 from app.docgen.library import TEMPLATES
@@ -185,6 +186,23 @@ def derive(s, contract: Contract, clauses_db: list[dict], cfg: dict, template_ke
     return {"values": len(vals), "checks": len(results), "deviations": len(items), "obligations": n_obl}
 
 
+# Intake screen: a callback that hears each step of reading one document (read, structure, metadata, extract, index, check). None outside that screen.
+PROGRESS: ContextVar = ContextVar("pipeline_progress", default=None)
+KEY_FIELDS = [("effective_date", "Start date"), ("expiry_date", "End date"), ("auto_renew", "Renews automatically"), ("notice_period_days", "Notice to stop renewal (days)"),
+              ("annual_value", "Annual value"), ("total_value", "Total value"), ("payment_terms_days", "Payment terms (days)"), ("liability_cap_multiple", "Liability cap (x annual fees)"),
+              ("termination_for_convenience", "Can exit for convenience"), ("governing_law", "Governing law"), ("processes_personal_data", "Handles personal data"),
+              ("has_dpa", "Data processing terms"), ("customer_signatory", "Signed for us by"), ("supplier_signatory", "Signed for supplier by")]
+
+
+def _emit(step: str, **data) -> None:
+    cb = PROGRESS.get()
+    if cb:
+        try:
+            cb(step, data)
+        except Exception:
+            pass
+
+
 def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", redline_mode: str = "auto", force: bool = False) -> dict:
     rel = str(path.relative_to(root))
     st = path.stat()
@@ -208,7 +226,12 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
             twin.source_size, twin.source_mtime_ns = st.st_size, st.st_mtime_ns
             return {"action": "moved", "contract_id": twin.id, "path": rel, "reason": f"same content hash; moved/renamed from {old}", **base}
         return {"action": "unchanged", "contract_id": twin.id, "path": rel, "reason": f"duplicate of {twin.source_path} (same content hash)", **base}
+    _emit("start", file=path.name, size=len(raw), hash=chash[:12])
+    t_ = time.time()
     md = docstruct.load_document(path)
+    _emit("read", pages=max(1, len(re.findall(r"<!-- page: \d+ -->", md))), paged=bool(re.search(r"<!-- page: \d+ -->", md)),   # (a Word file has no fixed pages)
+          words=len(re.findall(r"\w+", md)), format=path.suffix.lstrip(".").upper(),
+          scanned=bool(re.search(r"<!-- ocr", md)), seconds=round(time.time() - t_, 1))
     sc = path.with_suffix(".meta.json")
     sidecar = json.loads(sc.read_text()) if sc.exists() else {}
     classify = lambda h, t: kcc.classify(h, t, cfg["kcc"])  # noqa: E731
@@ -216,6 +239,12 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     clauses += kcc.detect_in_text(clauses, md, {c["clause_type"] for c in clauses}, {k["key"] for k in cfg["kcc"] if k.get("enabled", True)},
                                   _custom_keywords(cfg))     # clauses added in Admin are found by sentence too
     meta = infer_metadata(md, header, clauses, sidecar, rel)
+    kinds: dict[str, int] = {}
+    for c in clauses:
+        kinds[c["clause_type"]] = kinds.get(c["clause_type"], 0) + 1
+    _emit("structure", clauses=len(clauses), types=sorted(([k, n] for k, n in kinds.items() if k != "other"), key=lambda x: -x[1]),
+          other=kinds.get("other", 0), title=meta["title"], vendor=meta["vendor"], type=meta["type"], property=meta.get("property"), category=meta["category"])
+    t_ = time.time()
     if extractor != "offline":
         clauses += kcc_ai.tag(s, clauses, chash, kcc_ai.definitions(cfg["kcc"], {c["clause_type"] for c in clauses}), meta["type"])
     fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
@@ -232,6 +261,9 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     for f, v in corrections.items():                 # a person's correction survives re-extraction
         fields[f] = {**fields.get(f, {"clause_type": None, "page": 1}), "value": coerce_input(f, v), "confidence": 1.0, "corrected": True}
     val = {f: _coerce(f, d["value"]) for f, d in fields.items()}
+    _emit("extract", engine="Claude" if mode == "llm" else ("offline rules (Claude unavailable)" if mode == "heuristic-fallback" else "offline rules"), seconds=round(time.time() - t_, 1),
+          vendor=meta["vendor"], fields=[{"field": f, "label": lab, "value": None if val.get(f) is None else str(val.get(f)), "page": (fields.get(f) or {}).get("page"),
+                                          "confidence": (fields.get(f) or {}).get("confidence")} for f, lab in KEY_FIELDS])
     if meta["type"] in ("DPA", "NDA"):          # a DPA is not 'covered by a DPA'; an NDA processes no personal data: same result in every engine
         val["has_dpa"] = False
         if meta["type"] == "NDA":
@@ -261,7 +293,10 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         s.add(contract)
         action = "new"
     s.flush()
+    t_ = time.time()
     vecs = embeddings.embed([f"{c['heading']}. {c['text']}" for c in clauses]) if clauses else []
+    _emit("index", vectors=len(vecs), dims=len(vecs[0]) if vecs else 0, model={"fastembed": settings.fastembed_model, "local": settings.embedding_model}.get(embeddings.provider(), "hashed words (offline)"),
+          seconds=round(time.time() - t_, 1))
     by_type, db_clauses = {}, []
     for c, v in zip(clauses, vecs):
         row = Clause(contract_id=contract.id, clause_type=c["clause_type"], heading=c["heading"], text=c["text"], page=c["page"], embedding=v)
@@ -273,6 +308,15 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         s.add(FieldExtraction(contract_id=contract.id, field=f, value=None if d["value"] is None else str(d["value"]), corrected=bool(d.get("corrected")),
                               confidence=d["confidence"], source_clause_id=by_type.get(d["clause_type"]), source_page=d["page"]))
     stats = derive(s, contract, db_clauses, cfg, meta["template_key"], redline_mode if redline_mode != "auto" else "auto")
+    if PROGRESS.get():
+        fails = [dict(r) for r in s.execute(text("""SELECT r.name, COALESCE(x.severity, r.severity) AS severity, x.actual FROM check_results x JOIN checklist_rules r ON r.key = x.rule_key
+                                                    WHERE x.contract_id = :c AND x.status = 'fail'
+                                                    ORDER BY array_position(ARRAY['critical','high','medium','low'], COALESCE(x.severity, r.severity)), r.name"""),
+                                               {"c": contract.id}).mappings()]
+        exp, notice = contract.expiry_date, contract.notice_period_days
+        act_by = (exp - timedelta(days=notice)) if exp and contract.auto_renew and notice else exp
+        _emit("check", contract_id=contract.id, checks=stats["checks"], failed=fails[:8], failed_count=len(fails), deviations=stats["deviations"],
+              obligations=stats["obligations"], act_by=act_by.isoformat() if act_by else None, auto_renew=bool(contract.auto_renew))
     return {"action": action, "contract_id": contract.id, "path": rel, "title": meta["title"], "reason": "new content hash" if action == "new" else ("re-extracted on request" if force else "content hash changed"), **base, "parent_title": meta["parent_title"] or meta.get("parent_ref"),
             "extractor": mode, **stats}
 

@@ -32,7 +32,7 @@ def normalize(text: str) -> str:
         return str(v)
 
     t = re.sub(rf"\b({_WORD})(?:[- ](one|two|three|four|five|six|seven|eight|nine))?\b{UNIT_AFTER}", words, t, flags=re.I)
-    t = re.sub(r"\bUS\$|\bUSD\s*\$?|\$\s*(?=\d)", "USD ", t)
+    t = re.sub(r"\bUS\\?\$|\bUSD\s*\\?\$?|\\?\$\s*(?=\d)", "USD ", t)          # 'US\$' is how a Word file's dollar sign arrives in Markdown
     t = re.sub(r"\bUSD\s+USD\b", "USD", t)
     return re.sub(r"[ \t]{2,}", " ", t)
 

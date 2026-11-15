@@ -22,6 +22,7 @@ from app.routes_chat import router as chat_router
 from app.routes_comments import router as comments_router
 from app.routes_connectors import router as connectors_router
 from app.routes_docs import router as docs_router
+from app.routes_intake import router as intake_router  # noqa: E402
 from app.routes_hotel import router as hotel_router
 from app.routes_quality import router as quality_router
 from app.routes_scim import router as scim_router
@@ -161,6 +162,7 @@ if os.environ.get('SIMULATORS', '0') == '1':        # stand-ins for ERP and e-si
     app.mount('/sim/graph', sim_cloud.Lazy(1))
 app.include_router(vmo_router)
 app.include_router(hotel_router)
+app.include_router(intake_router)
 
 
 _addin = Path(__file__).resolve().parents[2] / "addin"

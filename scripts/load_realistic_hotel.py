@@ -1,4 +1,4 @@
-"""Add the five realistic hotel contracts (data/realistic_hotel/docs) to a running hotel demo: they are copied into the inbox (uploads/realistic) with
+"""Add the five realistic hotel contracts (data/realistic_hotel/docs) to a running hotel demo: they are copied into the inbox (uploads/intake, as the Intake screen does) with
 their category and property, and the pipeline reads them as it reads any uploaded contract (Claude when available, else the offline rules).
 
 From backend/ with the hotel environment:  python ../scripts/load_realistic_hotel.py
@@ -16,7 +16,7 @@ SRC = Path(__file__).resolve().parents[1] / "data" / "realistic_hotel"
 OWNER = "Andrea Whitfield"      # the procurement signatory in the documents
 
 with SessionLocal() as s:
-    dest = pipeline.inbox_path(s) / "uploads" / "realistic"
+    dest = pipeline.inbox_path(s) / "uploads" / "intake"      # the Intake screen's folder, so its reset removes them too
 dest.mkdir(parents=True, exist_ok=True)
 files = []
 for d in json.loads((SRC / "sources.json").read_text()):

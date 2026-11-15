@@ -308,6 +308,9 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     intent = "checks" if checks and not (doc_clauses and not checks) else "doc_clauses" if doc_clauses else "table"
     if intent == "table" and scope and len(scope) == 1 and metric == "list" and not group:
         intent = "card" if (overview or want_cols) else "search"
+        # 'what happens if we end it early?', 'can we exit?', 'how fast must they respond?': a question about what the document says, answered from its clauses
+        if intent == "card" and not overview and re.search(r"^(?:what happens|what if|what do we|what must|can (?:we|they|the)|could we|how (?:do|does|can|long|fast|quickly|soon|much)|is there|are (?:we|they)|do (?:we|they)|who (?:pays|is responsible))\b", q.strip()):
+            intent = "search"
     if intent == "table" and metric == "list" and not (where or group or want_cols or all_clauses):
         if not scope:
             return None
