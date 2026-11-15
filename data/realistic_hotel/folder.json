@@ -1,0 +1,40 @@
+{
+ "about": "The folder read on the Add contracts screen, in this order: the cleaning contractor's NDA, master agreement, two schedules and a scanned amendment, the five core contracts, and a byte-for-byte copy of one of them under another name (to show duplicate detection).",
+ "files": [
+  {
+   "file": "meridian_nda.docx"
+  },
+  {
+   "file": "meridian_msa.pdf"
+  },
+  {
+   "file": "meridian_sow_harbor.pdf"
+  },
+  {
+   "file": "meridian_sow_midtown.docx"
+  },
+  {
+   "file": "meridian_amendment_1_scan.pdf"
+  },
+  {
+   "file": "northshore_food_supply.pdf"
+  },
+  {
+   "file": "adirondack_hvac_maintenance.docx"
+  },
+  {
+   "file": "yieldline_rms_subscription.pdf"
+  },
+  {
+   "file": "keystone_valet_parking.docx"
+  },
+  {
+   "file": "prairie_waste_services.pdf"
+  },
+  {
+   "file": "northshore_food_supply.pdf",
+   "as": "Northshore food supply - signed copy.pdf",
+   "duplicate": true
+  }
+ ]
+}

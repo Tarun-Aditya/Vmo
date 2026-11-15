@@ -55,3 +55,21 @@ def test_word_dollar_sign_and_how_questions():
     plan = ask_nl.parse("What happens if we end this contract early?", scope=[1])
     assert plan and plan["intent"] == "search"
     assert ask_nl.parse("Tell me about this contract", scope=[1])["intent"] == "card"
+
+
+def test_a_folder_links_schedules_and_a_scanned_amendment_catches_a_duplicate_and_skips_a_second_run(client, clean_docs, monkeypatch):
+    monkeypatch.setattr(extract_rules.settings, "customer_names", "Seabright")
+    up = lambda name, as_=None: {"filename": as_ or name, "content_b64": base64.b64encode((SAMPLES / name).read_bytes()).decode()}  # noqa: E731
+    files = [up("meridian_msa.pdf"), up("meridian_sow_harbor.pdf"), up("meridian_amendment_1_scan.pdf"), up("meridian_msa.pdf", "MSA signed copy.pdf")]
+    done = {e["doc"]: e for e in _events(client.post("/api/intake", json={"files": files})) if e["step"] == "done"}
+    msa, sow, amd, dup = done["meridian_msa.pdf"], done["meridian_sow_harbor.pdf"], done["meridian_amendment_1_scan.pdf"], done["MSA_signed_copy.pdf"]
+    assert msa["action"] == "new" and msa["type"] == "MSA"
+    assert sow["type"] == "SOW" and sow["parent_id"] == msa["contract_id"]
+    assert amd["type"] == "Amendment" and amd["parent_id"] == msa["contract_id"] and set(amd["overrides"]) >= {"payment_terms_days", "expiry_date"}
+    assert dup["action"] == "duplicate" and dup["contract_id"] == msa["contract_id"]
+    with SessionLocal() as s:
+        eff = s.execute(text("SELECT payment_terms_days, expiry_date FROM v_effective_terms WHERE contract_id = :c"), {"c": msa["contract_id"]}).first()
+    assert eff[0] == 30 and str(eff[1]) == "2029-02-28"          # the scanned amendment's terms now govern the master agreement
+    again = [e for e in _events(client.post("/api/intake", json={"files": files[:2]})) if e["step"] == "done"]
+    assert [e["action"] for e in again] == ["unchanged", "unchanged"]
+    client.delete("/api/intake")

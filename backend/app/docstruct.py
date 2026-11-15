@@ -6,6 +6,7 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import threading
 from pathlib import Path
 
 from app import ingest_text
@@ -17,6 +18,9 @@ H_SECTION = re.compile(r"^\s*(?:SECTION|Section)\s+(\d+)\s*[.:\-–—]?\s*(.*)$
 H_NUM = re.compile(r"^\s*(\d{1,2})\.\s+([A-Z][A-Za-z0-9 ,&/'()\-–]{2,70})\s*$")
 H_SCHEDULE = re.compile(r"^\s*(?:SCHEDULE|Schedule|APPENDIX|Appendix|EXHIBIT|Exhibit|ORDER FORM|Order Form|ANNEX|Annex)\b[\s\dA-Z.:\-–—]*(.{0,70})$")
 SENTENCE_END = re.compile(r"[.;:,]\s*$")
+
+
+LAST = threading.local()          # what the last read on this thread did (ocr: the PDF had no text layer)
 
 
 def _page_split(text: str) -> list[str]:
@@ -33,6 +37,7 @@ def pdf_to_text(path: Path) -> str:
     if pages and not pages[-1].strip():
         pages = pages[:-1]
     if not "".join(pages).strip():
+        LAST.ocr = True                                   # the reader can say the text came from OCR
         return ocr_pdf(path)
     return "\n".join(f"<!-- page: {i} -->\n{merge_layout_tables(p)}" for i, p in enumerate(pages, 1))
 

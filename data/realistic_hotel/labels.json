@@ -1,5 +1,5 @@
 {
- "_about": "Fictional contracts written by Claude Code on 2026-11-15 to read like real US hotel supplier contracts (vendor paper, order forms, exhibits, signature blocks). Every value below is stated in the document; no names belong to real companies. Yieldline: effective_date is the Subscription Start Date (the Order Form is dated May 20, 2025). Keystone: it does not renew, so it has no renewal notice period (it has a 30-day termination-without-cause notice). Prairie and Keystone state no liability cap (null = uncapped). Where two people sign for Seabright (Adirondack, Yieldline), customer_signatory is the first.",
+ "_about": "Fictional contracts written by Claude Code on 2026-11-15 to read like real US hotel supplier contracts (vendor paper, order forms, exhibits, signature blocks). Every value below is stated in the document; no names belong to real companies. Yieldline: effective_date is the Subscription Start Date (the Order Form is dated May 20, 2025). Keystone: it does not renew, so it has no renewal notice period (it has a 30-day termination-without-cause notice). Prairie and Keystone state no liability cap (null = uncapped). Where two people sign for Seabright (Adirondack, Yieldline), customer_signatory is the first. The five Meridian documents (an NDA, a master agreement, two schedules and a scanned amendment) form the 'folder' set; the amendment's expiry_date and payment_terms_days are the values it sets on the master agreement.",
  "northshore_food_supply.pdf": {
   "vendor": "Northshore Foodservice Distributors LLC",
   "governing_law": "Massachusetts",
@@ -74,5 +74,58 @@
   "customer_signatory": "Robert Nakamura",
   "supplier_signatory": "Jennifer Alvarez",
   "fully_executed": true
+ },
+ "meridian_nda.docx": {
+  "vendor": "Meridian Hospitality Cleaning Services LLC",
+  "governing_law": "New York",
+  "effective_date": "2024-11-18",
+  "expiry_date": "2026-11-17",
+  "auto_renew": false,
+  "termination_for_convenience": true,
+  "customer_signatory": "Andrea Whitfield",
+  "supplier_signatory": "Carlos Ibarra"
+ },
+ "meridian_msa.pdf": {
+  "vendor": "Meridian Hospitality Cleaning Services LLC",
+  "governing_law": "New York",
+  "effective_date": "2025-03-01",
+  "expiry_date": "2028-02-29",
+  "auto_renew": true,
+  "notice_period_days": 90,
+  "termination_for_convenience": true,
+  "payment_terms_days": 45,
+  "liability_cap_multiple": 2.0,
+  "customer_signatory": "Andrea Whitfield",
+  "supplier_signatory": "Carlos Ibarra",
+  "fully_executed": true
+ },
+ "meridian_sow_harbor.pdf": {
+  "vendor": "Meridian Hospitality Cleaning Services LLC",
+  "effective_date": "2025-04-01",
+  "expiry_date": "2027-03-31",
+  "auto_renew": false,
+  "annual_value": 462000,
+  "customer_signatory": "Marcus Bell",
+  "supplier_signatory": "Carlos Ibarra",
+  "fully_executed": true
+ },
+ "meridian_sow_midtown.docx": {
+  "vendor": "Meridian Hospitality Cleaning Services LLC",
+  "effective_date": "2025-06-01",
+  "expiry_date": "2027-05-31",
+  "auto_renew": false,
+  "annual_value": 318000,
+  "termination_for_convenience": true,
+  "customer_signatory": "Helen Okoro",
+  "supplier_signatory": "Carlos Ibarra",
+  "fully_executed": true
+ },
+ "meridian_amendment_1_scan.pdf": {
+  "vendor": "Meridian Hospitality Cleaning Services LLC",
+  "effective_date": "2026-10-01",
+  "expiry_date": "2029-02-28",
+  "payment_terms_days": 30,
+  "customer_signatory": "Andrea Whitfield",
+  "supplier_signatory": "Carlos Ibarra"
  }
 }

@@ -57,7 +57,7 @@ def samples() -> list[dict]:
     out = []
     for d in _samples():
         f = SAMPLES / "docs" / d["file"]
-        out.append({"file": d["file"], "what": d["what"], "category": d.get("category"), "property": d.get("property"), "format": f.suffix.lstrip(".").upper(),
+        out.append({"file": d["file"], "what": d["what"], "group": d.get("group", "core"), "category": d.get("category"), "property": d.get("property"), "format": f.suffix.lstrip(".").upper(),
                     "size": f.stat().st_size, "contract_id": loaded.get(d["file"])})
     return out
 
@@ -73,6 +73,26 @@ def sample_file(name: str):
                         content_disposition_type="inline" if f.suffix.lower() == ".pdf" else "attachment")
 
 
+def _folder() -> list[dict]:
+    f = SAMPLES / "folder.json"
+    if not f.exists():
+        return []
+    by = {d["file"]: d for d in _samples()}
+    return [{**by[x["file"]], **x} for x in json.loads(f.read_text())["files"] if x["file"] in by]
+
+
+@router.get("/folder")
+def folder() -> list[dict]:
+    """The sample folder (about a dozen documents: a master agreement with its schedules, a scanned amendment, an NDA, the five contracts and one duplicate)."""
+    threading.Thread(target=_warm, daemon=True).start()
+    out = []
+    for x in _folder():
+        f = SAMPLES / "docs" / x["file"]
+        out.append({"name": x.get("as") or x["file"], "file": x["file"], "what": "Exact copy of another file in the folder" if x.get("duplicate") else x["what"],
+                    "format": f.suffix.lstrip(".").upper(), "size": f.stat().st_size, "duplicate": bool(x.get("duplicate"))})
+    return out
+
+
 class UploadIn(BaseModel):
     filename: str
     content_b64: str
@@ -81,17 +101,20 @@ class UploadIn(BaseModel):
 class IntakeIn(BaseModel):
     samples: list[str] = []
     files: list[UploadIn] = []
+    folder: bool = False          # read the sample folder; unchanged files are skipped, so a second run shows what incremental reading means
 
 
 def _stage(body: IntakeIn) -> list[Path]:
     dest, out = _dest(), []
     by_name = {d["file"]: d for d in _samples()}
-    for name in body.samples:
+    picks = [(x["file"], x.get("as") or x["file"]) for x in _folder()] if body.folder else [(n, n) for n in body.samples]
+    for name, as_ in picks:
         d = by_name.get(name)
         if not d:
             raise HTTPException(404, f"no sample called {name}")
-        f = dest / d["file"]
-        shutil.copy2(SAMPLES / "docs" / d["file"], f)
+        f = dest / re.sub(r"[^A-Za-z0-9._-]+", "_", as_)
+        if not (body.folder and f.exists()):         # the folder again: the files are as they were, so the pipeline sees them unchanged
+            shutil.copy2(SAMPLES / "docs" / d["file"], f)
         meta = {"category": d.get("category"), "owner": "Andrea Whitfield", "origin": "upload"}
         if d.get("property"):
             meta["property"] = d["property"]
@@ -121,7 +144,7 @@ def _summary(ids: list[int]) -> dict:
         return {"contracts": 0}
     with SessionLocal() as s:
         q = lambda sql: s.execute(text(sql), {"ids": ids})  # noqa: E731
-        c = q("""SELECT count(*) AS n, COALESCE(sum(annual_value), 0) AS annual, count(*) FILTER (WHERE liability_cap_multiple IS NULL) AS uncapped,
+        c = q("""SELECT count(*) AS n, COALESCE(sum(annual_value), 0) AS annual, count(*) FILTER (WHERE liability_cap_multiple IS NULL AND (liability_cap_text = 'Unlimited' OR (liability_cap_text IS NULL AND type NOT IN ('SOW', 'Work Order', 'Amendment', 'NDA', 'DPA')))) AS uncapped,
                         count(*) FILTER (WHERE processes_personal_data) AS personal, count(*) FILTER (WHERE auto_renew) AS auto_renew,
                         count(*) FILTER (WHERE NOT COALESCE(termination_for_convenience, false)) AS no_exit,
                         count(DISTINCT vendor) AS vendors FROM contracts WHERE id = ANY(:ids)""").mappings().one()
@@ -153,22 +176,25 @@ def intake(body: IntakeIn):
             for f in files:
                 tok = pipeline.PROGRESS.set(lambda step, data, _f=f.name: q.put({"doc": _f, "step": step, **data}))
                 try:
-                    r = pipeline.run_pipeline("intake", only=[f], force=True)
+                    r = pipeline.run_pipeline("intake", only=[f], force=bool(body.samples) and not body.folder)      # re-reading a chosen sample is on purpose; an identical upload or the folder again is skipped
                 finally:
                     pipeline.PROGRESS.reset(tok)
                 if r.get("status") == "busy":
                     q.put({"doc": f.name, "step": "error", "message": "another pipeline run is in progress; try again in a moment"})
                     continue
                 with SessionLocal() as s:
-                    rel = str(f.relative_to(pipeline.inbox_path(s)))
-                    row = s.execute(text("SELECT id, title FROM contracts WHERE source_path = :p"), {"p": rel}).first()
-                    ev = s.execute(text("SELECT action, detail FROM pipeline_events WHERE run_id = :r ORDER BY id DESC LIMIT 1"), {"r": r.get("run_id")}).first()
-                if row and (not ev or ev[0] != "failed"):
-                    ids.append(row[0])
-                    q.put({"doc": f.name, "step": "done", "contract_id": row[0], "title": row[1]})
+                    ev = s.execute(text("SELECT action, detail, reason, contract_id FROM pipeline_events WHERE run_id = :r ORDER BY id DESC LIMIT 1"), {"r": r.get("run_id")}).first()
+                    row = s.execute(text("""SELECT c.id, c.title, c.type, c.vendor, p.title AS parent, p.id AS parent_id, c.overrides FROM contracts c LEFT JOIN contracts p ON p.id = c.parent_id
+                                            WHERE c.id = :c"""), {"c": ev[3] if ev else None}).mappings().first()
+                if row and ev[0] != "failed":
+                    action = "duplicate" if ev[0] == "unchanged" and (ev[2] or "").startswith("duplicate") else ev[0]
+                    if action in ("new", "updated"):
+                        ids.append(row["id"])
+                    q.put({"doc": f.name, "step": "done", "action": action, "reason": ev[2], "contract_id": row["id"], "title": row["title"], "type": row["type"],
+                           "vendor": row["vendor"], "parent": row["parent"], "parent_id": row["parent_id"], "overrides": list(row["overrides"] or [])})
                 else:
                     q.put({"doc": f.name, "step": "error", "message": (ev[1] if ev else None) or "the document could not be read"})
-            q.put({"step": "summary", **_summary(ids)})
+            q.put({"step": "summary", **_summary(ids), "processed": len(ids), "files": len(files)})
         except Exception as e:  # report, never hang the stream
             q.put({"step": "error", "message": f"{type(e).__name__}: {e}"[:300]})
         finally:

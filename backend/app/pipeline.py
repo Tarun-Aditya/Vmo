@@ -217,9 +217,15 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     if not force and existing and existing.content_hash == chash:
         existing.source_size, existing.source_mtime_ns = st.st_size, st.st_mtime_ns        # touched but identical: remember the new stamp
         return {"action": "unchanged", "contract_id": existing.id, "path": rel, "reason": "same content hash as the last run", **base}
-    twin = None if existing or path.with_suffix(".meta.json").exists() else s.query(Contract).filter(Contract.content_hash == chash).first()
-    if twin and (root / (twin.source_path or "")).with_suffix(".meta.json").exists():
-        twin = None             # a sidecar can make identical text a different record (e.g. the executed copy of a draft)
+    twin = None if existing else s.query(Contract).filter(Contract.content_hash == chash).first()
+    if twin:                    # a sidecar can make identical text a different record (the executed copy of a draft): only a different status does
+        def _status(p_: Path) -> str | None:
+            try:
+                return json.loads(p_.with_suffix(".meta.json").read_text()).get("status") if p_.with_suffix(".meta.json").exists() else None
+            except (OSError, ValueError):
+                return None
+        if _status(path) != _status(root / (twin.source_path or "")) or twin.status != (_status(path) or twin.status):
+            twin = None
     if twin:                     # the same bytes under another name: identity is the hash, not the file name
         if not (root / (twin.source_path or "")).exists():
             old, twin.source_path = twin.source_path, rel
@@ -228,10 +234,11 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
         return {"action": "unchanged", "contract_id": twin.id, "path": rel, "reason": f"duplicate of {twin.source_path} (same content hash)", **base}
     _emit("start", file=path.name, size=len(raw), hash=chash[:12])
     t_ = time.time()
+    docstruct.LAST.ocr = False
     md = docstruct.load_document(path)
     _emit("read", pages=max(1, len(re.findall(r"<!-- page: \d+ -->", md))), paged=bool(re.search(r"<!-- page: \d+ -->", md)),   # (a Word file has no fixed pages)
           words=len(re.findall(r"\w+", md)), format=path.suffix.lstrip(".").upper(),
-          scanned=bool(re.search(r"<!-- ocr", md)), seconds=round(time.time() - t_, 1))
+          scanned=bool(getattr(docstruct.LAST, "ocr", False)), seconds=round(time.time() - t_, 1))
     sc = path.with_suffix(".meta.json")
     sidecar = json.loads(sc.read_text()) if sc.exists() else {}
     classify = lambda h, t: kcc.classify(h, t, cfg["kcc"])  # noqa: E731

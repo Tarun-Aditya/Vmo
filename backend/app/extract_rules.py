@@ -102,7 +102,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     # the start the term clause itself states wins over a date in the heading (a proposal date, a resolution date)
     tm = re.search(r"(?:become effective and commence on|effective for \d+ months starting|term of this (?:agreement|contract)[^.]{0,80}?shall be from|shall commence on|commences on)\s+([A-Za-z0-9,/ .\-]{6,30})", re.sub(r"\s+", " ", d.flat), re.I)
     stated = tu.first_date(tm.group(1)) if tm else None
-    if not stated and (sm := re.search(r"Subscription Start Date[\s|:*]+([A-Za-z0-9,/ .\-]{6,30})", d.flat)):        # an order form: the subscription starts on its own date, not the order date
+    if not stated and (sm := re.search(r"(?:Subscription|SOW|Service|Services|Schedule) Start Date[\s|:*]+([A-Za-z0-9,/ .\-]{6,30})", d.flat, re.I)):        # an order form: the subscription starts on its own date, not the order date
         stated = tu.first_date(sm.group(1))
     if stated:
         eff, guessed = stated, False
@@ -117,7 +117,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
         expiry = tu.first_date(m.group(1))
     if not expiry:          # 'continues until December 31, 2027 (the Initial Term)', 'Subscription Term | 36 months ..., ending May 31, 2028', 'ends on December 31, 2026 (the Term)': the term sentence, wherever the clause was filed
         for t_ in [tu.normalize(c["text"]) for c in d.by.get("term", []) + d.by.get("renewal", [])] + [re.sub(r"\s+", " ", d.flat)]:
-            for mm_ in re.finditer(r"(?:initial term|subscription term|the term of this|this agreement (?:begins|commences|continues|is effective)|term of this agreement|(?:the )?term (?:begins|commences)|\(the \W?term\W?\))[^.]{0,160}?(?:until|ending on|ending|ends on|expiring on|expires on|through)\s+([A-Za-z0-9,/ .\-]{6,30})", t_, re.I):
+            for mm_ in re.finditer(r"(?:initial term|subscription term|the term of this|this agreement (?:begins|commences|continues|is effective)|term of this agreement|(?:the )?term (?:begins|commences)|\(the \W?term\W?\))[^.]{0,160}?(?:until|ending on|ending|ends on|expiring on|expires on|through|(?:ends?|expires?|terminates?) [^.,]{0,30}?, on)\s+([A-Za-z0-9,/ .\-]{6,30})", t_, re.I):
                 if expiry := tu.first_date(mm_.group(1)):
                     break
             if expiry:
@@ -263,7 +263,8 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
         tc = "termination_for_convenience" if "termination_for_convenience" in d.by else None
         if re.search(r"neither party (?:may|shall|will|can) terminate[^.]{0,80}convenience|(?:no|not)[^.]{0,40}(?:right|entitled|permitted)[^.]{0,40}terminate[^.]{0,60}(?:convenience|without cause)|only (?:for|upon) (?:cause|material breach)|not (?:be )?(?:entitled|permitted)[^.]{0,40}convenience|(?:cannot|may not|shall not) be terminated for convenience|no (?:termination|right to terminate) for convenience|may not terminate[^.]{0,60}before the (?:end|expiration|expiry) of the", ttxt + " " + " ".join(re.findall(r"[^.]*\bmay not terminate\b[^.]*\.", d.flat, re.I)), re.I):
             put("termination_for_convenience", False, 0.92, tc)
-        elif re.search(r"(?:may|can|shall be entitled to)\s+terminate[^.]{0,120}(?:for convenience|without cause|for any reason)|for convenience[^.]{0,60}(?:upon|on|by giving|with)[^.]{0,30}\d+\s*days", ttxt, re.I):
+        elif re.search(r"(?:may|can|shall be entitled to)\s+terminate[^.]{0,120}(?:for convenience|without cause|for any reason)|for convenience[^.]{0,60}(?:upon|on|by giving|with)[^.]{0,30}\d+\s*days", ttxt, re.I) \
+                or re.search(r"(?:either party|customer|seabright|we|the hotel|owner)\s+(?:may|can)\s+(?:end|cancel)\s+(?:this (?:agreement|sow|contract|statement of work)|it)\b[^.]{0,30}?(?:on|upon|by giving|with)\s+[^.]{0,20}?\d+\)?\s*(?:calendar |business )?days", tu.normalize(d.flat), re.I):
             put("termination_for_convenience", True, 0.9, tc)
         elif __import__("app.kcc", fromlist=["x"]).sentence_hits("termination_for_convenience", d.flat):
             put("termination_for_convenience", True, 0.7, tc)           # a sentence that gives a party the right to terminate without cause / for convenience / on notice (shared with the clause detector)
@@ -342,12 +343,12 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
 def _signatures(d: Doc, tail: str) -> tuple[tuple | None, tuple | None]:
     cm = customer_markers()
     res: dict[str, tuple] = {}
-    for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^,\n]{{2,70}}?),?\s*(?i:on|dated)\s+(?P<date>[A-Za-z0-9,/ \-]{{6,24}})", tail):
+    for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^\n]{{2,100}}?),?\s*(?i:on|dated)\s+(?P<date>[A-Za-z0-9,/ \-]{{6,24}})", tail):
         role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
         res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
     # the same sentence wrapped over lines by a PDF ('... by Helena Cruz, VP Technology / Sourcing, on 07 January 2024'), or with the date on its own 'Date:' line
     flat = re.sub(r"(?<!\n)\n(?!\n)", " ", tail)
-    for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^,\n]{{2,70}}?)"
+    for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^\n]{{2,100}}?)"
                          rf"(?:,?\s*(?i:on|dated)\s+|\s+Signature\s*:\s*[_\s]*Date\s*:\s*)(?P<date>\d{{1,2}}\s+[A-Za-z]+,?\s+\d{{4}}|[A-Za-z]+\s+\d{{1,2}},?\s+\d{{4}}|\d[\d/.\-]{{5,9}})", flat):
         role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
         if tu.first_date(m.group("date")):

@@ -7,7 +7,8 @@
   "property": null,
   "customer_markers": [
    "Seabright"
-  ]
+  ],
+  "group": "core"
  },
  {
   "file": "adirondack_hvac_maintenance.docx",
@@ -17,7 +18,8 @@
   "property": "Seabright Lakeside Resort",
   "customer_markers": [
    "Seabright"
-  ]
+  ],
+  "group": "core"
  },
  {
   "file": "yieldline_rms_subscription.pdf",
@@ -27,7 +29,8 @@
   "property": null,
   "customer_markers": [
    "Seabright"
-  ]
+  ],
+  "group": "core"
  },
  {
   "file": "keystone_valet_parking.docx",
@@ -37,7 +40,8 @@
   "property": "Seabright Harbor Hotel",
   "customer_markers": [
    "Seabright"
-  ]
+  ],
+  "group": "core"
  },
  {
   "file": "prairie_waste_services.pdf",
@@ -47,6 +51,62 @@
   "property": "Seabright Airport Inn",
   "customer_markers": [
    "Seabright"
-  ]
+  ],
+  "group": "core"
+ },
+ {
+  "file": "meridian_nda.docx",
+  "what": "Mutual non-disclosure agreement with a cleaning contractor, signed before the master agreement (expires 17 Nov 2026)",
+  "type": "NDA",
+  "category": "Housekeeping",
+  "property": null,
+  "customer_markers": [
+   "Seabright"
+  ],
+  "group": "folder"
+ },
+ {
+  "file": "meridian_msa.pdf",
+  "what": "Master services agreement for contract cleaning and housekeeping support, all hotels (schedules are ordered under it)",
+  "type": "MSA",
+  "category": "Housekeeping",
+  "property": null,
+  "customer_markers": [
+   "Seabright"
+  ],
+  "group": "folder"
+ },
+ {
+  "file": "meridian_sow_harbor.pdf",
+  "what": "Statement of Work No. 1 under the cleaning master agreement: public areas and night cleaning, Harbor Hotel",
+  "type": "SOW",
+  "category": "Housekeeping",
+  "property": "Seabright Harbor Hotel",
+  "customer_markers": [
+   "Seabright"
+  ],
+  "group": "folder"
+ },
+ {
+  "file": "meridian_sow_midtown.docx",
+  "what": "Statement of Work No. 2 under the cleaning master agreement: supplemental room attendants, Midtown Suites",
+  "type": "SOW",
+  "category": "Housekeeping",
+  "property": "Seabright Midtown Suites",
+  "customer_markers": [
+   "Seabright"
+  ],
+  "group": "folder"
+ },
+ {
+  "file": "meridian_amendment_1_scan.pdf",
+  "what": "Amendment No. 1 to the cleaning master agreement, a scanned signed copy: payment terms 45 to 30 days, term extended to 2029",
+  "type": "Amendment",
+  "category": "Housekeeping",
+  "property": null,
+  "customer_markers": [
+   "Seabright"
+  ],
+  "group": "folder"
  }
 ]
