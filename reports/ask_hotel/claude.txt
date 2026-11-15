@@ -1,0 +1,14 @@
+PASS [claude-subscription] uncapped         
+PASS [claude-subscription] no_tfc           
+PASS [claude-subscription] auto_renewals    
+PASS [claude-subscription] notice_passed    
+PASS [claude-subscription] expire_90        
+PASS [claude-subscription] total_value      
+PASS [claude-subscription] top5_vendors     
+PASS [claude-subscription] pd_no_dpa        
+PASS [claude-subscription] harbor_vendors   
+PASS [claude-subscription] harbor_all       
+PASS [claude-subscription] lakeside_count   
+PASS [claude-subscription] per_property     
+PASS [claude-subscription] laundry_rate     
+13/13 correct

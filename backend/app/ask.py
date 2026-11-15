@@ -265,9 +265,14 @@ def answer(question: str, demo_mode: bool = False, scope: list[int] | None = Non
                 "cached_from": row[1],
                 "elapsed_ms": int((time.time() - t0) * 1000),
             }
+    res, fell_back = None, None
     if llm.available() and not force_offline:
-        res, source = ask_llm(question, scope=scope), "llm" if llm.provider() == "api" else "claude-subscription"
-    else:
+        try:
+            res, source = ask_llm(question, scope=scope), "llm" if llm.provider() == "api" else "claude-subscription"
+        except Exception as e:          # Claude unavailable (limit, network): answer with the offline engine and say so, never show the error as the answer
+            llm.note_failure(e)
+            fell_back = str(e)[:160]
+    if res is None:
         from app import ask_modules, ask_nl, ask_scripted
 
         res = None if scope else ask_scripted.answer(question)
@@ -291,6 +296,8 @@ def answer(question: str, demo_mode: bool = False, scope: list[int] | None = Non
 
     ask_present.finalize(res)
     res.update(question=question, source=source, elapsed_ms=int((time.time() - t0) * 1000), scoped=len(scope) if scope else 0)
+    if fell_back:
+        res["fallback_reason"] = f"Claude was unavailable ({fell_back}); this answer comes from the offline engine."
     return res
 
 

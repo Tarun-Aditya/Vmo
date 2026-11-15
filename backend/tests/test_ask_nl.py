@@ -101,9 +101,9 @@ def test_aggregate_answer_has_headline_breakdown_and_list(offline):
 def test_table_questions_pick_the_requested_columns(offline):
     r = ask.answer("Show start date, end date and signatures for all contracts", False)
     t = r["tables"][0]
-    assert [c["label"] for c in t["columns"]] == ["Contract", "Type", "Start date", "End date", "Signed by (Arcadia)", "Arcadia signed on",
+    assert [c["label"] for c in t["columns"]] == ["Contract", "Vendor", "Type", "Start date", "End date", "Signed by (Arcadia)", "Arcadia signed on",
                                                    "Signed by (Supplier)", "Supplier signed on", "Fully signed"]
-    assert len(t["rows"]) == 25 and t["columns"][-1]["kind"] == "bool" and t["columns"][2]["kind"] == "date" and not r["tiles"]
+    assert len(t["rows"]) == 25 and t["columns"][-1]["kind"] == "bool" and t["columns"][3]["kind"] == "date" and not r["tiles"]
 
 
 def test_signature_clause_and_draft_filters(offline):
@@ -118,7 +118,7 @@ def test_signature_clause_and_draft_filters(offline):
 def test_values_and_thresholds_are_askable(offline):
     r = ask.answer("What is the insurance cover per claim for each MSA?", False)
     t = r["tables"][0]
-    assert [c["label"] for c in t["columns"]] == ["Contract", "Type", "Insurance cover per claim"] and t["columns"][2]["kind"] == "money"
+    assert [c["label"] for c in t["columns"]] == ["Contract", "Vendor", "Type", "Insurance cover per claim"] and t["columns"][3]["kind"] == "money"
     assert sorted(float(x["insurance_cover_usd"]) for x in t["rows"]) == [500_000, 5_000_000, 5_000_000]
     r = ask.answer("Which contracts have payment terms below 45 days?", False)
     assert {x["title"][:20] for x in r["tables"][0]["rows"]} == {"SOW 1 – SAP S/4HANA ", "Master Services Agre"} and "payment terms" in r["answer"]
@@ -192,3 +192,27 @@ def test_notice_deadline_already_passed():
     for q in ("Which auto-renewing contracts have already passed their notice deadline?", "Contracts where the notice deadline has passed", "Which renewals missed the notice?"):
         assert any("CURRENT_DATE AND expiry_date >= CURRENT_DATE" in w for w in P(q)["where"]), q
     assert not any("< CURRENT_DATE" in w for w in P("Which contracts have a notice deadline in the next 60 days?")["where"])
+
+
+def test_claude_at_its_limit_falls_back_to_the_offline_engine(monkeypatch, seeded):
+    from app import llm
+
+    def limited(*a, **k):
+        raise RuntimeError("You've hit your session limit · resets 8:40am (UTC)")
+
+    monkeypatch.setattr(llm, "available", lambda: True)
+    monkeypatch.setattr(ask, "ask_llm", limited)
+    monkeypatch.setattr(llm, "_down_until", 0.0)
+    r = ask.answer("What is the total annual value of all active contracts?", demo_mode=False)
+    assert r["source"] in ("scripted", "offline-modules", "offline-planner")          # the limit text is never shown as the answer
+    assert "session limit" not in r["answer"] and "offline engine" in r["fallback_reason"]
+    assert llm._down_until > 0                                                          # later questions skip Claude for a while instead of failing one by one
+
+
+def test_property_questions_named_or_including_group_agreements(monkeypatch):
+    real = ask_nl._distinct
+    monkeypatch.setattr(ask_nl, "_distinct", lambda col: ["Seabright Harbor Hotel"] if col == "property" else real(col))
+    named = P("Which vendors have contracts that name Seabright Harbor Hotel as their property?")["where"]
+    wide = P("Which vendors serve Seabright Harbor Hotel, including group agreements that cover it?")["where"]
+    assert any("c.property" in w and "Harbor" in w for w in named) and not any("v_property_contracts" in w for w in named)
+    assert any("v_property_contracts" in w and "Harbor" in w for w in wide)

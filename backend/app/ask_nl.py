@@ -168,7 +168,11 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     for pr in _distinct("property"):                                    # a hotel property named in the question
         toks = [w for w in re.findall(r"[a-z]+", pr.lower()) if w not in {*customer_markers(), "hotel", "hotels", "resort", "inn", "lodge", "suites", "boutique", "the", "and"}]
         if toks and not scope and all(re.search(rf"\b{t}\b", q) for t in toks):
-            where.append(f"(SELECT c.property FROM contracts c WHERE c.id = contract_id) = {_lit(pr)}")
+            if re.search(r"includ\w* (?:the |any )?(?:group|shared)|group(?:-level)? agreements?|that cover|cover(?:s|ing)? (?:it|the property|this property)", q):
+                # the owner's wider reading: every contract that applies at the property, group agreements shared with the other hotels included
+                where.append(f"contract_id IN (SELECT pc.contract_id FROM v_property_contracts pc WHERE pc.property = {_lit(pr)})")
+            else:
+                where.append(f"(SELECT c.property FROM contracts c WHERE c.id = contract_id) = {_lit(pr)}")
             adj.append(f"at {pr}")
     vendor_hit = False
     for v in vendors:
@@ -311,7 +315,8 @@ def parse(question: str, today=None, cats=None, vendors=None, owners=None, scope
     if intent == "table" and metric == "list" and not scope and not re.search(r"contract|vendor|expir|renew|nda|sow|msa|dpa|saas|work order|sign|clause|who|which|show|list|when|what|draft", q):
         return None
 
-    cols = ["title", "vendor", "type"] + [c for c in want_cols if c not in ("title", "vendor", "type")]      # a contract list always says whose contract it is
+    lead = ["title", "type"] if scope else ["title", "vendor", "type"]      # a portfolio list says whose contract each row is; selected documents are already known
+    cols = lead + [c for c in want_cols if c not in lead]
     if all_clauses:
         cols = ["title", "type"] + ["has_" + k["key"] for k in kccs]
     elif not want_cols:

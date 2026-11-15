@@ -190,7 +190,7 @@ Set in `.env` (see `.env.example`):
 
 ## Tests
 
-* `make test`: backend suite (188 tests) against the offline-seeded synthetic corpus.
+* `make test`: backend suite (196 tests) against the offline-seeded synthetic corpus.
 * Outside Docker, use a separate database and data folder so tests never touch demo data:
   `DATABASE_URL=…/vmo_test DATA_DIR=./data_test LLM_PROVIDER=offline python -m app.seed && pytest`.
 * Browser walkthroughs: `scripts/demo_pilot.js` (any corpus) and `scripts/demo_walkthrough.js` (synthetic corpus).
@@ -253,14 +253,20 @@ all names are fictional.
   from one supplier are one alert), and an alert whose cause has gone is closed by itself: the seeded data now opens 24 alerts where it used to show 46.
 * **Ask** understands property: "which properties have the most contracts?", "contracts at Lakeside Resort", and "the laundry rate per kilogram at each property". The schema
   given to Claude now describes `properties`, `v_property_contracts` and `certificates` (it previously promised a `property` column that the view did not have).
+  **Measured on 13 owner questions** (`evals/questions_hotel.yaml`, expected answers from the spec, not the database; `QUESTIONS=questions_hotel.yaml
+  LABELS=labels_hotel.json python ../evals/pilot_ask_eval.py`): offline engine 13/13, Claude 13/13 (`reports/ask_hotel/`). Writing them found and fixed
+  "notice deadline already passed" being ignored, "personal data" being read as the breach-notice value, DPAs counted as "without a DPA", and a vendor
+  read as "Work" from 'This Statement of Work ("SOW")'. "Vendors at Harbor Hotel" means the contracts naming it; "including group agreements" widens it.
+* **When Claude hits a limit**, Ask answers with the offline engine and says so; the limit message is never shown as the answer (it used to be).
 * **Portfolio map** (`/map`): every contract family on one timeline with the last day to act, plus hierarchy problems.
 * **End-to-end walkthrough** (`node scripts/demo_e2e.js reports/e2e_hotel`): **25 of 25 steps pass** with no page errors, recorded in `reports/e2e_hotel/`
   (video, one screenshot per step, report). Steps 2 to 4 are the owner's screens: Properties with the sale view, Compare, Certificates.
 * **Claude mode on the five drafts** (`reports/e2e_hotel/CLAUDE_MODE.md`): all 17 planted deviations, none on the clean control, about 15 findings per draft
   (about 20 before duplicate and irrelevant missing-clause findings were removed). A failed playbook rule is always in the redline, whichever engine wrote it.
 * **Claude mode on the whole hotel corpus** (full seed read by Claude, 2026-11-15): see `reports/e2e_hotel/CLAUDE_MODE.md`.
-* Not yet done: one real integration needs a real invoice export or sandbox credentials; your own contracts (see "Measure it on your own contracts");
-  the new layout on the Admin pages.
+* **Admin** (13 pages) is grouped into Reading, Rules and System; the key-clause library has category tabs; the simulated Google Drive keeps its key across
+  restarts; simulator traffic no longer fills the audit log.
+* Not yet done (needs you): one real integration needs a real invoice export or sandbox credentials; your own contracts (see "Measure it on your own contracts").
 
 ## Demo script for a property owner (about 7 minutes)
 
@@ -344,4 +350,4 @@ DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright python -m app.se
 SIMULATORS=1 DATA_DIR=../data/hotel STANDARDS=hotel CUSTOMER_NAMES=Seabright uvicorn app.main:app --port 8000     # stand-in ERP and e-signature systems for the demo
 cd ../frontend && npm ci && npm run dev                 # http://localhost:5173
 ```
-Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 188 backend tests, type check, build and the 25-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).
+Checked from an empty database: seed, evals (fields 99.8%, redline recall 17/17), 196 backend tests, type check, build and the 25-step walkthrough (`node scripts/demo_e2e.js`) all pass. Generated at first use and not committed: the connector encryption key (`.secret_key`).

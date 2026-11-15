@@ -1,0 +1,14 @@
+PASS [scripted] uncapped         
+PASS [offline-planner] no_tfc           
+PASS [offline-planner] auto_renewals    
+PASS [offline-planner] notice_passed    
+PASS [offline-planner] expire_90        
+PASS [scripted] total_value      
+PASS [offline-planner] top5_vendors     
+PASS [offline-planner] pd_no_dpa        
+PASS [offline-planner] harbor_vendors   
+PASS [offline-planner] harbor_all       
+PASS [offline-planner] lakeside_count   
+PASS [offline-planner] per_property     
+PASS [offline-planner] laundry_rate     
+13/13 correct

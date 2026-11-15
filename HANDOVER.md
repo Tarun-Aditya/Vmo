@@ -157,3 +157,8 @@ Fixes they prompted: the supplier is the party introduced before a role term ("C
 term clause beats the date on the cover, "effective for 36 months starting ..." gives both dates, a city's state named in its title is not the governing law. Claude now also returns
 the supplier's name (used only when it appears in the document word for word); its prompt says how to treat blanks, conditional personal-data wording, and option years.
 CUAD hold-out after these changes: governing law 91.6% (was 89.1%), everything else unchanged.
+
+**2026-11-15 (later).** Ask on the hotel corpus is measured: 13 owner questions, offline 13/13 and Claude 13/13 (`reports/ask_hotel/`). Ask now falls back to the offline
+engine when Claude reports a usage limit, instead of showing the limit message as the answer. Admin pages regrouped and repaired (pack rule wording and scope refresh once
+per pack version; demo Google Drive survives restarts; simulator calls kept out of the audit log). The 25-step walkthrough was re-recorded and passes.
+Still needs you: a real invoice export or sandbox credentials for one live integration; 10-20 redacted contracts of your own.

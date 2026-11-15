@@ -8,6 +8,7 @@ from __future__ import annotations
 import asyncio
 import json
 import queue
+import re
 import tempfile
 import threading
 import time
@@ -93,6 +94,8 @@ async def _main(q: "queue.Queue", question: str, scope: list[int] | None, histor
                          int(u.get("output_tokens", 0)), int((time.time() - t0) * 1000))
                 if msg.is_error and not answer:
                     raise RuntimeError("; ".join(msg.errors or []) or msg.result or "the Claude call failed")
+    if not calls and re.search(r"hit your (?:session|usage|weekly|daily) limit|usage limit|rate limit|credit balance is too low|out of (?:extra )?usage", answer or "", re.I):
+        raise RuntimeError(answer)          # a subscription or API limit, not an answer: the caller falls back to the offline engine
     q.put({"type": "final", "res": {"answer": answer or "I could not complete that question.", "tool_calls": calls, "notes": notes}})
 
 
