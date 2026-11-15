@@ -1,5 +1,6 @@
 """Access control: local accounts (scrypt), signed session tokens, API tokens, optional OpenID Connect (RS256 id/access tokens checked against the issuer's JWKS),
-three roles (viewer < reviewer < admin) enforced in one middleware, and an audit log of every change.
+three roles (viewer < reviewer < admin) enforced in one middleware, an optional property limit per user (a property manager sees one hotel; see app/scope.py),
+and an audit log of every change.
 
 AUTH_MODE=off (default, for the demo) leaves everything open as an implicit admin. AUTH_MODE=on requires a login or token on every /api call."""
 from __future__ import annotations
@@ -138,21 +139,21 @@ def identify(token: str | None) -> dict | None:
     if token.startswith("ciq_"):
         h = hashlib.sha256(token.encode()).hexdigest()
         with SessionLocal() as s:
-            r = s.execute(text("""SELECT t.id, t.role AS trole, u.email, u.name, u.role, u.active FROM api_tokens t JOIN users u ON u.id = t.user_id
+            r = s.execute(text("""SELECT t.id, t.role AS trole, u.email, u.name, u.role, u.active, u.property FROM api_tokens t JOIN users u ON u.id = t.user_id
                                   WHERE t.token_hash = :h AND NOT t.revoked"""), {"h": h}).mappings().first()
             if not r or not r["active"]:
                 return None
             s.execute(text("UPDATE api_tokens SET last_used_at = now() WHERE id = :i"), {"i": r["id"]})
             s.commit()
         role = r["trole"] if RANK[r["trole"]] <= RANK[r["role"]] else r["role"]      # a token never outranks its owner
-        return {"email": r["email"], "name": r["name"], "role": role, "source": "token"}
+        return {"email": r["email"], "name": r["name"], "role": role, "source": "token", "property": r["property"]}      # a token carries its owner's property limit
     if token.count(".") == 1:
         d = read_session(token)
         if not d:
             return None
         with SessionLocal() as s:
-            u = s.execute(text("SELECT email, name, role, active FROM users WHERE email = :e"), {"e": d["e"]}).mappings().first()
-        return {"email": u["email"], "name": u["name"], "role": u["role"], "source": "session"} if u and u["active"] else None
+            u = s.execute(text("SELECT email, name, role, active, property FROM users WHERE email = :e"), {"e": d["e"]}).mappings().first()
+        return {"email": u["email"], "name": u["name"], "role": u["role"], "source": "session", "property": u["property"]} if u and u["active"] else None
     if token.count(".") == 2:
         u = verify_oidc(token)
         if not u:
@@ -161,9 +162,9 @@ def identify(token: str | None) -> dict | None:
             s.execute(text("""INSERT INTO users (email, name, role, source, last_login_at) VALUES (:e,:n,:r,'oidc',now())
                               ON CONFLICT (email) DO UPDATE SET role = EXCLUDED.role, name = COALESCE(EXCLUDED.name, users.name), last_login_at = now()
                               WHERE users.source = 'oidc'"""), {"e": u["email"], "n": u["name"], "r": u["role"]})
-            row = s.execute(text("SELECT active, role FROM users WHERE email = :e"), {"e": u["email"]}).mappings().first()
+            row = s.execute(text("SELECT active, role, property FROM users WHERE email = :e"), {"e": u["email"]}).mappings().first()
             s.commit()
-        return {**u, "role": row["role"]} if row and row["active"] else None
+        return {**u, "role": row["role"], "property": row["property"]} if row and row["active"] else None
     return None
 
 

@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Status, ago, api, inFuture, setToken, useSetting } from "./lib";
+import { Me, Status, ago, api, inFuture, propQs, setToken, useProperty, useSetting } from "./lib";
 
 export type Sev = "low" | "medium" | "high" | "critical";
 
@@ -58,14 +58,18 @@ export function Loading({ q }: { q: { isLoading: boolean; error: unknown } }) {
 }
 
 const ICON: Record<string, string> = {
-  "/": "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z", "/properties": "M4 21V8l8-5 8 5v13M9 21v-6h6v6M8 11h2M14 11h2", "/compare": "M5 20V9M12 20V4M19 20v-7M3 20h18", "/certificates": "M12 15a5 5 0 100-10 5 5 0 000 10zM9 14l-1.5 7L12 19l4.5 2L15 14", "/renewals": "M12 7v5l3 2M21 12a9 9 0 11-3-6.7M21 4v5h-5", "/map": "M6 8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6 20.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 7l8 4M8 17l8-4", "/contracts": "M6 3h9l4 4v14H6zM9 12h7M9 16h7", "/vendors": "M9 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM3 20c0-4 3-6 6-6s6 2 6 6M16 5a3 3 0 010 6M18 14c2 1 3 3 3 6",
+  "/": "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z", "/my-property": "M3 11l9-7 9 7v10H3zM9 21v-6h6v6", "/properties": "M4 21V8l8-5 8 5v13M9 21v-6h6v6M8 11h2M14 11h2", "/compare": "M5 20V9M12 20V4M19 20v-7M3 20h18", "/certificates": "M12 15a5 5 0 100-10 5 5 0 000 10zM9 14l-1.5 7L12 19l4.5 2L15 14", "/renewals": "M12 7v5l3 2M21 12a9 9 0 11-3-6.7M21 4v5h-5", "/map": "M6 8.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM18 14.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM6 20.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 7l8 4M8 17l8-4", "/contracts": "M6 3h9l4 4v14H6zM9 12h7M9 16h7", "/vendors": "M9 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7zM3 20c0-4 3-6 6-6s6 2 6 6M16 5a3 3 0 010 6M18 14c2 1 3 3 3 6",
   "/clauses": "M4 6h16M4 12h10M4 18h13", "/ask": "M4 5h16v11H9l-5 4z", "/redline": "M4 20l4-1 11-11-3-3L5 16z", "/templates": "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5",
   "/obligations": "M5 12l4 4 10-10M3 3h18v18H3z", "/spend": "M4 20V10M10 20V4M16 20v-7M22 20H2", "/risk": "M12 3l8 4v5c0 4-3 7-8 9-5-2-8-5-8-9V7z", "/new": "M12 5v14M5 12h14",
   "/alerts": "M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4", "/admin": "M12 15a3 3 0 100-6 3 3 0 000 6zM12 2v3M12 19v3M2 12h3M19 12h3",
 };
 // The seven screens a property-operations lead uses every week stay in view; the rest fold under "More", which opens by itself when you are on one of them.
-const NAV = [["/", "Portfolio"], ["/properties", "Properties"], ["/compare", "Compare"], ["/renewals", "Renewals"], ["/contracts", "Contracts"], ["/ask", "Ask"], ["/redline", "Redline"]];
-const MORE = [["/vendors", "Vendors"], ["/map", "Portfolio map"], ["/certificates", "Certificates"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/risk", "Risk"], ["/clauses", "Key clauses"], ["/templates", "Templates"], ["/new", "New contract"]];
+const NAV_ALL = [["/my-property", "My hotel"], ["/", "Portfolio"], ["/properties", "Properties"], ["/compare", "Compare"], ["/renewals", "Renewals"], ["/contracts", "Contracts"], ["/ask", "Ask"], ["/redline", "Redline"]];
+const MORE_ALL = [["/vendors", "Vendors"], ["/map", "Portfolio map"], ["/certificates", "Certificates"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/risk", "Risk"], ["/clauses", "Key clauses"], ["/templates", "Templates"], ["/new", "New contract"]];
+// a property manager's account (limited to one hotel) sees only the screens that can be narrowed to that hotel
+const NARROWED = ["/renewals", "/obligations", "/certificates", "/spend", "/alerts", "/contracts"];      // screens the property picker narrows
+const NAV_ONE = [["/my-property", "My hotel"], ["/renewals", "Renewals"], ["/contracts", "Contracts"], ["/ask", "Ask"]];
+const MORE_ONE = [["/certificates", "Certificates"], ["/obligations", "Obligations"], ["/spend", "Spend"], ["/alerts", "Alerts"]];
 
 function RailLink({ to, label, onClick }: { to: string; label: string; onClick?: () => void }) {
   return (
@@ -83,8 +87,11 @@ export function Layout() {
   const qc = useQueryClient();
   const modeSw = useMutation({ mutationFn: (demo: boolean) => api("/api/admin/mode", { method: "PUT", body: JSON.stringify({ demo }) }), onSuccess: () => qc.invalidateQueries() });
   const st = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/api/status"), refetchInterval: 10000 });
-  const al = useQuery({ queryKey: ["alerts-summary"], queryFn: () => api<{ unread: number; open: number; critical: number }>("/api/alerts/summary"), refetchInterval: 30000 });
-  const who = useQuery({ queryKey: ["whoami"], queryFn: () => api<{ email: string; name?: string; role: string; auth_required: boolean }>("/api/auth/me") });
+  const who = useQuery({ queryKey: ["whoami"], queryFn: () => api<Me>("/api/auth/me") });
+  const [prop, setProp, locked] = useProperty(who.data);
+  const props = useQuery({ queryKey: ["properties"], queryFn: () => api<{ properties: { property: string }[] }>("/api/properties") });
+  const NAV = locked ? NAV_ONE : NAV_ALL, MORE = locked ? MORE_ONE : MORE_ALL;
+  const al = useQuery({ queryKey: ["alerts-summary", prop], enabled: !!who.data, queryFn: () => api<{ unread: number; open: number; critical: number }>("/api/alerts/summary" + propQs(prop)), refetchInterval: 30000 });
   const lastRun = useRef<number | null>(null);
   useEffect(() => {
     // A pipeline run finished: refresh every screen, so all modules show the same new data.
@@ -118,8 +125,8 @@ export function Layout() {
         {moreOpen && <div id="rail-more" className="flex flex-col gap-1">{MORE.map(([to, label]) => <RailLink key={to} to={to} label={label} onClick={close} />)}</div>}
       </nav>
       <div className="flex-1" />
-      <RailLink to="/admin" label="Admin" onClick={close} />
-      {modeBlock}
+      {!locked && <RailLink to="/admin" label="Admin" onClick={close} />}
+      {!locked && modeBlock}
     </div>
   );
   return (
@@ -135,6 +142,15 @@ export function Layout() {
         <header className="sticky top-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line bg-paper/95 px-4 py-2 backdrop-blur dark:border-slate-700 dark:bg-[#14171B]/95 md:justify-end">
           <button className="min-h-[44px] rounded-lg border border-line bg-white px-3 text-sm font-medium dark:border-slate-600 dark:bg-slate-800 md:hidden" onClick={() => setOpen(true)} aria-label="Open navigation">☰ Menu</button>
           <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            {!!props.data?.properties.length && (
+              <label className="flex items-center gap-2 text-xs text-ink-mute dark:text-slate-300" title={locked ? "Your account is limited to this property" : "Narrow every screen that can be narrowed to one property"}>
+                <span className="font-semibold uppercase tracking-wider">Property</span>
+                <select aria-label="Property" value={prop} disabled={locked} onChange={(e) => setProp(e.target.value)}
+                  className="min-h-[36px] rounded-lg border border-line bg-white px-2 text-sm text-ink dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100">
+                  {!locked && <option value="">All properties</option>}
+                  {props.data.properties.map((p) => <option key={p.property} value={p.property}>{p.property}</option>)}
+                </select>
+              </label>)}
             {st.data && (
               <NavLink to="/admin" className="flex items-center gap-1.5 text-xs text-ink-mute dark:text-slate-300"
                 title={`Pipeline ${st.data.config.enabled ? "on" : "off"} · every ${st.data.config.interval_minutes} min`}>
@@ -153,8 +169,22 @@ export function Layout() {
             <button onClick={() => setDark(!dark)} className="min-h-[44px] rounded-lg border border-line bg-white px-3 dark:border-slate-600 dark:bg-slate-800" aria-label="Toggle theme">{dark ? "☀ Light" : "☾ Dark"}</button>
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-4 py-6 md:px-8"><Outlet /></main>
+        <main className="mx-auto max-w-7xl px-4 py-6 md:px-8">
+          {prop && NARROWED.some((x) => loc.pathname.startsWith(x)) && (
+            <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-900 dark:bg-indigo-950 dark:text-indigo-100" role="status">
+              <b>{prop}</b> only: the contracts that name it and the group agreements that cover it.
+              {!locked && <button type="button" className="ml-auto font-semibold underline" onClick={() => setProp("")}>Show all properties</button>}
+            </div>)}
+          {!who.data && !who.isError ? <p className="text-sm text-slate-500">Loading…</p>      /* the account decides which property the screens show: wait for it */
+            : locked && loc.pathname === "/" ? <Navigate to="/my-property" replace /> : <Outlet />}
+        </main>
       </div>
     </div>
   );
+}
+
+/** The property every narrowable screen shows ("" = all), as chosen at the top of the page (or fixed by a property-limited account). */
+export function useCurrentProperty(): string {
+  const who = useQuery({ queryKey: ["whoami"], queryFn: () => api<Me>("/api/auth/me") });
+  return useProperty(who.data)[0];
 }

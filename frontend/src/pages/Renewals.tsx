@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { api, daysLabel, fmtDate, usd } from "../lib";
-import { Card, Loading, Sev, SeverityChip } from "../ui";
+import { api, daysLabel, fmtDate, propQs, usd } from "../lib";
+import { Card, Loading, Sev, SeverityChip, useCurrentProperty } from "../ui";
 
 type Item = { id: number; title: string; vendor: string; type: string; expiry_date: string | null; auto_renew: boolean; notice_deadline: string | null; days_left: number | null; annual_value: number | null };
 type MapData = { today: string; families: { vendor: string; items: Item[] }[] };
@@ -13,10 +13,11 @@ const DECISIONS: [string, string][] = [["renew", "Renew as is"], ["renegotiate",
 
 /** What expires in the next 12 months, and the last day to act on each (expiry minus the notice period). */
 export default function Renewals() {
-  const q = useQuery({ queryKey: ["map", ""], queryFn: () => api<MapData>("/api/portfolio-map") });
+  const prop = useCurrentProperty();
+  const q = useQuery({ queryKey: ["map", prop], queryFn: () => api<MapData>("/api/portfolio-map" + propQs(prop)) });
   const [view, setView] = useState<"timeline" | "list">("timeline");
   const qc = useQueryClient();
-  const dq = useQuery({ queryKey: ["renewal-decisions"], queryFn: () => api<Decision[]>("/api/renewals/decisions") });
+  const dq = useQuery({ queryKey: ["renewal-decisions", prop], queryFn: () => api<Decision[]>("/api/renewals/decisions" + propQs(prop)) });
   const [form, setForm] = useState({ contract_id: "", decision: "renegotiate", owner: "", note: "" });
   const save = useMutation({ mutationFn: () => api("/api/renewals/decisions", { method: "POST", body: JSON.stringify({ ...form, contract_id: Number(form.contract_id) }) }),
     onSuccess: () => { setForm({ ...form, note: "" }); qc.invalidateQueries({ queryKey: ["renewal-decisions"] }); } });

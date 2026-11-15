@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Meter, Pill, Tile } from "../components/vmo";
 import { Btn, Field, inputCls } from "../forms";
-import { api, fmtDate, usd } from "../lib";
-import { Card, Loading, Sev, SeverityChip, Td, Th } from "../ui";
+import { api, fmtDate, propQs, usd } from "../lib";
+import { Card, Loading, Sev, SeverityChip, Td, Th, useCurrentProperty } from "../ui";
 
 type Summary = { billed: number; billed_90d: number; invoices: number; off_contract: number; planned: number; exceptions: number; at_risk: number; serious: number;
   by_vendor: { vendor: string; billed: number; planned: number; exceptions: number; at_risk: number }[]; monthly: { month: string; on_contract: number | null; off_contract: number | null }[];
@@ -18,12 +18,13 @@ export const KIND: Record<string, string> = { no_contract: "No contract on file"
 
 export default function Spend() {
   const qc = useQueryClient();
-  const sum = useQuery({ queryKey: ["spend-summary"], queryFn: () => api<Summary>("/api/spend/summary") });
-  const cs = useQuery({ queryKey: ["spend-contracts"], queryFn: () => api<CS[]>("/api/spend/contracts") });
+  const prop = useCurrentProperty();
+  const sum = useQuery({ queryKey: ["spend-summary", prop], queryFn: () => api<Summary>("/api/spend/summary" + propQs(prop)) });
+  const cs = useQuery({ queryKey: ["spend-contracts", prop], queryFn: () => api<CS[]>("/api/spend/contracts" + propQs(prop)) });
   const [sev, setSev] = useState("");
   const [kind, setKind] = useState("");
   const qs = new URLSearchParams({ ...(sev && { severity: sev }), ...(kind && { kind }) }).toString();
-  const ex = useQuery({ queryKey: ["spend-exceptions", qs], queryFn: () => api<Ex[]>(`/api/spend/exceptions?${qs}`) });
+  const ex = useQuery({ queryKey: ["spend-exceptions", qs, prop], queryFn: () => api<Ex[]>(`/api/spend/exceptions?${qs}${propQs(prop, false)}`) });
   const file = useRef<HTMLInputElement>(null);
   const [feed, setFeed] = useState({ name: "invoices_export.csv", content: "" });
   const up = useMutation({ mutationFn: () => api<{ new_docs: number; updated: number; exceptions: number }>("/api/feeds/upload", { method: "POST", body: JSON.stringify(feed) }), onSuccess: () => qc.invalidateQueries() });

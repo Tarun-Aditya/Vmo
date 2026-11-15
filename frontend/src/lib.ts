@@ -65,6 +65,27 @@ export function useSetting(key: string, initial: boolean): [boolean, (v: boolean
   }];
 }
 
+/** The property the screens are narrowed to ("" = every property). A property-limited account is locked to its own property. Kept per browser. */
+export type Me = { email: string; name?: string; role: string; auth_required: boolean; property?: string | null };
+export function useProperty(me?: Me | null): [string, (p: string) => void, boolean] {
+  const read = () => { try { return localStorage.getItem("ciq_property") ?? ""; } catch { return ""; } };
+  const [val, setVal] = useState(read);
+  useEffect(() => {
+    const h = () => setVal(read());
+    window.addEventListener("setting-changed", h);
+    return () => window.removeEventListener("setting-changed", h);
+  }, []);
+  const locked = !!me?.property;
+  return [locked ? me!.property! : val, (p: string) => {
+    if (locked) return;
+    try { localStorage.setItem("ciq_property", p); } catch { /* private mode */ }
+    window.dispatchEvent(new Event("setting-changed"));
+    setVal(p);
+  }, locked];
+}
+/** "?property=..." (or "&property=...") for an API call, empty when every property is shown. */
+export const propQs = (p: string, first = true) => (p ? `${first ? "?" : "&"}property=${encodeURIComponent(p)}` : "");
+
 export type Col = { key: string; label: string; kind: "text" | "date" | "money" | "bool" | "number" | "score" | "quote" | "severity" };
 export type Table = { title: string | null; kv?: boolean; columns: Col[]; rows: Record<string, unknown>[]; row_count: number };
 export type Step = { title: string; detail?: string; sql?: string; columns?: string[]; rows?: unknown[][]; row_count?: number; error?: string };

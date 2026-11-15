@@ -49,11 +49,12 @@ def meta():
 
 # ------------------------------------------------------------------ contracts
 @router.get("/contracts/filters")
-def contract_filters():
+def contract_filters(request: Request):
+    ids = _ids_at(request, None)          # a property-limited account sees the choices of its own property only
     return {
         k: [
             r["v"]
-            for r in q(f"SELECT DISTINCT {k} AS v FROM contracts WHERE {k} IS NOT NULL ORDER BY 1")
+            for r in q(f"SELECT DISTINCT {k} AS v FROM contracts WHERE {k} IS NOT NULL AND (CAST(:ids AS int[]) IS NULL OR id = ANY(:ids)) ORDER BY 1", ids=ids)
         ]
         for k in ("vendor", "category", "type", "owner", "property", "status")
     }
@@ -68,10 +69,18 @@ def list_contracts(
     status: str | None = None,
     search: str | None = None,
     property: str | None = None,
+    request: Request = None,
 ):
+    from app import scope
+
     where, p = [], {}
+    prop = scope.effective(request, property)
+    if prop:                # every contract that applies at the property: the ones naming it and the group agreements covering it
+        with SessionLocal() as s_:
+            where.append("c.id = ANY(:ids)")
+            p["ids"] = scope.contract_ids(s_, prop)
     for k, v in dict(
-        vendor=vendor, category=category, type=type, owner=owner, status=status, property=property
+        vendor=vendor, category=category, type=type, owner=owner, status=status
     ).items():
         if v:
             where.append(f"c.{k} = :{k}")
@@ -145,7 +154,10 @@ def _checks(cid: int) -> list[dict]:
 
 
 @router.get("/contracts/{cid}")
-def get_contract(cid: int):
+def get_contract(cid: int, request: Request):
+    from app import scope
+
+    scope.check_contract(request, cid)
     c = q1("SELECT * FROM contracts WHERE id = :i", i=cid)
     if not c:
         raise HTTPException(404, "contract not found")
@@ -491,12 +503,24 @@ class AskIn(BaseModel):
 
 
 @router.post("/ask")
-def ask(body: AskIn):
-    return ask_mod.answer(body.question, body.demo_mode, body.contract_ids or None)
+def ask(body: AskIn, request: Request):
+    from app import scope
+    from app.routes_chat import limited
+
+    ids, lim = limited(request, body.contract_ids or None)
+    tok = scope.SQL_LIMIT.set(lim)
+    try:
+        return ask_mod.answer(body.question, body.demo_mode and not lim, ids)        # cached demo answers cover the whole portfolio: never for a limited account
+    finally:
+        scope.SQL_LIMIT.reset(tok)
 
 
 @router.get("/ask/suggestions")
-def suggestions():
+def suggestions(request: Request):
+    from app import scope
+
+    if scope.user_property(request):
+        return []                      # the suggestions are portfolio-wide demo questions
     return [
         r["question"] for r in q("SELECT question FROM ask_cache ORDER BY created_at, question")
     ]
@@ -642,9 +666,20 @@ def usage():
     }
 
 
+def _ids_at(request: Request, property: str | None) -> list[int] | None:
+    """The contracts that apply at a property (None = every property); a property-limited account always gets its own property."""
+    from app import scope
+
+    prop = scope.effective(request, property)
+    if not prop:
+        return None
+    with SessionLocal() as s_:
+        return scope.contract_ids(s_, prop)
+
+
 # ------------------------------------------------------------------ portfolio map: every contract family on one timeline, with hierarchy problems
 @router.get("/portfolio-map")
-def portfolio_map(property: str | None = None, vendor: str | None = None):
+def portfolio_map(request: Request, property: str | None = None, vendor: str | None = None):
     """Contracts grouped by vendor family (parent, children, amendments) with the dates a VMO acts on, and the hierarchy / data problems found:
     a child that outlives its parent, an NDA that ends before its MSA, an SOW or work order with no parent, no end date, auto-renewal with no notice period."""
     rows = q(
@@ -653,9 +688,9 @@ def portfolio_map(property: str | None = None, vendor: str | None = None):
                   COALESCE(e.notice_period_days, c.notice_period_days) AS notice_days, COALESCE(e.annual_value, c.annual_value) AS annual_value,
                   COALESCE(e.liability_uncapped, false) AS uncapped
            FROM contracts c LEFT JOIN v_effective_terms e ON e.contract_id = c.id
-           WHERE c.status <> 'draft' AND (CAST(:p AS text) IS NULL OR c.property = :p OR c.type IN ('MSA')) AND (CAST(:v AS text) IS NULL OR c.vendor = :v)
+           WHERE c.status <> 'draft' AND (CAST(:ids AS int[]) IS NULL OR c.id = ANY(:ids)) AND (CAST(:v AS text) IS NULL OR c.vendor = :v)
            ORDER BY c.vendor, CASE c.type WHEN 'MSA' THEN 0 WHEN 'SaaS' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, c.effective_date""",
-        p=property, v=vendor,
+        ids=_ids_at(request, property), v=vendor,
     )
     today = dt.date.today()
     by_id = {r["id"]: r for r in rows}
@@ -713,7 +748,10 @@ class DecisionIn(BaseModel):
 @router.post("/renewals/decisions")
 def record_decision(b: DecisionIn, request: Request):
     """Record what the VMO decided for a contract coming up for renewal. Later decisions supersede earlier ones; the history is kept."""
+    from app import scope
     from app.routes_auth import me
+
+    scope.check_contract(request, b.contract_id)
 
     if b.decision not in ("renew", "renegotiate", "exit", "extend"):
         raise HTTPException(422, "decision must be renew, renegotiate, exit or extend")
@@ -727,7 +765,7 @@ def record_decision(b: DecisionIn, request: Request):
 
 
 @router.get("/renewals/decisions")
-def list_decisions():
+def list_decisions(request: Request, property: str | None = None):
     """The latest decision per contract, with who and when."""
     return q("""SELECT DISTINCT ON (contract_id) id, contract_id, decision, owner, note, decided_by, decided_at
-                FROM renewal_decisions ORDER BY contract_id, decided_at DESC, id DESC""")
+                FROM renewal_decisions WHERE CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids) ORDER BY contract_id, decided_at DESC, id DESC""", ids=_ids_at(request, property))

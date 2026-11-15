@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Pill, Tile } from "../components/vmo";
 import { Btn, Field, inputCls } from "../forms";
-import { api, fmtDate, usd } from "../lib";
-import { Card, Loading, Td, Th } from "../ui";
+import { api, fmtDate, propQs, usd } from "../lib";
+import { Card, Loading, Td, Th, useCurrentProperty } from "../ui";
 
 type Ob = { obligation_id: number; contract_id: number; contract: string; vendor: string; type: string; kind: string; party: string; obligation: string; due_date: string | null; frequency: string; target_value: number | null; target_unit: string | null; status: "open" | "overdue" | "done" | "waived"; completed_on: string | null; days_left: number | null; source: string };
 type ObRes = { rows: Ob[]; summary: { open: number; overdue: number; due_30: number; done: number; ongoing: number }; kinds: string[]; vendors: string[] };
@@ -55,8 +55,9 @@ export default function Obligations() {
   const [party, setParty] = useState("");
   const [find, setFind] = useState("");
   const qs = new URLSearchParams({ ...(status && { status }), ...(kind && { kind }), ...(vendor && { vendor }), ...(party && { party }), ...(find && { q: find }) }).toString();
-  const q = useQuery({ queryKey: ["obligations", qs], queryFn: () => api<ObRes>(`/api/obligations?${qs}`) });
-  const sla = useQuery({ queryKey: ["sla"], queryFn: () => api<SlaRes>("/api/sla") });
+  const prop = useCurrentProperty();
+  const q = useQuery({ queryKey: ["obligations", qs, prop], queryFn: () => api<ObRes>(`/api/obligations?${qs}${propQs(prop, false)}`) });
+  const sla = useQuery({ queryKey: ["sla", prop], queryFn: () => api<SlaRes>("/api/sla" + propQs(prop)) });
   const patch = useMutation({
     mutationFn: (v: { id: number; status: string }) => api(`/api/obligations/${v.id}`, { method: "PATCH", body: JSON.stringify({ status: v.status }) }),
     onSuccess: () => qc.invalidateQueries(),

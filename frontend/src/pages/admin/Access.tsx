@@ -5,7 +5,7 @@ import { Pill } from "../../components/vmo";
 import { api, ago, when } from "../../lib";
 import { Card, Loading } from "../../ui";
 
-type User = { id: number; email: string; name: string | null; role: "viewer" | "reviewer" | "admin"; source: string; active: boolean; last_login_at: string | null; tokens: number };
+type User = { id: number; email: string; name: string | null; role: "viewer" | "reviewer" | "admin"; property: string | null; source: string; active: boolean; last_login_at: string | null; tokens: number };
 type Tok = { id: number; name: string; prefix: string; role: string; created_at: string; last_used_at: string | null; revoked: boolean };
 type Entry = { id: number; ts: string; user_email: string | null; role: string | null; method: string; path: string; status: number | null; event: string };
 const ROLE_HELP = { viewer: "read everything, ask questions", reviewer: "+ review redlines, edit documents, acknowledge alerts, mark obligations", admin: "+ configuration, connectors, users, audit log" };
@@ -38,21 +38,26 @@ function Tokens({ u }: { u: User }) {
 function Users() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["users"], queryFn: () => api<User[]>("/api/users") });
-  const [f, setF] = useState({ email: "", name: "", password: "", role: "viewer" });
+  const [f, setF] = useState({ email: "", name: "", password: "", role: "viewer", property: "" });
+  const props = useQuery({ queryKey: ["properties"], queryFn: () => api<{ properties: { property: string }[] }>("/api/properties") });
+  const propNames = (props.data?.properties ?? []).map((p) => p.property);
   const [open, setOpen] = useState<number | null>(null);
   const refresh = () => qc.invalidateQueries({ queryKey: ["users"] });
-  const add = useMutation({ mutationFn: () => api("/api/users", { method: "POST", body: JSON.stringify(f) }), onSuccess: () => { setF({ email: "", name: "", password: "", role: "viewer" }); refresh(); } });
+  const add = useMutation({ mutationFn: () => api("/api/users", { method: "POST", body: JSON.stringify(f) }), onSuccess: () => { setF({ email: "", name: "", password: "", role: "viewer", property: "" }); refresh(); } });
   const upd = useMutation({ mutationFn: (u: User & { password?: string }) => api(`/api/users/${u.id}`, { method: "PUT", body: JSON.stringify(u) }), onSuccess: refresh });
   const del = useMutation({ mutationFn: (id: number) => api(`/api/users/${id}`, { method: "DELETE" }), onSuccess: refresh });
   if (!q.data) return <Loading q={q} />;
   return (
     <Card title="Users and roles">
       <p className="mb-3 text-sm text-slate-500">{(Object.entries(ROLE_HELP) as [string, string][]).map(([r, h]) => <span key={r} className="mr-4"><b>{r}</b>: {h}</span>)}</p>
-      <div className="mb-4 grid gap-2 md:grid-cols-5">
+      <p className="mb-3 text-sm text-slate-500"><b>Property:</b> a user limited to one property (a hotel's manager) sees that property only: its contracts, renewals, obligations, certificates, spend, alerts and service, and Ask answers from its documents only. Administrators always see every property.</p>
+      <div className="mb-4 grid gap-2 md:grid-cols-6">
         <input className={inputCls} aria-label="New user e-mail" placeholder="e-mail" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
         <input className={inputCls} aria-label="New user name" placeholder="name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
         <input className={inputCls} type="password" autoComplete="new-password" aria-label="New user password" placeholder="password (8+)" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
         <select className={inputCls} aria-label="New user role" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })}>{["viewer", "reviewer", "admin"].map((r) => <option key={r}>{r}</option>)}</select>
+        <select className={inputCls} aria-label="New user property" value={f.property} disabled={f.role === "admin"} onChange={(e) => setF({ ...f, property: e.target.value })}>
+          <option value="">Every property</option>{propNames.map((p) => <option key={p}>{p}</option>)}</select>
         <Btn onClick={() => add.mutate()} disabled={!f.email || f.password.length < 8}>+ Add user</Btn>
       </div>
       {(add.error || upd.error || del.error) && <p role="alert" className="mb-2 text-sm text-red-600">{String(add.error ?? upd.error ?? del.error).replace("Error: ", "")}</p>}
@@ -64,6 +69,8 @@ function Users() {
               <div className="min-w-[12rem] flex-1"><b>{u.name || u.email}</b> {u.name && <span className="text-xs text-slate-500">{u.email}</span>} {u.source !== "local" && <Pill>{u.source}</Pill>}
                 <div className="text-xs text-slate-500">{u.last_login_at ? `last sign-in ${ago(u.last_login_at)}` : "never signed in"}</div></div>
               <select className={`${inputCls} w-32`} aria-label={`${u.email} role`} value={u.role} onChange={(e) => upd.mutate({ ...u, role: e.target.value as User["role"] })}>{["viewer", "reviewer", "admin"].map((r) => <option key={r}>{r}</option>)}</select>
+              <select className={`${inputCls} w-52`} aria-label={`${u.email} property`} value={u.property ?? ""} disabled={u.role === "admin"} onChange={(e) => upd.mutate({ ...u, property: e.target.value || null })}>
+                <option value="">Every property</option>{propNames.map((p) => <option key={p}>{p}</option>)}</select>
               <button className="text-xs text-indigo-600 hover:underline dark:text-indigo-400" onClick={() => setOpen(open === u.id ? null : u.id)}>API tokens ({u.tokens})</button>
               <button className="text-xs text-slate-600 hover:underline dark:text-slate-300" title="Clear a lockout and switch off their two-factor" onClick={() => window.confirm(`Unlock ${u.email} and reset their two-factor?`) && api(`/api/users/${u.id}/unlock`, { method: "POST" }).then(refresh)}>Unlock / reset MFA</button>
               <button className="text-xs text-red-600 hover:underline" onClick={() => window.confirm(`Delete ${u.email}?`) && del.mutate(u.id)}>Delete</button>

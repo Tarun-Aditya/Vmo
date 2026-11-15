@@ -118,3 +118,62 @@ DOCS: list[dict] = [
          auto=True, notice=180, sla=98.0, inc=120, warr=0, conf=2, pd=True, dpa=False, sign="none", extras=["The commission rises to 18 percent of room revenue"], dev=["payment_terms", "liability_cap", "renewal", "sla", "data_protection"]),
     dict(key="draft_nda_clean", type="NDA", status="draft", vendor="Marlowe Hospitality Consulting LLP", cat="Consulting", owner=OWN[0], style="us_sections", fmt="docx", eff=10, term=24, law="New York", conf=3, sign="none", dev=[]),
 ]
+
+
+# ---------------------------------------------------------------- on site: service calls and supplier contacts (fictional; written to the feeds folder by the seed)
+# (property, vendor, kind, days before the seed, hour reported, hours to attend or None = not yet attended, hours to resolve, description)
+SERVICE_CALLS = [
+    (O, "Halcyon Elevator & Lift Maintenance Inc", "emergency", 3, 22.5, 1.6, 3.0, "Guest trapped in elevator 2"),
+    (O, "Halcyon Elevator & Lift Maintenance Inc", "fault", 19, 10.0, 3.0, 5.0, "Elevator 1 door not closing"),
+    (O, "Halcyon Elevator & Lift Maintenance Inc", "fault", 8, 14.0, 6.5, 9.0, "Elevator 2 levelling fault at lobby"),
+    (M, "Halcyon Elevator & Lift Maintenance Inc", "fault", 27, 9.0, 2.0, 4.0, "Service elevator stuck at floor 5"),
+    (M, "Halcyon Elevator & Lift Maintenance Inc", "emergency", 44, 18.0, 0.7, 2.0, "Passenger entrapment, elevator 3"),
+    (H, "Northgate Facilities & HVAC Inc", "fault", 33, 8.0, 2.0, 6.0, "No cooling on floor 4"),
+    (H, "Northgate Facilities & HVAC Inc", "fault", 12, 15.0, 3.5, 8.0, "Boiler pressure alarm"),
+    (H, "Northgate Facilities & HVAC Inc", "fault", 5, 11.0, 7.0, 12.0, "Ballroom air handling unit down before a wedding"),
+    (H, "Northgate Facilities & HVAC Inc", "fault", 1, 20.0, None, None, "Guest rooms 512-520 without heating"),
+    (H, "Staffwell Hospitality Staffing Inc", "request", 9, 7.0, 3.0, 3.0, "Two housekeepers absent, replacements needed"),
+    (A, "Staffwell Hospitality Staffing Inc", "request", 22, 6.5, 2.0, 2.0, "Housekeeper absent, morning shift"),
+    (A, "Staffwell Hospitality Staffing Inc", "request", 6, 6.0, 5.5, 5.5, "Three housekeepers absent, full house"),
+    (L, "Verdant Pest Control Inc", "fault", 40, 16.0, 20.0, 26.0, "Guest reported ants in room 112"),
+    (L, "Verdant Pest Control Inc", "fault", 15, 13.0, 31.0, 36.0, "Mouse sighting in the restaurant store"),
+    (H, "Crestline Laundry & Linen Services Inc", "request", 18, 9.0, 30.0, 30.0, "Extra bath linen for a full weekend"),
+    (H, "Northgate Facilities & HVAC Inc", "planned", 25, 9.0, 0.0, 6.0, "Quarterly chiller service"),
+]
+
+# (vendor, property or None for every property, name, role, phone, email)
+CONTACTS = [
+    ("Halcyon Elevator & Lift Maintenance Inc", None, "Marcus Webb", "24/7 service desk", "555-0101", "service@halcyon-elevators.example"),
+    ("Halcyon Elevator & Lift Maintenance Inc", O, "Dana Price", "Field engineer, Park City", "555-0102", "dana.price@halcyon-elevators.example"),
+    ("Halcyon Elevator & Lift Maintenance Inc", M, "Luis Ortega", "Field engineer, New York", "555-0103", "luis.ortega@halcyon-elevators.example"),
+    ("Northgate Facilities & HVAC Inc", None, "Priya Nair", "Account manager", "555-0111", "priya.nair@northgate-fm.example"),
+    ("Northgate Facilities & HVAC Inc", H, "Tom Fischer", "Site supervisor, Boston", "555-0112", "tom.fischer@northgate-fm.example"),
+    ("Staffwell Hospitality Staffing Inc", None, "Grace Ellison", "Branch manager", "555-0121", "grace.ellison@staffwell.example"),
+    ("Staffwell Hospitality Staffing Inc", A, "Ben Carter", "On-call coordinator, Chicago", "555-0122", "oncall.chicago@staffwell.example"),
+    ("Verdant Pest Control Inc", L, "Nina Rossi", "Technician", "555-0131", "nina.rossi@verdant-pest.example"),
+    ("Crestline Laundry & Linen Services Inc", None, "Owen Park", "Customer service", "555-0141", "service@crestline-linen.example"),
+    ("Brightstar Security Services Inc", None, "Ray Holden", "Control room (24/7)", "555-0151", "control@brightstar-security.example"),
+    ("Lumen Energy Supply Inc", None, "Sara Lind", "Key account manager", "555-0161", "sara.lind@lumen-energy.example"),
+    ("Stayflow Property Systems Inc", None, "Help desk", "PMS support (24/7)", "555-0171", "support@stayflow.example"),
+    ("Hearth & Table Foods Inc", None, "Mia Chen", "Account manager", "555-0181", "mia.chen@hearthandtable.example"),
+]
+
+
+def write_onsite(feeds, seed) -> None:
+    """service_log.csv and vendor_contacts.csv in the feeds folder, times relative to the seed date (UTC)."""
+    import csv
+    from datetime import datetime, time, timedelta, timezone
+
+    feeds.mkdir(parents=True, exist_ok=True)
+    with (feeds / "service_log.csv").open("w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["id", "property", "vendor", "kind", "description", "reported_at", "attended_at", "resolved_at", "reported_by"])
+        for n, (prop, vendor, kind, days, hour, att, res, what) in enumerate(SERVICE_CALLS, 1):
+            rep = datetime.combine(seed - timedelta(days=days), time(0), tzinfo=timezone.utc) + timedelta(hours=hour)
+            iso = lambda h: (rep + timedelta(hours=h)).isoformat() if h is not None else ""      # noqa: E731
+            w.writerow([f"demo-{n:03d}", prop, vendor, kind, what, rep.isoformat(), iso(att), iso(res), "front desk"])
+    with (feeds / "vendor_contacts.csv").open("w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["vendor", "property", "name", "role", "phone", "email", "note"])
+        for vendor, prop, name, role, phone, email in CONTACTS:
+            w.writerow([vendor, prop or "", name, role, phone, email, ""])

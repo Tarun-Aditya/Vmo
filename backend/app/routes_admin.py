@@ -44,12 +44,16 @@ def status():
 
 
 @router.get("/documents")
-def documents(search: str | None = None):
-    """Light list for the Ask scope picker."""
+def documents(request: Request, search: str | None = None):
+    """Light list for the Ask scope picker (a property-limited account: its property's documents only)."""
+    from app import scope
+
+    mine = scope.user_property(request)
+    ids = scope.limit_for(mine)["ids"] if mine else None
     return rows("""SELECT id, title, vendor, type, status FROM contracts
-                   WHERE (CAST(:s AS text) IS NULL OR title ILIKE :p OR vendor ILIKE :p OR type ILIKE :p)
+                   WHERE (CAST(:s AS text) IS NULL OR title ILIKE :p OR vendor ILIKE :p OR type ILIKE :p) AND (CAST(:ids AS int[]) IS NULL OR id = ANY(:ids))
                    ORDER BY (status='draft'), vendor, CASE type WHEN 'MSA' THEN 0 WHEN 'SOW' THEN 1 WHEN 'Work Order' THEN 2 ELSE 3 END, title""",
-                s=search, p=f"%{search}%" if search else None)
+                s=search, p=f"%{search}%" if search else None, ids=ids)
 
 
 # ------------------------------------------------------------------ pipeline

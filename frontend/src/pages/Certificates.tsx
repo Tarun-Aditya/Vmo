@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { api } from "../lib";
-import { Loading } from "../ui";
+import { api, propQs } from "../lib";
+import { Loading, useCurrentProperty } from "../ui";
 
 type C = { id: number; vendor: string; kind: string; name: string; contract_id: number | null; contract_title: string | null; page: number | null; expiry_date: string | null; received_on: string | null;
   reference: string | null; status: "expired" | "expiring" | "missing" | "valid"; days_left: number | null; properties: string[] };
@@ -17,7 +17,8 @@ const day = (d: string) => new Date(d + "T00:00:00").toLocaleDateString("en-GB",
 /** The certificates each vendor's contract obliges it to hold, and whether the copy on file is still in date. */
 export default function Certificates() {
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ["certificates"], queryFn: () => api<{ certificates: C[]; summary: Record<C["status"], number>; soon_days: number }>("/api/certificates") });
+  const prop = useCurrentProperty();
+  const q = useQuery({ queryKey: ["certificates", prop], queryFn: () => api<{ certificates: C[]; summary: Record<C["status"], number>; soon_days: number }>("/api/certificates" + propQs(prop)) });
   const [f, setF] = useState<C["status"] | "all">("all");
   const save = useMutation({ mutationFn: (v: { id: number; expiry_date: string }) => api(`/api/certificates/${v.id}`, { method: "PATCH", body: JSON.stringify({ expiry_date: v.expiry_date, received_on: new Date().toISOString().slice(0, 10) }) }), onSuccess: () => qc.invalidateQueries({ queryKey: ["certificates"] }) });
   if (!q.data) return <Loading q={q} />;

@@ -102,11 +102,17 @@ class UserIn(BaseModel):
     password: str | None = None
     role: str = "viewer"
     active: bool = True
+    property: str | None = None          # a property manager: the account sees this property only (None = every property)
 
 
 def _check(u: UserIn, creating: bool) -> None:
     if u.role not in ROLES or "@" not in u.email:
         raise HTTPException(422, "a valid e-mail and a role of viewer, reviewer or admin are required")
+    u.property = (u.property or "").strip() or None
+    if u.property and u.role == "admin":
+        raise HTTPException(422, "an administrator configures the whole group and cannot be limited to one property")
+    if u.property and not rows("SELECT 1 FROM properties WHERE name = :p", p=u.property):
+        raise HTTPException(422, f"unknown property {u.property}")
     if creating and not u.password:
         raise HTTPException(422, "a password is required")
     if u.password and (msg := password_problem(u.password, u.email)):
@@ -128,7 +134,7 @@ def bootstrap(b: UserIn, request: Request):
 
 @router.get("/users")
 def users():
-    return rows("""SELECT u.id, u.email, u.name, u.role, u.source, u.active, u.created_at, u.last_login_at,
+    return rows("""SELECT u.id, u.email, u.name, u.role, u.property, u.source, u.active, u.created_at, u.last_login_at,
                           (SELECT count(*) FROM api_tokens t WHERE t.user_id = u.id AND NOT t.revoked) AS tokens FROM users u ORDER BY u.id""")
 
 
@@ -137,8 +143,8 @@ def create_user(b: UserIn):
     _check(b, True)
     try:
         with SessionLocal() as s:
-            s.execute(text("INSERT INTO users (email, name, role, password_hash, active) VALUES (:e,:n,:r,:p,:a)"),
-                      {"e": b.email.strip().lower(), "n": b.name, "r": b.role, "p": auth.hash_password(b.password or ""), "a": b.active})
+            s.execute(text("INSERT INTO users (email, name, role, password_hash, active, property) VALUES (:e,:n,:r,:p,:a,:pr)"),
+                      {"e": b.email.strip().lower(), "n": b.name, "r": b.role, "p": auth.hash_password(b.password or ""), "a": b.active, "pr": b.property})
             s.commit()
     except Exception:
         raise HTTPException(409, "a user with that e-mail exists")
@@ -158,8 +164,8 @@ def update_user(uid: int, b: UserIn, request: Request):
     if (b.role != "admin" or not b.active) and cur[0]["role"] == "admin" and _admins_left(uid) == 0:
         raise HTTPException(409, "the last active administrator cannot be demoted or disabled")
     with SessionLocal() as s:
-        s.execute(text("UPDATE users SET name=:n, role=:r, active=:a, password_hash=COALESCE(:p, password_hash) WHERE id=:i"),
-                  {"n": b.name, "r": b.role, "a": b.active, "p": auth.hash_password(b.password) if b.password else None, "i": uid})
+        s.execute(text("UPDATE users SET name=:n, role=:r, active=:a, property=:pr, password_hash=COALESCE(:p, password_hash) WHERE id=:i"),
+                  {"n": b.name, "r": b.role, "a": b.active, "pr": b.property, "p": auth.hash_password(b.password) if b.password else None, "i": uid})
         s.commit()
     return next(x for x in users() if x["id"] == uid)
 

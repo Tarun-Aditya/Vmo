@@ -6,6 +6,7 @@ the logged-in Claude subscription instead of an API key. Yields streaming events
 from __future__ import annotations
 
 import asyncio
+import contextvars
 import json
 import queue
 import re
@@ -110,7 +111,8 @@ def events(question: str, scope: list[int] | None = None, history: list[dict] | 
             q.put({"type": "exception", "error": f"{type(e).__name__}: {e}"})
         q.put(None)
 
-    threading.Thread(target=runner, daemon=True).start()
+    ctx = contextvars.copy_context()          # the tools run in this thread: they must see the request's property limit (scope.SQL_LIMIT)
+    threading.Thread(target=lambda: ctx.run(runner), daemon=True).start()
     while (ev := q.get()) is not None:
         if ev["type"] == "exception":
             raise RuntimeError(ev["error"])

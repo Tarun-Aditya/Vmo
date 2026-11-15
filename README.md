@@ -13,8 +13,11 @@ standards, and anything else you ask about the portfolio, with the clause to che
 > real tenants. See [Known limits](#known-limits). The fictional owner is **Seabright Hotels & Resorts Inc**, a United States group with six properties (Boston, New York, Lake Placid, Chicago, Savannah, Park City); every vendor,
 > person and document in the demo data is fictional.
 
-**Navigation.** The left rail keeps seven screens in view: Portfolio, Properties, Compare, Renewals, Contracts, Ask and Redline. The rest (vendors, portfolio map,
-certificates, obligations, spend, risk, key clauses, templates, new contract) fold under **More**, which opens by itself when you are on one of them.
+**Navigation.** The left rail keeps the everyday screens in view: My hotel, Portfolio, Properties, Compare, Renewals, Contracts, Ask and Redline; the rest
+fold under **More**. A **Property** picker at the top narrows Renewals, Contracts, Obligations, Certificates, Spend and Alerts to one hotel.
+
+**Two kinds of user.** The owner (or group procurement) sees the whole portfolio. A **property manager**, the person running one hotel, gets **My hotel** and,
+when their account is limited to that hotel, sees nothing else: see "Property managers" below.
 
 ## What it does
 
@@ -24,6 +27,7 @@ certificates, obligations, spend, risk, key clauses, templates, new contract) fo
 | **Properties** | One record per property (rooms, city, kind). Each property's yearly cost is its own schedules **plus its share of group-level agreements** (by rooms), so the energy contract or the booking system is counted where it is used. Cost per room, what makes up the cost, what ends soon. |
 | **Sale view** | For each property: which contracts can be ended if it is sold, which can be ended on notice, and which a buyer would inherit, with the value still to run. A schedule that is silent follows its master agreement. |
 | **Compare** | Where one vendor serves several properties: the rates and terms each property signed, side by side, with the gap between best and worst and an estimate of what the best rate is worth. |
+| **My hotel** | The property manager's page: what to act on this week at one hotel (renewal deadlines, overdue duties, lapsed certificates, late service), how each vendor on site is keeping the response time its contract promises, who to call, and what a buyer would inherit. |
 | **Certificates** | The certificates each vendor's contract obliges it to hold (insurance, food safety, state inspections, payment-card attestation), with the expiry of the copy on file: expired, expiring, not on file. |
 | **Contracts and hierarchy** | Repository with filters. Contract detail shows the text beside extracted fields (click a field to see its source passage, page and confidence), parent/child links (MSA → SOW → Work Order, amendments), and **effective terms** after amendments, with where each value comes from. |
 | **Key clauses** | Matrix of every document × every key clause, with a citation for each tick and boxed gaps where the template requires a clause. The clause library is configurable in Admin. |
@@ -268,7 +272,24 @@ all names are fictional.
   restarts; simulator traffic no longer fills the audit log.
 * Not yet done (needs you): one real integration needs a real invoice export or sandbox credentials; your own contracts (see "Measure it on your own contracts").
 
-## Demo script for a property owner (about 7 minutes)
+## Property managers
+
+* **My hotel** (`/my-property`): one page per property. *To act on*: renewal notice deadlines, overdue obligations, expired or expiring certificates and late
+  service calls, most urgent first. *Service on site*: each vendor's promised response time, read from its contract (an elevator contract that promises 1 hour
+  for an entrapment and 4 hours for any other fault holds each call to the right one), against the calls logged at the hotel: on-time share, typical and worst
+  time, open calls, and a form to log a call or mark it attended. *Who to call*: the vendor's contacts for this hotel and group-wide. *If sold*: what a buyer inherits.
+* **Property filter**: the picker at the top narrows Renewals, Contracts, Obligations (and SLAs), Certificates, Spend and Alerts. "At a property" means the contracts
+  naming it plus the group agreements covering it, and their amendments and DPAs; never another property's schedules.
+* **Alerts by property**: every alert records the properties it concerns. An alert channel (e-mail, Slack, Teams, webhook) can be set to one property in
+  Admin → Alerts, so a hotel's manager hears about that hotel only. A late service call raises its own alert (critical for an emergency).
+* **Accounts limited to one property** (Admin → Access and audit, *Property*): such a user sees only that property, everywhere. The access check refuses every
+  API path that is not explicitly allowed for property managers, so a screen added later cannot show other hotels by accident. Ask answers only from the
+  property's documents, and its database queries run on a connection where every table and view is replaced by a version holding that property's rows only
+  (`app/scope.py`), so a query written by Claude cannot read another hotel either. Saved Ask conversations are private to the person who asked.
+  Administrators cannot be limited (they configure the whole group).
+* **Service calls and contacts** come from people (the page) or from `feeds/service_log.csv` and `feeds/vendor_contacts.csv`; the hotel seed writes fictional ones.
+
+## Demo script (about 8 minutes)
 
 1. **Portfolio (1 min).** "Three notice deadlines need a decision; this much renews unless someone acts." The last day to act, not the expiry date.
 2. **Properties (1.5 min).** What each hotel costs under contract and per room, including its share of the energy contract and the hotel systems. Open one property:
@@ -277,7 +298,9 @@ all names are fictional.
 4. **Certificates (30 s).** A food supplier's HACCP certificate expired twelve days ago; an insurance certificate lapsed last month.
 5. **Ask (1.5 min).** "Which contracts at Lakeside Resort cannot be terminated for convenience?", then a clause question with its citations.
 6. **Redline (1 min).** A vendor's renewal draft: what departs from the house standards, most serious first, with replacement wording.
-7. **Close (30 s).** What is simulated (ERP, e-signature, drives) and what comes next: your own contracts.
+7. **Property manager (1 min).** Pick Harbor Hotel at the top: My hotel shows the expired insurance certificate, the missed renewal notice and a heating fault
+   still unattended past its 4-hour promise, with the supplier's site supervisor to call.
+8. **Close (30 s).** What is simulated (ERP, e-signature, drives) and what comes next: your own contracts.
 
 ## Measure it on your own contracts
 

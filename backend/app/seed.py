@@ -41,7 +41,7 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
             f"{len(manifest['drafts'])} drafts into {root / 'inbox'} (seed date {seed_date})")
     with SessionLocal() as s:
         s.execute(text("TRUNCATE templates, template_clauses, contracts, clauses, field_extractions, clause_deviations, "
-                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages, vendor_scores, properties, certificates, alerts RESTART IDENTITY CASCADE"))
+                       "extracted_values, check_results, redlines, ask_cache, pipeline_events, pipeline_runs, conversations, chat_messages, vendor_scores, properties, certificates, alerts, service_events, vendor_contacts RESTART IDENTITY CASCADE"))
         kcc.ensure_defaults(s)
         if corpus == "hotel":
             from app import hotel_pack
@@ -66,6 +66,7 @@ def run(seed_date: date | None = None, extractor: str = "auto", redline_mode: st
             cdir.mkdir(parents=True, exist_ok=True)
             for n, (vendor, kind, days, ref) in enumerate(hotel_spec.CERTIFICATES, 1):          # each certificate as the document the vendor would send
                 (cdir / f"certificate_{n:02d}.md").write_text(hotel_spec.certificate_md(vendor, kind, seed_date + timedelta(days=days), seed_date + timedelta(days=days - 365), ref))
+            hotel_spec.write_onsite(root / "feeds", seed_date)          # service calls at the hotels and supplier contacts (fictional), as the CSV files a property team keeps
 
         log(f"feeds loaded: {feeds.run_feeds('seed')}")
     except Exception as e:

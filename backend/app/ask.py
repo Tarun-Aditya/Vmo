@@ -66,6 +66,14 @@ def _ro_engine():
     return create_engine(settings.readonly_database_url, pool_pre_ping=True)
 
 
+@lru_cache
+def _ro_single():
+    """Read-only connections that are never reused: temporary views made for one property-limited question die with the connection."""
+    from sqlalchemy.pool import NullPool
+
+    return create_engine(settings.readonly_database_url, poolclass=NullPool)
+
+
 def _jsonable(v):
     if isinstance(v, decimal.Decimal):
         return float(v)
@@ -81,8 +89,20 @@ def run_sql(query: str) -> dict:
         return {"error": "Only a single statement is allowed."}
     if not re.match(r"^(select|with)\b", q, re.I) or FORBIDDEN.search(q):
         return {"error": "Only read-only SELECT queries are allowed."}
+    from app import scope
+
+    lim = scope.SQL_LIMIT.get()
+    if lim and scope.QUALIFIED.search(q):
+        return {"error": "Refer to tables and views by their plain names (no schema prefix)."}
     try:
-        with _ro_engine().connect() as c:
+        with (_ro_single() if lim else _ro_engine()).connect() as c:
+            if lim:              # a property-limited account: this connection only sees its property (temporary views), then it is closed
+                c.exec_driver_sql("SET default_transaction_read_only = off")      # temporary objects only: the role cannot create anything in the shared schema
+                c.commit()
+                scope.shadow_views(c, lim)
+                c.commit()
+                c.exec_driver_sql("SET default_transaction_read_only = on")
+                c.commit()
             c.exec_driver_sql("SET TRANSACTION READ ONLY")
             # '%' must be doubled: the driver would otherwise read LIKE patterns as placeholders
             res = c.exec_driver_sql(

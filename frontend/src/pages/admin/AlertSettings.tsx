@@ -5,8 +5,8 @@ import { api, ago } from "../../lib";
 import { Card, Loading } from "../../ui";
 
 type Rule = { key: string; name: string; description: string | null; severity: string; params: Record<string, number | string>; channels: string[]; enabled: boolean; open_alerts: number };
-type Chan = { id: number; name: string; kind: "email" | "slack" | "teams" | "webhook"; config: Record<string, string | boolean>; secrets_set: Record<string, boolean>; enabled: boolean; min_severity: string; last_status: string | null; last_message: string | null; last_sent_at: string | null };
-type Draft = { id?: number; name: string; kind: Chan["kind"]; config: Record<string, string | boolean>; secrets: Record<string, string>; enabled: boolean; min_severity: string };
+type Chan = { id: number; name: string; kind: "email" | "slack" | "teams" | "webhook"; config: Record<string, string | boolean>; secrets_set: Record<string, boolean>; enabled: boolean; min_severity: string; property?: string | null; last_status: string | null; last_message: string | null; last_sent_at: string | null };
+type Draft = { id?: number; name: string; kind: Chan["kind"]; config: Record<string, string | boolean>; secrets: Record<string, string>; enabled: boolean; min_severity: string; property?: string | null };
 const SEVS = ["low", "medium", "high", "critical"];
 const CH: [string, string][] = [["in_app", "In app"], ["email", "E-mail"], ["chat", "Slack / Teams / webhook"]];
 const blank = (): Draft => ({ name: "", kind: "email", config: { port: "25" }, secrets: {}, enabled: true, min_severity: "high" });
@@ -44,6 +44,7 @@ function Channels() {
   const [edit, setEdit] = useState<Draft | null>(null);
   const [msg, setMsg] = useState<Record<number, { ok: boolean; text: string }>>({});
   const refresh = () => qc.invalidateQueries({ queryKey: ["alert-channels"] });
+  const props = useQuery({ queryKey: ["properties"], queryFn: () => api<{ properties: { property: string }[] }>("/api/properties") });
   const save = useMutation({ mutationFn: (d: Draft) => api<Chan>(d.id ? `/api/admin/alert-channels/${d.id}` : "/api/admin/alert-channels", { method: d.id ? "PUT" : "POST", body: JSON.stringify(d) }), onSuccess: () => { setEdit(null); refresh(); } });
   const test = useMutation({ mutationFn: (id: number) => api<{ ok: boolean; error?: string }>(`/api/admin/alert-channels/${id}/test`, { method: "POST" }), onSuccess: (r, id) => { setMsg((m) => ({ ...m, [id]: { ok: r.ok, text: r.ok ? "Test alert delivered." : r.error ?? "failed" } })); refresh(); } });
   const del = useMutation({ mutationFn: (id: number) => api(`/api/admin/alert-channels/${id}`, { method: "DELETE" }), onSuccess: refresh });
@@ -57,6 +58,9 @@ function Channels() {
         <div className="mb-4 grid gap-3 rounded border border-slate-200 p-3 md:grid-cols-3 dark:border-slate-700">
           <Field label="Name"><input className={inputCls} aria-label="Channel name" value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></Field>
           <Field label="Type"><select className={inputCls} aria-label="Channel type" value={edit.kind} disabled={!!edit.id} onChange={(e) => setEdit({ ...edit, kind: e.target.value as Chan["kind"], config: {}, secrets: {} })}><option value="email">E-mail (SMTP)</option><option value="slack">Slack</option><option value="teams">Microsoft Teams</option><option value="webhook">Generic webhook (JSON)</option></select></Field>
+          <Field label="Only for property" hint="A hotel's own channel (its manager's e-mail, its Teams channel) gets only the alerts about that hotel.">
+            <select className={inputCls} aria-label="Channel property" value={edit.property ?? ""} onChange={(e) => setEdit({ ...edit, property: e.target.value || null })}>
+              <option value="">Every property</option>{(props.data?.properties ?? []).map((p) => <option key={p.property}>{p.property}</option>)}</select></Field>
           <Field label="Send from severity"><select className={inputCls} aria-label="Minimum severity" value={edit.min_severity} onChange={(e) => setEdit({ ...edit, min_severity: e.target.value })}>{SEVS.map((s) => <option key={s}>{s}</option>)}</select></Field>
           {edit.kind === "email" ? <>{cfg("host", "SMTP host", "smtp.company.com")}{cfg("port", "Port")}{cfg("from", "From", "contractiq@company.com")}{cfg("to", "To", "vmo@company.com")}{cfg("username", "Username")}{sec("password", "Password")}{cfg("app_url", "App URL (for links)", "https://contractiq.company.com")}
               <Field label="Security"><div className="flex gap-4 pt-1 text-sm"><label className="flex items-center gap-1"><input type="checkbox" checked={!!edit.config.starttls} onChange={(e) => setEdit({ ...edit, config: { ...edit.config, starttls: e.target.checked } })} />STARTTLS</label><label className="flex items-center gap-1"><input type="checkbox" checked={!!edit.config.ssl} onChange={(e) => setEdit({ ...edit, config: { ...edit.config, ssl: e.target.checked } })} />SSL</label></div></Field></>
@@ -71,7 +75,7 @@ function Channels() {
         {q.data.map((c) => (
           <li key={c.id} className="flex flex-wrap items-center gap-3 py-2 text-sm">
             <Toggle checked={c.enabled} label={`${c.name} enabled`} onChange={(v) => save.mutate({ ...c, enabled: v, secrets: {} })} />
-            <div className="flex-1"><b>{c.name}</b> <span className="text-xs text-slate-500">{c.kind} · from {c.min_severity}{c.last_sent_at && ` · last ${c.last_status === "ok" ? "✓" : "✗"} ${ago(c.last_sent_at)}`}</span>
+            <div className="flex-1"><b>{c.name}</b> <span className="text-xs text-slate-500">{c.kind} · from {c.min_severity}{c.property ? ` · ${c.property} only` : ""}{c.last_sent_at && ` · last ${c.last_status === "ok" ? "✓" : "✗"} ${ago(c.last_sent_at)}`}</span>
               {msg[c.id] && <div role="status" className={`text-xs ${msg[c.id].ok ? "text-emerald-700 dark:text-emerald-400" : "text-red-600"}`}>{msg[c.id].text}</div>}</div>
             <Btn kind="ghost" onClick={() => test.mutate(c.id)}>Send test</Btn><Btn kind="ghost" onClick={() => setEdit({ ...c, secrets: {} })}>Edit</Btn>
             <button className="text-xs text-red-600 hover:underline" onClick={() => window.confirm(`Delete channel “${c.name}”?`) && del.mutate(c.id)}>Delete</button>

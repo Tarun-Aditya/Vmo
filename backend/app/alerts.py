@@ -11,6 +11,7 @@ from email.message import EmailMessage
 import httpx
 from sqlalchemy import text
 
+from app import scope
 from app.connectors import crypto
 from app.db import SessionLocal
 
@@ -30,6 +31,7 @@ DEFAULT_RULES = [
     ("review_waiting", "Draft waiting for review", "A vendor draft has been in the review queue longer than this.", "review_waiting", "medium", {"days": 5}, ["in_app"]),
     ("approval_waiting", "Approval step stalled", "An approver has not decided a step for longer than the rule's reminder period.", "approval_waiting", "medium", {}, ["in_app", "email"]),
     ("certificate_expiry", "Vendor certificate expired or about to", "A certificate a vendor must hold under its contract (insurance, food safety, inspection, payment-card) has run out or is about to.", "certificate", "high", {"days": 30}, ["in_app", "email", "chat"]),
+    ("service_late", "Vendor late to a service call", "A call at a property was not attended within the response time the vendor's contract promises.", "service", "high", {"days": 14}, ["in_app", "email", "chat"]),
     ("connector_error", "Connector sync failed", "A cloud-storage connector could not sync.", "connector_error", "high", {}, ["in_app", "email"]),
 ]
 
@@ -80,6 +82,16 @@ def _candidates(s, r: dict, today: date) -> list[dict]:
             body = xs[0]["detail"] if len(xs) == 1 else xs[0]["detail"] + f" And {len(xs) - 1} more of the same kind."
             cids = {x["contract_id"] for x in xs}
             out.append(dict(dedupe=f"{r['key']}:{k}:{vendor}:{len(xs)}:{round(total)}", title=title, body=body, contract_id=cids.pop() if len(cids) == 1 else None, vendor=vendor, link="/spend", severity=sev))
+    elif kind == "service":
+        from app import onsite
+
+        for (prop,) in s.execute(text("SELECT DISTINCT property FROM service_events")).all():
+            for c in onsite.service(s, prop, int(p.get("days", 14)))["calls"]:
+                if c["late"]:
+                    waited = f"attended after {c['attend_hours']:g} h" if c["attend_hours"] is not None else "still not attended"
+                    out.append(dict(dedupe=f"{r['key']}:{c['id']}", title=f"{c['vendor']} late at {prop}: {waited}, promised {c['promised_hours']:g} h",
+                                    body=f"{c['description'] or c['kind']} reported {c['reported_at']:%b %d %H:%M}.", contract_id=c["contract_id"], vendor=c["vendor"],
+                                    link="/my-property", severity="critical" if c["kind"] == "emergency" else "high", properties=[prop]))
     elif kind == "certificate":
         from app import certificates
 
@@ -124,12 +136,14 @@ def evaluate(today: date | None = None, deliver: bool = True) -> dict:
             # an open alert whose cause is gone (the invoice was matched, the certificate renewed, the document re-read correctly) is closed, not left to pile up
             s.execute(text("UPDATE alerts SET status = 'resolved' WHERE rule_key = :r AND status = 'open' AND NOT (dedupe_key = ANY(:keep))"), {"r": r["key"], "keep": [c["dedupe"] for c in cands]})
             for c in cands:
-                ins = s.execute(text("""INSERT INTO alerts (rule_key, dedupe_key, title, body, severity, link, contract_id, vendor) VALUES (:r,:d,:t,:b,:s,:l,:c,:v)
+                props = c.get("properties") or scope.alert_properties(s, c.get("contract_id"), c.get("vendor"))      # the hotels this alert concerns: who should hear of it
+                ins = s.execute(text("""INSERT INTO alerts (rule_key, dedupe_key, title, body, severity, link, contract_id, vendor, properties) VALUES (:r,:d,:t,:b,:s,:l,:c,:v,:p)
                                         ON CONFLICT (dedupe_key) DO NOTHING RETURNING id"""),
-                                {"r": r["key"], "d": c["dedupe"], "t": c["title"], "b": c.get("body"), "s": c.get("severity") or r["severity"], "l": c.get("link"), "c": c.get("contract_id"), "v": c.get("vendor")}).scalar()
+                                {"r": r["key"], "d": c["dedupe"], "t": c["title"], "b": c.get("body"), "s": c.get("severity") or r["severity"], "l": c.get("link"), "c": c.get("contract_id"),
+                                 "v": c.get("vendor"), "p": props}).scalar()
                 if ins:
                     new += 1
-                    fresh.append((r, {**c, "id": ins, "severity": c.get("severity") or r["severity"]}))
+                    fresh.append((r, {**c, "id": ins, "severity": c.get("severity") or r["severity"], "properties": props}))
         s.commit()
         channels = [dict(r) for r in s.execute(text("SELECT * FROM alert_channels WHERE enabled")).mappings()]
     if deliver and fresh and channels:
@@ -142,6 +156,8 @@ def evaluate(today: date | None = None, deliver: bool = True) -> dict:
                     continue
                 if SEV_RANK.get(a["severity"], 1) < SEV_RANK.get(ch["min_severity"], 1):
                     continue
+                if ch.get("property") and ch["property"] not in (a.get("properties") or []):
+                    continue                    # a channel for one hotel (its manager's e-mail, its Teams channel) hears only about that hotel
                 res[ch["name"]] = send(ch, a)
                 delivered_n += res[ch["name"]].get("ok", False)
             if res:

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { api, fmtDate, usd } from "../lib";
-import { Card, Loading, SeverityChip, Td, Th } from "../ui";
+import { Card, Loading, SeverityChip, Td, Th, useCurrentProperty } from "../ui";
 
 type Row = { id: number; title: string; vendor: string; category: string; type: string; owner: string; property?: string | null; status: string; parent_id: number | null;
   effective_date: string | null; expiry_date: string | null; annual_value: number | null; total_value: number | null; auto_renew: boolean;
@@ -100,7 +100,8 @@ export default function Contracts() {
   const [saved, setSaved] = useState<"all" | "expiring" | "flagged" | "unsigned">("all");
   const [sel, setSel] = useState<number | null>(null);
   const filters = useQuery({ queryKey: ["filters"], queryFn: () => api<Record<string, string[]>>("/api/contracts/filters") });
-  const qs = new URLSearchParams({ ...Object.fromEntries(Object.entries(f).filter(([, v]) => v)), ...(search ? { search } : {}) }).toString();
+  const prop = useCurrentProperty();
+  const qs = new URLSearchParams({ ...(prop ? { property: prop } : {}), ...Object.fromEntries(Object.entries(f).filter(([, v]) => v)), ...(search ? { search } : {}) }).toString();
   const q = useQuery({ queryKey: ["contracts", qs], queryFn: () => api<Row[]>(`/api/contracts?${qs}`) });
   const now = Date.now();
   const shown = (q.data ?? []).filter((c) => saved === "all" || (saved === "expiring" && !!c.expiry_date && new Date(c.expiry_date).getTime() - now < 90 * 864e5 && new Date(c.expiry_date).getTime() > now) || (saved === "flagged" && (c.liability_uncapped || (c.deviation_count ?? 0) > 5)) || (saved === "unsigned" && !c.fully_executed));

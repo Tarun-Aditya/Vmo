@@ -27,18 +27,19 @@ def _rows(sql: str, **p) -> list[dict]:
 
 
 # ------------------------------------------------------------------ history
-def list_conversations(q: str | None = None) -> list[dict]:
+def list_conversations(q: str | None = None, owner: str | None = None) -> list[dict]:
     return _rows("""SELECT c.id, c.title, c.updated_at, c.created_at, c.scope,
                            (SELECT count(*) FROM chat_messages m WHERE m.conversation_id = c.id AND m.role = 'user') AS questions,
                            (SELECT content FROM chat_messages m WHERE m.conversation_id = c.id AND m.role = 'assistant' ORDER BY id DESC LIMIT 1) AS last_answer
                     FROM conversations c
-                    WHERE CAST(:q AS text) IS NULL OR c.title ILIKE :p
-                       OR EXISTS (SELECT 1 FROM chat_messages m WHERE m.conversation_id = c.id AND m.content ILIKE :p)
-                    ORDER BY c.updated_at DESC LIMIT 100""", q=q, p=f"%{q}%" if q else None)
+                    WHERE (CAST(:q AS text) IS NULL OR c.title ILIKE :p
+                       OR EXISTS (SELECT 1 FROM chat_messages m WHERE m.conversation_id = c.id AND m.content ILIKE :p))
+                      AND (CAST(:o AS text) IS NULL OR c.owner = :o)
+                    ORDER BY c.updated_at DESC LIMIT 100""", q=q, p=f"%{q}%" if q else None, o=owner)
 
 
 def get_conversation(cid: int) -> dict | None:
-    c = _rows("SELECT id, title, scope, created_at, updated_at FROM conversations WHERE id=:i", i=cid)
+    c = _rows("SELECT id, title, scope, owner, created_at, updated_at FROM conversations WHERE id=:i", i=cid)
     if not c:
         return None
     msgs = _rows("SELECT id, role, content, payload, created_at FROM chat_messages WHERE conversation_id=:i ORDER BY id", i=cid)
@@ -57,12 +58,12 @@ def delete(cid: int) -> None:
         s.commit()
 
 
-def _save_user(cid: int | None, question: str, scope: list[int] | None) -> int:
+def _save_user(cid: int | None, question: str, scope: list[int] | None, owner: str | None = None) -> int:
     with SessionLocal() as s:
         if cid is None or not s.execute(text("SELECT 1 FROM conversations WHERE id=:i"), {"i": cid}).first():
             title = " ".join(question.split())[:70]
-            cid = s.execute(text("INSERT INTO conversations (title, scope) VALUES (:t, CAST(:s AS jsonb)) RETURNING id"),
-                            {"t": title, "s": json.dumps(scope or [])}).scalar()
+            cid = s.execute(text("INSERT INTO conversations (title, scope, owner) VALUES (:t, CAST(:s AS jsonb), :o) RETURNING id"),
+                            {"t": title, "s": json.dumps(scope or []), "o": owner}).scalar()
         s.execute(text("INSERT INTO chat_messages (conversation_id, role, content, payload) VALUES (:c,'user',:q,CAST(:p AS jsonb))"),
                   {"c": cid, "q": question, "p": json.dumps({"scope": scope or []})})
         s.commit()
@@ -154,12 +155,12 @@ def _llm_stream(question: str, scope: list[int] | None, history: list[dict]) -> 
     yield {"type": "final", "res": res, "source": "llm"}
 
 
-def stream_answer(question: str, conversation_id: int | None, demo_mode: bool, scope: list[int] | None) -> Iterator[str]:
+def stream_answer(question: str, conversation_id: int | None, demo_mode: bool, scope: list[int] | None, owner: str | None = None) -> Iterator[str]:
     t0 = time.time()
     scope = scope or None
     try:
         history = _history(conversation_id) if conversation_id else []
-        cid = _save_user(conversation_id, question, scope)
+        cid = _save_user(conversation_id, question, scope, owner)
         yield _sse({"type": "meta", "conversation_id": cid})
         res, source = None, "offline-planner"
         use_llm = llm.available() and not (demo_mode and not scope and _cached(question))

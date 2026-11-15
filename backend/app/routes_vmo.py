@@ -4,11 +4,11 @@ from __future__ import annotations
 import statistics
 from datetime import date
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import feeds, risk
+from app import feeds, risk, scope
 from app.db import SessionLocal
 
 router = APIRouter(prefix="/api")
@@ -24,6 +24,18 @@ def one(sql: str, **p):
     return r[0] if r else None
 
 
+def _at(request: Request, property: str | None) -> dict:
+    """SQL parameters narrowing a query to one property: ids = contracts that apply there, vs = vendors serving it (for invoices quoting no contract). None = every property."""
+    prop = scope.effective(request, property)
+    if not prop:
+        return {"ids": None, "vs": None, "prop": None}
+    with SessionLocal() as s:
+        return {"ids": scope.contract_ids(s, prop), "vs": scope.vendors(s, prop), "prop": prop}
+
+
+AT = "(CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids) OR (contract_id IS NULL AND vendor = ANY(:vs)))"        # a row at the property
+
+
 def _refresh():
     with SessionLocal() as s:
         risk.compute_all(s)
@@ -32,20 +44,22 @@ def _refresh():
 
 # ------------------------------------------------------------------ obligations
 @router.get("/obligations")
-def obligations(status: str | None = None, kind: str | None = None, vendor: str | None = None, party: str | None = None, contract_id: int | None = None, q: str | None = None):
+def obligations(request: Request, status: str | None = None, kind: str | None = None, vendor: str | None = None, party: str | None = None, contract_id: int | None = None,
+                q: str | None = None, property: str | None = None):
+    at = _at(request, property)
     data = rows("""SELECT obligation_id, contract_id, title AS contract, vendor, type, kind, party, obligation, due_date, frequency, target_value, target_unit, status, completed_on, days_left, source
                    FROM v_obligations
                    WHERE contract_status <> 'draft' AND (CAST(:st AS text) IS NULL OR status = :st) AND (CAST(:k AS text) IS NULL OR kind = :k)
                      AND (CAST(:v AS text) IS NULL OR vendor = :v) AND (CAST(:p AS text) IS NULL OR party = :p) AND (CAST(:c AS int) IS NULL OR contract_id = :c)
-                     AND (CAST(:q AS text) IS NULL OR obligation ILIKE :qq OR title ILIKE :qq)
+                     AND (CAST(:q AS text) IS NULL OR obligation ILIKE :qq OR title ILIKE :qq) AND (CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids))
                    ORDER BY CASE status WHEN 'overdue' THEN 0 WHEN 'open' THEN 1 ELSE 2 END, due_date NULLS LAST, vendor, obligation""",
-                st=status, k=kind, v=vendor, p=party, c=contract_id, q=q, qq=f"%{q}%" if q else None)
+                st=status, k=kind, v=vendor, p=party, c=contract_id, q=q, qq=f"%{q}%" if q else None, ids=at["ids"])
     summ = one("""SELECT count(*) FILTER (WHERE status='open') AS open, count(*) FILTER (WHERE status='overdue') AS overdue,
                          count(*) FILTER (WHERE status='open' AND days_left BETWEEN 0 AND 30) AS due_30, count(*) FILTER (WHERE status='done') AS done,
                          count(*) FILTER (WHERE due_date IS NULL AND status='open') AS ongoing
-                  FROM v_obligations WHERE contract_status <> 'draft'""")
-    return {"rows": data, "summary": summ, "kinds": [r["kind"] for r in rows("SELECT DISTINCT kind FROM obligations ORDER BY 1")],
-            "vendors": [r["vendor"] for r in rows("SELECT DISTINCT vendor FROM v_obligations WHERE contract_status <> 'draft' ORDER BY 1")]}
+                  FROM v_obligations WHERE contract_status <> 'draft' AND (CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids))""", ids=at["ids"])
+    return {"rows": data, "summary": summ, "kinds": [r["kind"] for r in rows("SELECT DISTINCT kind FROM obligations ORDER BY 1")], "property": at["prop"],
+            "vendors": [r["vendor"] for r in rows("SELECT DISTINCT vendor FROM v_obligations WHERE contract_status <> 'draft' AND (CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids)) ORDER BY 1", ids=at["ids"])]}
 
 
 class ObligationPatch(BaseModel):
@@ -55,9 +69,11 @@ class ObligationPatch(BaseModel):
 
 
 @router.patch("/obligations/{oid}")
-def obligation_patch(oid: int, b: ObligationPatch):
+def obligation_patch(oid: int, b: ObligationPatch, request: Request):
     if b.status not in ("open", "done", "waived"):
         raise HTTPException(422, "status must be open, done or waived")
+    if (cid := one("SELECT contract_id FROM obligations WHERE id = :i", i=oid)):
+        scope.check_contract(request, cid["contract_id"])
     done_on = b.completed_on or (date.today() if b.status == "done" else None)
     with SessionLocal() as s:
         r = s.execute(text("UPDATE obligations SET status=:s, note=COALESCE(:n, note), completed_on=:d, updated_at=now() WHERE id=:i"),
@@ -82,14 +98,16 @@ def _credit(shortfall: float, better: str | None, tiers: list) -> float:
 
 
 @router.get("/sla")
-def sla(vendor: str | None = None):
+def sla(request: Request, vendor: str | None = None, property: str | None = None):
+    at = _at(request, property)
     from app import config_items
 
     with SessionLocal() as s_:
         tiers = config_items.get(s_, "sla", "credit_tiers", [[0.5, 0.05], [1.0, 0.10], [None, 0.20]])
     meta = {m["key"]: m for m in rows("SELECT key, name, unit, better FROM metrics")}
     pts = rows("""SELECT s.contract_id, s.title, s.vendor, s.metric_key, s.period, s.actual, s.target, s.breach, s.shortfall, s.incidents, t.annual_value
-                  FROM v_sla s JOIN v_effective_terms t ON t.contract_id = s.contract_id WHERE (CAST(:v AS text) IS NULL OR s.vendor = :v) ORDER BY s.contract_id, s.metric_key, s.period""", v=vendor)
+                  FROM v_sla s JOIN v_effective_terms t ON t.contract_id = s.contract_id WHERE (CAST(:v AS text) IS NULL OR s.vendor = :v) AND (CAST(:ids AS int[]) IS NULL OR s.contract_id = ANY(:ids))
+                  ORDER BY s.contract_id, s.metric_key, s.period""", v=vendor, ids=at["ids"])
     series: dict[tuple, dict] = {}
     for p in pts:
         k = (p["contract_id"], p["metric_key"])
@@ -131,44 +149,52 @@ def sla_add(m: Measurement):
 
 # ------------------------------------------------------------------ spend
 @router.get("/spend/summary")
-def spend_summary():
-    tot = one("""SELECT COALESCE(sum(amount),0) AS billed, COALESCE(sum(amount) FILTER (WHERE invoice_date >= CURRENT_DATE - 90),0) AS billed_90d, count(*) AS invoices,
-                        COALESCE(sum(amount) FILTER (WHERE contract_id IS NULL),0) AS off_contract FROM invoices""")
-    ex = one("SELECT count(*) AS n, COALESCE(sum(amount_at_risk),0) AS at_risk, count(*) FILTER (WHERE severity IN ('critical','high')) AS serious, "
-             "COALESCE(sum(amount_at_risk) FILTER (WHERE severity IN ('critical','high')),0) AS serious_at_risk FROM spend_exceptions")
-    plan = one("SELECT COALESCE(sum(planned_value),0) AS planned FROM v_contract_spend")
-    by_vendor = rows("""SELECT v.vendor, COALESCE(i.billed,0) AS billed, COALESCE(p.planned,0) AS planned, COALESCE(e.n,0) AS exceptions, COALESCE(e.risk,0) AS at_risk
+def spend_summary(request: Request, property: str | None = None):
+    at = _at(request, property)
+    p = {"ids": at["ids"], "vs": at["vs"]}
+    tot = one(f"""SELECT COALESCE(sum(amount),0) AS billed, COALESCE(sum(amount) FILTER (WHERE invoice_date >= CURRENT_DATE - 90),0) AS billed_90d, count(*) AS invoices,
+                         COALESCE(sum(amount) FILTER (WHERE contract_id IS NULL),0) AS off_contract FROM invoices WHERE {AT}""", **p)
+    ex = one(f"SELECT count(*) AS n, COALESCE(sum(amount_at_risk),0) AS at_risk, count(*) FILTER (WHERE severity IN ('critical','high')) AS serious, "
+             f"COALESCE(sum(amount_at_risk) FILTER (WHERE severity IN ('critical','high')),0) AS serious_at_risk FROM spend_exceptions WHERE {AT}", **p)
+    plan = one("SELECT COALESCE(sum(planned_value),0) AS planned FROM v_contract_spend WHERE CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids)", ids=at["ids"])
+    by_vendor = rows(f"""SELECT v.vendor, COALESCE(i.billed,0) AS billed, COALESCE(pl.planned,0) AS planned, COALESCE(e.n,0) AS exceptions, COALESCE(e.risk,0) AS at_risk
                         FROM (SELECT DISTINCT vendor FROM invoices UNION SELECT DISTINCT vendor FROM contracts WHERE status <> 'draft') v
-                        LEFT JOIN (SELECT vendor, sum(amount) AS billed FROM invoices GROUP BY 1) i USING (vendor)
-                        LEFT JOIN (SELECT vendor, sum(planned_value) AS planned FROM v_contract_spend GROUP BY 1) p USING (vendor)
-                        LEFT JOIN (SELECT vendor, count(*) AS n, sum(amount_at_risk) AS risk FROM spend_exceptions GROUP BY 1) e USING (vendor)
-                        WHERE COALESCE(i.billed,0) > 0 ORDER BY billed DESC""")
-    monthly = rows("""SELECT to_char(date_trunc('month', invoice_date), 'YYYY-MM') AS month, sum(amount) FILTER (WHERE contract_id IS NOT NULL) AS on_contract,
-                             sum(amount) FILTER (WHERE contract_id IS NULL) AS off_contract FROM invoices WHERE invoice_date >= date_trunc('month', CURRENT_DATE) - interval '11 months'
-                      GROUP BY 1 ORDER BY 1""")
-    by_kind = rows("SELECT kind, severity, count(*) AS n, sum(amount_at_risk) AS at_risk FROM spend_exceptions GROUP BY 1,2 ORDER BY at_risk DESC")
+                        LEFT JOIN (SELECT vendor, sum(amount) AS billed FROM invoices WHERE {AT} GROUP BY 1) i USING (vendor)
+                        LEFT JOIN (SELECT vendor, sum(planned_value) AS planned FROM v_contract_spend WHERE CAST(:ids AS int[]) IS NULL OR contract_id = ANY(:ids) GROUP BY 1) pl USING (vendor)
+                        LEFT JOIN (SELECT vendor, count(*) AS n, sum(amount_at_risk) AS risk FROM spend_exceptions WHERE {AT} GROUP BY 1) e USING (vendor)
+                        WHERE COALESCE(i.billed,0) > 0 ORDER BY billed DESC""", **p)
+    monthly = rows(f"""SELECT to_char(date_trunc('month', invoice_date), 'YYYY-MM') AS month, sum(amount) FILTER (WHERE contract_id IS NOT NULL) AS on_contract,
+                             sum(amount) FILTER (WHERE contract_id IS NULL) AS off_contract FROM invoices
+                       WHERE invoice_date >= date_trunc('month', CURRENT_DATE) - interval '11 months' AND {AT} GROUP BY 1 ORDER BY 1""", **p)
+    by_kind = rows(f"SELECT kind, severity, count(*) AS n, sum(amount_at_risk) AS at_risk FROM spend_exceptions WHERE {AT} GROUP BY 1,2 ORDER BY at_risk DESC", **p)
     return {"billed": tot["billed"], "billed_90d": tot["billed_90d"], "invoices": tot["invoices"], "off_contract": tot["off_contract"], "planned": plan["planned"],
-            "exceptions": ex["n"], "at_risk": ex["at_risk"], "serious": ex["serious"], "serious_at_risk": ex["serious_at_risk"], "by_vendor": by_vendor, "monthly": monthly, "by_kind": by_kind}
+            "exceptions": ex["n"], "at_risk": ex["at_risk"], "serious": ex["serious"], "serious_at_risk": ex["serious_at_risk"], "by_vendor": by_vendor, "monthly": monthly,
+            "by_kind": by_kind, "property": at["prop"]}
 
 
 @router.get("/spend/contracts")
-def spend_contracts(vendor: str | None = None):
+def spend_contracts(request: Request, vendor: str | None = None, property: str | None = None):
+    at = _at(request, property)
     return rows("""SELECT s.contract_id, s.title, s.vendor, s.type, s.effective_date, s.expiry_date, s.planned_value, s.billed, s.invoices, s.last_invoice, s.elapsed_pct, s.expected_to_date, s.pct_of_planned,
                           (SELECT count(*) FROM spend_exceptions e WHERE e.contract_id = s.contract_id) AS exceptions
-                   FROM v_contract_spend s WHERE (CAST(:v AS text) IS NULL OR s.vendor = :v) ORDER BY s.billed DESC, s.title""", v=vendor)
+                   FROM v_contract_spend s WHERE (CAST(:v AS text) IS NULL OR s.vendor = :v) AND (CAST(:ids AS int[]) IS NULL OR s.contract_id = ANY(:ids))
+                   ORDER BY s.billed DESC, s.title""", v=vendor, ids=at["ids"])
 
 
 @router.get("/spend/exceptions")
-def spend_exceptions(kind: str | None = None, severity: str | None = None, vendor: str | None = None):
-    return rows("""SELECT exception_id, kind, severity, amount_at_risk, detail, vendor, contract_id, contract_title, invoice_no, invoice_date, invoice_amount FROM v_spend_exceptions
-                   WHERE (CAST(:k AS text) IS NULL OR kind = :k) AND (CAST(:s AS text) IS NULL OR severity = :s) AND (CAST(:v AS text) IS NULL OR vendor = :v)
-                   ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, amount_at_risk DESC""", k=kind, s=severity, v=vendor)
+def spend_exceptions(request: Request, kind: str | None = None, severity: str | None = None, vendor: str | None = None, property: str | None = None):
+    at = _at(request, property)
+    return rows(f"""SELECT exception_id, kind, severity, amount_at_risk, detail, vendor, contract_id, contract_title, invoice_no, invoice_date, invoice_amount FROM v_spend_exceptions
+                   WHERE (CAST(:k AS text) IS NULL OR kind = :k) AND (CAST(:s AS text) IS NULL OR severity = :s) AND (CAST(:v AS text) IS NULL OR vendor = :v) AND {AT}
+                   ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, amount_at_risk DESC""", k=kind, s=severity, v=vendor, ids=at["ids"], vs=at["vs"])
 
 
 @router.get("/invoices")
-def invoices(contract_id: int | None = None, vendor: str | None = None):
-    return rows("""SELECT invoice_id, vendor, contract_id, contract_title, invoice_no, invoice_date, due_date, paid_date, amount, description, days_paid_late FROM v_invoices
-                   WHERE (CAST(:c AS int) IS NULL OR contract_id = :c) AND (CAST(:v AS text) IS NULL OR vendor = :v) ORDER BY invoice_date DESC LIMIT 300""", c=contract_id, v=vendor)
+def invoices(request: Request, contract_id: int | None = None, vendor: str | None = None, property: str | None = None):
+    at = _at(request, property)
+    return rows(f"""SELECT invoice_id, vendor, contract_id, contract_title, invoice_no, invoice_date, due_date, paid_date, amount, description, days_paid_late FROM v_invoices
+                   WHERE (CAST(:c AS int) IS NULL OR contract_id = :c) AND (CAST(:v AS text) IS NULL OR vendor = :v) AND {AT}
+                   ORDER BY invoice_date DESC LIMIT 300""", c=contract_id, v=vendor, ids=at["ids"], vs=at["vs"])
 
 
 class FeedUpload(BaseModel):

@@ -2,8 +2,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Btn } from "../forms";
-import { api, ago } from "../lib";
-import { Card, Loading, SeverityChip, Sev } from "../ui";
+import { ago, api, propQs } from "../lib";
+import { Card, Loading, Sev, SeverityChip, useCurrentProperty } from "../ui";
 
 export type AlertRow = { id: number; rule_key: string; title: string; body: string | null; severity: Sev; link: string | null; contract_id: number | null; vendor: string | null; status: "open" | "acknowledged" | "resolved"; created_at: string; read_at: string | null; acknowledged_by: string | null; delivered: Record<string, { ok: boolean }> };
 
@@ -11,10 +11,11 @@ export default function Alerts() {
   const qc = useQueryClient();
   const [view, setView] = useState<"all" | "unread" | "critical">("all");
   const [status, setStatus] = useState<"open" | "acknowledged" | "resolved">("open");
-  const q = useQuery({ queryKey: ["alerts", status], queryFn: () => api<{ items: AlertRow[]; unread: number }>(`/api/alerts?status=${status}&limit=300`) });
+  const prop = useCurrentProperty();
+  const q = useQuery({ queryKey: ["alerts", status, prop], queryFn: () => api<{ items: AlertRow[]; unread: number }>(`/api/alerts?status=${status}&limit=300${propQs(prop, false)}`) });
   const refresh = () => { qc.invalidateQueries({ queryKey: ["alerts"] }); qc.invalidateQueries({ queryKey: ["alerts-summary"] }); };
   const set = useMutation({ mutationFn: (v: { id: number; status: string }) => api(`/api/alerts/${v.id}`, { method: "PUT", body: JSON.stringify({ status: v.status, by: "you" }) }), onSuccess: refresh });
-  const readAll = useMutation({ mutationFn: () => api("/api/alerts/read-all", { method: "POST" }), onSuccess: refresh });
+  const readAll = useMutation({ mutationFn: () => api("/api/alerts/read-all" + propQs(prop), { method: "POST" }), onSuccess: refresh });
   const run = useMutation({ mutationFn: () => api<{ new: number }>("/api/alerts/evaluate", { method: "POST" }), onSuccess: refresh });
   if (!q.data) return <Loading q={q} />;
   const items = q.data.items.filter((a) => view === "all" || (view === "unread" && !a.read_at) || (view === "critical" && a.severity === "critical"));

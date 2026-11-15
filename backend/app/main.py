@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 
-from app import auth, kcc, scheduler
+from app import auth, kcc, scheduler, scope
 from app.db import SessionLocal, engine
 from app.routes import router
 from app.routes_admin import router as admin_router
@@ -113,6 +113,10 @@ async def access_control(request: Request, call_next):
             ip = request.client.host if request.client else None
             await run_in_threadpool(auth.audit, user, method, path, code, ip, "denied")
             return JSONResponse({"detail": "Sign in required" if code == 401 else f"This needs the {need} role"}, status_code=code)
+        if user.get("property") and not scope.allowed_for_property_user(method, path):        # deny by default for a property-limited account
+            ip = request.client.host if request.client else None
+            await run_in_threadpool(auth.audit, user, method, path, 403, ip, "denied")
+            return JSONResponse({"detail": f"Your account is limited to {user['property']}"}, status_code=403)
         request.state.user = user
     resp = await call_next(request)
     if method not in ("GET", "HEAD", "OPTIONS") or "/export" in path:

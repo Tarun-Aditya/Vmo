@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import json
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import alerts
+from app import alerts, scope
 from app.connectors import crypto
 from app.db import SessionLocal
 
@@ -22,18 +22,24 @@ def rows(sql: str, **p) -> list[dict]:
         return [dict(r) for r in s.execute(text(sql), p).mappings().all()]
 
 
+AT = "(CAST(:p AS text) IS NULL OR :p = ANY(properties))"         # the alerts that concern one property
+
+
 @router.get("/alerts")
-def list_alerts(status: str = "open", limit: int = 100):
-    where = "" if status == "all" else "WHERE status = :s" if status in ("open", "acknowledged", "resolved") else "WHERE status <> 'resolved'"
-    items = rows(f"""SELECT id, rule_key, title, body, severity, link, contract_id, vendor, status, created_at, read_at, acknowledged_by, delivered FROM alerts {where}
-                     ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, created_at DESC LIMIT :l""", s=status, l=min(limit, 500))
-    return {"items": items, "unread": rows("SELECT count(*) AS n FROM alerts WHERE status='open' AND read_at IS NULL")[0]["n"]}
+def list_alerts(request: Request, status: str = "open", limit: int = 100, property: str | None = None):
+    prop = scope.effective(request, property)
+    where = "TRUE" if status == "all" else "status = :s" if status in ("open", "acknowledged", "resolved") else "status <> 'resolved'"
+    items = rows(f"""SELECT id, rule_key, title, body, severity, link, contract_id, vendor, properties, status, created_at, read_at, acknowledged_by, delivered FROM alerts
+                     WHERE {where} AND {AT}
+                     ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, created_at DESC LIMIT :l""", s=status, l=min(limit, 500), p=prop)
+    return {"items": items, "unread": rows(f"SELECT count(*) AS n FROM alerts WHERE status='open' AND read_at IS NULL AND {AT}", p=prop)[0]["n"], "property": prop}
 
 
 @router.get("/alerts/summary")
-def summary():
-    r = rows("SELECT count(*) FILTER (WHERE read_at IS NULL) AS unread, count(*) AS open, count(*) FILTER (WHERE severity='critical') AS critical FROM alerts WHERE status='open'")[0]
-    return r
+def summary(request: Request, property: str | None = None):
+    prop = scope.effective(request, property)
+    return rows(f"""SELECT count(*) FILTER (WHERE read_at IS NULL) AS unread, count(*) AS open, count(*) FILTER (WHERE severity='critical') AS critical
+                    FROM alerts WHERE status='open' AND {AT}""", p=prop)[0]
 
 
 class StatusIn(BaseModel):
@@ -42,9 +48,12 @@ class StatusIn(BaseModel):
 
 
 @router.put("/alerts/{aid}")
-def update_alert(aid: int, b: StatusIn):
+def update_alert(aid: int, b: StatusIn, request: Request):
     if b.status not in (None, "open", "acknowledged", "resolved"):
         raise HTTPException(422, "status must be open, acknowledged or resolved")
+    mine = scope.user_property(request)
+    if mine and not rows("SELECT 1 FROM alerts WHERE id = :i AND :p = ANY(properties)", i=aid, p=mine):
+        raise HTTPException(404, "alert not found")
     with SessionLocal() as s:
         n = s.execute(text("UPDATE alerts SET status=COALESCE(:st,status), read_at=COALESCE(read_at, now()), acknowledged_by=COALESCE(:by, acknowledged_by) WHERE id=:i"), {"st": b.status, "by": b.by, "i": aid}).rowcount
         s.commit()
@@ -54,11 +63,12 @@ def update_alert(aid: int, b: StatusIn):
 
 
 @router.post("/alerts/read-all")
-def read_all():
+def read_all(request: Request, property: str | None = None):
+    prop = scope.effective(request, property)
     with SessionLocal() as s:
-        s.execute(text("UPDATE alerts SET read_at = now() WHERE read_at IS NULL"))
+        s.execute(text(f"UPDATE alerts SET read_at = now() WHERE read_at IS NULL AND {AT}"), {"p": prop})
         s.commit()
-    return summary()
+    return summary(request, property)
 
 
 @router.post("/alerts/evaluate")
@@ -112,11 +122,15 @@ class ChannelIn(BaseModel):
     secrets: dict = {}
     enabled: bool = True
     min_severity: str = "medium"
+    property: str | None = None           # deliver only the alerts that concern this property (None = every alert)
 
 
 def _check(c: ChannelIn) -> None:
     if c.kind not in SECRET_FIELDS or c.min_severity not in SEVERITIES or not c.name.strip():
         raise HTTPException(422, "invalid name, kind or minimum severity")
+    c.property = (c.property or "").strip() or None
+    if c.property and not rows("SELECT 1 FROM properties WHERE name = :p", p=c.property):
+        raise HTTPException(422, f"unknown property {c.property}")
     if c.kind == "email" and not (c.config.get("host") and c.config.get("to")):
         raise HTTPException(422, "e-mail needs an SMTP host and a recipient")
 
@@ -136,8 +150,8 @@ def create_channel(c: ChannelIn):
     sec = {k: v for k, v in c.secrets.items() if k in SECRET_FIELDS[c.kind] and v}
     with SessionLocal() as s:
         try:
-            cid = s.execute(text("""INSERT INTO alert_channels (name, kind, config, secrets_enc, enabled, min_severity) VALUES (:n,:k,CAST(:c AS jsonb),:s,:e,:m) RETURNING id"""),
-                            {"n": c.name.strip(), "k": c.kind, "c": json.dumps(_clean(c)), "s": crypto.encrypt(sec) if sec else None, "e": c.enabled, "m": c.min_severity}).scalar()
+            cid = s.execute(text("""INSERT INTO alert_channels (name, kind, config, secrets_enc, enabled, min_severity, property) VALUES (:n,:k,CAST(:c AS jsonb),:s,:e,:m,:p) RETURNING id"""),
+                            {"n": c.name.strip(), "k": c.kind, "c": json.dumps(_clean(c)), "s": crypto.encrypt(sec) if sec else None, "e": c.enabled, "m": c.min_severity, "p": c.property}).scalar()
             s.commit()
         except Exception:
             raise HTTPException(409, "a channel with that name already exists")
@@ -153,8 +167,8 @@ def update_channel(cid: int, c: ChannelIn):
     sec = crypto.decrypt(cur[0]["secrets_enc"])
     sec.update({k: v for k, v in c.secrets.items() if k in SECRET_FIELDS[c.kind] and v})
     with SessionLocal() as s:
-        s.execute(text("UPDATE alert_channels SET name=:n, kind=:k, config=CAST(:c AS jsonb), secrets_enc=:s, enabled=:e, min_severity=:m WHERE id=:i"),
-                  {"n": c.name.strip(), "k": c.kind, "c": json.dumps(_clean(c)), "s": crypto.encrypt(sec) if sec else None, "e": c.enabled, "m": c.min_severity, "i": cid})
+        s.execute(text("UPDATE alert_channels SET name=:n, kind=:k, config=CAST(:c AS jsonb), secrets_enc=:s, enabled=:e, min_severity=:m, property=:p WHERE id=:i"),
+                  {"n": c.name.strip(), "k": c.kind, "c": json.dumps(_clean(c)), "s": crypto.encrypt(sec) if sec else None, "e": c.enabled, "m": c.min_severity, "p": c.property, "i": cid})
         s.commit()
     return _view(rows("SELECT * FROM alert_channels WHERE id=:i", i=cid)[0])
 

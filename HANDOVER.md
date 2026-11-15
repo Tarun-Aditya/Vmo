@@ -162,3 +162,10 @@ CUAD hold-out after these changes: governing law 91.6% (was 89.1%), everything e
 engine when Claude reports a usage limit, instead of showing the limit message as the answer. Admin pages regrouped and repaired (pack rule wording and scope refresh once
 per pack version; demo Google Drive survives restarts; simulator calls kept out of the audit log). The 25-step walkthrough was re-recorded and passes.
 Still needs you: a real invoice export or sandbox credentials for one live integration; 10-20 redacted contracts of your own.
+
+**Property managers (2026-11-15).** My hotel page, property picker on the daily screens, alert routing per property, accounts limited to one property (deny-by-default
+API allow-list in `app/scope.py`, Ask queries run against per-property temporary views, private conversations), service calls against contract response times,
+supplier contacts. Migration 0033. Tests: `tests/test_property_manager.py` (the property limit, the Ask database limit, alert routing, service promises, contacts,
+conversation ownership). Writing them found a real leak, now fixed: a master agreement covering two hotels let one hotel's manager see the other hotel's schedule.
+Limits: the property limit applies only with `AUTH_MODE=on` (with sign-in off everyone is an administrator); service calls are entered by hand or from a CSV,
+not from a ticketing system; contacts are entered by hand.

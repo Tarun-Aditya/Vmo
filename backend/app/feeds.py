@@ -33,7 +33,7 @@ def feed_files() -> list[Path]:
     from app.opsdocs import DOC_EXT
 
     d = feeds_dir()
-    return sorted(f for f in d.rglob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXT | {".csv"} and f.name != "certificates.csv")       # certificates.csv is read by app.certificates
+    return sorted(f for f in d.rglob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in DOC_EXT | {".csv"} and f.name not in ("certificates.csv", "service_log.csv", "vendor_contacts.csv"))       # read by app.certificates / app.onsite
 
 
 FEED_OF = {"invoice": "invoices", "sla_report": "sla", "acceptance": "obligation_status", "certificate": "certificates"}
@@ -351,9 +351,10 @@ def run_feeds(trigger: str = "manual") -> dict:
         tot = dict(new=0, updated=0, skipped=0)
         failed = 0
         with SessionLocal() as s:
-            from app import certificates
+            from app import certificates, onsite
 
             certificates.sync(s)
+            onsite.load_files(s)            # service calls and supplier contacts kept as files in the feeds folder
             s.commit()
         for f in files:
             try:
