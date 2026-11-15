@@ -26,6 +26,10 @@ contracts in `data/real_hotel`.
 
 `src/*.md` are the sources; `labels.json` holds the values stated in each document (including both signatories); `sources.json` the category and property.
 
+**Recorded results for Demo mode.** `recorded.json` holds the terms extracted from each sample document and the answers to the questions in
+`demo_questions.json`, keyed by content fingerprint; Demo mode replays them (`backend/app/recorded.py`). Re-record with Claude:
+`python ../scripts/record_demo.py` from `backend/`, Demo mode off. The committed file was recorded with the offline engine.
+
 **Use them**
 * Score the engine: `REAL_SET=realistic_hotel python ../evals/real_hotel_eval.py` (from `backend/`; `LLM_PROVIDER=offline` for the rules, unset for Claude).
 * Add them to a running hotel demo: `python ../scripts/load_realistic_hotel.py` (from `backend/`, hotel environment). A re-seed removes them again,

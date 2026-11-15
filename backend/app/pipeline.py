@@ -273,7 +273,14 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     t_ = time.time()
     if extractor != "offline":
         clauses += kcc_ai.tag(s, clauses, chash, kcc_ai.definitions(cfg["kcc"], {c["clause_type"] for c in clauses}), meta["type"])
-    fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
+    from app import recorded
+
+    rec = recorded.fields_for(chash)           # Demo mode, a sample document: the terms recorded from the engine (Claude) that read it
+    if rec:
+        fields, mode = rec
+    else:
+        fields, mode = extraction.extract(md, header, clauses, meta["type"], extractor)
+        recorded.observe(chash, fields, mode, path.name)
     named = fields.pop("supplier_name", None)          # Claude's reading of who the supplier is: used when the name is in the document word for word, never stored as a field
     if named and not sidecar.get("vendor") and not (header.get("Parties") and meta["vendor"] != "Unknown vendor"):
         from app import meta_rules
@@ -287,7 +294,7 @@ def ingest_file(s, path: Path, root: Path, cfg: dict, extractor: str = "auto", r
     for f, v in corrections.items():                 # a person's correction survives re-extraction
         fields[f] = {**fields.get(f, {"clause_type": None, "page": 1}), "value": coerce_input(f, v), "confidence": 1.0, "corrected": True}
     val = {f: _coerce(f, d["value"]) for f, d in fields.items()}
-    _emit("extract", engine="Claude" if mode == "llm" else ("offline rules (Claude unavailable)" if mode == "heuristic-fallback" else "offline rules"), seconds=round(time.time() - t_, 1),
+    _emit("extract", engine=mode if mode.startswith("recorded") else "Claude" if mode == "llm" else ("offline rules (Claude unavailable)" if mode == "heuristic-fallback" else "offline rules"), seconds=round(time.time() - t_, 1),
           vendor=meta["vendor"], fields=[{"field": f, "label": lab, "value": None if val.get(f) is None else str(val.get(f)), "page": (fields.get(f) or {}).get("page"),
                                           "confidence": (fields.get(f) or {}).get("confidence")} for f, lab in KEY_FIELDS])
     if meta["type"] in ("DPA", "NDA"):          # a DPA is not 'covered by a DPA'; an NDA processes no personal data: same result in every engine

@@ -1,0 +1,23 @@
+{
+ "about": "Questions recorded for Demo mode (scripts/record_demo.py): each is asked about the listed sample documents, as when they are ticked on Ask. 'meridian' = the cleaning contractor's five documents; 'core' = the five core contracts.",
+ "groups": {
+  "meridian": ["meridian_nda.docx", "meridian_msa.pdf", "meridian_sow_harbor.pdf", "meridian_sow_midtown.docx", "meridian_amendment_1_scan.pdf"],
+  "core": ["northshore_food_supply.pdf", "adirondack_hvac_maintenance.docx", "yieldline_rms_subscription.pdf", "keystone_valet_parking.docx", "prairie_waste_services.pdf"]
+ },
+ "questions": [
+  {"question": "Show start date, end date and payment terms", "documents": "meridian"},
+  {"question": "What are the insurance requirements?", "documents": "meridian"},
+  {"question": "What are the termination terms?", "documents": "meridian"},
+  {"question": "Who signed each one and when?", "documents": "meridian"},
+  {"question": "Show start date, end date and payment terms", "documents": "core"},
+  {"question": "Which of these have no liability cap?", "documents": "core"},
+  {"question": "What are the insurance requirements?", "documents": "core"},
+  {"question": "Total annual value by category", "documents": "core"},
+  {"question": "What happens if we end this contract early?", "documents": ["prairie_waste_services.pdf"]},
+  {"question": "How fast must they respond to an emergency?", "documents": ["adirondack_hvac_maintenance.docx"]},
+  {"question": "Who pays if a guest's car is damaged?", "documents": ["keystone_valet_parking.docx"]},
+  {"question": "What happens to our guest data at the end of the contract?", "documents": ["yieldline_rms_subscription.pdf"]},
+  {"question": "Tell me about this contract", "documents": ["meridian_msa.pdf"]},
+  {"question": "What are the payment terms, liability cap and governing law?", "documents": ["northshore_food_supply.pdf"]}
+ ]
+}

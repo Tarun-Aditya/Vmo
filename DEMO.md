@@ -17,8 +17,14 @@ The Seabright portfolio (32 documents) is already loaded, so every screen has a 
    * **Demo mode on** (offline rules): identical every run, no internet. The sample folder of 11 takes about two minutes; a long contract about 20 seconds,
      mostly indexing.
    * **Demo mode off** (Claude): Claude reads each document. Slower and slightly different each run: rehearse once in this mode and time it.
-3. **Admin → Pipeline → Demo sample folder**: if it says the files are in the portfolio, press **Remove it**.
-4. Have the originals at hand (`data/realistic_hotel/docs`), and optionally a PDF of your own to drag in.
+3. **Record Claude's results once** (recommended): with Demo mode **off** and Claude configured, run `python ../scripts/record_demo.py` from `backend/`.
+   It reads the sample documents and asks the demo questions (`data/realistic_hotel/demo_questions.json`) with Claude, and saves the results in
+   `data/realistic_hotel/recorded.json`; commit that file. In Demo mode the sample documents then show Claude's terms and the recorded questions Claude's
+   answers, instantly and identically every run, without internet. They are labelled *recorded (Claude, date)* in the live run and *recorded answer* in Ask.
+   Anything else (your own files, other questions) is read live by the offline engine. The file in the repository was recorded with the offline engine,
+   because the session that built this had no Claude access.
+4. **Admin → Pipeline → Demo sample folder**: if it says the files are in the portfolio, press **Remove it**.
+5. Have the originals at hand (`data/realistic_hotel/docs`), and optionally a PDF of your own to drag in.
 
 ## Act 1: the contracts (2 minutes)
 

@@ -158,6 +158,13 @@ term clause beats the date on the cover, "effective for 36 months starting ..." 
 the supplier's name (used only when it appears in the document word for word); its prompt says how to treat blanks, conditional personal-data wording, and option years.
 CUAD hold-out after these changes: governing law 91.6% (was 89.1%), everything else unchanged.
 
+**2026-11-15: recorded results for the demo.** Demo mode (no Claude) replays recorded results for the sample documents: the terms extracted from each
+(keyed by sha256 of the file) and the answers to the questions in `data/realistic_hotel/demo_questions.json` (keyed by question and the documents' fingerprints;
+contract ids inside an answer are stored as fingerprints and mapped back to the running database). `scripts/record_demo.py` records them with the active
+engine into `data/realistic_hotel/recorded.json`; the committed file was recorded with the offline engine (no Claude access in that session): **run it once with
+Demo mode off and Claude configured to record Claude's results.** Replayed results are labelled (live run: *recorded (engine, date)*; Ask: *recorded answer*);
+other documents and questions, and Live mode, are unaffected. Test: `tests/test_recorded.py`.
+
 **2026-11-15: continuous intake, repository, Ask scope.** Ingestion stays in the pipeline (Admin → Pipeline), not on a separate page: every run, whatever
 started it (schedule, folder watch, connector, mailbox, upload, Run now) and for any number of documents, reports each document's steps (read, clauses,
 terms, vectors, checks) and outcome (new, re-read, duplicate, already read, linked under its parent, the terms an amendment changes) in a **live run** panel

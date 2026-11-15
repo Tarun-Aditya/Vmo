@@ -6,7 +6,7 @@ import { Card, Sev, SeverityChip, Td, Th } from "../ui";
 
 type Res = {
   question: string; answer: string; tiles: { label: string; kind: string; value: number | null }[]; tables: Table[]; thinking: Step[];
-  source: string; cached_from?: string; elapsed_ms: number; scoped?: number;
+  source: string; cached_from?: string; elapsed_ms: number; scoped?: number; recorded_engine?: string; recorded_at?: string;
 };
 type Doc = { id: number; title: string; vendor: string; type: string; status: string };
 
@@ -70,7 +70,7 @@ type Msg =
 type Conv = { id: number; title: string; updated_at: string; questions: number; last_answer: string | null };
 type Stored = { id: number; title: string; scope: number[] | null; messages: { id: number; role: "user" | "assistant"; content: string; payload: (Res & { scope?: number[] }) | null }[] };
 
-function Thinking({ steps, reasoning, running, ms, source }: { steps: Step[]; reasoning: string; running: boolean; ms?: number; source?: string }) {
+function Thinking({ steps, reasoning, running, ms, source, rec }: { steps: Step[]; reasoning: string; running: boolean; ms?: number; source?: string; rec?: string }) {
   const [open, setOpen] = useState(running);
   const wasRunning = useRef(running);
   useEffect(() => { if (running) setOpen(true); else if (wasRunning.current) setOpen(false); wasRunning.current = running; }, [running]);
@@ -78,7 +78,7 @@ function Thinking({ steps, reasoning, running, ms, source }: { steps: Step[]; re
     <div className="rounded-lg border border-dashed border-slate-300 bg-white/60 dark:border-slate-600 dark:bg-slate-800/60" data-thinking={running ? "live" : "done"}>
       <button onClick={() => setOpen(!open)} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-600 dark:text-slate-300" aria-expanded={open}>
         <span aria-hidden>{open ? "▾" : "▸"}</span><span className="font-medium">Thinking{running ? "…" : ""}</span>
-        <span className="text-xs text-slate-500">· {steps.length} step{steps.length !== 1 ? "s" : ""}{!running && ms !== undefined ? ` · ${ms} ms · ${source === "cache" ? "cached" : source}` : ""}</span>
+        <span className="text-xs text-slate-500">· {steps.length} step{steps.length !== 1 ? "s" : ""}{!running && ms !== undefined ? ` · ${ms} ms · ${source === "cache" ? "cached" : source === "recorded" ? `recorded answer${rec ? ` (${rec})` : ""}` : source}` : ""}</span>
         {running && <span className="ml-1 inline-block h-2 w-2 animate-pulse rounded-full bg-indigo-500" aria-hidden />}
       </button>
       {open && (
@@ -112,7 +112,7 @@ function Answer({ m }: { m: Extract<Msg, { role: "assistant" }> }) {
   const r = m.result;
   return (
     <div className="space-y-3" data-msg="assistant" {...(m.running ? { "data-streaming": "1" } : {})}>
-      <Thinking steps={r?.thinking ?? m.steps} reasoning={m.reasoning} running={m.running} ms={r?.elapsed_ms} source={r?.source} />
+      <Thinking steps={r?.thinking ?? m.steps} reasoning={m.reasoning} running={m.running} ms={r?.elapsed_ms} source={r?.source} rec={r?.recorded_engine ? `${r.recorded_engine}${r.recorded_at ? ", " + r.recorded_at.slice(0, 10) : ""}` : undefined} />
       {m.error && <p className="text-sm text-red-600">{m.error}</p>}
       {(m.answer || r) && (
         <Card title="Answer" right={r && <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-200">{r.scoped ? `Scope: ${r.scoped} selected document${r.scoped > 1 ? "s" : ""}` : "Scope: whole portfolio"}</span>}>

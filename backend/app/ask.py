@@ -272,6 +272,11 @@ def citations(calls: list[dict]) -> list[dict]:
 
 def answer(question: str, demo_mode: bool = False, scope: list[int] | None = None, force_offline: bool = False) -> dict:
     t0 = time.time()
+    from app import recorded
+
+    rec = recorded.answer_for(question, scope)          # Demo mode: a recorded answer about the sample documents
+    if rec:
+        return {**rec, "question": question, "elapsed_ms": int((time.time() - t0) * 1000), "scoped": len(scope) if scope else 0}
     if demo_mode and not scope:
         with SessionLocal() as s:
             row = s.execute(
