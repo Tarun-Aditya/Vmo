@@ -10,7 +10,7 @@
 
 **Bill to:** Seabright Hotels & Resorts Ltd
 
-**Reference:** SOFTWARE AS A SERVICE AGREEMENT – BookWave Distribution
+**Reference:** Software as a Service Agreement – BookWave Distribution
 
 **Service period:** 19 Nov 2025 – 09 Dec 2026
 

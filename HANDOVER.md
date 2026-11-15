@@ -158,6 +158,17 @@ term clause beats the date on the cover, "effective for 36 months starting ..." 
 the supplier's name (used only when it appears in the document word for word); its prompt says how to treat blanks, conditional personal-data wording, and option years.
 CUAD hold-out after these changes: governing law 91.6% (was 89.1%), everything else unchanged.
 
+**2026-11-15: five realistic contracts.** `data/realistic_hotel`: fictional but written as real US hotel supplier paper (food distribution, HVAC maintenance,
+revenue-management software with a data processing addendum, valet parking, a waste hauler's evergreen form). Offline rules read 72% of their labelled fields at
+first; 100% (60/60 with signatories) after the fixes: an end date stated in a "Term and Renewal" clause or an order-form row; an order form's subscription start
+date; "US$" unit prices, per-occurrence amounts and "up to" limits are not the annual value; "shall not exceed the Annual Contract Price" is a 1x cap; a separate
+data-breach cap is not the general cap; "may not terminate before the end of the term" and non-cancellable fees mean no termination for convenience; termination
+on an SLA failure or a sale is not convenience; the sentence that pays an invoice beats any other "within 10 days"; signature blocks on an order form's first page;
+"By: /s/ Name" signatures; a party row in capitals or turned into a heading; all-capital titles tidied. Clause measures no longer come from any sentence holding
+a common word of their name ("notice", "termination"): the waste contract had shown a 360-hour "security incident notice" made from a 15-day cure period.
+Checks: tests 208 passed; public hotel contracts 49/54 (unchanged); CUAD 150 hold-out unchanged; hotel corpus and redline below. Limit: the author of the
+contracts also wrote the fixes, so this is evidence the engine reads such paper, not an independent accuracy figure. Claude was not run on them.
+
 **2026-11-15 (later).** Ask on the hotel corpus is measured: 13 owner questions, offline 13/13 and Claude 13/13 (`reports/ask_hotel/`). Ask now falls back to the offline
 engine when Claude reports a usage limit, instead of showing the limit message as the answer. Admin pages regrouped and repaired (pack rule wording and scope refresh once
 per pack version; demo Google Drive survives restarts; simulator calls kept out of the audit log). The 25-step walkthrough was re-recorded and passes.

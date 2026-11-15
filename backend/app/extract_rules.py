@@ -102,6 +102,8 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     # the start the term clause itself states wins over a date in the heading (a proposal date, a resolution date)
     tm = re.search(r"(?:become effective and commence on|effective for \d+ months starting|term of this (?:agreement|contract)[^.]{0,80}?shall be from|shall commence on|commences on)\s+([A-Za-z0-9,/ .\-]{6,30})", re.sub(r"\s+", " ", d.flat), re.I)
     stated = tu.first_date(tm.group(1)) if tm else None
+    if not stated and (sm := re.search(r"Subscription Start Date[\s|:*]+([A-Za-z0-9,/ .\-]{6,30})", d.flat)):        # an order form: the subscription starts on its own date, not the order date
+        stated = tu.first_date(sm.group(1))
     if stated:
         eff, guessed = stated, False
     elif blank_eff:
@@ -113,6 +115,13 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     m, ec = d.search(r"(?:now expires? on|extended to|until|expires? on|expiring on|ends? on|ending on|end date[:\s|]*|continues? (?:in (?:full )?(?:force|effect) )?until|through(?: and including)?|terminat\w+ on|continu\w+ to(?: and including)?|to and including)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", ("term",))
     if m:
         expiry = tu.first_date(m.group(1))
+    if not expiry:          # 'continues until December 31, 2027 (the Initial Term)', 'Subscription Term | 36 months ..., ending May 31, 2028', 'ends on December 31, 2026 (the Term)': the term sentence, wherever the clause was filed
+        for t_ in [tu.normalize(c["text"]) for c in d.by.get("term", []) + d.by.get("renewal", [])] + [re.sub(r"\s+", " ", d.flat)]:
+            for mm_ in re.finditer(r"(?:initial term|subscription term|the term of this|this agreement (?:begins|commences|continues|is effective)|term of this agreement|(?:the )?term (?:begins|commences)|\(the \W?term\W?\))[^.]{0,160}?(?:until|ending on|ending|ends on|expiring on|expires on|through)\s+([A-Za-z0-9,/ .\-]{6,30})", t_, re.I):
+                if expiry := tu.first_date(mm_.group(1)):
+                    break
+            if expiry:
+                break
     if not expiry:
         for t_ in [tu.normalize(c["text"]) for c in d.by.get("term", [])] + [d.flat[:6000]]:
             for mm_ in re.finditer(r"(?:until|expires? on|expiring on|ends? on|ending on|through(?: and including)?|terminat\w+ on|continu\w+ to(?: and including)?|to and including)[:\s|*]*([A-Za-z0-9,/ .\-]{6,30})", t_, re.I):
@@ -165,17 +174,20 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             before, after = d.flat[max(0, m.start() - 90):m.start()].lower(), d.flat[m.end():m.end() + 28].lower()
             if re.search(r"insur|per claim|\bcap\b|liabilit|exceed the greater|aggregate liability|indemn|penalt|credit", before[-70:] + after) and not re.search(r"fees?", before[-50:]):
                 continue
+            if re.match(r"\s*(?:\(\s*[^)]{0,20}\)\s*)?(?:per|/|each|an)\s*(?:occurrence|hour|month|delivery|deliveries|lift|haul|ton|pound|night|vehicle|claim|day|property|unit|room|invoice|incident|call|visit|person|accident|location)\b", after) \
+                    or re.search(r"(?:up to|exceed|minimum order[^.]{0,30}is|charge of|fee of|rate of|unit price[^.]{0,30})\s*$", before[-40:]):
+                continue
             amounts.append((v, before, after))
         annual = total = None
         explicit_total = False
         for v, before, after in amounts:
             ca = max((x.end() for x in re.finditer(A_CUE, before)), default=-1)
             ct = max((x.end() for x in re.finditer(T_CUE, before)), default=-1)
-            if re.search(r"per year|annually|a year|per annum|each year|/yr", after):
+            if re.search(r"per year|annually|a year|per annum|each year|/yr|per (?:contract|subscription) year", after):
                 ca = max(ca, len(before))
             elif re.match(r"\s*\(\s*(?:the\s+)?(?:total|fixed|aggregate|not[- ]to[- ]exceed)\b", after):      # 'USD 540,000 (total contract value)'
                 ct, explicit_total = len(before) + 1, True
-            if ca > ct and annual is None:
+            if ca > ct and (annual is None or (v > annual and ca >= len(before) - 60)):     # a later, larger amount cued as annual ('Total annual subscription fees') beats a per-unit line
                 annual = v
             elif ct > ca and total is None:
                 total = v
@@ -191,6 +203,10 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     # ---- payment terms
     pm, pc = d.search(r"(?:pay|payable|payment|invoice|remit)[^.]{0,160}?within\s+(\d+)\s+(?:calendar\s+)?days|\bnet\s*(\d+)\b|within\s+(\d+)\s+(?:calendar\s+)?days\s+(?:of|after|from)[^.]{0,40}(?:receipt|invoice|date of invoice)|(\d+)\s+days\s+(?:from|after|of)\s+(?:receipt of|the date of)\s+(?:a\s+|the\s+|each\s+)?(?:valid\s+)?invoice", ("payment", "fees"))
     n = next((int(g) for g in pm.groups() if g), None) if pm else None
+    if not pm or not pc:      # no payment clause was found by heading: the sentence that pays an invoice beats the first 'within 10 days' anywhere (an audit refund, a report)
+        im = re.search(r"\bpay\s+(?:each|every|all|any|the)?\s*(?:correct|undisputed|proper|valid|approved|such)?\s*invoices?[^.]{0,80}?within\s+(\d+)\s+(?:calendar\s+)?days", tu.normalize(d.flat), re.I)
+        if im:
+            n = int(im.group(1))
     if amend:
         am = re.search(r"payment terms?[^.]{0,120}?(\d+)\s*days|(?:within|net)\s*(\d+)\s*days", d.flat, re.I)
         n = next((int(g) for g in am.groups() if g), None) if am else None
@@ -206,6 +222,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
             ltxt = (m.group(0) if m else "")
         lc = "liability_cap" if "liability_cap" in d.by else None
         if ltxt:
+            ltxt = " ".join(x for x in re.split(r"(?<=[.;])\s+", ltxt) if not re.search(r"in place of the cap|instead of the cap|\bsuper[- ]?cap|(?:breach of|for)\s+(?:section\s+[\d.]+\s+)?\(?(?:security|data protection|privacy|confidentiality)\b", x, re.I)) or ltxt
             low = ltxt.lower()
             numeric = re.search(r"(\d+(?:\.\d+)?)\s*(?:x|times)\b|(\d+)\s*%\s*of|(?:fees|charges|amounts?)\s+(?:paid|payable|paid or payable)[^.]{0,80}(?:12|twelve)\s+months|\bone[- ]half\b", low)
             if not numeric and re.search(r"\bunlimited\b|\bno (?:limit|cap)\b|\bnot be (?:subject to any )?(?:limit|cap)|\buncapped\b|\bwithout (?:any )?limit", low):
@@ -225,7 +242,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
                 elif half:
                     put("liability_cap_multiple", 0.5, 0.8, lc)
                     put("liability_cap_text", "0.5 times annual fees", 0.8, lc)
-                elif re.search(r"(?:fees|charges|amounts?)\s+(?:paid|payable|paid or payable)[^.]{0,80}(?:12|twelve)\s+months|(?:12|twelve)\s+months[^.]{0,80}(?:fees|charges)", ltxt, re.I):
+                elif re.search(r"(?:fees|charges|amounts?)\s+(?:paid|payable|paid or payable)[^.]{0,80}(?:12|twelve)\s+months|(?:12|twelve)\s+months[^.]{0,80}(?:fees|charges)|(?:not exceed|limited to)\s+(?:the\s+)?annual (?:contract price|contract value|fees|charges)", ltxt, re.I):
                     put("liability_cap_multiple", 1.0, 0.85, lc)
                     put("liability_cap_text", "1 times annual fees", 0.85, lc)
                 elif re.search(r"(?:master|parent|governed by|provisions of the|as set out in the|set out in the)[^.]{0,60}(?:agreement|msa|sow)", ltxt, re.I):
@@ -240,12 +257,14 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     if not amend:
         ttxt = d.scoped("termination_for_convenience") or " ".join(re.findall(r"[^.]*\b(?:convenience|without cause|for any reason|without reason)\b[^.]*\.", d.flat))
         tc = "termination_for_convenience" if "termination_for_convenience" in d.by else None
-        if re.search(r"neither party (?:may|shall|will|can) terminate[^.]{0,80}convenience|(?:no|not)[^.]{0,40}(?:right|entitled|permitted)[^.]{0,40}terminate[^.]{0,60}(?:convenience|without cause)|only (?:for|upon) (?:cause|material breach)|not (?:be )?(?:entitled|permitted)[^.]{0,40}convenience|(?:cannot|may not|shall not) be terminated for convenience|no (?:termination|right to terminate) for convenience", ttxt, re.I):
+        if re.search(r"neither party (?:may|shall|will|can) terminate[^.]{0,80}convenience|(?:no|not)[^.]{0,40}(?:right|entitled|permitted)[^.]{0,40}terminate[^.]{0,60}(?:convenience|without cause)|only (?:for|upon) (?:cause|material breach)|not (?:be )?(?:entitled|permitted)[^.]{0,40}convenience|(?:cannot|may not|shall not) be terminated for convenience|no (?:termination|right to terminate) for convenience|may not terminate[^.]{0,60}before the (?:end|expiration|expiry) of the", ttxt + " " + " ".join(re.findall(r"[^.]*\bmay not terminate\b[^.]*\.", d.flat, re.I)), re.I):
             put("termination_for_convenience", False, 0.92, tc)
         elif re.search(r"(?:may|can|shall be entitled to)\s+terminate[^.]{0,120}(?:for convenience|without cause|for any reason)|for convenience[^.]{0,60}(?:upon|on|by giving|with)[^.]{0,30}\d+\s*days", ttxt, re.I):
             put("termination_for_convenience", True, 0.9, tc)
         elif __import__("app.kcc", fromlist=["x"]).sentence_hits("termination_for_convenience", d.flat):
             put("termination_for_convenience", True, 0.7, tc)           # a sentence that gives a party the right to terminate without cause / for convenience / on notice (shared with the clause detector)
+        elif re.search(r"\bnon-?cancell?able\b|\bnoncancell?able\b", d.flat, re.I):
+            put("termination_for_convenience", False, 0.7, tc)       # 'fees are non-cancellable' and no exit right anywhere: the customer cannot walk away
         else:
             put("termination_for_convenience", None, 0.4, tc)
     # ---- governing law
@@ -269,7 +288,7 @@ def extract(md: str, header: dict, clauses: list[dict], doc_type: str) -> dict:
     if not amend:
         scope = d.flat
         neg = re.search(r"(?:do(?:es)? not|will not|shall not|no)\s+(?:involve|include|require|entail|process)[^.]{0,40}personal data|no personal data", scope, re.I)
-        pos = re.search(r"(?:services?|engagement|work|supplier|vendor|[A-Z][a-z]+)\s+(?:will|shall|may|does|do)?\s*(?:involve|include|require|entail)s?[^.]{0,50}(?:process\w*|access\w*|handl\w*)[^.]{0,30}personal (?:data|information)|(?:will|may|does|do|shall)\s+(?:have access to|process|handle|receive|store|access)\s+(?:the\s+)?(?:customer'?s?\s+)?personal (?:data|information)(?!\s+only)|personal (?:data|information) of (?:the )?(?:customer|arcadia|its)[^.]{0,40}(?:will|is|are|may|shall) (?:be )?(?:process|access|stor|handl)", scope, re.I)
+        pos = re.search(r"(?:services?|engagement|work|supplier|vendor|[A-Z][a-z]+)\s+(?:will|shall|may|does|do)?\s*(?:involve|include|require|entail)s?[^.]{0,50}(?:process\w*|access\w*|handl\w*)[^.]{0,30}personal (?:data|information)|(?:will|may|does|do|shall)\s+(?:have access to|process|handle|receive|store|access)\s+(?:the\s+)?(?:customer'?s?\s+)?personal (?:data|information)(?!\s+only)|(?:data|information)\s+(?:includes?|contains?)\s+personal (?:data|information) (?:about|of|relating to)|personal (?:data|information) of (?:the )?(?:customer|arcadia|its)[^.]{0,40}(?:will|is|are|may|shall) (?:be )?(?:process|access|stor|handl)", scope, re.I)
         pd = False if neg else bool(pos) and d.type != "NDA"
         put("processes_personal_data", pd, 0.8, "data_protection" if "data_protection" in d.by else None)
         dpa = bool(re.search(r"(?:executed|entered into|signed|agreed|concluded|put in place)\s+(?:a|an|the)\s+(?:data processing (?:agreement|addendum)|dpa)|(?:data processing (?:agreement|addendum)|\bDPA\b)[^.]{0,60}(?:dated|forms? part|is attached|has been (?:executed|entered|signed)|is in place|is incorporated|governs|supplements|(?:has|have) been)|(?:data processing (?:agreement|addendum)|\bDPA\b)[^.]{0,30}(?:executed|signed) (?:alongside|concurrently|together)", scope, re.I)) and not re.search(r"no (?:dpa|data processing agreement)|(?:must|shall|will|to) be (?:executed|entered into|signed)[^.]{0,30}before|not (?:yet )?(?:entered into|executed|in place)[^.]{0,30}(?:dpa|data processing)", scope, re.I)
@@ -307,9 +326,17 @@ def _cells(line: str, labels: str) -> list[str]:
 
 def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
     """(customer, supplier) -> (name, date | None) or None. Handles 'Signed ... by X, Title, on DATE' sentences, By/Name/Title/Date blocks,
-    two-column signature tables (Markdown, Word, PDF layout) and unsigned blocks (blank Name)."""
+    two-column signature tables (Markdown, Word, PDF layout) and unsigned blocks (blank Name). The signature page is normally at the end; an order form or
+    a supplier's printed form is signed on its first page, before the terms, so a party not found in the last pages is looked for in the whole document."""
+    c, s_ = _signatures(d, d.md[-7000:])
+    if (c is None or s_ is None) and len(d.md) > 7000:
+        c2, s2 = _signatures(d, d.md)
+        c, s_ = c or c2, s_ or s2
+    return c, s_
+
+
+def _signatures(d: Doc, tail: str) -> tuple[tuple | None, tuple | None]:
     cm = customer_markers()
-    tail = d.md[-7000:]
     res: dict[str, tuple] = {}
     for m in re.finditer(rf"(?i:signed|executed|countersigned)\b[^\n]{{0,60}}?(?i:for and on behalf of|on behalf of|for)\s+(?:the\s+)?(?P<party>[^\n]{{2,90}}?)\s+by\s+(?P<name>{NAME})\s*,\s*(?P<title>[^,\n]{{2,70}}?),?\s*(?i:on|dated)\s+(?P<date>[A-Za-z0-9,/ \-]{{6,24}})", tail):
         role = "customer" if any(k in m.group("party").lower() for k in cm + ["customer", "client"]) else "supplier"
@@ -323,10 +350,14 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
             res.setdefault(role, (m.group("name").strip(), tu.first_date(m.group("date"))))
     lines = [re.sub(r"[*_`]", "", ln).rstrip() for ln in tail.splitlines()]
     is_name = re.compile(r"^\W*(?:Printed\s+Name|Signed\s+by|Name)\b", re.I)
+    is_by = re.compile(r"^\W*(?:By|Signature)\s*:?\s*/s/", re.I)          # 'By: /s/ Thomas R. Leclair' (a conformed signature names the signer)
     for i, ln in enumerate(lines):
-        if not is_name.match(ln.strip()):
+        by_line = bool(is_by.match(ln.strip()))
+        if not (is_name.match(ln.strip()) or by_line):
             continue
-        names = _cells(ln, r"Printed\s+Name|Signed\s+by|Name")
+        names = _cells(ln, r"By|Signature" if by_line else r"Printed\s+Name|Signed\s+by|Name")
+        if by_line:
+            names = [re.sub(r"^/?s/\s*", "", n) if re.match(r"/?s/", n) else "" for n in names]          # (the label strip may already have taken the first '/')
         inline_date = None
         for k, n in enumerate(names):                    # 'Name: Anika Rao Title: Authorised Signatory Date: 16 October 2026' flattened onto one line
             mt = re.search(r"\s+(?:Title|Date|Signature)\b\s*:?", n or "")
@@ -353,6 +384,8 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
         hdr_lines: list[str] = []
         for w in reversed(lines[max(0, i - 10):i]):          # the header of this signature block only (stop at the previous heading / long paragraph)
             if w.lstrip().startswith("#") or len(w) > 170:
+                if w.lstrip().startswith("#") and not hdr_lines and any(k in w.lower() for k in cm):     # a PDF turned the table's party row into a heading
+                    hdr_lines.insert(0, w.lstrip("# "))
                 break
             hdr_lines.insert(0, w)
         before = " ".join(hdr_lines).lower()
@@ -375,9 +408,22 @@ def signatures(d: Doc) -> tuple[tuple | None, tuple | None]:
                 tail = ln_[pos + mm.end():].strip(" |") if mm and len(names) > 1 else ""
                 if len(cells_) > 1 and ci > 0:
                     cpos, spos = 10**8, 0
+                elif len(cells_) == 1 and len(names) > 1 and COMPANY_RX.search(ln_[:pos]) is None and re.search(r"\b(?:inc|llc|ltd|co|corp|corporation|company|lp)\b\.?\s*$", ln_[:pos].strip(), re.I):
+                    cpos, spos = 10**8, 0                    # 'ACME SERVICES, INC. SEABRIGHT HOTELS & RESORTS INC' collapsed onto one line: the other company comes first
                 elif len(cells_) > 1 or tail:
                     cpos, spos = 0, 10**8
                 break
+        if len(names) > 1:          # a table header row naming both parties: the column holding our company says which side is ours (names in capitals defeat COMPANY_RX)
+            for ln_ in reversed(hdr_lines):
+                if "|" in ln_ and any(k in ln_.lower() for k in cm):
+                    raw_ = [c.strip(" *_") for c in ln_.strip().strip("|").split("|")]
+                    if len(raw_) > 2 and not COMPANY_RX.search(raw_[0]) and not any(k in raw_[0].lower() for k in cm):
+                        raw_ = raw_[1:]                  # a row label ('Party', 'Company') is not a column
+                    cells_ = [c.lower() for c in raw_]
+                    ours = [n for n, c in enumerate(cells_) if any(k in c for k in cm)]
+                    if len(cells_) > 1 and len(ours) == 1 and all(cells_[n] for n in range(len(cells_)) if n != ours[0]):
+                        cpos, spos = (0, 10**8) if ours[0] == 0 else (10**8, 0)
+                    break
         tag_c, tag_s = before.find("(customer)"), before.find("(supplier)")
         if tag_c >= 0 and tag_s >= 0:                    # 'Vantage Telecom Services Inc (Supplier)   Arcadia Retail Inc. (Customer)'
             cpos, spos = tag_c, tag_s

@@ -1,11 +1,12 @@
 # Monthly Service Level Report
 
-**Vendor:** Lumen Energy Supply Inc
+**Vendor:** BookWave Distribution Inc
 
-**Agreement:** Master Services Agreement – Lumen Energy Supply
+**Agreement:** Software as a Service Agreement – BookWave Distribution
 
-**Reporting period:** August 2026
+**Reporting period:** September 2026
 
 | Service level | Target | Actual | Incidents | Comment |
 |---|---|---|---|---|
+| Service availability | – | 98.81 | 1 | Breach: service credit claim |
 | Security incident notice | – | 12 | 1 |  |

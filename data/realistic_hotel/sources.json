@@ -1,0 +1,52 @@
+[
+ {
+  "file": "northshore_food_supply.pdf",
+  "what": "Prime vendor food distribution agreement, all six hotels (cost-plus pricing, fill-rate service levels, recalls)",
+  "type": "MSA",
+  "category": "Food & Beverage",
+  "property": null,
+  "customer_markers": [
+   "Seabright"
+  ]
+ },
+ {
+  "file": "adirondack_hvac_maintenance.docx",
+  "what": "Mechanical systems (HVAC, chillers, boilers, kitchen refrigeration) preventive maintenance agreement, Lakeside Resort",
+  "type": "MSA",
+  "category": "Elevators & Engineering",
+  "property": "Seabright Lakeside Resort",
+  "customer_markers": [
+   "Seabright"
+  ]
+ },
+ {
+  "file": "yieldline_rms_subscription.pdf",
+  "what": "Revenue management software: order form, subscription agreement, SLA and data processing addendum, all six hotels",
+  "type": "SaaS",
+  "category": "Technology",
+  "property": null,
+  "customer_markers": [
+   "Seabright"
+  ]
+ },
+ {
+  "file": "keystone_valet_parking.docx",
+  "what": "Valet parking and garage management agreement, Harbor Hotel (management fee, reimbursable payroll, vehicle damage, uncapped)",
+  "type": "MSA",
+  "category": "Parking",
+  "property": "Seabright Harbor Hotel",
+  "customer_markers": [
+   "Seabright"
+  ]
+ },
+ {
+  "file": "prairie_waste_services.pdf",
+  "what": "Waste hauling and recycling service agreement, Airport Inn (hauler's form: 36-month evergreen renewal, 180-90 day window, liquidated damages)",
+  "type": "MSA",
+  "category": "Waste & Recycling",
+  "property": "Seabright Airport Inn",
+  "customer_markers": [
+   "Seabright"
+  ]
+ }
+]

@@ -1,11 +1,12 @@
 # Monthly Service Level Report
 
-**Vendor:** Evergreen Waste & Recycling Inc
+**Vendor:** PayGuard Payments Inc
 
-**Agreement:** Master Services Agreement – Evergreen Waste & Recycling
+**Agreement:** SaaS Subscription Agreement
 
 **Reporting period:** August 2026
 
 | Service level | Target | Actual | Incidents | Comment |
 |---|---|---|---|---|
-| Security incident notice | per contract | 20 | 1 | No issues |
+| Service availability | per contract | 100 | 0 | No issues |
+| Security incident notice | per contract | 6 | 1 | No issues |

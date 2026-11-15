@@ -5,6 +5,7 @@ The documents are not in the repository (they belong to the public bodies that p
 Labels: data/real_hotel/labels.json  {file: {field: value}}; a field that is absent from a document's labels was not labelled and is not scored.
 
 Usage (from backend/):  python ../evals/real_hotel_eval.py [--dump out.json]
+       REAL_SET=realistic_hotel python ../evals/real_hotel_eval.py   (five fictional contracts written to read like real ones: data/realistic_hotel)
   LLM_PROVIDER=offline for the rules alone; unset for Claude (subscription CLI or API key)."""
 import json
 import os
@@ -12,15 +13,16 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1] / "data" / "real_hotel"
+ROOT = Path(__file__).resolve().parents[1] / "data" / os.environ.get("REAL_SET", "real_hotel")      # REAL_SET=realistic_hotel: the realistic fictional set in the repository
 MANIFEST = json.loads((ROOT / "sources.json").read_text())
 # the buyer in each document is a public body; the other party is the supplier
 os.environ["CUSTOMER_NAMES"] = ",".join(sorted({m for d in MANIFEST for m in d["customer_markers"]}))
 
-from app import docstruct, extraction, kcc, llm, meta_rules, pipeline  # noqa: E402
-from app.parsing import parse_document  # noqa: E402
+from app import docstruct, extraction, kcc, llm, meta_rules, pipeline
+from app.parsing import parse_document
 
-FIELDS = ["vendor", "governing_law", "effective_date", "expiry_date", "auto_renew", "notice_period_days", "termination_for_convenience", "payment_terms_days", "liability_cap_multiple"]
+FIELDS = ["vendor", "governing_law", "effective_date", "expiry_date", "auto_renew", "notice_period_days", "termination_for_convenience", "payment_terms_days", "liability_cap_multiple",
+          "annual_value", "total_value", "processes_personal_data"]
 
 
 def same(field: str, got, want) -> bool:
@@ -29,7 +31,7 @@ def same(field: str, got, want) -> bool:
     if got in (None, ""):
         return False
     if field == "vendor":
-        n = lambda s: re.sub(r"[^a-z0-9]+", " ", re.sub(r"\b(inc|llc|corp|corporation|company|co|ltd|lp|l p)\b\.?", "", str(s).lower())).strip()  # noqa: E731
+        n = lambda s: re.sub(r"[^a-z0-9]+", " ", re.sub(r"\b(inc|llc|corp|corporation|company|co|ltd|lp|l p)\b\.?", "", str(s).lower())).strip()
         return n(want) in n(got) or n(got) in n(want)
     if field == "governing_law":
         return str(want).lower() in str(got).lower()

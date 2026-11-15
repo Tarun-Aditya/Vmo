@@ -316,6 +316,10 @@ Until then there are two pieces of evidence on real paper:
 * **Twelve real hotel-world contracts** from public records (`sh scripts/fetch_real_hotel.sh`, then `python ../evals/real_hotel_eval.py` from `backend/`).
   `data/real_hotel/README.md` lists them and shows what real contracts do that the fictional ones do not: blanks in templates, parties introduced by role,
   start dates inside the term clause, vendor paper that renews itself, scans with handwritten mark-up.
+* **Five realistic hotel supplier contracts** written for this project (`data/realistic_hotel`, committed): food distribution, HVAC maintenance,
+  revenue-management software, valet parking and a waste hauler's evergreen form, with rate tables, service levels, insurance and `/s/` signatures.
+  `python ../scripts/load_realistic_hotel.py` adds them to the hotel demo; `REAL_SET=realistic_hotel python ../evals/real_hotel_eval.py` scores them
+  (offline 60/60; not an independent test, see the folder's README).
 * **The services-type subset of the public CUAD contracts** (42 held-out agreements: maintenance, outsourcing, hosting, supply), offline: governing law 92%,
   liability cap F1 0.91, assignment 0.92, insurance 0.87, termination for convenience F1 0.67 (`reports/cuad_offline_holdout_services.txt`).
 

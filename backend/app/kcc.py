@@ -305,6 +305,16 @@ def _safe_re(p: str) -> bool:
 
 
 # ------------------------------------------------------------------ metric extraction
+GENERIC_STEMS = {"notice", "period", "termin", "clause", "presen", "requir", "number", "amount", "days", "hours", "months", "contra", "agreem", "within", "maximu",
+                 "minimu", "time", "trigge", "standa", "limits", "value", "obliga", "provid", "custom", "suppli", "servic", "change"}
+
+
+# sentences that read like a clause's measure but are about something else: a notice of a security incident is not a service response time; a separate
+# cap for data breaches ('2 times the fees ... in place of the cap') is not the general liability cap
+SENTENCE_EXCLUDE = {"service_response": r"\bnotif\w*|\bsecurity incident|\bbreach\b|\breport\w*\b",
+                    "liability_cap": r"in place of the cap|instead of the cap|\bsuper[- ]?cap|(?:breach of|for)\s+(?:section\s+[\d.]+\s+)?\(?(?:security|data protection|privacy|confidentiality)\b"}
+
+
 def extract_metrics(clauses: list[dict], metrics: list[dict], kcc_cfg: list[dict] | None = None) -> list[dict]:
     """clauses: {id?, clause_type, text, page}. Returns [{metric_key, value_num, value_text, clause_id, page, confidence}].
     A metric is read from the clauses of its KCC type; when the document has no such clause (real contracts merge or rename them) the pattern is tried
@@ -316,25 +326,31 @@ def extract_metrics(clauses: list[dict], metrics: list[dict], kcc_cfg: list[dict
         by_type.setdefault(c["clause_type"], []).append(c)
     kw = {k["key"]: [w for w in (k.get("keywords") or []) if w and _safe_re(w)] for k in (kcc_cfg or [])}
     names = {k["key"]: k["name"] for k in (kcc_cfg or [])}
+    stem_kw: dict[str, list[str]] = {}
     for m in metrics:       # the words of the metric's own and its clause's name (stems) also mark a sentence as relevant: 'availability' ~ 'available'
-        stems = {w[:6] for w in re.findall(r"[a-z]{5,}", f"{m.get('name', '')} {names.get(m.get('kcc_key'), '')}".lower())}
+        stems = {w[:6] for w in re.findall(r"[a-z]{5,}", f"{m.get('name', '')} {names.get(m.get('kcc_key'), '')}".lower())} - GENERIC_STEMS
         if m["kcc_key"] and stems:
             kw.setdefault(m["kcc_key"], [])
-            kw[m["kcc_key"]] = list(dict.fromkeys(kw[m["kcc_key"]] + [rf"\b{x}\w*" for x in stems]))
+            stem_kw[m["kcc_key"]] = list(dict.fromkeys(stem_kw.get(m["kcc_key"], []) + [rf"\b{x}\w*" for x in stems]))
     out = []
     for m in metrics:
         if not _safe_re(m["pattern"]):
             continue
         typed = by_type.get(m["kcc_key"]) if m["kcc_key"] else clauses
         attempts = [(typed, False)] if typed else []
-        if m["kcc_key"] and kw.get(m["kcc_key"]):      # the clause may be missing or merged / mis-typed: also try the keyword sentences of the whole document
+        if m["kcc_key"] and (kw.get(m["kcc_key"]) or stem_kw.get(m["kcc_key"])):      # the clause may be missing or merged / mis-typed: also try the keyword sentences of the whole document
             attempts.append((clauses, True))
         found = False
         for pool, sentence_mode in attempts:
             for c in pool:
                 text_ = tu.normalize(c["text"])
+                if (ex := SENTENCE_EXCLUDE.get(m["kcc_key"] or "")):
+                    text_ = " ".join(x for x in re.split(r"(?<=[.;])\s+", text_) if not re.search(ex, x, re.I))
                 if sentence_mode:
-                    sents = [x for x in re.split(r"(?<=[.;])\s+", text_) if any(re.search(w, x, re.I) for w in kw[m["kcc_key"]])]
+                    # a sentence about the clause: one of its configured keywords, or two distinct words of its name ('security' and 'incident'); one name word
+                    # alone is not enough ('the breach within 15 days' is a cure period, not a personal data breach notice)
+                    sents = [x for x in re.split(r"(?<=[.;])\s+", text_) if any(re.search(w, x, re.I) for w in kw.get(m["kcc_key"], []))
+                             or sum(1 for w in stem_kw.get(m["kcc_key"], []) if re.search(w, x, re.I)) >= min(2, len(stem_kw.get(m["kcc_key"], [])))]
                     text_ = " ".join(sents)
                 mt = re.search(m["pattern"], text_, re.I)
                 if not mt:
@@ -448,7 +464,7 @@ PRESENCE = {
 
 
 # sentences that look like a match but are not (a termination for breach / insolvency, or a survival clause), skipped for that key
-NEGATIVE = {"ip_ownership": r"\b(?:grants?|licen[sc]e[ds]?|sublicen[sc]\w*)\b(?![^.;]*(?:work made for hire|hereby assign))", "termination_for_convenience": r"\b(?:breach|default|insolven\w*|bankrupt\w*|failure to|fails? to|surviv\w+|for cause|material)\b(?![^.;]*(?:without cause|for convenience))|\bnotwithstanding any termination\b"}
+NEGATIVE = {"ip_ownership": r"\b(?:grants?|licen[sc]e[ds]?|sublicen[sc]\w*)\b(?![^.;]*(?:work made for hire|hereby assign))", "termination_for_convenience": r"\b(?:breach|default|insolven\w*|bankrupt\w*|failure to|fails? to|surviv\w+|for cause|material)\b(?![^.;]*(?:without cause|for convenience))|\bnotwithstanding any termination\b|\bfalls? below\b|\bif\b[^.;]{0,80}\b(?:availability|uptime|service levels?|response times?|fill rate)\b|\bmisse[sd]\b|\bsells?\b[^.;]{0,40}\b(?:hotel|premises|property)|\bceases? to operate\b"}
 
 
 def sentence_hits(key: str, text_: str) -> list[str]:

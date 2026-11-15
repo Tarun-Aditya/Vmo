@@ -2,7 +2,7 @@
  "invoices": {
   "invoice_001.md": {
    "vendor": "BookWave Distribution Inc",
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
    "invoice_no": "BOO-2512-001",
    "invoice_date": "2025-11-19",
    "due_date": "2025-12-19",
@@ -1199,7 +1199,7 @@
   },
   "invoice_134.docx": {
    "vendor": "BookWave Distribution Inc",
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
    "invoice_no": "BOO-2611-134",
    "invoice_date": "2026-11-06",
    "due_date": "2026-12-06",
@@ -1209,357 +1209,30 @@
  },
  "sla": {
   "sla_report_001.md": {
-   "contract_title": "Master Services Agreement \u2013 Brightstar Security Services",
-   "vendor": "Brightstar Security Services Inc",
-   "period": "2026-08-01",
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Inc",
+   "period": "2026-05-01",
    "rows": [
     {
-     "metric_key": "incident_notice_hours",
-     "actual": 6,
-     "incidents": 1
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
     }
    ]
   },
   "sla_report_002.docx": {
-   "contract_title": "Master Services Agreement \u2013 Brightstar Security Services",
-   "vendor": "Brightstar Security Services Inc",
-   "period": "2026-09-01",
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Inc",
+   "period": "2026-06-01",
    "rows": [
     {
-     "metric_key": "incident_notice_hours",
-     "actual": 1080,
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
      "incidents": 1
     }
    ]
   },
   "sla_report_003.pdf": {
-   "contract_title": "Master Services Agreement \u2013 Brightstar Security Services",
-   "vendor": "Brightstar Security Services Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 6,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_004.md": {
-   "contract_title": "Master Services Agreement \u2013 Evergreen Waste & Recycling",
-   "vendor": "Evergreen Waste & Recycling Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_005.docx": {
-   "contract_title": "Master Services Agreement \u2013 Evergreen Waste & Recycling",
-   "vendor": "Evergreen Waste & Recycling Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 30,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_006.pdf": {
-   "contract_title": "Master Services Agreement \u2013 Evergreen Waste & Recycling",
-   "vendor": "Evergreen Waste & Recycling Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 30,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_007.md": {
-   "contract_title": "Master Services Agreement \u2013 Halcyon Elevator & Lift Maintenance",
-   "vendor": "Halcyon Elevator & Lift Maintenance Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_008.docx": {
-   "contract_title": "Master Services Agreement \u2013 Halcyon Elevator & Lift Maintenance",
-   "vendor": "Halcyon Elevator & Lift Maintenance Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 6,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_009.pdf": {
-   "contract_title": "Master Services Agreement \u2013 Halcyon Elevator & Lift Maintenance",
-   "vendor": "Halcyon Elevator & Lift Maintenance Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 6,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_010.md": {
-   "contract_title": "Master Services Agreement \u2013 Hearth & Table Foods",
-   "vendor": "Hearth & Table Foods Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_011.docx": {
-   "contract_title": "Master Services Agreement \u2013 Hearth & Table Foods",
-   "vendor": "Hearth & Table Foods Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_012.pdf": {
-   "contract_title": "Master Services Agreement \u2013 Hearth & Table Foods",
-   "vendor": "Hearth & Table Foods Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_013.md": {
-   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
-   "vendor": "Lumen Energy Supply Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_014.docx": {
-   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
-   "vendor": "Lumen Energy Supply Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 6,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_015.pdf": {
-   "contract_title": "Master Services Agreement \u2013 Lumen Energy Supply",
-   "vendor": "Lumen Energy Supply Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_016.md": {
-   "contract_title": "Master Services Agreement \u2013 Northgate Facilities & HVAC",
-   "vendor": "Northgate Facilities & HVAC Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_017.docx": {
-   "contract_title": "Master Services Agreement \u2013 Northgate Facilities & HVAC",
-   "vendor": "Northgate Facilities & HVAC Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 30,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_018.pdf": {
-   "contract_title": "Master Services Agreement \u2013 Northgate Facilities & HVAC",
-   "vendor": "Northgate Facilities & HVAC Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_019.md": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-03-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 99.34,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_020.docx": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-04-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 99.29,
-     "incidents": 0
-    }
-   ]
-  },
-  "sla_report_021.pdf": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-05-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 99.31,
-     "incidents": 0
-    }
-   ]
-  },
-  "sla_report_022.md": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-06-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 99.23,
-     "incidents": 0
-    }
-   ]
-  },
-  "sla_report_023.docx": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-07-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 99.32,
-     "incidents": 0
-    }
-   ]
-  },
-  "sla_report_024.pdf": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 98.62,
-     "incidents": 1
-    },
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_025.md": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 98.81,
-     "incidents": 1
-    },
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_026.docx": {
-   "contract_title": "SOFTWARE AS A SERVICE AGREEMENT \u2013 BookWave Distribution",
-   "vendor": "BookWave Distribution Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 99.26,
-     "incidents": 0
-    },
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_027.pdf": {
-   "contract_title": "SaaS Subscription Agreement",
-   "vendor": "PayGuard Payments Inc",
-   "period": "2026-05-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 100.0,
-     "incidents": 0
-    }
-   ]
-  },
-  "sla_report_028.md": {
-   "contract_title": "SaaS Subscription Agreement",
-   "vendor": "PayGuard Payments Inc",
-   "period": "2026-06-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 100.0,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_029.docx": {
    "contract_title": "SaaS Subscription Agreement",
    "vendor": "PayGuard Payments Inc",
    "period": "2026-07-01",
@@ -1571,27 +1244,10 @@
     }
    ]
   },
-  "sla_report_030.pdf": {
+  "sla_report_004.md": {
    "contract_title": "SaaS Subscription Agreement",
    "vendor": "PayGuard Payments Inc",
    "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "sla_availability_pct",
-     "actual": 100.0,
-     "incidents": 0
-    },
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 12,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_031.md": {
-   "contract_title": "SaaS Subscription Agreement",
-   "vendor": "PayGuard Payments Inc",
-   "period": "2026-09-01",
    "rows": [
     {
      "metric_key": "sla_availability_pct",
@@ -1605,7 +1261,24 @@
     }
    ]
   },
-  "sla_report_032.docx": {
+  "sla_report_005.docx": {
+   "contract_title": "SaaS Subscription Agreement",
+   "vendor": "PayGuard Payments Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 100.0,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 36,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_006.pdf": {
    "contract_title": "SaaS Subscription Agreement",
    "vendor": "PayGuard Payments Inc",
    "period": "2026-10-01",
@@ -1622,7 +1295,118 @@
     }
    ]
   },
-  "sla_report_033.pdf": {
+  "sla_report_007.md": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-03-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.34,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_008.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-04-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.29,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_009.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-05-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.31,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_010.md": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-06-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.23,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_011.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-07-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.32,
+     "incidents": 0
+    }
+   ]
+  },
+  "sla_report_012.pdf": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-08-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 98.62,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 20,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_013.md": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-09-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 98.81,
+     "incidents": 1
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_014.docx": {
+   "contract_title": "Software as a Service Agreement \u2013 BookWave Distribution",
+   "vendor": "BookWave Distribution Inc",
+   "period": "2026-10-01",
+   "rows": [
+    {
+     "metric_key": "sla_availability_pct",
+     "actual": 99.26,
+     "incidents": 0
+    },
+    {
+     "metric_key": "incident_notice_hours",
+     "actual": 12,
+     "incidents": 1
+    }
+   ]
+  },
+  "sla_report_015.pdf": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-03-01",
@@ -1634,7 +1418,7 @@
     }
    ]
   },
-  "sla_report_034.md": {
+  "sla_report_016.md": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-04-01",
@@ -1646,7 +1430,7 @@
     }
    ]
   },
-  "sla_report_035.docx": {
+  "sla_report_017.docx": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-05-01",
@@ -1658,7 +1442,7 @@
     }
    ]
   },
-  "sla_report_036.pdf": {
+  "sla_report_018.pdf": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-06-01",
@@ -1670,7 +1454,7 @@
     }
    ]
   },
-  "sla_report_037.md": {
+  "sla_report_019.md": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-07-01",
@@ -1682,7 +1466,7 @@
     }
    ]
   },
-  "sla_report_038.docx": {
+  "sla_report_020.docx": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-08-01",
@@ -1694,12 +1478,12 @@
     },
     {
      "metric_key": "incident_notice_hours",
-     "actual": 6,
+     "actual": 20,
      "incidents": 1
     }
    ]
   },
-  "sla_report_039.pdf": {
+  "sla_report_021.pdf": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-09-01",
@@ -1711,12 +1495,12 @@
     },
     {
      "metric_key": "incident_notice_hours",
-     "actual": 6,
+     "actual": 30,
      "incidents": 1
     }
    ]
   },
-  "sla_report_040.md": {
+  "sla_report_022.md": {
    "contract_title": "Software as a Service Agreement \u2013 Stayflow Property Systems",
    "vendor": "Stayflow Property Systems Inc",
    "period": "2026-10-01",
@@ -1728,43 +1512,7 @@
     },
     {
      "metric_key": "incident_notice_hours",
-     "actual": 6,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_041.docx": {
-   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
-   "vendor": "Staffwell Hospitality Staffing Inc",
-   "period": "2026-08-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
      "actual": 30,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_042.pdf": {
-   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
-   "vendor": "Staffwell Hospitality Staffing Inc",
-   "period": "2026-09-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
-     "incidents": 1
-    }
-   ]
-  },
-  "sla_report_043.md": {
-   "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
-   "vendor": "Staffwell Hospitality Staffing Inc",
-   "period": "2026-10-01",
-   "rows": [
-    {
-     "metric_key": "incident_notice_hours",
-     "actual": 20,
      "incidents": 1
     }
    ]
@@ -1775,49 +1523,49 @@
    "contract_title": "Statement of Work No.\u00a01 -- Security Services at Seabright Midtown Suites",
    "vendor": "Brightstar Security Services Inc",
    "key": "milestone:2026-04-29",
-   "completed_on": "2026-05-02"
+   "completed_on": "2026-04-28"
   },
   "acceptance_002.docx": {
    "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
    "vendor": "Crestline Laundry & Linen Services Inc",
    "key": "milestone:2026-01-19",
-   "completed_on": "2026-01-16"
+   "completed_on": "2026-01-15"
   },
   "acceptance_003.pdf": {
    "contract_title": "Statement of Work No. 1: Laundry and Linen Services at Seabright",
    "vendor": "Crestline Laundry & Linen Services Inc",
    "key": "milestone:2026-02-02",
-   "completed_on": "2026-02-02"
+   "completed_on": "2026-01-29"
   },
   "acceptance_004.md": {
    "contract_title": "Statement of Work No.\u00a01 -- Laundry and Linen Services at Seabright Harbor Hotel",
    "vendor": "Crestline Laundry & Linen Services Inc",
    "key": "milestone:2025-07-17",
-   "completed_on": "2025-07-18"
+   "completed_on": "2025-07-15"
   },
   "acceptance_005.docx": {
    "contract_title": "Statement of Work No.\u00a01: Elevator and Lift Maintenance Services at Seabright Midtown Suites",
    "vendor": "Halcyon Elevator & Lift Maintenance Inc",
    "key": "milestone:2025-01-18",
-   "completed_on": "2025-01-16"
+   "completed_on": "2025-01-18"
   },
   "acceptance_006.pdf": {
    "contract_title": "Statement of Work No.\u00a01 -- Elevator Maintenance Services at Seabright Summit Lodge",
    "vendor": "Halcyon Elevator & Lift Maintenance Inc",
    "key": "milestone:2025-02-17",
-   "completed_on": "2025-02-14"
+   "completed_on": "2025-02-18"
   },
   "acceptance_007.md": {
    "contract_title": "Statement of Work No. 1 \u2013 Facilities and HVAC Services at Seabright",
    "vendor": "Northgate Facilities & HVAC Inc",
    "key": "milestone:2025-11-30",
-   "completed_on": "2025-11-27"
+   "completed_on": "2025-12-04"
   },
   "acceptance_008.docx": {
    "contract_title": "Statement of Work No.\u00a01 -- Staffing Services at Seabright Airport Inn",
    "vendor": "Staffwell Hospitality Staffing Inc",
    "key": "milestone:2025-10-25",
-   "completed_on": "2025-10-28"
+   "completed_on": "2025-10-30"
   }
  }
 }

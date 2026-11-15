@@ -150,6 +150,23 @@ def parent_ref(md: str, doc_type: str) -> dict | None:
     return None
 
 
+SMALL = {"a", "an", "and", "as", "at", "by", "for", "in", "of", "on", "or", "the", "to", "with"}
+KEEP_UPPER = {"LLC", "LLP", "LP", "USA", "US", "HVAC", "SOW", "MSA", "NDA", "DPA", "SLA", "IT", "II", "III", "RMS", "PMS", "F&B"}
+
+
+def tidy_title(title: str, vendor: str) -> str:
+    """A heading in capitals reads as a title ('PRIME VENDOR FOOD DISTRIBUTION AGREEMENT' -> 'Prime Vendor Food Distribution Agreement'); a supplier's letterhead name in
+    front of the agreement name moves after it, as the other titles read ('ACME, INC. SERVICE AGREEMENT' -> 'Service Agreement – Acme')."""
+    letters = [ch for ch in title if ch.isalpha()]
+    if letters and sum(ch.isupper() for ch in letters) / len(letters) > 0.8 and len(letters) > 8:
+        words = title.split()
+        title = " ".join(w if w.strip(",.;:()") in KEEP_UPPER else (w.lower() if i and w.lower() in SMALL else w[:1] + w[1:].lower()) for i, w in enumerate(words))
+        m = re.match(r"^(.{3,70}?\b(?:Inc|LLC|Co|Corp|Corporation|Company|Ltd|L\.P)\.?)\s+(.*\b(?:Agreement|Contract)\b.*)$", title)
+        if m and vendor != "Unknown vendor":
+            title = f"{m.group(2)} – {vendor_short(vendor)}"
+    return title
+
+
 def infer(md: str, header: dict, clauses: list[dict], sidecar: dict, folder_hint: str = "") -> dict:
     title = next((ln[2:].strip() for ln in md.splitlines() if ln.startswith("# ")), None) or "Untitled document"
     title = re.sub(r"\*+", "", title).strip()
@@ -159,6 +176,7 @@ def infer(md: str, header: dict, clauses: list[dict], sidecar: dict, folder_hint
         dt = "Amendment"
     if dt not in ("MSA", "SOW", "Work Order", "NDA", "SaaS", "DPA", "Amendment"):
         dt = find_type(title, md)
+    title = tidy_title(title, vendor)
     if GENERIC_TITLE.match(title) and vendor != "Unknown vendor":
         title = f"{title} – {vendor_short(vendor)}"
     ref = parent_ref(md, dt)

@@ -1,11 +1,11 @@
 # Monthly Service Level Report
 
-**Vendor:** Hearth & Table Foods Inc
+**Vendor:** BookWave Distribution Inc
 
-**Agreement:** Master Services Agreement – Hearth & Table Foods
+**Agreement:** Software as a Service Agreement – BookWave Distribution
 
-**Reporting period:** August 2026
+**Reporting period:** June 2026
 
 | Service level | Target | Actual | Incidents | Comment |
 |---|---|---|---|---|
-| Security incident notice | per contract | 12 | 1 | No issues |
+| Service availability | per contract | 99.23 | 0 | No issues |

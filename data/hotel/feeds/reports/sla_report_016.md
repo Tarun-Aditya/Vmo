@@ -1,11 +1,11 @@
 # Monthly Service Level Report
 
-**Vendor:** Northgate Facilities & HVAC Inc
+**Vendor:** Stayflow Property Systems Inc
 
-**Agreement:** Master Services Agreement – Northgate Facilities & HVAC
+**Agreement:** Software as a Service Agreement – Stayflow Property Systems
 
-**Reporting period:** August 2026
+**Reporting period:** April 2026
 
 | Service level | Target | Actual | Incidents | Comment |
 |---|---|---|---|---|
-| Security incident notice | per contract | 12 | 1 | No issues |
+| Service availability | per contract | 100 | 1 | No issues |

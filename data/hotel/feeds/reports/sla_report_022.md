@@ -1,11 +1,12 @@
 # Monthly Service Level Report
 
-**Vendor:** BookWave Distribution Inc
+**Vendor:** Stayflow Property Systems Inc
 
-**Agreement:** SOFTWARE AS A SERVICE AGREEMENT – BookWave Distribution
+**Agreement:** Software as a Service Agreement – Stayflow Property Systems
 
-**Reporting period:** June 2026
+**Reporting period:** October 2026
 
 | Service level | Target | Actual | Incidents | Comment |
 |---|---|---|---|---|
-| Service availability | per contract | 99.23 | 0 | No issues |
+| Service availability | per contract | 100 | 0 | No issues |
+| Security incident notice | per contract | 30 | 1 | No issues |
