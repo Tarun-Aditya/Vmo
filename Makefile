@@ -1,4 +1,4 @@
-.PHONY: dev up down seed seed-pilot seed-offline eval test lint migrate docs showcase cuad cuad-full video
+.PHONY: dev up down seed seed-pilot seed-offline eval test lint migrate docs showcase cuad cuad-full video demo-video
 dev:      ; docker compose up --build
 up:       ; docker compose up -d --build
 down:     ; docker compose down
@@ -16,3 +16,4 @@ showcase: ; docker compose up -d --build && docker compose exec api alembic upgr
 cuad:     ; cd backend && python ../evals/cuad_eval.py ../data/cuad/CUAD_v1 --split test --vmo   # real-contract accuracy on the bundled CUAD text (LLM_PROVIDER=offline for rules)
 cuad-full: ; sh scripts/fetch_cuad.sh   # download the full CUAD including PDFs
 video:    ; node scripts/demo_e2e.js reports/e2e   # records the end-to-end walkthrough (needs the app running and Playwright)
+demo-video: ; node scripts/demo_storyboard.js reports/demo   # records the DEMO.md story (hotel data, SIMULATORS=1, app running): reports/demo/contractiq-demo.mp4

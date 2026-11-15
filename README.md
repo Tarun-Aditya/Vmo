@@ -118,6 +118,8 @@ Admin → Connectors has one-click "connect demo" buttons. Expect to debug permi
 
 ## See it working: the end-to-end video
 
+**The demo as story-boarded** (`DEMO.md`): `reports/demo/contractiq-demo.mp4` (about 6 minutes, Demo mode, hotel edition): the paper, a folder of contracts read live in Admin → Pipeline, one document with its sources, the folder again, then the repository, Renewals and Ask over all documents and over ticked ones. Step report: `reports/demo/report.md`. Re-record with `make demo-video`.
+
 `reports/e2e/contractiq-e2e.mp4` (also `.webm`) is one recording of the whole product in Demo mode (no Claude, simulated external systems), driven by
 `scripts/demo_e2e.js` against a fresh pilot seed: **22 of 22 feature steps passed**, no page errors (`reports/e2e/REPORT.md`, one screenshot per step).
 It covers: dashboard, repository, contract detail with hierarchy and effective terms, vendors, key-clause matrix, an admin adding a clause that
