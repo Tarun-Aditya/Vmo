@@ -1,4 +1,4 @@
-.PHONY: dev up down seed seed-pilot seed-offline eval test lint migrate docs reference-docs showcase cuad cuad-full video demo-video
+.PHONY: dev up down seed seed-pilot seed-offline eval test lint migrate docs reference-docs showcase cuad cuad-full video demo-video presentation-video
 dev:      ; docker compose up --build
 up:       ; docker compose up -d --build
 down:     ; docker compose down
@@ -18,3 +18,4 @@ cuad:     ; cd backend && python ../evals/cuad_eval.py ../data/cuad/CUAD_v1 --sp
 cuad-full: ; sh scripts/fetch_cuad.sh   # download the full CUAD including PDFs
 video:    ; node scripts/demo_e2e.js reports/e2e   # records the end-to-end walkthrough (needs the app running and Playwright)
 demo-video: ; node scripts/demo_storyboard.js reports/demo   # records the DEMO.md story (hotel data, SIMULATORS=1, app running): reports/demo/contractiq-demo.mp4
+presentation-video: ; node scripts/presentation_storyboard.js reports/presentation/video   # records the leadership demo: the paper-to-rows page, then the product on the same rows

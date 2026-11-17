@@ -31,6 +31,10 @@ Other files:
 - `decks/check-overflow.js`: renders each slide of a deck with Playwright and reports any content
   below the bottom margin (y 952). Run it from inside a deck folder: `node ../check-overflow.js`.
 - `screenshot-*.png`: the page's live runs and document view.
+- `video/paper-to-rows-demo.mp4`: the demo recorded as one video (2 min 40 s): the page's one-document and ten-document
+  stories with documents opened, then the product on the same rows (Renewals, the repository, Ask). One screenshot per
+  step and `video/report.md` (17/17 steps). Re-record with `make presentation-video` (app running in Demo mode with the
+  sample folder read, `SIMULATORS=1`).
 
 ## Order of the session (about 35 minutes)
 

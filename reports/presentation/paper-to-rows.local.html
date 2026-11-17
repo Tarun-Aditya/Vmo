@@ -440,7 +440,7 @@ async function simOne(){
       logLine(log, `clause ${c.dataset.c} → <b>${esc(c.querySelector(".tag").textContent.split(" · ")[0])}</b>`);
       docScroll(doc, c); await w(230);
     }
-    cnt.textContent = "20"; logLine(log, "<b>20 clauses</b> stored, typed from a library of 44 (10 shown here)");
+    cnt.textContent = "20"; logLine(log, "<b>20 clauses</b> stored, typed from a library of 49 (10 shown here)");
     await w(300); setStage(tr, 2); await w(250);
     let k = 0;
     for (const x of WASTE_FIELDS){
@@ -568,7 +568,7 @@ const ONE = [
   {
     eyebrow:"One document · step 1, read and structure",
     h:"Read the file, then split it into typed clauses",
-    lede:"PDF, Word or a scanned image is turned into text with page numbers. The text is split into 20 clauses and each one is given a type from a library of 44: renewal, payment, liability cap, governing law and so on.",
+    lede:"PDF, Word or a scanned image is turned into text with page numbers. The text is split into 20 clauses and each one is given a type from a library of 49: renewal, payment, liability cap, governing law and so on.",
     render: () => `<div class="stage">${docPanel("show-clauses", "The document, split into clauses")}
       <div class="panel"><div class="panel-label"><span>Stored as rows</span></div>
       <div class="tbl-wrap">${tname("clauses","20 rows for this contract, each with a search vector")}<table class="rows">
