@@ -10,6 +10,9 @@ The documents read live are fictional but written like real US hotel supplier pa
 NDA, master agreement, two schedules and a scanned amendment; food, HVAC, revenue-management software, valet and waste contracts; and one exact copy.
 The Seabright portfolio (32 documents) is already loaded, so every screen has a full portfolio to show.
 
+**Presenting to leadership?** Lead with the idea, not the product: the decks and the click-through *From paper to rows* page in
+`reports/presentation/` (see its README) come first, and this runbook's act 3 follows as the proof. The page covers acts 1 and 2 without the app.
+
 ## Before you start (5 minutes, once)
 
 1. Start the hotel edition (`make showcase`, or "Run it from a clean clone" in the README) with the simulators on, and open the app.

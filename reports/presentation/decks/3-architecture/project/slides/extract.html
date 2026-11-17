@@ -1,0 +1,23 @@
+<section id="extract" style="background:#FBF9F4;padding:128px;display:flex;flex-direction:column;gap:30px;font-family:'DM Sans', Arial, sans-serif">
+<p style="font-size:26px;font-weight:700;letter-spacing:3px;color:#A24E16">4 · EXTRACT</p>
+<h2 style="font-family:'Cormorant Garamond', Georgia, serif;font-size:60px;font-weight:600;line-height:1.1;color:#1F2A37;width:1500px">Every term with its value, source and confidence</h2>
+<div style="display:grid;grid-template-columns:1fr 1.15fr;gap:28px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:28px;font-weight:700;color:#1F2A37">Claude</h3><p style="font-size:24px;line-height:1.4;color:#4B5563">A forced tool call with a fixed JSON schema: value, confidence and source clause for each field</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #A24E16;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:28px;font-weight:700;color:#1F2A37">Offline rules</h3><p style="font-size:24px;line-height:1.4;color:#4B5563">The same fields with no AI call; they also fill any gap Claude leaves</p></div>
+<div style="background:#F3DFCF;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px"><h3 style="font-size:28px;font-weight:700;color:#1F2A37">People correct</h3><p style="font-size:24px;line-height:1.4;color:#1F2A37">A correction is stored, survives every re-read and becomes a measured label</p></div>
+</div>
+<div style="background:#1F2A37;border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:12px">
+<p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#E3A66B">ONE EXTRACTED TERM</p>
+<div style="display:grid;grid-template-columns:200px 1fr;gap:10px">
+<p style="font-size:24px;color:#C9BCA0">field</p><p style="font-size:24px;color:#FBF9F4">notice_period_days</p>
+<p style="font-size:24px;color:#C9BCA0">value</p><p style="font-size:24px;color:#FBF9F4">90</p>
+<p style="font-size:24px;color:#C9BCA0">confidence</p><p style="font-size:24px;color:#FBF9F4">0.90</p>
+<p style="font-size:24px;color:#C9BCA0">source</p><p style="font-size:24px;color:#FBF9F4">Term and Automatic Renewal, page 3</p>
+<p style="font-size:24px;color:#C9BCA0">engine</p><p style="font-size:24px;color:#FBF9F4">Claude, or offline rules</p>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#DCEBE8">About 20 contract fields (dates, renewal, notice, value, payment, cap, exit, law, personal data, signers) plus 19 configurable clause measures (response time, insurance cover, rates)</p>
+</div>
+</div>
+<aside>Extraction produces the terms, each one checkable. With Claude on, extraction is a forced tool call against a fixed JSON schema: for every field Claude returns a value, a confidence and the clause it came from; the prompt lives in a file, not in code. The offline rules extract the same fields without any AI call; they are the engine in Demo mode and they fill any field Claude leaves empty where a rule can read it exactly, such as dates and signatures. The record on the right is a real example from the waste contract: notice period 90 days, confidence 0.90, from the Term and Automatic Renewal clause on page 3. There are about 20 contract fields and 19 clause measures that an administrator can configure, such as response time, insurance cover or a rate per kilogram. When a person corrects a value, the correction is stored, survives every later re-read and becomes a label against which accuracy is measured.</aside>
+</section>

@@ -1,0 +1,16 @@
+<section id="vectors" style="background:#F3EBDD;padding:128px;display:flex;flex-direction:column;gap:32px;font-family:'DM Sans', Arial, sans-serif">
+<p style="font-size:26px;font-weight:700;letter-spacing:3px;color:#A24E16">5 · INDEX</p>
+<h2 style="font-family:'Cormorant Garamond', Georgia, serif;font-size:60px;font-weight:600;line-height:1.1;color:#1F2A37;width:1500px">Every clause searchable by meaning, not just words</h2>
+<div style="display:flex;align-items:stretch;gap:20px">
+<div style="flex:1;background:#FFFFFF;border:1px solid #E2D9C8;border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:12px"><p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#A24E16">A CLAUSE</p><p style="font-size:24px;line-height:1.45;color:#1F2A37">“If Customer terminates this Agreement before the end of the term… liquidated damages… six months”</p></div>
+<div style="display:flex;align-items:center"><x-shape kind="arrow-right" style="background:#C9BCA0;width:64px;height:32px"></x-shape></div>
+<div style="flex:1;background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:12px"><p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#1D4B4C">A VECTOR</p><p style="font-size:24px;line-height:1.45;color:#4B5563">384 numbers that capture its meaning (BGE-small model), stored next to the clause</p></div>
+<div style="display:flex;align-items:center"><x-shape kind="arrow-right" style="background:#C9BCA0;width:64px;height:32px"></x-shape></div>
+<div style="flex:1;background:#DCEBE8;border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:12px"><p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#1D4B4C">A QUESTION</p><p style="font-size:24px;line-height:1.45;color:#1F2A37">“What happens if we end this contract early?” finds that clause, 74% match</p></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-radius:14px;padding:20px 24px"><p style="font-size:24px;color:#1F2A37"><b>In the same database:</b> pgvector in Postgres, so a search can be narrowed by supplier, type or the documents ticked</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-radius:14px;padding:20px 24px"><p style="font-size:24px;color:#1F2A37"><b>Runs locally:</b> the embedding model runs on our own server; no clause text leaves it to be indexed</p></div>
+</div>
+<aside>Indexing is what makes clause questions work. Each clause is turned into a vector, 384 numbers that capture its meaning, using the open BGE-small embedding model, and stored next to the clause in the same Postgres database through pgvector. A question is turned into a vector the same way, and the closest clauses are returned: “what happens if we end this contract early?” finds the liquidated-damages clause with a 74 percent match although it never says “end early”. Because vectors and terms share one database, a search can be narrowed by supplier, document type or the documents a user has ticked. The embedding model runs on our own server, so clause text does not leave it to be indexed; with no model available a simpler word-based fallback keeps the demo working.</aside>
+</section>

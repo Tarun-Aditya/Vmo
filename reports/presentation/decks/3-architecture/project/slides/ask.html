@@ -1,0 +1,20 @@
+<section id="ask" style="background:#FBF9F4;padding:128px;display:flex;flex-direction:column;gap:30px;font-family:'DM Sans', Arial, sans-serif">
+<p style="font-size:26px;font-weight:700;letter-spacing:3px;color:#A24E16">ASK</p>
+<h2 style="font-family:'Cormorant Garamond', Georgia, serif;font-size:60px;font-weight:600;line-height:1.1;color:#1F2A37;width:1500px">Plain-English questions, answered from the data, showing the work</h2>
+<div style="display:flex;align-items:stretch;gap:16px">
+<div style="width:300px;background:#F3DFCF;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#7A3A0F">QUESTION</p><p style="font-size:24px;line-height:1.4;color:#1F2A37">All documents, or only the ones ticked</p></div>
+<div style="display:flex;align-items:center"><x-shape kind="arrow-right" style="background:#C9BCA0;width:44px;height:24px"></x-shape></div>
+<div style="width:320px;background:#1F2A37;border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px"><p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#E3A66B">ROUTER</p><p style="font-size:24px;line-height:1.4;color:#FBF9F4">Claude picks the tools in a loop; an offline planner without AI</p></div>
+<div style="display:flex;align-items:center"><x-shape kind="arrow-right" style="background:#C9BCA0;width:44px;height:24px"></x-shape></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:16px;padding:14px 20px"><p style="font-size:24px;color:#1F2A37"><b>run_sql</b> · counts, totals, lists, groups</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #A24E16;border-radius:16px;padding:14px 20px"><p style="font-size:24px;color:#1F2A37"><b>search_clauses</b> · closest clauses by meaning</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:16px;padding:14px 20px"><p style="font-size:24px;color:#1F2A37"><b>get_contract</b> · one contract’s current terms</p></div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:#DCEBE8;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:700;color:#1D4B4C">SAFE BY CONSTRUCTION</p><p style="font-size:24px;line-height:1.4;color:#1F2A37">Read-only database role, SELECT only, 5-second timeout, 200-row cap; a hotel account’s queries see only its hotel</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-radius:16px;padding:20px 24px;display:flex;flex-direction:column;gap:6px"><p style="font-size:24px;font-weight:700;color:#A24E16">SHOWS ITS WORK</p><p style="font-size:24px;line-height:1.4;color:#1F2A37">The answer, then the SQL it ran, the rows, and the cited clauses with page and match</p></div>
+</div>
+<aside>Ask is how people use the data without learning a query language. A question is asked over all documents or only the ones a user has ticked. With Claude on, a router runs a tool-use loop and picks the tools; without Claude, an offline planner maps the question to the same tools. Three tools: run_sql for counts, totals, lists and groupings over the structured data; search_clauses for the clauses closest in meaning, using the vectors; and get_contract for one contract's current terms after amendments. It is safe by construction: SQL runs as a read-only database role, only SELECT is allowed, each query has a five-second timeout and at most 200 rows, and an account limited to one hotel queries views that only contain that hotel. It always shows its work: the answer first, then the SQL it ran, the rows, and the clauses it cited with page and match score.</aside>
+</section>

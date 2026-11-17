@@ -1,0 +1,26 @@
+<section id="model" style="background:#FBF9F4;padding:128px;display:flex;flex-direction:column;gap:26px;font-family:'DM Sans', Arial, sans-serif">
+<p style="font-size:26px;font-weight:700;letter-spacing:3px;color:#A24E16">THE DATA MODEL</p>
+<h2 style="font-family:'Cormorant Garamond', Georgia, serif;font-size:60px;font-weight:600;line-height:1.1;color:#1F2A37;width:1500px">One database, the contract at the centre, sources kept</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;align-items:stretch">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:16px;padding:16px 20px"><h3 style="font-size:26px;font-weight:700;color:#1F2A37">clauses</h3><p style="font-size:24px;color:#4B5563">type, text, page, vector</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:16px;padding:16px 20px"><h3 style="font-size:26px;font-weight:700;color:#1F2A37">field_extractions</h3><p style="font-size:24px;color:#4B5563">value, confidence, source clause, page</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #A24E16;border-radius:16px;padding:16px 20px"><h3 style="font-size:26px;font-weight:700;color:#1F2A37">field_corrections</h3><p style="font-size:24px;color:#4B5563">what a person fixed, kept on re-read</p></div>
+</div>
+<div style="background:#1F2A37;border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:12px;justify-content:center">
+<h3 style="font-family:'Cormorant Garamond', Georgia, serif;font-size:44px;font-weight:600;color:#E3A66B">contracts</h3>
+<p style="font-size:24px;line-height:1.45;color:#FBF9F4">One row per document: supplier, type, hotel, dates, renewal, notice, value, payment, cap, exit, law, personal data, signers, file fingerprint</p>
+<p style="font-size:24px;color:#C9BCA0">parent_id: schedule → master; amendment → what it amends</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:16px;padding:16px 20px"><h3 style="font-size:26px;font-weight:700;color:#1F2A37">extracted_values</h3><p style="font-size:24px;color:#4B5563">clause measures: response time, cover, rates</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #A24E16;border-radius:16px;padding:16px 20px"><h3 style="font-size:26px;font-weight:700;color:#1F2A37">checks, redlines</h3><p style="font-size:24px;color:#4B5563">rule results and deviations, with severity</p></div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:16px;padding:16px 20px"><h3 style="font-size:26px;font-weight:700;color:#1F2A37">obligations, certificates</h3><p style="font-size:24px;color:#4B5563">who owes what, by when; invoices, SLAs</p></div>
+</div>
+</div>
+<div style="background:#F3EBDD;border-radius:16px;padding:18px 26px;display:flex;gap:28px;align-items:center">
+<p style="font-size:24px;font-weight:700;letter-spacing:2px;color:#7A3A0F">VIEWS</p>
+<p style="font-size:24px;color:#1F2A37"><b>v_effective_terms</b> amendments applied, with the source of each term · <b>v_renewals</b> last day to act · <b>v_property_contracts</b> what applies at each hotel</p>
+</div>
+<aside>The database is Postgres with the pgvector extension, so relational terms and clause vectors live together. At the centre, contracts: one row per document with its supplier, type, hotel, dates, renewal and notice terms, value, payment terms, liability cap, exit right, governing law, personal-data flag, signers and the file's fingerprint; parent_id links a schedule to its master agreement and an amendment to what it amends. Around it: clauses with their type, text, page and vector; field_extractions, one row per extracted value with its confidence, source clause and page; field_corrections, what people fixed; extracted_values for the configurable clause measures; check results and redline deviations with severity; obligations and certificates; and operational data such as invoices and service-level measurements. Three views carry the business logic: v_effective_terms applies amendments over the original and records which document each current term comes from; v_renewals computes the last day to act; v_property_contracts says which contracts apply at each hotel, including shares of group agreements. In total 57 tables and 17 views, built through 33 versioned migrations.</aside>
+</section>

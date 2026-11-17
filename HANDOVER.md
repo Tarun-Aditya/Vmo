@@ -197,3 +197,11 @@ supplier contacts. Migration 0033. Tests: `tests/test_property_manager.py` (the 
 conversation ownership). Writing them found a real leak, now fixed: a master agreement covering two hotels let one hotel's manager see the other hotel's schedule.
 Limits: the property limit applies only with `AUTH_MODE=on` (with sign-in off everyone is an administrator); service calls are entered by hand or from a CSV,
 not from a ticketing system; contacts are entered by hand.
+
+## Update: leadership presentation (`reports/presentation/`)
+The pitch is told idea first, product second. Three decks (the idea; hotel operations for the property manager and the owner; solution and
+architecture), the three combined into one 36-slide deck, and *From paper to rows*, a self-contained page that shows one contract and then a folder
+of ten becoming rows, with animated runs, a document view per file, effective terms after the amendment and four business queries. Every value on
+the page was exported from the hotel database after the pipeline read `data/realistic_hotel` with the offline engine
+(`scripts/export_presentation_data.py`; re-running it reproduces the embedded data exactly). The runs are timed animations of those results, not
+live calls. Published links, talk track, invitation email and update steps: `reports/presentation/README.md` and `email.md`.

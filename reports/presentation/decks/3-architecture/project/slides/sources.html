@@ -1,0 +1,29 @@
+<section id="sources" style="background:#FBF9F4;padding:128px;display:flex;flex-direction:column;gap:32px;font-family:'DM Sans', Arial, sans-serif">
+<p style="font-size:26px;font-weight:700;letter-spacing:3px;color:#A24E16">1 · SOURCES AND INTAKE</p>
+<h2 style="font-family:'Cormorant Garamond', Georgia, serif;font-size:60px;font-weight:600;line-height:1.1;color:#1F2A37;width:1500px">Contracts arrive from where they already live</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #1D4B4C;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:700;color:#1F2A37">Connectors</h3>
+<ul style="font-size:24px;line-height:1.55;color:#4B5563;padding-left:28px">
+<li>Watched inbox folders</li>
+<li>Google Drive</li>
+<li>OneDrive and SharePoint (Microsoft Graph)</li>
+<li>Contracts mailbox (IMAP attachments)</li>
+<li>REST feeds: ERP and procurement systems</li>
+<li>Upload, any number of files</li>
+</ul>
+<p style="font-size:24px;color:#7A3A0F">Connector secrets are stored encrypted.</p>
+</div>
+<div style="background:#FFFFFF;border:1px solid #E2D9C8;border-top:6px solid #A24E16;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px">
+<h3 style="font-size:30px;font-weight:700;color:#1F2A37">Runs by itself, reads only what changed</h3>
+<ul style="font-size:24px;line-height:1.55;color:#4B5563;padding-left:28px">
+<li>On a schedule, or as soon as a file appears</li>
+<li>Each file fingerprinted: size, time, SHA-256 hash</li>
+<li>Unchanged: skipped. Changed: re-read</li>
+<li>Same bytes under another name: a duplicate, not stored twice</li>
+<li>Every run and file logged, shown live in Admin</li>
+</ul>
+</div>
+</div>
+<aside>Intake is built so nobody has to upload anything in production. The connectors read where contracts already live: watched folders, Google Drive, OneDrive and SharePoint through Microsoft Graph, a contracts mailbox over IMAP, and REST feeds from ERP and procurement systems; uploads are there for ad hoc files. In the proof of concept the external systems are labelled simulators that speak the real APIs; a customer's own tenant replaces them. Credentials are stored encrypted. The pipeline runs on a schedule or as soon as a file appears. Each file is fingerprinted by size, modified time and SHA-256 hash, so unchanged files are skipped, changed ones re-read, and the same bytes under a different name are recognised as a duplicate. Every run and every file's outcome is logged and shown live in Admin.</aside>
+</section>

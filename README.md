@@ -116,6 +116,13 @@ and client code runs against it over HTTP. Simulators are mounted only when `SIM
 
 Admin → Connectors has one-click "connect demo" buttons. Expect to debug permissions and consent on the first real connection.
 
+## Presenting the idea to leadership
+
+`reports/presentation/` holds the leadership pitch: three slide decks (the idea, hotel operations, solution and architecture), the three combined into
+one deck, a click-through page that shows one contract and then a folder of ten turning into relational rows (with live runs and a document view),
+and the invitation email. Its README gives the published links, the order of the session (about 35 minutes), the page's talk track and how to update
+it. The page's data is exported from the database by `scripts/export_presentation_data.py`.
+
 ## See it working: the end-to-end video
 
 **The demo as story-boarded** (`DEMO.md`): `reports/demo/contractiq-demo.mp4` (about 6 minutes, Demo mode, hotel edition): the paper, a folder of contracts read live in Admin → Pipeline, one document with its sources, the folder again, then the repository, Renewals and Ask over all documents and over ticked ones. Step report: `reports/demo/report.md`. Re-record with `make demo-video`.
@@ -213,7 +220,8 @@ evals/               extraction, redline, Ask, module, OCR, retrieval, CUAD and 
 corpus/pilot/        source text of the 36 fictional pilot documents
 data/                inbox, feeds, templates (generated files are git-ignored)
 addin/               Word task-pane add-in (untested inside Word)
-scripts/             seed, backup, demo walkthroughs
+scripts/             seed, backup, demo walkthroughs, presentation data export
+reports/presentation/ leadership decks, the paper-to-rows page and the invitation email
 docs/, HANDOVER.md   security notes; handover with measured results and limits
 CLAUDE.md            original scope and conventions
 ```
