@@ -283,6 +283,10 @@ def pipeline_samples_remove():
     """Remove the demo sample folder and everything read from it, so the demo can start again."""
     with SessionLocal() as s:
         n = s.execute(text("DELETE FROM contracts WHERE source_path LIKE :p"), {"p": SAMPLE_DIR + "/%"}).rowcount
+        if n:
+            from app import ask
+
+            ask.mark_documents_changed(s, "sample folder removed")
         s.commit()
         d = pipeline.inbox_path(s) / SAMPLE_DIR
     shutil.rmtree(d, ignore_errors=True)

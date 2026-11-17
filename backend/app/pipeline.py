@@ -490,6 +490,10 @@ def run_pipeline(trigger: str = "manual", extractor: str = "auto", only: list[Pa
                               AND EXISTS (SELECT 1 FROM contracts d WHERE d.type = 'DPA' AND d.status <> 'draft' AND d.vendor = c.vendor)"""))
             from app import certificates, properties
 
+            if counts["new_docs"] or counts["updated"]:
+                from app import ask
+
+                ask.mark_documents_changed(s)      # cached Ask answers no longer cover every document
             properties.sync(s)             # a record for every property a document names; group agreements are attributed through v_property_contracts
             certificates.sync(s)           # the certificates the clauses oblige each vendor to hold
             now = datetime.now(timezone.utc)

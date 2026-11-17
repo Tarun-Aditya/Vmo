@@ -270,6 +270,22 @@ def citations(calls: list[dict]) -> list[dict]:
     return out
 
 
+# A cached answer describes the documents as they were when it was saved. Documents added, changed or removed since then make it
+# stale (it would leave out a new contract), so it is used only if it is newer than the last change to the documents.
+_FRESH = "created_at >= COALESCE((SELECT updated_at FROM app_settings WHERE key = 'documents_changed_at'), '-infinity'::timestamptz)"
+
+
+def cached_response(s, question: str):
+    """The cached (response, source) for a question, if it is still current, else None."""
+    return s.execute(text(f"SELECT response, source FROM ask_cache WHERE question_key=:k AND {_FRESH}"), {"k": norm_key(question)}).first()
+
+
+def mark_documents_changed(s, by: str = "pipeline") -> None:
+    """Documents were added, changed or removed: answers cached before now no longer describe the portfolio."""
+    s.execute(text("""INSERT INTO app_settings (key, value, updated_at, updated_by) VALUES ('documents_changed_at', 'true'::jsonb, clock_timestamp(), :b)
+                      ON CONFLICT (key) DO UPDATE SET updated_at = clock_timestamp(), updated_by = EXCLUDED.updated_by"""), {"b": by})
+
+
 def answer(question: str, demo_mode: bool = False, scope: list[int] | None = None, force_offline: bool = False) -> dict:
     t0 = time.time()
     from app import recorded
@@ -279,10 +295,7 @@ def answer(question: str, demo_mode: bool = False, scope: list[int] | None = Non
         return {**rec, "question": question, "elapsed_ms": int((time.time() - t0) * 1000), "scoped": len(scope) if scope else 0}
     if demo_mode and not scope:
         with SessionLocal() as s:
-            row = s.execute(
-                text("SELECT response, source FROM ask_cache WHERE question_key=:k"),
-                {"k": norm_key(question)},
-            ).first()
+            row = cached_response(s, question)
         if row:
             return {
                 **row[0],

@@ -50,8 +50,32 @@ def test_loop_feeds_sql_error_back_and_retries(monkeypatch, seeded):
     assert res["tool_calls"][1]["output"]["rows"] == [[25]]
 
 
-def test_demo_mode_uses_cache_and_offline_answers_are_cited(monkeypatch, seeded):
+def _forget_document_changes(db):
+    with db.begin() as c:
+        c.execute(text("DELETE FROM app_settings WHERE key = 'documents_changed_at'"))
+
+
+def test_cached_answers_are_not_used_after_the_documents_change(monkeypatch, seeded, db):
+    """A cached answer saved before documents were added would leave them out: once they change, the answer is computed again."""
     monkeypatch.setattr("app.llm.available", lambda: False)
+    q = "Which vendors have uncapped liability?"
+    _forget_document_changes(db)
+    try:
+        assert ask.answer(q, demo_mode=True)["source"] == "cache"
+        from app.db import SessionLocal
+
+        with SessionLocal() as s:
+            ask.mark_documents_changed(s, "test")
+            s.commit()
+        r = ask.answer(q, demo_mode=True)
+        assert r["source"] != "cache" and r["tool_calls"]
+    finally:
+        _forget_document_changes(db)
+
+
+def test_demo_mode_uses_cache_and_offline_answers_are_cited(monkeypatch, seeded, db):
+    monkeypatch.setattr("app.llm.available", lambda: False)
+    _forget_document_changes(db)      # as if the cache was saved after the last change to the documents
     r = ask.answer("Which vendors have uncapped liability?", demo_mode=True)
     assert r["source"] == "cache" and r["tool_calls"][0]["name"] == "run_sql"
     r = ask.answer(

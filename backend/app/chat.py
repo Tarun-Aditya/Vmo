@@ -190,4 +190,4 @@ def stream_answer(question: str, conversation_id: int | None, demo_mode: bool, s
 
 def _cached(question: str) -> bool:
     with SessionLocal() as s:
-        return s.execute(text("SELECT 1 FROM ask_cache WHERE question_key=:k"), {"k": ask.norm_key(question)}).first() is not None
+        return ask.cached_response(s, question) is not None

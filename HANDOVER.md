@@ -205,3 +205,12 @@ of ten becoming rows, with animated runs, a document view per file, effective te
 the page was exported from the hotel database after the pipeline read `data/realistic_hotel` with the offline engine
 (`scripts/export_presentation_data.py`; re-running it reproduces the embedded data exactly). The runs are timed animations of those results, not
 live calls. Published links, talk track, invitation email and update steps: `reports/presentation/README.md` and `email.md`.
+
+## Fix: stale cached Ask answers after documents change (2026-11-17)
+In Demo mode Ask answers the seeded demo questions from `ask_cache`, filled at seed time. Nothing marked those answers out of date when
+documents were added, so after the sample folder was read "Which vendors have uncapped liability?" still answered one vendor instead of
+three (it left out the two new uncapped contracts; this was visible in the earlier recordings). Now the pipeline records the time documents
+were added or changed, and removing the sample folder does too (`app_settings.documents_changed_at`, `ask.mark_documents_changed`); a cached
+answer is used only if it is newer (`ask.cached_response`), otherwise the question is answered again from the current data. The cached
+questions still feed Ask's suggestions. Test: `tests/test_ask_loop.py::test_cached_answers_are_not_used_after_the_documents_change`;
+full backend suite 220 passed.
