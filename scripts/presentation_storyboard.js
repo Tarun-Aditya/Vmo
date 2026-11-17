@@ -10,6 +10,11 @@ const OUT = path.resolve(process.argv[2] || 'reports/presentation/video');
 const PAGE = 'file://' + path.resolve(__dirname, '../reports/presentation/paper-to-rows.local.html');
 const U = process.env.WEB || 'http://localhost:5173', A = process.env.API || 'http://localhost:8000';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Voice-over (optional): outDir/narration/NN.wav and durations.json from scripts/make_narration.py. Each step lasts at least as long as its
+// line, and the lines are mixed into the video at the moment their step starts.
+const NAR = path.join(OUT, 'narration');
+const DUR = fs.existsSync(path.join(NAR, 'durations.json')) ? JSON.parse(fs.readFileSync(path.join(NAR, 'durations.json'), 'utf8')) : [];
+const marks = [];
 const results = [], errs = [];
 let n = 0;
 
@@ -20,6 +25,7 @@ let n = 0;
   const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, recordVideo: { dir: OUT, size: { width: 1440, height: 900 } } });
   await ctx.addInitScript(() => { try { localStorage.removeItem('ciq_property'); } catch {} });
   const p = await ctx.newPage();
+  const T0 = Date.now();          // the video starts with the page
   p.on('pageerror', (e) => errs.push('pageerror: ' + e.message));
   p.on('response', (r) => { if (r.status() >= 500 && r.url().includes('/api/')) errs.push(r.status() + ' ' + new URL(r.url()).pathname); });
   const caption = (t) => p.evaluate((t) => {
@@ -31,8 +37,15 @@ let n = 0;
   const api = async (u, method = 'GET', body) => { const r = await p.request.fetch(A + u, { method, headers: { 'content-type': 'application/json' }, data: body ? JSON.stringify(body) : undefined }); try { return await r.json(); } catch { return null; } };
   const step = async (title, fn, hold = 4500) => {
     n++;
-    try { const note = await fn(); await caption(title + (note ? ` · ${note}` : '')); await sleep(hold); await p.screenshot({ path: `${OUT}/${String(n).padStart(2, '0')}.png` }); results.push([true, title, note || '']); }
-    catch (e) { results.push([false, title, e.message.split('\n')[0]]); await caption(title + ' (step failed, continuing)'); await sleep(1000); }
+    const t = Date.now();
+    marks.push(t - T0);
+    const voice = (DUR[n - 1] || 0) * 1000;
+    await caption(title);
+    try {
+      const note = await fn(); await caption(title + (note ? ` · ${note}` : ''));
+      await sleep(Math.max(hold, voice + 700 - (Date.now() - t)));
+      await p.screenshot({ path: `${OUT}/${String(n).padStart(2, '0')}.png` }); results.push([true, title, note || '']);
+    } catch (e) { results.push([false, title, e.message.split('\n')[0]]); await caption(title + ' (step failed, continuing)'); await sleep(Math.max(1000, voice + 700 - (Date.now() - t))); }
   };
   const hash = async (h) => { await p.evaluate((h) => { location.hash = h; }, h); await sleep(500); };
   const docScroll = (sel, y) => p.evaluate(([s, y]) => { const e = document.querySelector(s); if (e) e.scrollTo({ top: y, behavior: 'smooth' }); }, [sel, y]);
@@ -85,12 +98,22 @@ let n = 0;
   await p.goto(U + '/ask'); await p.waitForLoadState('networkidle').catch(() => {}); await sleep(1000);
   await step('Ask in plain English: which auto-renewing contracts have already passed their notice deadline?', async () => {
     await ask('Which auto-renewing contracts have already passed their notice deadline?'); return ''; }, 6000);
-  await step('Which vendors have uncapped liability? The same answer the page showed, from the same rows', async () => {
+  await step('Which vendors have uncapped liability? The valet and waste contracts from the page, and a food supplier elsewhere in the portfolio', async () => {
     await ask('Which vendors have uncapped liability?'); return ''; }, 6000);
 
   const vid = p.video(); await ctx.close(); await b.close();
   const webm = await vid.path();
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', path.join(OUT, 'paper-to-rows-demo.mp4')]);
+  const enc = ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart'];
+  const lines = marks.map((at, i) => [at, path.join(NAR, `${String(i + 1).padStart(2, '0')}.wav`)]).filter(([, f]) => DUR.length && fs.existsSync(f));
+  if (lines.length) {
+    const inputs = lines.flatMap(([, f]) => ['-i', f]);
+    const delays = lines.map(([at], i) => `[${i + 1}:a]adelay=${at}|${at}[a${i}]`).join(';');
+    const mix = `${delays};${lines.map((_, i) => `[a${i}]`).join('')}amix=inputs=${lines.length}:normalize=0,apad[aout]`;
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, ...inputs, '-filter_complex', mix, '-map', '0:v', '-map', '[aout]', ...enc,
+      '-c:a', 'aac', '-b:a', '128k', '-shortest', path.join(OUT, 'paper-to-rows-demo.mp4')]);
+  } else {
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', webm, ...enc, path.join(OUT, 'paper-to-rows-demo.mp4')]);
+  }
   fs.unlinkSync(webm);
   const ok = results.filter((r) => r[0]).length;
   fs.writeFileSync(path.join(OUT, 'report.md'), `# Presentation demo video — ${ok}/${results.length} steps passed\n\nRecorded by \`node scripts/presentation_storyboard.js\`: the *From paper to rows* page (local copy), then the product in Demo mode.\n\n` +

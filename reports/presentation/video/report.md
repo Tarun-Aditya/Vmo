@@ -18,6 +18,6 @@ Recorded by `node scripts/presentation_storyboard.js`: the *From paper to rows* 
 14. PASS The product · Renewals: the last day to act for every contract, not the expiry date
 15. PASS The repository: the cleaning master agreement with its schedules, NDA and amendment beneath it
 16. PASS Ask in plain English: which auto-renewing contracts have already passed their notice deadline?
-17. PASS Which vendors have uncapped liability? The same answer the page showed, from the same rows
+17. PASS Which vendors have uncapped liability? The valet and waste contracts from the page, and a food supplier elsewhere in the portfolio
 
 Errors: none

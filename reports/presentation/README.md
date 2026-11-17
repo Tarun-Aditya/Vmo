@@ -31,10 +31,17 @@ Other files:
 - `decks/check-overflow.js`: renders each slide of a deck with Playwright and reports any content
   below the bottom margin (y 952). Run it from inside a deck folder: `node ../check-overflow.js`.
 - `screenshot-*.png`: the page's live runs and document view.
-- `video/paper-to-rows-demo.mp4`: the demo recorded as one video (2 min 40 s): the page's one-document and ten-document
-  stories with documents opened, then the product on the same rows (Renewals, the repository, Ask). One screenshot per
-  step and `video/report.md` (17/17 steps). Re-record with `make presentation-video` (app running in Demo mode with the
-  sample folder read, `SIMULATORS=1`).
+- `video/paper-to-rows-demo.mp4`: the demo recorded as one video with a voice-over (4 min): the page's one-document and
+  ten-document stories with documents opened, then the product on the same rows (Renewals, the repository, Ask). One
+  screenshot per step and `video/report.md` (17/17 steps). The narration is `scripts/presentation_narration.json`, one
+  line per step, spoken offline by Piper. To re-record:
+  1. `pip install piper-tts` (apart from the project, e.g. in a virtual environment) and download a voice from
+     https://huggingface.co/rhasspy/piper-voices (the recording used `en_US/lessac/high`: the `.onnx` and `.onnx.json`);
+  2. `PIPER=<path to piper> PIPER_MODEL=<voice .onnx> python scripts/make_narration.py` (writes `video/narration/`,
+     audio not committed);
+  3. with the app running in Demo mode, the sample folder read and `SIMULATORS=1`: `make presentation-video`. Each step
+     lasts as long as its line, and the lines are mixed in where their steps start. Without narration files the video is
+     recorded silent, with captions only.
 
 ## Order of the session (about 35 minutes)
 

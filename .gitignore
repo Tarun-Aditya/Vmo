@@ -23,3 +23,6 @@ backend/*.egg-info/
 data/hotel/.cache/
 data/real_hotel/docs/
 .sim_gdrive_key.pem
+
+# spoken narration for the presentation video (regenerate with scripts/make_narration.py)
+reports/presentation/video/narration/*.wav
