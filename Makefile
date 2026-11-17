@@ -1,9 +1,10 @@
-.PHONY: dev up down seed seed-pilot seed-offline eval test lint migrate docs showcase cuad cuad-full video demo-video
+.PHONY: dev up down seed seed-pilot seed-offline eval test lint migrate docs reference-docs showcase cuad cuad-full video demo-video
 dev:      ; docker compose up --build
 up:       ; docker compose up -d --build
 down:     ; docker compose down
 migrate:  ; docker compose exec api alembic upgrade head
 docs:     ; docker compose exec api python -m app.docgen.generate
+reference-docs: ; cd backend && SCHEDULER_ENABLED=0 python ../scripts/gen_reference_docs.py   # on the host (backend installed, DATABASE_URL set or the Docker db on :5432): regenerate docs/reference/API.md and DATABASE.md
 seed:     ; docker compose exec api python /scripts/seed.py
 seed-pilot: ; docker compose exec api python -m app.seed --pilot
 seed-hotel: ; docker compose exec api python -m app.seed --hotel

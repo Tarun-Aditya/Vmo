@@ -13,6 +13,10 @@ standards, and anything else you ask about the portfolio, with the clause to che
 > real tenants. See [Known limits](#known-limits). The fictional owner is **Seabright Hotels & Resorts Inc**, a United States group with six properties (Boston, New York, Lake Placid, Chicago, Savannah, Park City); every vendor,
 > person and document in the demo data is fictional.
 
+**Documentation.** [`docs/`](docs/README.md): [setup and configuration](docs/SETUP.md), [architecture](docs/ARCHITECTURE.md),
+[the document pipeline](docs/PIPELINE.md), [data model](docs/DATA_MODEL.md), [development](docs/DEVELOPMENT.md), and generated references for
+[every API endpoint](docs/reference/API.md) and [every table and view](docs/reference/DATABASE.md).
+
 **Navigation.** The left rail keeps the everyday screens in view: My hotel, Portfolio, Properties, Compare, Renewals, Contracts, Ask and Redline; the rest
 fold under **More**. A **Property** picker at the top narrows Renewals, Contracts, Obligations, Certificates, Spend and Alerts to one hotel.
 
@@ -213,7 +217,7 @@ Set in `.env` (see `.env.example`):
 ```
 backend/app/         FastAPI app: pipeline, extraction, kcc (clause library), kcc_ai, deviations, ask*, routes_*,
                      connectors/, simulators/, collab, mode (Demo/Live), llm, embeddings
-backend/alembic/     migrations (0001 to 0032; below 0005 cannot be downgraded)
+backend/alembic/     migrations (0001 to 0033; below 0005 cannot be downgraded)
 backend/tests/       pytest suite
 frontend/src/        React + Vite + TypeScript + Tailwind + TanStack Query
 evals/               extraction, redline, Ask, module, OCR, retrieval, CUAD and pilot evals
@@ -222,7 +226,8 @@ data/                inbox, feeds, templates (generated files are git-ignored)
 addin/               Word task-pane add-in (untested inside Word)
 scripts/             seed, backup, demo walkthroughs, presentation data export
 reports/presentation/ leadership decks, the paper-to-rows page and the invitation email
-docs/, HANDOVER.md   security notes; handover with measured results and limits
+docs/                setup, architecture, pipeline, data model, development, security; reference/ (generated API and database)
+HANDOVER.md          handover with measured results and limits
 CLAUDE.md            original scope and conventions
 ```
 
