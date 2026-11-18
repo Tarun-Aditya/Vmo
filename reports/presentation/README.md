@@ -18,6 +18,7 @@ first.
 | Deck 3: *Solution and Architecture* (13 slides) | https://claude.ai/artifact/Fq9jvutjv13tFRwMgrtf1j | `decks/3-architecture/` |
 | *From paper to rows* (presenter page) | https://claude.ai/artifact/KNfuZFnyyYj5gUV8Mboqci | `paper-to-rows.html` |
 | Invitation email | | `email.md` |
+| The 11 documents the page reads, and a guide to opening them | | `documents/`, `paper-to-rows-documents.zip` |
 
 The links are private to their owner. Share each one from its page's Share menu before anyone else
 opens it.
@@ -43,18 +44,20 @@ Other files:
      lasts as long as its line, and the lines are mixed in where their steps start. Without narration files the video is
      recorded silent, with captions only.
 
-## Order of the session (about 35 minutes)
+## Order of the session (about 40 minutes)
 
 1. **Deck 1, the idea (10 minutes).** The business runs on contracts; their terms are locked in
    documents; every process around them is manual. AI turns documents into structured, related
    data, continuously, and every process then runs on the data.
 2. **Deck 2, hotel operations (8 minutes).** The same problem for a hotel group: what it means for
    the property manager at one hotel, and for an owner across many.
-3. **From paper to rows (8 minutes).** The missing piece between the idea and the product: one
+3. **The documents, the manual way (4 minutes).** Open the files in `documents/` one by one, following
+   `documents/PRESENTER_GUIDE.md`: where each term sits and what a person has to work out by hand.
+4. **From paper to rows (8 minutes).** The missing piece between the idea and the product: one
    document, then a folder of ten, turning into rows. Talk track below.
-4. **The product (5 minutes).** Switch to the running app: renewals, the contract repository and
+5. **The product (5 minutes).** Switch to the running app: renewals, the contract repository and
    Ask, all reading the rows the page just showed. See `DEMO.md` act 3.
-5. **Deck 3, architecture (as needed).** For a technical audience, or for questions afterwards.
+6. **Deck 3, architecture (as needed).** For a technical audience, or for questions afterwards.
 
 The complete deck has all three decks in this order, each starting with its own cover, so one
 link covers steps 1, 2 and 5.
