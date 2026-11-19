@@ -8,6 +8,13 @@ data, applied at scale to the supplier contracts behind hotel operations and pro
 The product is the proof that the data can run the business; the presentation explains the idea
 first.
 
+## Reuse in other repositories
+
+The method behind this folder (idea first, three decks, the paper-to-rows page, documents with a presenter guide, the
+narrated video, the email) is packaged as a skill: `skills/leadership-pitch/` (source) and
+`skills/leadership-pitch.skill` (install it with Save skill in Claude, or copy the folder into a repository's
+`.claude/skills/`).
+
 ## What is here
 
 | Piece | Published link | Source in this folder |

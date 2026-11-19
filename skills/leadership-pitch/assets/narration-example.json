@@ -1,0 +1,22 @@
+{
+  "about": "Example voice-over: one line per storyboard step, in order. Spoken by make_narration.py.",
+  "lines": [
+    "This is a signed supplier contract: the waste and recycling agreement for our Airport Inn. Five pages. Everything the business needs to know is in here, but today, only a person can read it.",
+    "Watch the pipeline read it. It reads the pages. It splits the text into clauses, and gives each one a type. It extracts every key term, with the clause and page it came from. It indexes the clauses for search, and checks them against our standards. A few seconds, for work that takes a person an hour.",
+    "Here are the clauses. Twenty of them, each one typed: renewal, payment, liability, and so on. Each is stored as a row, with a vector, so we can later search by meaning, not just by keywords.",
+    "Every value is found in its own sentence. Click auto-renewal, and you see the words that say it. The notice period: ninety days. Liability: no limit. Nothing is a black box. Every value can be checked.",
+    "And now the contract is data. One row for the contract. One row for each term, pointing back to its clause. The duties it creates, and the checks it failed against our standards. The same shape, for every contract we will ever read.",
+    "And the rows answer the question nobody asked in time. Expiry, minus the notice period: the last day to cancel was the first of September. It has passed. On the first of December, this contract renews itself for another three years, with no cap on liability, and no way out.",
+    "That was one document. Now, a real folder. Eleven files: PDFs, Word documents, a scanned amendment, and a renamed copy of one of the contracts.",
+    "Every file goes through the same five steps. The contracts table fills, row by row. The scan is read with OCR. And the copy is recognised by its fingerprint, and turned away, so nothing is counted twice.",
+    "We can open any document. This is the amendment: a scanned image. It has been read, split into clauses, and its values are highlighted in the text.",
+    "And this is the master agreement with our cleaning contractor. Every value has a page, and a confidence. Click one, and you are taken to the sentence it came from.",
+    "The files are connected, not just stored. The two schedules and the NDA link to their master agreement. And the scanned amendment changes the terms: payment within thirty days, instead of forty-five. Without this, finance keeps paying on the old terms.",
+    "Now the business runs on the rows. Where must we act, or have we already missed it? Where is our liability unlimited? Which contracts can we not leave? What do we spend at each hotel? Each one is a single query, answered in a second.",
+    "Once the data exists, every contract process can run on it. Ten documents, or ten thousand: the pipeline and the tables are the same. Now let me show you the product, running on this data.",
+    "Renewals shows the last day to act for every contract, not just the expiry date, so the deadline is visible before it passes.",
+    "The repository keeps the structure: the cleaning master agreement, with its schedules, the NDA, and the amendment beneath it.",
+    "And anyone can ask in plain English. Which auto-renewing contracts have already passed their notice deadline? The answer comes back as a table, with the waste contract at the top.",
+    "Which vendors have uncapped liability? Three: the valet and waste contracts we just saw, and a food supplier elsewhere in the portfolio. The same rows, wherever you ask. Signed paper in. Decisions out."
+  ]
+}
